@@ -1,0 +1,69 @@
+{
+    "system_user"     : "mojo",
+    "system_password" : "asdf",
+    "db_user"         : "root",
+    "db_password"     : "REPLACE_MYSQL_ROOT_PASSWORD",
+    "domains"   : [
+        "Law",
+        "Finance",
+        "Business",
+        "Information technology and data processing",
+        "Electronics",
+        "Industrial manufacturing",
+        "Biotechnology and health",
+        "Environment",
+        "Energy",
+        "Transport",
+        "Communications systems",
+        "Tourism",
+        "Education",
+        "National and international organizations and affairs",
+        "Other"
+    ],
+    "forms" : {
+        "edit_meta" : {
+            "ImportPara_splitter" : {
+                "display_name" : "Sentence splitter",
+                "meta_key"     : "ImportPara_splitter",
+                "default"      : "europarl",
+                "options" : [
+                    { "name" : "None", "value" : "no" },
+                    { "name" : "Europarl", "value" : "europarl" },
+                    { "name" : "Lingua",   "value" : "lingua"   },
+                    { "name" : "OpenNLP",  "value" : "opennlp"  }
+                ]
+            },
+            "ImportPara_pdf_mode" : {
+                "display_name" : "PDF comversion",
+                "meta_key"     : "ImportPara_pdf_mode",
+                "default"      : "tika",
+                "options" : [
+                    { "name" : "pdftotext (standard)", "value" : "standard" },
+                    { "name" : "pdftotext (raw)",      "value" : "raw"   },
+                    { "name" : "pdftotext (layout)",   "value" : "layout"  },
+                    { "name" : "Apache Tika",          "value" : "tika"  }
+                ]
+            },
+            "AlignPara_search_parallel" : {
+                "display_name" : "Document name matching",
+                "meta_key"     : "AlignPara_search_parallel",
+                "default"      : "identical",
+                "options" : [
+                    { "name" : "identical",  "value" : "identical"  },
+                    { "name" : "similar",    "value" : "similar"   }
+                ]
+            },
+            "AlignPara_method" : {
+                "display_name" : "Sentence aligner",
+                "meta_key"     : "AlignPara_method",
+                "default"      : "bisent",
+                "options" : [
+                    { "name" : "one-to-one",   "value" : "one-to-one" },
+                    { "name" : "length-based", "value" : "GaleChurch" },
+                    { "name" : "hunalign (standard)", "value" : "hunalign" },
+                    { "name" : "hunalign (bisent)",   "value" : "bisent" }
+                ]
+            }
+        }
+    }
+}

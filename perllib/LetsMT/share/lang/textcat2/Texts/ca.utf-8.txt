@@ -1,0 +1,1491 @@
+                             Nominàlia La nova estructura
+                          d'adjudicació de dominis a Internet
+                                       va fent camí i ha trobat una fita a
+                                       Barcelona. La Fundació Catalana per
+                  la Recerca ha aconseguit ser un
+                          dels registradors mundials de la
+                                       nova etapa, on apareixeran dominis
+                                       nous (diferents del .com, .org,
+                                       .edu...). La FCR ha creat per a dur
+                                       a terme aquesta feina el servei
+                                       Nominàlia on trobareu informació
+                                       sobre aquest procés.
+                                       Els directius de la nova empresa
+                                       han anunciat que intentaran
+                                       aconseguir el domini .cat, fet que
+                                       ha aixecat reaccions diverses, no
+                                       sempre positives, entre els
+                                       militants de la campanya pel .ct
+
+ La religió en un xip Josep Maria
+                                       Caldero ha preparat una interessant
+                                       pàgina que debat sobre els recursos
+                                       religiosos a la xarxa, especialment
+                                       aquells que poden ser usats per
+                                       professors de secundària. Des de La
+                                       religió en un xip podeu accedir al
+                                       currículum de secundària, a un
+                                       llistat d'adreces webs i a diversos
+                                       cercadors.
+
+                             Premis a Joan Francesc Mira, Emili
+                                       Rodríguez i Vicent Pitarch Aquesta
+                                       nit es fa el lliurament a València
+                                       dels VII Premis dels Escriptors
+                                       Valencians. Els guardonats són,
+                                       aquest any, Joan Francesc Mira,
+                                       Emili Rodríguez i Vicent Pitarch,
+                                       en els apartats de narrativa,
+                                       poesia i assaig. L'acte de
+                                       lliurament fa part d'un sopar on es
+                                       farà homenatge a Gonçal Castelló.
+                                       Trobareu més informació a la web de
+                                       l'Associació d'Escriptors en
+                                       Llengua Catalana.
+
+                             Traductors automàtics El diari Los
+                                       Angeles Times ha anunciat que serà
+                                       la primera web en atrevir-se a
+                                       provar un software de traducció
+                                       simultània. Gràcies a una aliança
+                                       amb Alis Technologies, aquesta
+                                       companyia fabricarà un producte per
+                                       a LA Times que permetrà llegir les
+                                       notícies de diverses seccions del
+                                       diari en francés, espanyol i
+                                       japonés. El diari, com fins avui,
+                                       només publicarà la versió en anglés
+                                       i el software farà les traduccions
+                                       a la mesura dels usuaris.
+
+                             ...i encara ...Expo@Internet a
+                                       Barcelona, ... Correllengua '97 al
+                                       País Valencià.
+
+                             Troba-ho a Enciclopèdia.
+                                       Enciclopèdia Catalana us mostra
+                                       diferents entrades relacionades amb
+                                       el casament de la infanta Cristina
+                                       i el jugador d'handbol del FC
+                                       Barcelona Iñaki Urdangarín, que es
+                                       celebrarà el 4 d'octubre a la
+                                       Catedral de Barcelona.
+
+                            
+
+
+
+
+                             Xat casteller Ahir va ser el primer
+                             dimecres que una edició local de VilaWeb ha
+                             organitzat un dels xats d'actualitat que
+                             organitzen cada dimecres VilaWeb, La
+                             Vanguardia i el programa Els Matins amb
+                             Josep Cuní.
+                             El xat es va fer amb el cap de la colla
+                             castellera de Vilafranca, Francesc Moreno
+                             "Melilla". Des d'aquí podeu accedir a la
+                             seva transcripció.
+
+
+
+                             Correllengua'97 Aquest cap de
+                         setmana arreu del País Valencià es
+                                       formaran les diverses columnes del
+                                       Correllengua, que fins ara ha
+                                       recorregut altres zones del país.
+                                       El Bloc Jaume I i VilaWeb, com ja
+                                       han fet altres anys, us conviden a
+                                       participar a través d'Internet en
+                                       aquesta cursa en suport al català.
+                                       L'organització, aquest any, es fa
+                                       per comarques i Internet s'integra
+                                       com la comarca número 22. La
+                                       proposta es delimitar els seus
+                                       limits amb els vostres missatges.
+                                       Deixeu un missatge amb la població
+                                       des d'on escriviu i tractarem de
+                                       configurar el mapa de tots aquells
+                                       llocs del país i el món des d'on es
+                                       dóna suport al Correllengua '97.
+
+                             Edicions de VilaWeb Podeu accedir a
+                                       les edicions de VilaWeb a:
+                                       Andorra, Arenys de Mar, Badalona,
+                                       Berga, Calafell, Castelldefels, El
+                                       Vendrell, Figueres, Girona,
+                                       Granollers, Igualada, La Seu
+                                       d'Urgell, Lleida, Los Angeles,
+                                       Manresa, Mollet del Vallès,
+                                       Montcada i Reixac, Nova York,
+                                       Puigcerdà, Sabadell, Sa Pobla, Sant
+                                       Boi de Llobregat, Sitges, Solsona,
+                                       Terrassa, Vilafranca, Vilanova i la
+                                       Geltrú.
+
+                                       Si teniu interés en crear una
+                                       VilaWeb local us recomanem que
+                                       llegiu la descripció continguda en
+                                       aquesta pàgina.
+                                       Diverses edicions locals han creat
+                                       una secció de serveis on es poden
+                                       trobar informacions pràctiques, com
+                                       per exemple números de telèfons
+                                       d'urgència mèdica, d'avaries, o de
+                                       les farmàcies de guàrdia. De moment
+                                       ja funcionen a VilaWeb Montcada i
+                                       Reixac, a VilaWeb Badalona, VilaWeb
+                                       Castelldefels, VilaWeb Vilanova,
+                                       VilaWeb Sitges, VilaWeb Granollers,
+                                       VilaWeb Girona, VilaWeb Calafell i
+                                       a VilaWeb Sabadell.
+
+
+
+
+ Selecció de         OT/PPP Bot en nova versió 1.5.5 és una
+ novetats i                    aplicació d'AppleScript que manté la
+ actualitzacions de            connexió PPP automàticament oberta encara
+ software per a                que es trenqui la connexió amb el servidor.
+ Internet                      També es poden programar les sessions en
+ realitzada per                línia. Per a plataformes Macintosh, es troba
+ Lluís Crespo i                a http://www.inch.com/~tjb/scripts.html i és
+ mantinguda per                gratuït.
+ Martí Crespo.
+                     Mind's TaskTray 1.1 és un software per a
+                               usuaris de Windows 95 que fa possible
+                          inserir icones d'accés directe al costat del
+                               rellotge de l'escriptori, de tal manera que
+                               es poden obrir programes, documents i fer
+                               altres tasques. És shareware i el registre
+                               costa $15. Es baixa a
+                           http://www.delos.net/mindproducts/index.htm.
+
+
+
+
+
+     Versió Text del Navegador | Les Notícies | Correu | Partal, Maresma
+                                & Associats
+
+
+                  Cultura i drets. Per la protecció de la
+                          creativitat a Europa
+
+                          AELC/EWC (1995)
+
+                          Resum de les ponències que es van llegir
+                          dins el congrés de "Cultura i Drets",
+                          organitzat per l'European Writers'
+                          Congress, la International Copyright
+                          Society, l'European Federation of
+                          Journalists i l'Associació d'Escriptors en
+                          Llengua Catalana, a Barcelona. Articles de
+                          Jochen Kelter ("Culture et droits. Pour la
+                          protection de la créativité en Europe"),
+                          Hans Peter Blueuel ("Kulturpolitik in
+                          Europa"), Pere Gimferrer ("Propietat
+                          intel.lectual i situació social dels
+                          intel.lectuals a Europa"), Maureen Duffy
+                          ("Cassandra in Captivity: Moral Rights and
+                          the European authors"), Luis Gordillo ("La
+                          situación de los artistas plásticos en
+                          Europa"), Jean-Loup Tournier ("La situcion
+                          des compositeurs en Europe"), Dr.
+                          Hans-Friedrich Beseler ("Harmonisation of
+                          Copyright from a European point of view"),
+                          Tarja Koskinen-Olsson ("Introduction to the
+                          Round Table. Intellectual Property and the
+                          challenge of technological development"),
+                          Eduardo Bautista García ("Propiedad
+                          intelectual y desafio del desarrollo
+                          tecnológico"), Prof. Dr. Jüngen Becker ("La
+                          propriété Intellectuelle et le défi du
+                          développement technologique") i Prof. Dr.
+                          Ferdinand Melichar ("The challnge of
+                          technological developments for literary
+                          works"). També s'inclou el discurs
+                          inaugural del Congrés, a càrrec del
+                          conseller de cultura Joan Gitart, el
+                          discurs de cloenda d'Avel.lí Artís-Gener i
+                          la "Ressolució de Barcelona". Tots els
+                          articles estan traduïts a l'anglès.
+
+
+
+                  55 Propostes de guió per a llargmetratge
+                          (català, castellà, anglès)
+
+                          Editorial Columna (1994)
+
+                          L'any 1992, durant el primer any de vida de
+                          la Secció de Guionistes de l'AELC, van
+                          sorgir diversos projectes d'actuació a
+                          l'entorn de la problemàtica professional
+                          dels guionistes. Tal vegada, el més atractiu
+                          i original de tots, fou el de la publicació
+                          d'un llibre col.lectiu, format per un recull
+                          de sinopsis, inèdites, de llarg-metratges.
+                          El llibre recull 55 sinopsis de
+                          llarmetratges cinematogràfics, escrites en
+                          tres idiomes i realitzades per trenta-vuit
+                          guionistes.
+ DOSSIER: DAU AL SET (1ª part)                                      
+
+ L'artista Cuixart    rostres i figures         "Orlando Innamorato" (1993)
+                      per Pilar Giró
+
+
+
+ Atès que en l'obra cuixartiana podem pendre la directriu de viatjar per la
+ unitat en la diversitat, la temàtica englobada en les seves apreciacions
+ pictòriques de rostres i figures és un dels discursos possibles que ens
+ manifesta. D'aquesta manera es pren el fil del diàleg que no trenca amb el
+ passat artístic i alhora dóna una visió nova de la representació emprant
+ un llenguatge del nostre present que pot despertar nous camins vers
+ l'aproximació de la tècnica a les necessitats expressives.
+ En aquesta resposta de lectura s'ha tingut en consideració el pensament de
+ Benjamin respecte la tasca de l'historiador o el crític d'art, com a
+ transformador en paraules clarificadores del missatge de l'artista, aquest
+ serà el camí que conduirà vers la teoria de l'art i no perdre's, en canvi,
+ descobrint errors o mancances de l'obra. Així doncs, ens adonem que és la
+ figura del poeta qui en la seva expressió pot aconseguir millor el
+ significat de les formes, les imatges de la paraula.
+ I darrera aquest teló de mots emergeixen les obres de Cuixart, l'artista
+ que pinta els colors de la nit al límit inefable del mirall, on les
+ paraules són dibuixades amb la poesia del color. Cada quadre forma part de
+ la resposta en la recerca d'una alienació que es fongui sobre la
+ superfície i la profunditat; per això, mirant les seves obres possiblement
+ mai esbrinariem el Mediterrani si no veiessim la follia imaginativa
+ escrutada de les entranyes de la terra per esdevenir art.
+ Per això en la pintura de Cuixart s'imposa el realisme de la irrealitat,
+ es comprenen les figures per la seva transfiguració. Tan sols recordem que
+ si el món no fos primer somni, romandriem presoners de les seves
+ representacions.
+ És en aquest traspassar la figura per anar més enllà, fins a la seva
+ quintaessència i expressar-la així dins o fora, que Cuixart mostra ser
+ hereu de l'avantguarda del nostre segle. Ja Kandinsky ens teoritzava que
+ la pintura sorgeix de la conjunció entre l'aspecte més racional que ens
+ atorga el coneixement científic i l'irracional del sentiment i l'art.
+ I aquesta simbiosi material, espiritual, la trobem inherent en l'obra de
+ Cuixart des del magicisme que poseeixen les obres de Dau al Set, els ors i
+ plates que porten de la riquesa a la pobresa, els objectes integrats a la
+ pintura, o en la seva introspecció a l'interegne del secret femení, a
+ l'anàlisi psicològica dels seus personatges dins l'actualitat. En tota la
+ seva obra es manifesta una permisibilitat a descobrir formes portadores de
+ tensions.
+ La llei fonamental de l'art és el ritme, l'harmonia, el dinamisme.
+ Elements purs, composició i construcció, tot s'organitza vers un veritable
+ llenguatge que és l'home i el cosmos. El món és un llenguatge que ens
+ porta d'allò espiritual que hi ha al fons de l'ànima humana i així es com
+ manifesta en la seva pintura les inquietuds d'una ancestral ànsia creativa
+ i un llenguatge nou.
+ El treball de creació comporta implícita una labor mental, l'artista no
+ pot crear del no-res. L'artista, mitjançant el seu treball, és el portador
+ d'un record i alhora d'un missatge.
+ Com deia Klee, la memòria històrica ens ha de preservar d'una recerca
+ compulsiva de la novetat a expenses d'allò natural. Cercar la novetat
+ afiantsant-se en la història i Cuixart ens mostra com la pintura és un
+ camí viu per a seguir explicant l'esdevenir del món. En el seu realisme
+ pictòric es manifesta la pròpia i personal percepció de la realitat
+ humana, la qual ens permet visualitzar la màgia implícita en el context de
+ la vida diària, que sorgeix d'imprevist, darrera la realitat aparent.
+ Cuixart sempre ha barrejat la idea de figuració amb abstracció geomètrica
+ i la intersecció de signes gràfics o cabalístics que semblen voler
+ explicar-nos quelcom més d'aquell ésser pintat en el qual l'artista s'hi
+ ha projectat física i espiritualment de manera indisociable.
+ Totes aquestes presències absents són recuperades per Cuixart escrutant en
+ el gran univers, mostrant-nos en la seva obra els secrets que flueixen
+ sota la derma, a la recerca de la imatge que Dionís va fragmentar. Ara la
+ veritat no és una sinó tantes com bocins.
+
+ I recordant a Kokoscha seguirem buscant aquell rostre que l'home modern ha
+ perdut i que està condemnat a buscar-lo.
+
+
+    El curs 97-98 comença a Cornellà amb l'ESO totalment implantat
+    616 nens i nenes de 3 anys comencen l'escola primàri
+
+    El curs 1997-98 comença aquest mes de setembre amb la novetat que
+    els sis instituts de la ciutat ofereixen les quatre branques del nou
+    batxillerat previstes a la llei de la reforma de l'ensenyament
+    secundari (LOGSE). Cornellà és una de les poblacions més avançades
+    en l'aplicació de la reforma educativa (ESO), i també una de les
+    primeres que ofereix cursar estudis de batxillerat artístic, que es
+    podrà seguir a l'Institut Verdaguer. Per la seva banda, les escoles
+    primàries començaran el curs el 15 de setembre.
+
+       La nostra ciutat s'ha avançat al calendari proposat per la
+              Generalitat per a introduir paulatinament la nova
+              estructura de l'ensenyament secundari. Els sis instituts
+    de la ciutat -Verdaguer, Esteve Terradas, Francesc Macià, Martí i
+    Pol, Joan Miró i MªAurèlia Capmany- ofereixen les modalitats de
+    ciències de la naturalesa i de la salut, d'humanitats i ciències
+    socials, de batxillerat tecnològic i d'artístic. A més, als IES
+    Esteve Terradas i Martí i Pol es poden cursar els cicles formatius
+    de grau mitjà, que són la nova alternativa al batxillerat.
+
+    Les escoles de primària, tant públiques com concertades, comencen el
+    curs el dia 15 de setembre. Al primer curs escolar, anomenat P3, hi
+    ha matriculats un total de 616 nens i nenes de Cornellà, dels quals
+    472 aniran a l'escola pública.
+
+    Malgrat que l'educació és competència de la Generalitat,
+    l'Ajuntament de Cornellà hi està fortament implicat, a través de
+    l'Institut Municipal d'Educació (IME). L'IME es fa càrrec de tres
+    escoles bressol i ofereix a les escoles i instituts públics i
+    concertats diversos programes i propostes educatives.
+
+    A les tres escoles bressols depenents de l'IME, les 123 places que
+    s'oferien pràcticament s'han omplert, després dels períodes de
+    matriculació del mes de juliol. Els nens inenes de 0 a 3 anys poden
+    començar a formar-se dins aquestes institucions, a La       
+    Trepa, La Baldufa, i Linda Vista, en el curs que
+    començaran el 8 de setembre.
+
+    L'IME també ofereix els cursos de l'Escola Municipal de Música com a
+    complement de la formació a partir dels 6 anys. El curs començarà el
+    dia 15 per continuar fent que els joves facin música i i la facin
+    estimar, a través dels vuit instruments en què es poden
+    especialitzar. D'altra banda, els nens i nenes amb necessitats
+    educatives especials comencen el curs també el dia 15, a l'Escola
+    Municipal d'Educació Especial Can Mercader.
+
+    Com cada mes de setembre, el fet important de l'inici de curs és que
+    des de les escoles i instituts s'ajuda a formar els joves
+    integralment, i a endinsar-los en la vida cívica de Cornellà.
+
+
+     Teatro,       El Patronat rep 48 milions per reformar el
+                            seu teatre
+
+    música                  L'Ajuntament de Cornellà i el Patronat
+    y cine para las         Cultural i Recreatiu han acordat ampliar el
+    noches de verano        conveni que van signar el 1996 en 48
+                            milions de pessetes més. Aquesta nova
+    Este verano se han      aportació permetrà finalitzar les obres de
+    reunido en Cornellà     construcció de la nova Sala del Teatre, amb
+    multitud de propuestas  capacitat per 250 persones.
+    refrescantes para
+    hacer más llevadero el  Segons el conveni, el Patronat proposa a
+    calor estival. Teatro   l'Ajuntament la requalificació de la
+    y música integraron el  parcel.la en què es troba la seva seu a fi
+    programa de las "Nits   i efecte de garantir d'ara en endavant la
+    d'Estiu", que se        seva qualificació com a zona d'equipaments,
+    llevaron a cabo en el   permetent al mateix temps a l'Ajuntament la
+    Parc de Can Mercader y  possibilitat de traslladar la qualificació
+    el Auditori de          de zona apta per a la construcció
+    Cornellà, con la        d'habitatges a una altra part del municipi.
+    presencia de artistas
+    de la talla de Pepe     Aquests 48 milions, afegits als 70 que es
+    Rubianes o Lucrecia,    van atorgar el 1996, suposen una aportació
+    entre otros. El parque  econòmica total al Patronat Cultural i
+    se abría por primera    Recreatiu de 118 milions de pessetes per a
+    vez de noche para       la reforma de la seu d'una de les entitats
+    llevar a cabo veladas   cíviques i culturals més antigues i
+    de este tipo, con         participatives de la ciutat.
+    música para todos los             Durant una primera fase de les
+    gustos.                           obres es va rehabilitar
+                            l'estructura del Patronat, i més tard se
+    En el Auditori, cada    n'ha condicionat l'exterior. La reforma de
+    sábado de julio y       la sala escènica permetrà que hi tinguin
+    agosto ha habido una    lloc espectacles teatrals i musicals i
+    actuación teatral de    estarà oberta a tots els ciutadans i
+    categoría más que       ciutadanes de Cornellà. 
+    contrastada.
+    La noches de verano
+    han ofrecido otras      Animación en la 22ª fiesta del barrio de La
+    alternativas, como en   Miranda
+    la Plaça de Sant                                            
+    Ildefons, donde se      A finales de junio se celebraron
+    repite la experiencia   las fiestas de la Miranda, que
+    del cine al aire        contaron con la gran participación de las
+    libre. Las películas    entidades del barrio, que como siempre se
+    "Space Jam" y "Mars     han implicado en la organización de los
+    Attacks!" reunieron a   actos. Los coloquios, recitales,
+    un numeroso público     exposiciones, torneos de ajedrez, dómino, o
+    dispuesto a disfrutar   petanca, rock, habaneras, y bailes
+    con ellas. Los grupos   populares que copaban el programa de actos
+    de música local no      muestran la diversidad que acompañó al fin
+    olvidaron a sus         de semana. El fin de fiesta en La Miranda
+    seguidores durante las  fue a cargo de la orquesta Titànics, en la
+    vacaciones y            Plaça de Linda Vista, i sirvió de colofón a
+    realizaron diversos     los tres días de celebraciones en el
+    conciertos de rock, en  barrio. 
+    estos momentos en que
+    algunos de ellos se
+    están asomando al
+    mercado discográfico.
+
+    De día, las
+    temperaturas invitaban
+    a ir a bañarse, pero
+    también cabía la
+    posibilidad de pasar
+    el rato leyendo en la
+    "Bibliopiscina" en Can
+    Mercader. Finalmente,
+    cabe recordar que los
+    más jóvenes han tenido
+    la posibilidad de
+    participar en los
+    numerosos campus de
+    verano de los esplais
+    de la ciudad y en
+    algunas escuelas
+    deportivas veraniegas
+    para practicar sus
+    deportes favoritos.
+
+    Cornellà vetlla pels drets dels infants amb una nova ordenança
+    El text implica les institucions i la població en la seva protecció
+
+    L'Ajuntament de Cornellà ha elaborat una ordenança que demana als
+    ciutadans una especial atenció cap als drets de la infància i una
+    més gran preocupació per part de tothom, persones i institucions, a
+    l'hora d'atendre les seves necessitats. Entre els objectius del
+    reglament hi ha promoure un seguit de mesures que facilitin la
+    participació dels infants i dels adolescents en els temes que els
+    afecten. L'ordenança és pionera a l'Estat i proposa la creació d'un
+    seguit d'òrgans que tramitaran les queixes i propostes d'aquest grup
+    d'edat.
+
+       El reglament canalitzarà la participació dels joves en el
+              disseny dels projectes que els impliquin com a ciutadans
+    de Cornellà, amb instruments com l'Oficina de la Infància i
+    l'Adolescència, que coordinarà i canalitzarà totes les actuacions
+    relacionades amb el reglament; també es constituirà una comissió
+    interdepartamental de la Infància i l'Adolescència, que reunirà
+    periòdicament tots els regidors directament o indirectament
+    relacionats amb polítiques que afectin els infants i els
+    adolescents; es crearà el Consell Municipal d'Infants; i, en darrer
+    terme, s'articularà el Programa Infants-Formació.
+
+    L'Ajuntament de Cornellà fa així una crida a tots els seus ciutadans
+    i ciutadanes apel.lant la responsabilitat d'assumir i de compartir,
+    davant el futur proper, la construcció d'una ciutat amb una vida
+    quotidiana més respectuosa amb els drets de tots i amb més qualitat
+    de vida per a tothom, vetllant més pels petits i tenint molt més en
+    compte els joves en qualsevol àmbit ciutadà.
+
+    Tradicionalment, el municipi de Cornellà de Llobregat ha destacat
+    per la seva preocupació en l'atenció a la infància i l'adolescència
+    duent a terme un seguit de mesures adreçades a facilitar la
+    participació dels infants i a fer reconèixer els seus drets. En
+    aquest context cal situar les visites setmanals que els escolars de
+    la ciutat fan a l'Ajuntament on transmeten a l'Alcaldia les seves
+    opinions sobre la ciutat. De forma paral.lela aquest any es va obrir
+    una via de participació mitjançant la campanya de la "Nit de Reis",
+    en què se'ls demanava què calia regalar-li a Cornellà. Fruit
+    d'aquesta consulta, integrada en la carta als reis, ja s'ha
+    contactat amb un grup de 20 nens d'entre 7 i 9 anys disposats a
+    col.laborar-hi.
+
+      Projecte "Infants-Consens"                              
+
+      La iniciativa de l'Ajuntament de Cornellà s'ha
+      correspost amb la voluntat dels partits polítics representats al
+      Parlament de Catalunya, segons el document titulat
+      "Infants-Consens" que van aprovar el passat 3 de juliol. El text
+      proposa a totes les institucions polítiques catalanes l'inici de
+      treballs per millorar la comunicació entre els infants i els
+      adults, garantir els drets i la participació dels menors de 18
+      anys en les decisions que els afecten, i atendre el funcionament
+      dels mitjans de comunicació per fomentar-hi que la producció
+      destinada al públic jove sigui de gran qualitat.
+
+      El document implica el compromís de situar dins de cada partit
+      una persona responsable d'assumir i plantejar la perspectiva dels
+      infants a cada tema que es tracti.
+
+
+
+    La teulada de l'Església de Santa Maria, renovada durant el seu 50è
+    aniversari
+
+       L'Ajuntament de Cornellà ha subvencionat amb 4.500.000
+              pessetes la reparació de la teulada de la parròquia de
+              Santa Maria. L'església està inclosa en el nou catàleg del
+    patrimoni històrico-artístic de la ciutat que va aprovar recentment
+    el consistori.
+
+    Amb la subvenció s'ha pogut cobrir la pràctica totalitat del cost de
+    les obres, pressupostades en 4,8 milions de pessetes. Els treballs
+    de reforma han consistit en substituir les teules que estaven
+    deteriorades per peces noves, i en el condicionament de tota la
+    teulada. La reparació va finalitzar el mes de juny, quan justament
+    se celebrava el 50è aniversari de la consagració de l'Església de
+    Santa Maria, reconstruïda després de la guerra civil. 
+    Precsa cierra sus cursos anuales con        Plazo abierto para
+    formación y competitividad                  solicitar nichos y
+                                                columbarios
+    La empresa municipal de promoción
+    econó-mica, Precsa, clausuró las            Del 1 al 31 de octubre
+    actividades del curso 96-97 con una         se podrán presentar
+    jornada dedicada a la formación y la        instancias para
+    competitividad.                             solicitar los derechos
+                                                funerarios sobre 300
+    El Ayuntamiento de Cornellà participó en    nuevos nichos y 210
+    la organización del acto en el Auditori,    columbarios del
+    que se cerró con las intervenciones del     cementerio de Cornellà.
+    alcalde de la ciudad, José Montilla, y de   Las tasas de las
+    José Antonio Gómez Cid, delegado            concesiones han sido
+    territorial del Departament de Treball de   inicialmente
+    la Generalitat de Catalunya.                modificadas por el
+                                                pleno municipal, y la
+       El título de la jornada era       documentación se debe
+              "Formación y competitividad: el   presentar en el
+    reto para las empresas y los                Departamento de
+    trabajadores", y se hizo hincapié en la     Contratación y
+    necesidad de la formación continua para     Patrimonio del
+    hacer frente a la transformación de la      Ayuntamiento.
+    sociedad. También se realizó una
+    conferencia dedicada a la calidad de la     El precio de las
+    formación, así como la importancia que      adjudicaciones va de
+    tiene asegurar la calidad en el trabajo     93.030 a 192.030
+    para valorar si los cursos cumplen sus      pesetas en los nichos y
+    objetivos.                                  de 24.690 a 40.935
+                                                pesetas los
+    Según los conferenciantes, la formación     columbarios, a la
+    ocupacional es una herramienta muy          espera de la aprobación
+    adecuada para ayudar a encontrar empleo, y  definitiva de las
+    destinando más recursos será más efectiva.  tasas. Para más
+    El acto llenó la sala anexa del Auditori    información se debe
+    con una asistencia mayoritariamente joven,  acudir al departamento
+    el colectivo a quien se dirigen             de Servicios Generales,
+    específicamente muchos de los cursos de     en la planta baja del
+    formación.                           Ayuntamiento. 
+
+
+
+
+
+
+    Aumenta el número de motos que respetan los   El pleno pide una
+    límites de ruido                              política de viviendas
+                                                  para la gente joven
+    46 motocicletas y ciclomotores      
+    quedaron inmovilizados en el                  El Ayuntamiento de
+    depósito municipal durante la                 Cornellà ha aprobado
+    campaña de medición y control del exceso de   una moción que insta a
+    ruidos que anualmente lleva a cabo la         la Generalitat de
+    Guardia Urbana, un número inferior al de      Catalunya a definir la
+    años anteriores.                              política de vivenda
+                                                  para los jóvenes. La
+    La Guardia Urbana realizó en el mes de mayo   propuesta, presentada
+    un total de 143 mediciones dentro de esta     por el PSC, fue
+    campaña, en la que se comprueba que el        aprobada con la
+    nivel sonoro de los vehículos se ajuste a     unanimidad de todos
+    lo que recogen las ordenanzas municipales.    los grupos políticos.
+    Previamente, los agentes municipales
+    realizan una fase informativa tanto           El acuerdo contempla
+    directamente a los conductores como en los    proceder al pago
+    centros educativos de secundaria, ya que      inmediato de las
+    los adolescentes son los principales          ayudas a fondo perdido
+    conductores de este tipo de motos. En 1997,   para compradores
+    han recibido estas charlas 1328 alumnos       menores de 30 años ya
+    entre catorce y dieciséis años                concedidas y que aún
+    pertenecientes a 18 escuelas e institutos     no se han cobrado. En
+    de la ciudad.                          segundo lugar, se
+                                                  insta al Govern a
+                                                  de ayudas para los
+    Cornellà se moviliza                          jóvenes, ya que la
+    contra el terror de ETA                       Generalitat dispone de
+                                                  competencias
+                                           exclusivas en esta
+                                                  materia.
+    La ciudad de Cornellà se unió al resto de
+    España para manifestar su profunda repulsa    L'Ajuntament evitarà
+    al asesinato, perpetrado el pasado mes de     contractar serveis a
+    julio por ETA, de Miguel Ángel Blanco         les ETT
+    Garrido, concejal del Partido Popular en el
+    Ayuntamiento de Ermua. Entre las acciones     L'Ajuntament de
+    realizadas durante los días anteriores y      Cornellà s'ha adherit
+    posteriores al asesinato el Ayuntamiento de   a una moció presentada
+    Cornellà aprobó por unanimidad una moción     al ple municipal pel
+    por la paz y por la libertad en la que        grup d'Iniciativa per
+    repudiaba la violencia etarra.         Catalunya-Els Verds
+                                                  que demana el
+                                                  compromís del
+                                                  consistori de no
+                                                  recórrer als serveis
+                                                  de les empreses de
+                                                  treball temporal
+                                                  (ETT), ni tampoc
+                                                  fomentar o promocionar
+                                                  les activitats
+                                                  desenvolupades per
+                                                  aquest tipus
+                                                  d'empreses. El text,
+                                                  aprovat al ple per
+                                                  unanimitat, demana que
+                                                  es modifiqui la
+                                                  legislació que afecta
+                                                  les ETT i que se
+                                                  substitueixin per
+                                                  noves fórmules
+                                                  centrades en el foment
+                                                  de l'ocupació,
+                                                  l'assessorament i la
+                                                  incentivació a la
+                                                  contractació
+                                                  empresarial i la
+                                                  recerca de més
+                                                  estabilitat laboral.
+
+                                                  Cursos de català per a
+                                                  adults 97-98
+
+                                                  Inscripcions: 15 i 16
+                                                  de setembre (alumnes
+                                                  antics) i 17 i 18 de
+                                                  setembre (nous).
+                                                  Nivells: A1, A2; L5,
+                                                  L6; S1, S2, S3, S4 i
+                                                  S5.
+
+                                                  Lloc: Centre de
+                                                  Normalització
+                                                  Lingüística, Plaça
+                                                  dels Enamorats, 7.
+                                                  Informació: 474 16 08
+                                                  i 377 02 12, de 10 a
+                                                  13 hores i de 17 a 21
+                                                  hores. Els cursos
+                                                  comencen l'1
+                                                  d'octubre. Les places
+                                                  són limitades. 
+
+
+
+
+
+                      L'alcalde rep dels nens els seus desitjos
+                             per a la ciutat
+    Premio de educación                                         
+    vial a la escuela de     Prop d'un centenar de nens i pares
+    Can Mercader             van participar, durant el mes de
+                             juliol, a la festa organitzada després que
+    Manuel Gómez Bueno,      el Mag Maginet fes arribar a l'alcalde els
+    alumno de la Escola Can  desitjos dels nens de Cornellà per a la
+    Mercader de Educación    seva ciutat. Les peticions es van recollir
+    Especial de Cornellà,    de les cartes entregades als Reis Mags
+    obtuvo el segundo        d'Orient.
+    premio del XXXI
+    Concurso de dibujo       De les cartes que els nens i nenes de
+    infantil y juvenil       Cornellà van entregar al Mag Maginet al
+    sobre circulación vial,  Poblat Àrab, de l'1 al 4 de gener, es
+    concedido por la         desprenia l'interès d'aquests per la nostra
+    Dirección General de     ciutat. Ara, l'Ajuntament de Cornellà ha
+    Tráfico. Manuel recibió  volgut agrair a tots els que hi van
+    un diploma               participar l'interès demostrat. Durant la
+    acreditativo, así como   tarda de l'11 de juliol, els petits van
+    algunos regalos de       poder participar en jocs infantils, en un
+    manos del Jefe           berenar, i en tota mena d'activitats
+    Provincial de Tráfico y  preparades per a ells. Tots van estar
+    del Subdelegado del      contents que els Reis pensessin en ells en
+    Gobierno en Barcelona.   ple mes de juliol.
+    Los dibujos presentados
+    aspectos de la
+    circulación y de las     El Baix estudia com facilitar la mobilitat
+    normas de educación      de les persones
+    vial.
+                             El Consell Comarcal del Baix Llobregat va
+    Controles en la          realitzar el mes de juny passat una jornada
+    seguridad de los         sobre la problemàtica de la mobilitat de
+    transportes escolares    les persones a les poblacions de la
+                             comarca. Les conclusions destaquen la
+    Durante el mes de junio  redacció d'un pla sobre mobilitat a la
+    la Guardia Urbana de     comarca i la creació de l'oficina de
+    Cornellà inspeccionó 26  gestió.
+    autobuses de transporte
+    escolar, de los que      A la jornada es va posar en relleu la
+    tres fueron denunciados  importància de la transformació d'antigues
+    por deficiencias en los  carreteres en travesseres urbanes, per
+    vehículos y tres más     donar-hi un caràcter més cívic.    
+    por causa del            Cornellà n'és un exemple amb la
+    conductor. Este          carretera d'Esplugues, que no
+    servicio gratuito se ha  deixa mai de ser un carrer més que enllaça
+    ofrecido a todos los     les dues poblacions.
+    centros escolares de
+    Cornellà, asociaciones   Entre les propostes presentades, s'hi troba
+    de padres y madres de    la redacció d'un pla que definiria uns
+    alumnos y grupos de      criteris per racionalitzar el trànsit del
+    esplai para controlar    Baix Llobregat, i la creació d'una agència
+    los transportes en       de mobilitat comarcal que redactaria i
+    cualquier salida que     gestionaria aquest pla.
+    realicen durante el
+    curso, y para
+    garantizar la seguridad
+    de los escolares de la
+    ciudad en sus
+    desplazamientos.
+
+
+
+
+
+    4a edició de Nuvi Baix  Cornellà es mulla contra l'esclerosi
+    a la Fira de Cornellà   múltiple
+
+    Del 19 al 21 de         La ciutat de Cornellà va solidaritzar-se
+    setembre se celebra la  amb els afectats per l'esclerosi múltiple
+    quarta edició de Nuvi   (EM) durant la jornada del Mulla't 97 que
+    Baix `97, el saló       es va celebrar el 5 de juliol a la piscina
+    dedicat als casaments,  de Can Millars.
+    esdeveniments i actes
+    socials, dins del          A Cornellà, la piscina de Can
+    recinte de la Fira de             Millars va gaudir d'una bona
+    Cornellà. L'any         assistència de voluntaris, que tots junts
+    passat, aquest          van nedar prop de 40.000 metres per lluitar
+    certamen va reunir      contra l'EM. Les existències de samarretes,
+    32.000 visitants i la   gorres i tovalloles gairebé es van esgotar
+    presència de més de     i la recaptació es va afegir a tota
+    100 expositors.         l'obtinguda per les piscines catalanes que
+                            participaven en la jornada. Al llarg de 24
+    El saló s'inaugurarà    hores, prop de 200 pìscines a tot Catalunya
+    el divendres a les 17   van obrir les portes per obtenir fons
+    hores, i s'hi           destinats a combatre l'esclerosi múltiple.
+    realitzaran diverses    
+    desfilades de models i
+    propostes que
+    ofereixen les empreses  "Ja som mares"
+    que hi participen.
+    Està previst que        La campanya "Ja som mares", organitzada pel
+    s'ocupi totalment el    Consell de la Dona i que es va celebrar al
+    recinte de la Fira de   Centre Cívic Sant Ildefons, es va
+    Cornellà, uns 8.000     desenvolupar durant el mes de juliol amb
+    metres quadrats. A      una gran assistència de mares joves.
+    Nuvi Baix es podrà
+    trobar gran varietat    
+    de moda d'home, de
+    dona i infantil,
+    complements,
+    perruqueria, parament
+    de la llar, informació
+    sobre llistes de noces
+    i serveis com agències
+    de viatges, hotels,
+    restaurants o
+    realització de
+    reportatges
+    fotogràfics i de
+    vídeo.
+
+    "Estima i estima't"
+    para el uso correcto
+    del preservativo
+
+    Los departamentos
+    municipales de Sanidad
+    y de Juventud
+    colaborarán en la
+    campaña "Estima i
+    estima't. Evita el
+    risc" para fomentar la
+    utilización correcta
+    del preservativo,
+    además de sensibilizar
+    y educar a los jóvenes
+    para prevenir el sida
+    y los embarazos no
+    deseados.
+
+    El Servicio de
+    Prevención del
+    Ayuntamiento de
+    Cornellà ha previsto
+    repartir 8.000
+    trípticos, que
+    contendrán un
+    preservativo, en las
+    Carpas de Cornellà y
+    en diversos bares
+    musicales y discotecas
+    de la ciudad. El
+    folleto resalta que el
+    preservativo es el
+    mejor método para
+    evitar las
+    enfermedades de
+    transimisión sexual,
+    como el sida, y uno de
+    los mejores métodos
+    para evitar los
+    embarazos no deseados.
+    Además, se incluyen
+    unas instrucciones
+    ilustradas con la
+    forma correcta de
+    utilizar los
+    profilácticos, porque
+    usados de forma
+    incorrecta pueden
+    perder parte de su
+    eficacia.
+
+    Convenio entre el ICD
+    y el Ayuntamiento
+
+    El Ayuntamiento de
+    Cornellà, a través de
+    la Comisión de
+    Gobierno, aprobó el
+    pasado mes de julio un
+    convenio de
+    colaboración con el
+    Institut Català de la
+    Dona para dinamizar y
+    llevar a cabo acciones
+    destinadas a fomentar
+    la igualdad de
+    oportunidades entre
+    mujeres y hombres
+    desde el Centre
+    d'Informació i
+    Recursos per a Dones.
+    
+
+
+
+
+    
+
+    Campaña para fomentar un uso correcto de los nuevos pipicanes de
+    Cornellà
+
+    La Guardia Urbana está realizando una campaña de control de la
+    utilización de los "pipicanes" instalados en Cornellà, para
+    concienciar a los ciudadanos de que es necesario un uso correcto de
+    estos espacios para potenciar su efectividad. Hasta finales del mes
+    de julio las patrullas que actúan en los barrios de la ciudad habían
+    realizado un total de 721 identificaciones a perros, de los cuales
+    477 no se hallaban dados de alta en el padrón correspondiente.
+    La campaña informativa se inició el pasado mes de febrero,
+    simultáneamente a la aparición de los nuevos modelos de
+    pipican en algunos puntos de Cornellà. Dos agentes han realizado un
+    control específico de las zonas más afectadas por las infracciones
+    que cometen algunos propietarios de perros, y han cursado un total
+    de 13 denuncias.
+
+    Las multas que se pueden imponer relacionadas con la tenencia de
+    animales van de 5.000 a 15.000 pesetas, y penalizan infracciones
+    como no censar los perros, no llevarlos debidamente identificados o
+    sueltos, o llevarlos en lugares donde no pueden tener acceso. Del
+    mismo modo, se sanciona con 10.000 pesetas no recoger
+    convenientemente los excrementos en la vía pública, donde se
+    incluyen los pipicanes.
+
+    Esta unidad de la Guardia Urbana actúa en el horario más habitual de
+    paseo de los perros, entre las 7 y las 9:30 de la mañana y de 19 a
+    24 horas. La intervención durará hasta final de año.
+
+
+    Publicació d'un llibre que recull la normativa sanitària de les
+    fleques
+                                                                
+    Les fleques, despatxos de pa i pastisseries de Cornellà ja
+    poden disposar d'un document que recull les condicions
+    tècnico-sanitàries i de consum que regulen aquesta activitat.
+
+    El llibre ha estat publicat pel Departament de Salut Pública de
+    l'Ajuntament de Cornellà, amb l'objectiu d'aportar als professionals
+    del sector els principals aspectes de la normativa vigent que els
+    afecten. Així es podran millorar les condicions sanitàries i de
+    consum d'aquests comerços, i evitar algun possible problema o frau
+    en la salut pública.
+
+    Alhora, durant el mes de juliol es va iniciar una campanya
+    d'inspeccions a aquest tipus de comerços per tota la ciutat, amb
+    l'objectiu de comprovar que la normativa es compleix i informar-los
+    de la publicació d'aquest llibret, adreçat a tots els negocis
+    relacionats amb el pa i la pastisseria, i que són uns 400 a tot
+    Cornellà.
+
+    Els establiments solen imposar-se un autocontrol pel que fa als
+    processos de manipulació, conservació i elaboració dels productes, i
+    això fa del document que ha preparat el Departament de Salut Pública
+    una guia útil per als professionals a la qual adreçar-se en cas de
+    dubte. L'administració també es compromet a supervisar i ajudar els
+    professionals del sector en l'aplicació dels criteris que s'hi
+    estableixen.
+
+    Aquesta guia és la segona d'aquestes caracterísitiques que ofereix
+    l'Ajuntament de Cornellà, després de la publicada l'any passat
+    destinada als bars i restaurants que va servir per completar una
+    campanya informativa en aquests establiments. 
+
+
+                 Edita: Ajuntament de Cornellà de Llobregat
+
+             Més de 200 professionals del teatre
+             demanen la dimissió del conseller
+             Pujals
+             El manifest, preparat diumenge a la
+             nit, tal com va avançar aquesta
+             pàgina en exclusiva, es va fer
+             públic dimarts a la tarda. Entre els
+             punts més importants del manifest es
+             demana la dimissió del conseller
+             Pujals pel procediment seguit amb
+             l'afer del TNC i el seu director
+             Josep M. Flotats, i també s'exigeix
+             que el departament de Cultura retiri
+             el decret sobre el 35% de quota del
+             teatre privat sobre les sales
+             públiques. Entre els signants
+             figuren noms tan significatius, a
+             títol personal, com la cúpula
+             directiva del Teatre Lliure, amb
+             Lluís Pasqual, Lluís Homar, Anna
+             Lizaran, Josep Montanyès, Carlota
+             Soldevila o Guillem-Jordi Graells,
+             entre altres, així com professionals
+             del teatre com Núria Espert, Rosa
+             Maria Sardà, Josep M. Pou,
+             Constantino Romero, Mario Gas, Vicky
+             Peña, Montserrat Carulla o Rosa
+             Novell. El manifest obre una nova
+             via d'aigua en la malmesa nau del
+             departament de Cultura capitanejada
+             per Joan Maria Pujals després d'un
+             any d'atzucacs i de paràlisi de
+             gestió que a primers de setembre va
+             desembocar en un senyal d'alerta amb
+             la dimissió del director general de
+             Promoció Cultural, Romà Cuyàs.
+
+             L'exposició sobre Fabià Puigserver
+             del Teatre Lliure ha estat vista per
+             unes 25.000 persones
+             La mostra que la temporada passada
+             es va presentar habilitant totes les
+             dependències del Teatre del carrer
+             Montseny, ha estat aquests dies en
+             el Festival de la Unió de Teatres
+             d'Europa, celebrat a Tessalònica, on
+             s'ha vist també l'obra 'Quartet', de
+             Heiner Müller, amb Lluís Homar i
+             Anna Lizaran. L'Exposició Fabià
+             Puigserver, que es podria preparar
+             en versió castellana per la demanda
+             que té des de diversos punts de
+             l'Estat, va tenir uns 7.000
+             visitants a Barcelona durant 61
+             dies, uns 11.000 a La Passió d'Olesa
+             de Montserrat, uns 5.000 a Sabadell
+             i uns 1.200 a la població de Salomó.
+
+             Jordi Sarsanedas i Albert Jané
+             deixen 'Serra d'Or' i 'Cavall Fort'
+             Dues jubilacions faran que aquest
+             any es produeixi el relleu en la
+             direcció editorial de dos autors
+             reconeguts en els últims 30 anys.
+             D'una banda, Jordi Sarsanedas deixa
+             aquest mes la direcció de 'Serra
+             d'Or' i Albert Jané, recent premi
+             Nacional de Cultura, deixarà 'Cavall
+             Fort' al desembre. Mentre ja es
+             coneix el successor --en aquest cas
+             successora--, del primer, Marta
+             Nadal, el consell de redacció de
+             Cavall Fort encara està estudiant
+             qui es farà càrrec, des del gener,
+             de la direcció de la revista
+             infantil.
+
+             El Centre Georges Pompidou de París
+             tanca per tres anys
+             Us oferim de fer una visita virtual
+             al popular Beaubourg de París,
+             coincidint amb l'inici de les obres
+             de reforma que duraran tres anys i
+             que costaran 11.000 milions de
+             pessetes. El Beaubourg té previst de
+             tornar a obrir el 31 de desembre de
+             1999. La immensa Biblioteca del
+             Beaubourg és una de les que es troba
+             a la xarxa amb accés lliure.
+
+             EL MÉS DESTACAT D'EDICIONS ANTERIORS
+
+             Dues grans cadenes britàniques de
+             venda de llibres a través de la
+             xarxa Internet obren els seus
+             aparadors
+             Des d'aquesta setmana, la cadena
+             Dillons i la cadena Blackwells, les
+             dues angleses, han obert a la xarxa
+             Internet el seu servei de venda de
+             llibres. La primera, que en
+             llenguatge virtual es coneix per The
+             book place, ha fet una inversió de
+             240 milions de pessetes i dos anys
+             de prepració per entrar al mercat
+             virtual. De moment té en catàleg un
+             milió dos-cents mil títols. Per la
+             seva banda, Blackwells ja funcionava
+             en xarxa, però ha fet un remodelatge
+             per poder oferir un catàleg, a
+             partir del mes d'octubre, d'un milió
+             i mig de títols. Una altra de les
+             cadenes que ja funcionen des de fa
+             temps a Internet és Amazon. Aquesta
+             llibreria nord-americana virtual,
+             amb seu a Seattle, no té magatzem
+             propi i la seva facturació de
+             distribució ha arribat durant els
+             últims quatre mesos a uns 4.000
+             milions de pessetes. L'expansió en
+             aquest camp és constant i els
+             experts asseguren que és el futur de
+             la venda de llibres pels avantatges
+             que representa, sobretot de no moure
+             i emmagatzemar material ja que només
+             cal tenir-lo enregistrat en un
+             catàleg i encarregar-se de fer
+             d'intermediari.
+
+             Gabriel Janer Manila, premi
+             Carlemany
+             L'escriptor Gabriel Janer Manila,
+             tal com va avançar aquesta pàgina,
+             ha obtingut el premi Carlemany per
+             la seva novel.la 'Els jardins
+             incendiats'. El premi és dotat amb 4
+             milions de pessetes i està convocat
+             per Enciclopèdia Catalana, Edicions
+             Proa i el Govern d'Andorra, amb
+             compromís de publicació a
+             l'Editorial Columna. Els anteriors
+             guanyadors del premi han estat Maria
+             Mercè Marçal, Maria de la Pau Janer
+             i Robert Saladrigas.
+
+             El manuscrit de 'El quadern gris' de
+             Josep Pla s'editarà en CDRom
+             Continua la febre Pla. A banda de
+             l'espectacle que els Joglars
+             presenten al Teatre Romea, 'La
+             increïble història del Dr. Floit i
+             Mr. Pla', s'ha inaugurat al Centre
+             Cultural de la Caixa de Girona , a
+             la Fontana d'Or (c/ Ciutadans, 19)
+             l'exposició 'La diabòlica mania
+             d'escriure' sobre l'autor de 'El
+             quadern gris', un títol que
+             últimament ha estat d'actualitat amb
+             la presentació pública del manuscrit
+             original i l'anunci, per part dels
+             hereus del llegat Pla, que
+             l'esmentat manuscrit es podrà
+             consultar en format CdRom. Aquests
+             dies, però, ja es pot veure a
+             l'exposició de Girona, i el 18 de
+             novembre s'exposarà a Barcelona.
+
+             Marguerite Duras i Gertrude Stein,
+             presents en el Festival de Tardor de
+             París
+             Obres d'aquestes dues autores es
+             veuran en el Festival de Tardor de
+             París. Els muntatges de Bob Wilson,
+             'La maladie de la mort', de
+             Marguerite Duras, i 'Saints and
+             Singing', de Gertrude Stein, a més
+             de 'L'hort dels cirerers', de
+             Txekhov, readaptat per Peter Zadek,
+             'Measure for Measure', de
+             Shakespeare, i la presentació de
+             'Pearls for pigs', de Richard
+             Foreman.
+
+
+             Del 10 al 12 d?octubre. Oslo.
+             Assemblea general del Consell
+             Europeu d?Associacions de Traductors
+             Literaris (CEATL).
+             Diverses sessions de debat a la Casa
+             dels Escriptors, al centre d?Oslo.
+             Hi assisteix el vice-president de
+             l?AELC, Francesc Parcerisas.
+
+             13 d?octubre. La Cuina de l?Institut
+             del Teatre. Centenari Sebastià
+             Gasch. Organitza: Institució de les
+             Lletres Catalanes i Institut del
+             Teatre. Col.labora: AELC.Taula
+             rodona amb comunicacions de Joan M.
+             Minguet, Miquel Porter Moix, Jordi
+             Jané i Emili Gasch. Soirée
+             d'homenatge al Teatre Adrià Gual.
+             Jordi Jané (que conduïrà la sessió
+             com a Monsieur Loyal), amb Tortell
+             Poltrona, Circ Crac, Monti i Cia,
+             Hausson, Joan Brossa, El Molino,
+             Carme Sansa, Angel Pawlowsky, Lita
+             Claver La Maña, Lloll Bertran, Cesc
+             Gelabert, Pep Bou, Rosa Maria Sardà,
+             Esther Formosa, Toni Albà, Manel
+             Barceló i altres artistes del món de
+             l?espectacle per confirmar.
+
+             17, 18 i 19 d?octubre. La Seu
+             d?Urgell.
+             I Congrés de Literatura Infantil i
+             Juvenil catalana
+             Tema general: Present i futur de la
+             literatura infantil i juvenil
+             catalana. President d?honor: Josep
+             Vallverdú.
+             Ponències: Teresa Duran (El sector
+             professional); Teresa Colomer
+             (Tipologia i continguts en relació a
+             Europa); Gemma Lluch (La projecció
+             social). Taules de debat amb Joaquim
+             Carbó, Pep Montserrat, Xavier
+             Blanch, Maria Victòria Pujol, Mercè
+             Escardó, Pere Martí, Toni Matas,
+             Mercè Canela, Anna Gasol, Rosa M.
+             Serrano, Antoni Arca, Pau Joan
+             Hernàndez, Teresa Mañà, Josep M.
+             Aloy, Gabriel Janer Manila, Miquel
+             Desclot, Pep Albanell, Montserrat
+             Canela i Rosa Mut. Comissari del
+             congrés: Andreu Sotorra. El congrés
+             és obert a tot el sector
+             professional.
+
+             23 al 26 d?octubre. Biarritz.
+             Galeusca.
+             Tema general: El viatge literari.
+             Ponències: El viatge interior, La
+             literatura a les escoles, i La
+             literatura de viatges. Recepció de
+             l'Ajuntament de Biarritz i ruta
+             cultural de la població i rodalia.
+             Hi assisteixen diversos ponents i
+             comunicadors de l'AELC (a
+             determinar). Organitza: Associacions
+             d?escriptors bascos, gallecs i
+             catalans.
+
+             27 d?octubre. Centre d?Art Santa
+             Mònica. Simposi Ausiàs March-Roís de
+             Corella. Organitza: Institució de
+             les Lletres Catalanes i Institut
+             Universitari Joan LLuís Vives.
+             Col.laboració de l?AELC.
+             Inscripcions: 3.500 pta. Opció: 1
+             crèdit acadèmic. Presentació del
+             Simposi a càrrec de Jordi
+             Sarsanedas. Comunicacions sobre
+             Ausiàs March de Lola Badia, Robert
+             Archer i Albert Hauf. Conferència
+             sobre Ausiàs March de Pere
+             Gimferrer. Lectura d?obres de March
+             i Corella amb la intervenció de
+             l?actriu Pepa López.
+
+             28 d?octubre. Continuació Simposi
+             Ausiàs March-Roís de Corella.
+             Comunicacions de Tomàs Martinez i
+             Emili Rodríguez Bernabeu, Dominic
+             Keown, Jaume Pérez Montaner i
+             Francesc Parcerisas. Conferència de
+             clausura: La tragèdia de Caldesa, a
+             càrrec de Josep Romeu Figueras.
+
+             31 d?octubre. XXè Aniversari de
+             l?AELC.
+             Inici del programa d?actes
+             commemoratius a celebrar durant
+             l?últim trimestre arreu dels Països
+             Catalans.
+             (En fase de preparació)
+
+             3 de novembre. Centre d?Art Santa
+             Mònica. Simposi Llorenç Villalonga.
+             Organitza: Institució de les Lletres
+             Catalanes. Col.labora: Institut
+             Universitari Joan Lluís Vives i
+             AELC. Inscripcions: 3.500 pta.
+             Opció: 1 crèdit acadèmic.Conferència
+             inaugural de Joaquim Molas.
+             Comunicacions de Antoni Nadal Soler,
+             Sebastià Alzamora i Carme Riera.
+             Conferència sobre El Llorenç
+             Villalonga que he conegut a càrrec
+             de Baltasar Porcel.
+
+             4 de novembre. Continuació Simposi
+             Llorenç Villalonga. Conferència:
+             Villalonga i la guerra civil, de
+             Josep Massot. Comunicacions:
+             Villalonga, biografia i edició de
+             textos, a càrrec de Jaume Pomar,
+             Francesc Vallverdú i Damià
+             Ferrà-Pons. Comunicacions:
+             Villalonga i el teatre, el cinema i
+             la TV, amb Ricard Salvat, Josep-Pere
+             Peyró i Lluís M. Güell. Comentari de
+             l?obra i representació teatral
+             Diàlegs socràtics, amb la
+             col.laboració del Consell Insular de
+             Mallorca.
+
+             5 de novembre. Centre d?Art Santa
+             Mònica. Homenatge a Joan Fuster.
+             Organitza: Institució de les Lletres
+             Catalanes. Col.laboració AELC. Taula
+             rodona amb Antonio Furió, Josep
+             Ballester i Sebastià Serrano.
+             Lectura de textos amb la presentació
+             del muntatge Assagem Fuster,
+             seleccionat per Cinta Massip,
+             dirigit per Feliu Formosa, amb els
+             intèrprets Isabel Rocatti, Jordi
+             Dauder i Pep Tosar.
+
+             6 de novembre. Centre d?Art Santa
+             Mònica. Simposi Joan Mascaró i
+             Fornés. Organitza: Institució de les
+             Lletres Catalanes. Col.labora: AELC.
+             Conferència de Gregori Mir. Aquest
+             simposi, així com els d?homenatge a
+             Joan Fuster i els d?Ausiàs March,
+             Roís de Corella i Sebastià Gasch han
+             estat dissenyats, en qualitat de
+             comissaris, per Guillem Jordi
+             Graells i Margarida Aritzeta.
+
+             14 desembre. Paraula Amiga. Dedicada
+             a Mèxic. (En preparació).
+
+             PREVISIÓ 1998
+             Gener: Ràdio i Literatura. Jornades
+             sobre la ràdio (en homenatge a
+             Joaquim Soler). Amb la participació
+             de diversos professionals del
+             periodisme radiofònic i el
+             guionatge. (En fase de preparació).
+
+       Associació d'Escriptors en Llengua Catalana
+               C/ Canuda, 6 5è (Ateneu Barcelonès)
+                                   08002 Barcelona
+                Truqueu al telèfon: (93) 302.78.28
+                                    Fax: 412.58.73
+                 Escriviu a l'e-mail: info@aelc.es
+
+
+
+                   Memòria 1996
+
+                           Hi trobareu: Any de comiat, Introducció,
+                           Activitats realitzades durant el 1996,
+                           Altres col.laboracions i activitats,
+                           Internacional, Participació en premis,
+                           Publicacions, Informe de tesoreria,
+                           Projecte de programació per al 1997, Socis.
+
+
+
+
+                          Hi trobareu: Salutació del president,
+                          Activitats realitzades durant el 1995,
+                          Publicaicons realitzades el 1995,
+                          Activitats professionals (Serveis jurídics,
+                          Establiment de barems professionals,
+                          Situació dels escriptors jubilats, Marc
+                          contractual, Pla de previsió i ajuts
+                          assistencials de CEDRO, Defensa de
+                          l'autoria des d'una perspectiva
+                          internacional), Representació de l'AELC en
+                          institucions, Convenis i col.laboracions
+                          amb institucions i entitats, Informe de
+                          tesoreria, Projecte activitats 1996,
+                          Membres de la Junta, Socis membres.
+
+   
+
+
+                   Una llengua, una cultura, un mercat
+
+                           Quaderns Divulgatius, 7 (1996)
+
+                           En aquest quadern recollim les ponències
+                           que es van presentar en unes Jornades a la
+                           Universitat de València, sota el lema: "Una
+                           llengua, una cultura, un mercat",
+                           organitzades per l'Associació d'Escriptors
+                           en Llengua Catalana. Hi van participar tots
+                           els sectors culturals, de tot el domini
+                           lingüístic, que tenim la llengua com a
+                           mitjà d'expressió. Actors, cantants,
+                           periodistes, productors i directors de
+                           cinema, representants de mitjans de
+                           comunicació escrits i audiovisuals i
+                           escriptors i editors. Es recullen els
+                           articles de Josep Gifreu (La paraula
+                           mediàtica en el mercat cultural català),
+                           Josep M. Balcells (Ràdio), Gabriel Jaraba
+                           (La paraula mediàtica. Televisió), Joan
+                           Marí (Construir i destruir l'espai i la
+                           identitat), Ezequiel Castelló (Un projecte
+                           fusterià per al País Valencià), Pere Tió
+                           (Una llengua, una cultura, un mercat), Pere
+                           Fullana (Diari de Balears. Un diari acabat
+                           d'estrenar), Vicent Partal (VilaWeb. El
+                           català al Quart Mitjà), Enric Frigola (Una
+                           llengua, una cultura, un debat),
+                           Guillem-Jordi Graells (La paraula dita),
+                           Jaume Comas (Una preocupació, una ocupació,
+                           una proposta), Toni Pastor (El Projecte
+                           Alcover), Isabel Racotti (La poesia des de
+                           la màxima humilitat), Antoni Verdaguer i
+                           Serra (Cinema català i cinema en català (La
+                           llengua catalana al cinema)), Joan F. Mira
+                           (L'espai de la llengua escrita), Joan E.
+                           Pellicer (Una sola llengua, una sola
+                           cultura), Fracesc de B. Moll (Per un espai
+                           cultural comú), Rosa Serrano (Una llengua?
+                           una cultura? un mercat?), Jaume Fuster
+                           (Fronteres interiors), Josep Ballester
+                           (Entre la utopia i la dissidència), Josep
+                           Lluís Sirera (El fet teatral), Carles
+                           Duarte (La paraula escrita). Finalment es
+                           recullen les conclusions de les jornades.
+
+ 
+
+
+                 La generació dels setanta: 25 anys
+
+                           Quaderns Divulgatius, 6 (1996)
+
+                           Fa vint-i-cinc anys que Oriol Pi de
+                           Cabanyes i Guillem -Jordi Graells van
+                           començar a elaborar el llibre La generació
+                           literària dels setanta. Aquest quadern
+                           recull algunes de les ponències que es van
+                           presentar en les jornades, organitzades per
+                           l'AELC, al voltant d'aquesta generació
+                           literària. Guillem-Jordi Graells presenta
+                           La generació literària dels setanta, Oriol
+                           Pi de Cabanyes parla Sobre "La genaració
+                           del 70" vint-i-cinc anys després, Isidor
+                           Cònsul reflexiona al voltant de Poesia i
+                           poetes dels setanta, Àlex Broch tracta Els
+                           narradors de la generació dels setanta,
+                           Oriol Izquierdo escriu Quantes generacions
+                           perdudes, Francesc Massip afronta
+                           Dramaturgs i teatrers de la generació dels
+                           70: Els ous d'ar de la gallina?, i Joaquim
+                           Vilà i Folch tracta Els dramaturgs de la
+                           generació del 70.
+
+  
+
+
+                Els escriptors mallorquins es presenten
+
+                           Quaderns Divulgatius, 5 (1996)
+
+                           L'Associació d'Escriptors en Llengua
+                           Catalana, amb el suport del Consell Insular
+                           de Mallorca, va organitzar durant el darrer
+                           trimestre de 1995 la presentació, a Aula de
+                           Lletres de Barcelona, dels escriptors
+                           Llorenç Capellà, Miquel Àngel Riera, Miquel
+                           Rayó i Antònia Vicens. Ens plau publicar
+                           les presentacions que van fer,
+                           respectivament, Antoni Serra, Carme Arnau,
+                           Josep-Francesc Delgado i Vincenç Llorca.
+
+                           Avui, només aquells escriptors illencs o
+                           valencians que viuen i treballen a
+                           Catalunya o que publiquen amb regularitat
+                           els seus llibres a les editorials catalanes
+                           són coneguts en l'àmbit de la comunitat
+                           autònoma i això condiciona una política
+                           editorial que, sempre amb excepcions
+                           estimables, rebutja la publicació d'autors
+                           de més enllà de la pròpia comunitat, en nom
+                           de la viabilitat del producte litarari. Per
+                           això, i per d'altres raons, en la
+                           programació d'activitats de la nostra
+                           Associació, les presentacions d'autor
+                           tornen a tenir-hi cabuda, recuperant aquell
+                           cicle que havíem organitzat fa quinze anys,
+                           sota el títol L'autor i la seva obra , no
+                           circumscrit només a Barcelona, sinó amb
+                           voluntat d'existir a tot el llarg i l'ample
+                           del domini lingüístic.
+
+ 
+
+
+               CEATL, Jornada sobre la traducció
+
+                          Quaderns Divulgatius, 4 (1996)
+
+                          Aquest recull aplega quatre articles i un
+                          decàleg sobre la traducció literària.
+                          L'escriptor neerlandès Cees Noteboom en
+                          l'article Ser traduïts: el gran problema de
+                          les petites llengües fa un repàs
+                          d'extraordinària lucidesa sobre les
+                          condicions i problemes amb què solen topar
+                          les llengües minoritàries a l'hora de veure
+                          traduïdes les seves obres a llengües de més
+                          gran difusió. Peter Bergsma a El traductor
+                          literari als Països Baixos parla de la
+                          situació -considerada per molts com la
+                          ideal- dels traductors literaris
+                          neerlandesos, i no sols dóna xifres que
+                          suscitaran greuges comparatius, sinó que en
+                          destaca avantatges i paranys. Françoise
+                          Cartano a És un ofici la traducció
+                          literària? analitza la situació a França,
+                          país que malgrat la seva extraordinària
+                          tradició en el camp de la traducció
+                          literària, no ofereix als seus traductors un
+                          panorama laboral excessivament galdós.
+                          Finalment, Françoise Wuilmart a La traducció
+                          literària: especificitat, actualitat, futur
+                          fa un esbós del que pot ser l'ensenyament de
+                          la traducció literària en un centre
+                          universitari europeu.
+
+
+
+
+              Homenatge a Marià Villangómez
+
+                          Institut d'Estudis Eivissencs (1996)
+
+                          Diu Ponç Pons que "la poètica de Villangómez
+                          té un segell inconfusible d'humanitat, de
+                          saviesa. La sal i el sol de les Illes
+                          brillen purs en els seus versos passionals i
+                          apassionants, moderns, però també clàssics,
+                          oberts des del Mediterrani a tot el món,
+                          però arrelats en la més profunda,
+                          corprenedora, vital, cívica, idiomàtica
+                          eivissenquicitat". En aquest
+                          llibre-homenatge hi trobareu poemes dedicats
+                          al poeta de Maria Àngels Anglada, Josep
+                          Ballester, Vicent Berenguer, Blai Bonet,
+                          Antonio Colinas, Narcís Comadira, Pep Costa,
+                          Pere Gimferrer, Ramon Guillem, Julio
+                          Herranz, Damià Huguet, Vicenç Llorca, Miquel
+                          López Crespí, Maria-Mercè Marçal, Antoni
+                          Marí, Josep Marí, Miquel Martí i Pol,
+                          Francesc Parcerisas, Jaume Pérez Montaner,
+                          Joan Perucho, Josep Riera, Josep Planells
+                          Bonet, Ponç Pons, Miquel Àngel Riera, Toni
+                          Roca, Pere Rosselló Bover, J.M.
+                          Sala-Valldaura, Jean Serra, Jaume Subirana,
+                          Àlex Susanna, Àngel Terron, Vicente Valero,
+                          Antoni Vidal Ferrando i Olga Xirinacs.

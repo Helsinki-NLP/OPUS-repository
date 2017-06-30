@@ -1,0 +1,92 @@
+% layout 'default';
+ 
+<h2>Add Corpus</h2>
+
+<div class='button_menu tool_bar'>
+    <ul>
+        <li><%= link_to index => ( title=>'back', id=>"icon_link", class=>"ui-state-default ui-corner-all") => begin %><span class="ui-icon ui-icon-triangle-1-w"></span>back<% end %></li>
+        <br style="clear:both"/>
+    </ul>
+</div>
+
+
+<div class='ui-widget form_box' style='width:30em;'>
+    <div class='ui-widget-content ui-corner-all'>
+    
+        <div class='ui-widget-header ui-corner-all form_header'>
+            <span>Create New Corpus</span>
+            <a href='#' style='float:right;' onclick='$("#dialog_help_add_corpus_form").dialog("open")'><span class="ui-icon ui-icon-help"></span></a>
+        </div>
+        
+        <div class='form_content'>
+        
+            %= form_for url_for('/add_corpus') => (method => 'post') => begin
+              
+              <div class='form_element'>
+              Corpus Name: <%= text_field 'slot_name' %><br/>
+              </div>
+              
+              <div class='form_element'>
+              Description<br>
+              <%= text_area 'description',  class => 'ui-corner-all text_area' %><br/>
+              </div>
+              
+              <div class='form_element'>
+              Domain:      <%= select_field 'domain'  => [ @$domain ] %><br/>
+              </div>
+              
+              <div class='form_element'>
+              Provider:    <%= text_field 'provider' %><br/>
+              </div>
+              
+              <div class='form_element'>
+              Permissions: <%= select_field 'group' => [ qw/public private/ ] %><br/>
+              </div>
+              
+              <hr class='form_seperator_line'/>
+                            
+              <div class='form_button_box'>
+                 %= submit_button 'Create', class => 'ui-state-default ui-corner-all form_button'
+              </div>                           
+              
+            % end
+
+        </div>
+    </div>
+</div>
+
+<div id="dialog_help_add_corpus_form" class='dialog help_box' title="Help - Create New Corpus">
+        
+            <h3>Corpus Name</h3>
+            <p>...</p>                    
+            
+            <h3>Description</h3>
+            <p>Give a short optional description of the corpus being created.</p>
+            
+            <h3>Domain</h3>
+            <p>...</p>
+            
+            <h3>Provider</h3>
+            <p>...</p>
+            
+            <h3>Permission</h3>
+            <p>...</p>
+</div>
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

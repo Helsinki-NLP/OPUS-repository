@@ -1,0 +1,48 @@
+### Don't edit by hand!
+### This file is overwritten by the LetsMT! installation/update makefile
+
+<IfModule mod_ssl.c>
+    <VirtualHost *:REPLACE_LETSMTPORT>
+        TimeOut REPLACE_SSL_TIMEOUT
+        APREQ2_ReadLimit REPLACE_SSL_READLIMIT
+        ServerAdmin webmaster@localhost
+        ServerName REPLACE_SERVER:REPLACE_LETSMTPORT
+        LogLevel warn
+        ErrorLog REPLACE_APACHE_ERROR_LOG
+        CustomLog /var/log/apache2/ssl_access.log combined
+
+        ## got to set this, but it points to nothing
+        DocumentRoot /usr/local/www
+        <Directory />
+            AllowOverride None
+            Options FollowSymLinks
+        </Directory>
+
+        ## locale environment
+        PerlSetEnv LC_ALL en_US.UTF-8
+        SetEnv LC_ALL en_US.UTF-8
+        PassEnv LC_ALL
+
+        ## SSL #######################
+        SSLEngine on
+        SSLCertificateFile REPLACE_CERTROOT/server/certificates/REPLACE_SERVER.crt
+        SSLCertificateKeyFile REPLACE_CERTROOT/server/keys/REPLACE_SERVER.key
+        SSLCertificateChainFile REPLACE_CERTROOT/server/certificates/REPLACE_SERVER.crt
+        SSLCACertificatePath REPLACE_CERTPATH
+        SSLCACertificateFile REPLACE_CERTROOT/ca.crt
+        SSLCARevocationPath REPLACE_REVOCATIONPATH
+        SSLVerifyClient require
+        SSLVerifyDepth 2
+
+        ## mod_perl ##################
+        PerlOptions +Parent
+        PerlPostConfigRequire REPLACE_MODPERL_STARTUP
+        PerlSwitches -IREPLACE_LETSMTPERL5LIB
+        <Location /ws>
+            SetHandler perl-script
+            ### for Content-Length in downloads to be computed by mod_perl
+            PerlOptions +ParseHeaders
+            PerlResponseHandler LetsMT::WWW::ModPerlHandler
+        </Location>
+    </VirtualHost>
+</IfModule>

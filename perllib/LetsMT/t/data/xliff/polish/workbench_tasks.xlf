@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:iws="http://www.idiominc.com/ws/asset"><iws:dwb-project-info project_name="Flash Player_10.x salt_pl-pl_pl_PL_20101012_130443" ws_url="https://loc.adobe.com:443/ws" session_id="1787404432" live_tm="False" /><file source-language="en-US" datatype="x-test/lex" original="/ALF/en-us/Products/Flash Player/10.x salt/0//en-us_pl-pl_20100912T130441Z_1.lex" target-language="pl-PL" tool="Idiom WorldServer Desktop Workbench 9.0.1" build-num="49" xml:space="default"><header><iws:asset-data><iws:seg_asset_id>633713</iws:seg_asset_id><iws:task_id>865701</iws:task_id><iws:display_task_id>1</iws:display_task_id><iws:ais_src_path>/ALF/en-us/Products/Flash Player/10.x salt/0//en-us_pl-pl_20100912T130441Z_1.lex</iws:ais_src_path><iws:src_fingerprint>1286913883000</iws:src_fingerprint><iws:ais_tgt_path>/ALF/pl-pl/Products/Flash Player/10.x salt/0//en-us_pl-pl_20100912T130441Z_1.lex</iws:ais_tgt_path><iws:tgt_fingerprint /><iws:steplock>None</iws:steplock><iws:source_lang_id>1033</iws:source_lang_id><iws:target_lang_id>1045</iws:target_lang_id><iws:show_markup>true</iws:show_markup></iws:asset-data></header><body><trans-unit id="0000000007"><source>Adobe® Flash® Player 10.1 Installer</source><target>Instalator programu Adobe® Flash® Player 10.1</target><iws:segment-metadata sid="[STRINGTABLE#IDS_TITLE_INSTALL]-[20384716]-[2985152]" tm_score="94.76" ws_word_count="4" max_segment_length="0"><iws:status source_content="repeated" translation_status="pending" translation_type="manual_translation" /></iws:segment-metadata><iws:boundary-seg sequence="bs1366513" ais-src-path="/ALF/en-us/Products/Flash Player/10.x salt/0//en-us_pl-pl_20100912T130441Z_1.lex" ais-tgt-path="/ALF/pl-pl/Products/Flash Player/10.x salt/0//en-us_pl-pl_20100912T130441Z_1.lex" /><iws:markup-seg sequence="0000000001">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;!DOCTYPE lex SYSTEM "\Altius\Production\Documentation\LEX\Specifications\LEX 1.0.dtd"&gt;
+
+&lt;lex:lex xmlns:lex="http://ns.adobe.com/lex" xsi:schemaLocation="http://ns.adobe.com/lex \Altius\Production\Documentation\LEX\Specifications\LEX-Schema-1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;lex:workflow-metadata&gt;
+&lt;lex:contact-sheet&gt;
+&lt;lex:staff-member name="John Nguyen" userid="jonguyen" role="Localization Engineering Lead" email="jonguyen@adobe.com" im="" phone="" general-description="" /&gt;
+&lt;/lex:contact-sheet&gt;
+&lt;lex:roles&gt;
+&lt;lex:role id="6" name="Localization Engineering Lead" description="" /&gt;
+&lt;/lex:roles&gt;
+&lt;lex:states&gt;
+&lt;lex:state-type name="NEW" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="CHANGED" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="UNCHANGED" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="REMOVED" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="LOCALIZED" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="SENT_FOR_TRANSLATION" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="AVAILABLE_FOR_TRANSLATION" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="LOCALIZATION_DEFECTIVE" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="UNLOCALIZED" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="NON_TRANSLATABLE" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="AVAILABLE_FOR_REVIEW" initial-state="" terminal-state="" /&gt;
+&lt;lex:state-type name="SENT_FOR_REVIEW" initial-state="" terminal-state="" /&gt;
+&lt;/lex:states&gt;
+&lt;/lex:workflow-metadata&gt;
+&lt;lex:project name="Player 10.x salt_Polish (Poland)" product="Flash Player" version="10.x salt" project-completion-date="20101030T000000Z" project-start-date="20100827T000000Z" job-completion-date="20100912T130442Z" job-start-date="20100912T130442Z"&gt;
+&lt;lex:project-metadata&gt;
+&lt;lex:variant-types&gt;
+&lt;lex:variant-typename type="platform"&gt;unix&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;win&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;mac&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;linux&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;javaME&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;brew&lt;/lex:variant-typename&gt;
+&lt;lex:variant-typename type="platform"&gt;symbian&lt;/lex:variant-typename&gt;
+&lt;/lex:variant-types&gt;
+&lt;/lex:project-metadata&gt;
+&lt;lex:feature name="defaultFeature"&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000002">&lt;lex:domain-context id="STRINGTABLE#IDS_TITLE_INSTALL" record-locator="2985152" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000003">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20384720"&gt;
+&lt;lex:value&gt;Adobe® Flash® Player 10.1 Installer&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000004">
+</iws:markup-seg><iws:markup-seg sequence="0000000005">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000006">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20384716"&gt;
+&lt;lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000008">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000009">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000010">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000011">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000012">
+</iws:markup-seg><iws:markup-seg sequence="0000000013">&lt;lex:domain-context id="FPInstallerWindowTitle" record-locator="2984689" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000014">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20377324"&gt;
+&lt;lex:value&gt;Adobe® Flash® Player 10.1 Installer&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000015">
+</iws:markup-seg><iws:markup-seg sequence="0000000016">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000017">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20377335"&gt;
+&lt;lex:value&gt;</iws:markup-seg></trans-unit><trans-unit id="0000000018"><source>Adobe® Flash® Player 10.1 Installer</source><target>Instalator programu Adobe® Flash® Player 10.1</target><iws:segment-metadata sid="[FPInstallerWindowTitle]-[20377335]-[2984689]" tm_score="94.76" ws_word_count="4" max_segment_length="0"><iws:status source_content="repetition" propagated="exact" /></iws:segment-metadata><iws:markup-seg sequence="0000000019">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000020">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000021">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000022">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000023">
+</iws:markup-seg><iws:markup-seg sequence="0000000024">&lt;lex:domain-context id="LicenseAgreementLink" record-locator="2984706" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000025">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20377605"&gt;
+&lt;lex:value&gt;Read the license here.&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000026">
+</iws:markup-seg><iws:markup-seg sequence="0000000027">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000028">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20377591"&gt;
+&lt;lex:value&gt;</iws:markup-seg></trans-unit><trans-unit id="0000000029"><source>Read the license here.</source><target>Tutaj można przeczytać licencję.</target><iws:segment-metadata sid="[LicenseAgreementLink]-[20377591]-[2984706]" tm_score="0" ws_word_count="4" max_segment_length="0"><iws:status translation_status="pending" translation_type="manual_translation" /></iws:segment-metadata><iws:markup-seg sequence="0000000030">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000031">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000032">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000033">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000034">
+</iws:markup-seg><iws:markup-seg sequence="0000000035">&lt;lex:domain-context id="ReadAndAgreeToTermsOfUse" record-locator="2984714" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000036">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20377737"&gt;
+&lt;lex:value&gt;I have read and agree to the terms of the Flash Player License Agreement.&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000037">
+</iws:markup-seg><iws:markup-seg sequence="0000000038">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000039">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20377723"&gt;
+&lt;lex:value&gt;</iws:markup-seg></trans-unit><trans-unit id="0000000040"><source>I have read and agree to the terms of the Flash Player License Agreement.</source><target>Potwierdzam przeczytanie warunków Umowy licencyjnej programu Flash Player i zgodę na nie.</target><iws:segment-metadata sid="[ReadAndAgreeToTermsOfUse]-[20377723]-[2984714]" tm_score="86" ws_word_count="14" max_segment_length="0"><iws:status source_content="repeated" translation_status="pending" translation_type="manual_translation" /></iws:segment-metadata><iws:markup-seg sequence="0000000041">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000042">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000043">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000044">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000045">
+</iws:markup-seg><iws:markup-seg sequence="0000000046">&lt;lex:domain-context id="STRINGTABLE#IDS_SUBJECT_TO_LICENSE" record-locator="2985213" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000047">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20385682"&gt;
+&lt;lex:value&gt;&amp;lt;a href='http://www.adobe.com/products/eulas/#flash_player'&gt;Read the license here.&amp;lt;/a&gt;&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000048">
+</iws:markup-seg><iws:markup-seg sequence="0000000049">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000050">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20385678"&gt;
+&lt;lex:value&gt;</iws:markup-seg></trans-unit><trans-unit id="0000000051"><source>&lt;a href='http://www.adobe.com/products/eulas/#flash_player'&gt;Read the license here.&lt;/a&gt;</source><target>&lt;a href='http://www.adobe.com/products/eulas/#flash_player'&gt;Tutaj można przeczytać licencję&lt;/a&gt;.</target><iws:segment-metadata sid="[STRINGTABLE#IDS_SUBJECT_TO_LICENSE]-[20385678]-[2985213]" tm_score="0" ws_word_count="13" max_segment_length="0"><iws:status translation_status="pending" translation_type="manual_translation" /></iws:segment-metadata><iws:markup-seg sequence="0000000052">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000053">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000054">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000055">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000056">
+</iws:markup-seg><iws:markup-seg sequence="0000000057">&lt;lex:domain-context id="STRINGTABLE#IDS_AGREE_TO_LICENSE" record-locator="2985200" resource-type="String" priority="0"&gt;
+&lt;lex:propset /&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000058">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="true" lang="en-us" locale-variant=""&gt;
+&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="CHANGED" internal-id="20385481"&gt;
+&lt;lex:value&gt; I have read and agree to the terms of the Flash Player License Agreement.&lt;/lex:value&gt;
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000059">
+</iws:markup-seg><iws:markup-seg sequence="0000000060">&lt;lex:element type="text" mime-type="" review-complete="false" translation-complete="false" review-cycle="0" is-core="false" lang="pl-pl" locale-variant=""&gt;
+</iws:markup-seg><iws:markup-seg sequence="0000000061">&lt;lex:variant type="default" name="default"&gt;
+&lt;lex:le state="SENT_FOR_TRANSLATION" internal-id="20385473"&gt;
+&lt;lex:value&gt;</iws:markup-seg></trans-unit><trans-unit id="0000000062"><source> I have read and agree to the terms of the Flash Player License Agreement.</source><target> Potwierdzam przeczytanie warunków Umowy licencyjnej programu Flash Player i zgodę na nie.</target><iws:segment-metadata sid="[STRINGTABLE#IDS_AGREE_TO_LICENSE]-[20385473]-[2985200]" tm_score="100" ws_word_count="14" max_segment_length="0"><iws:status source_content="repetition" translation_status="pending" translation_type="manual_translation" /></iws:segment-metadata><iws:markup-seg sequence="0000000063">&lt;/lex:value&gt;</iws:markup-seg><iws:markup-seg sequence="0000000064">
+&lt;lex:metadata&gt;
+&lt;lex:propset /&gt;
+&lt;/lex:metadata&gt;
+&lt;/lex:le&gt;
+&lt;lex:comments /&gt;
+&lt;/lex:variant&gt;</iws:markup-seg><iws:markup-seg sequence="0000000065">
+&lt;lex:personal-comment userid="" date="" /&gt;
+&lt;/lex:element&gt;</iws:markup-seg><iws:markup-seg sequence="0000000066">
+&lt;/lex:domain-context&gt;</iws:markup-seg><iws:markup-seg sequence="0000000067">
+
+&lt;lex:propset /&gt;
+&lt;/lex:feature&gt;
+&lt;/lex:project&gt;
+&lt;/lex:lex&gt;</iws:markup-seg></trans-unit></body></file></xliff>

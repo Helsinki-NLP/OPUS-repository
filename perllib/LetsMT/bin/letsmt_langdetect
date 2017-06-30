@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+letsmt_langdetect - try to detect the language of a given file
+
+=head1 USAGE
+
+ # detect language of a given file:
+ letsmt_langdetect [-u user] [-s slot] [-p] file
+
+ # create a new language model for language 'lang' from a given file
+ letsmt_langdetect [-u user] [-s slot] [-p] -n lang file
+
+=head1 OPTIONS
+
+If you want to use it for resources in the repository:
+
+ -s slot .......... specify a slot
+ -u user .......... specify a repository username
+ -p path/to/file .. relative path to the resource
+
+=head1 DESCRIPTION
+
+=head2 In language detection mode:
+
+The script simply returns a (space-separated) list of possible languages.
+
+=head2 In training mode (-n):
+
+The script tries to install the language model in the central LM home
+directory. This fails if you do not have permissions to create files
+there or if the file already exists. In that case, letsmt_langdetect
+will try to safe the file in the current directory. 
+
+'lang' can be a valid ISO639 code or a valid language
+name. Internally, this will be converted into a ISO639 2-letter code
+if possible. This code will be used to store the language model (for
+example 'en.lm' for English).
+
+=cut
+
+use strict;
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+# use open qw(:std :locale);        # don't use locale here!
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::Lang::Detect qw/ :all /;
+
+use Getopt::Std;
+use vars qw($opt_h $opt_n $opt_p $opt_s $opt_t $opt_u $opt_V);
+getopts('hn:p:s:t:u:V');
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_langdetect - try to detect the language of a given file',
+    -verbose => 1,
+) if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+
+# make a new language model ($opt_n = language)
+
+if ($opt_n){
+    local $/;           # so it doesn't affect $/ elsewhere
+    undef $/;
+    binmode(STDIN);
+    my $text = <>;      # swallow input.
+    $text || die "determining the language of an empty file is hard...\n";
+    create_lm($text,$opt_n);
+    exit;
+}
+
+# the input resource (could be local or in the RR)
+
+my $path = $opt_p || shift;
+my $resource = new LetsMT::Resource(
+    user => $opt_u,
+    slot => $opt_s,
+    path => $path
+);
+
+
+print join( ' ', &detect_language($resource)), "\n";
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

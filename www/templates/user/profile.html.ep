@@ -1,0 +1,61 @@
+% layout 'default';
+
+<h2>Edit Profile</h2>
+
+<div id='form_box'
+    class='ui-state-default ui-corner-all profile_form centered'>
+    
+	%= form_for url_for('/update') => (method => 'post') => begin
+	
+      <div class='form_element'>
+	  Name:<br/> 
+	  <input name='user' type='text' value="<%= session 'user' =%>" disabled='disabled' class='text_input' /> 
+	</div>
+    
+    <div class='form_element'>
+	  Email:<br/>
+	  <input name='email' value="<%= stash 'email' =%>" class='text_input' />
+	</div>
+    
+    <div class='form_element'>
+	  Old Password:<br/>
+	  %= password_field 'pass_old', class => 'text_input'
+	</div>
+    
+    <div class='form_element'>
+	  New Password:<br/>
+	  %= password_field 'pass_new_1', class => 'text_input'	
+    </div>
+    
+    <div class='form_element'>
+	  New Password Repeat:<br/>
+	  %= password_field 'pass_new_2', class => 'text_input'
+	</div>  
+	  
+<hr class='form_seperator_line' />
+    
+    <div class='form_button_box'>	  
+	  %= submit_button 'Update', class => 'ui-state-default ui-corner-all submit_button form_button centered'
+	</div>
+    
+	% end
+</div>
+
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+
+=head1 NAME
+
+letsmt_align - sentence-align resources from the repository
+
+=head1 USAGE
+
+ letsmt_align -u user -s slot -e srcpath -f trgpath [OPTIONS]
+
+ slot ........ name of the REST-slot (= corpus name)
+ user ........ name of the REST-user (= branch name)
+ srcpath ..... relative path to the source language file
+ trgpath ..... relative path to the target language file
+
+=head2 OPTIONS
+
+ -m method .... optional alignment method (default: Gale/Church algorithm)
+ -v ........... verbose output
+
+ -h ........... show the help text
+ -V ........... display the LetsMT library version
+
+=head1 DESCRIPTION
+
+This script aligns two XML resources and creates a sentence alignment file.
+WARNING: it overwrites any existing sentence alignment file with the same name without asking!
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use File::Temp;
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::WebService;
+use LetsMT::Align;
+use LetsMT::Corpus qw/:all/;
+
+# default alignment method if not specified (-m)
+our $DEFAULT_ALIGNER = 'GaleChurch';
+
+use Getopt::Std;
+use vars qw($opt_e $opt_f $opt_h $opt_m $opt_s $opt_u $opt_v $opt_V);
+getopts('s:u:m:e:f:hvV');
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_align - sentence-align resources from the repository',
+    -verbose => 1,
+) if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+my $user    = $opt_u || &pod2usage() && exit;
+my $slot    = $opt_s || &pod2usage() && exit;
+my $srcpath = $opt_e || &pod2usage() && exit;
+my $trgpath = $opt_f || &pod2usage() && exit;
+my $method  = $opt_m || $DEFAULT_ALIGNER;
+
+# make a temporary working directory
+my $local_dir = &File::Temp::tempdir(
+    'align_XXXXXXXX',
+    DIR     => '/tmp',
+    CLEANUP => 1
+);
+
+my $srcres = &LetsMT::Resource::make( $slot, $user, $srcpath, $local_dir );
+my $trgres = &LetsMT::Resource::make( $slot, $user, $trgpath, $local_dir );
+
+my %AlignPara       = &get_align_parameter( $srcres );
+$AlignPara{method}  = $opt_m if ($opt_m);
+$AlignPara{verbose} = $opt_v if ($opt_v);
+
+my $aligner = new LetsMT::Align( %AlignPara );
+my $algres;
+
+print "Try to align $srcres and $trgres ... \n";
+unless ( $algres = $aligner->align_resources( $srcres, $trgres ) ) {
+    die "something went wrong ....\n";
+}
+print "Done! ($algres)\n";
+
+
+END {
+    File::Temp::cleanup();
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

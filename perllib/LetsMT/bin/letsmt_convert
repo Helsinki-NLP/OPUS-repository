@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+letsmt_convert - a script for converting data files
+
+=head1 USAGE
+
+ letsmt_convert [OPTIONS] infile outfile
+
+If input is in Moses format:
+
+ letsmt_convert [OPTIONS] -i moses infile targetfile outfile
+
+OPTIONS
+
+ -i format .......... input format (default = xml)
+ -o format .......... output format (default = text)
+ -l lang ............ language of input resource (default = <guess from path>)
+
+ -b method .......... sentence splitter (default = no)
+ -m mode ............ reader mode (optional)
+ -n types ........... list of normalizer (comma separated)
+ -t method .......... tokenizer (default = no)
+
+ -s slot ............ slot (for fetching)
+ -u user ............ user ID (for fetching)
+
+ -h ................. show the help text
+ -V ................. display the LetsMT library version
+
+=head1 DESCRIPTION
+
+Convert between data file formats used by LetsMT.
+
+The language option may be useful for certain sentence splitters and tokenizer.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+# use FindBin;                       # We use this in order to use the library in the source tree,
+# use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::Export::Reader;
+use LetsMT::Export::Writer;
+
+use LetsMT::DataProcessing::Splitter;
+use LetsMT::DataProcessing::Tokenizer;
+use LetsMT::DataProcessing::Normalizer;
+
+use Getopt::Std;
+my %opts;
+my $known_opts = 'b:hi:l:m:n:o:s:t:u:V';
+getopts ($known_opts, \%opts);
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_convert - convert LetsMT data files',
+    -verbose => 1,
+) if ($opts{h});
+
+if ($opts{V}) {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+}
+
+my $infile  = shift @ARGV or die "No input file given!\n";
+getopts ($known_opts, \%opts);
+my $trgfile = shift @ARGV if ( $opts{i} =~ /^moses$/i );
+getopts ($known_opts, \%opts);
+my $outfile = shift @ARGV or die "No output file given!\n";
+getopts ($known_opts, \%opts);
+
+my $user      = $opts{u};
+my $slot      = $opts{s};
+my $informat  = $opts{i} || 'xml';
+my $outformat = $opts{o} || 'text';
+
+my $inresource  = &LetsMT::Resource::make( $slot, $user, $infile );
+my $outresource = &LetsMT::Resource::make( $slot, $user, $outfile );
+
+# resource languaga
+my $lang = $opts{l} || $inresource->language;
+
+# pre-processors for the reader
+my ($splitter,$tokenizer,$normalizer);
+if ($opts{b}){
+    $splitter = new LetsMT::DataProcessing::Splitter(
+        method => $opts{b},
+        lang   => $lang
+    );
+}
+if ($opts{t}){
+    $tokenizer = new LetsMT::DataProcessing::Tokenizer(
+        method => $opts{t},
+        lang   => $lang
+    );
+}
+if ($opts{n}){
+    $normalizer = new LetsMT::DataProcessing::Normalizer( type => $opts{n} );
+}
+
+# send resource to constructor
+# --> may guess resource type if data format is not given
+my $input = new LetsMT::Export::Reader(
+    $inresource, $informat,
+    mode       => $opts{m},
+    normalizer => $normalizer,
+    splitter   => $splitter,
+    tokenizer  => $tokenizer
+);
+my $output = new LetsMT::Export::Writer( $outresource, $outformat );
+
+my @inres  = ($inresource);
+my @outres = ($outresource);
+
+# Moses format requires two resources (source and target language file)
+
+if ( $informat eq 'moses' ) {
+    push( @inres, &LetsMT::Resource::make( $slot, $user, $trgfile ) );
+}
+
+$input->open(@inres)   || die "cannot open $inresource (or empty)!\n";
+$output->open(@outres) || die "cannot open $outresource!\n";
+
+my $before = {};
+my $after  = {};
+
+while ( my $data = $input->read( $before, $after ) ) {
+    $output->write( $data, $before, $after );
+}
+
+$input->close();
+$output->close();
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

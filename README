@@ -1,0 +1,130 @@
+###############################
+# LetsMT! Resource Repository #
+###############################
+
+LetsMT! <http://www.letsmt.eu> is a project on "Building a Platform for Online
+Sharing of  Training Data and  Building User Tailored MT".  This package holds
+the software contributed  by the  Computational Linguistics  group at  Uppsala
+University, called the Resource Repository.
+
+
+SYSTEM REQUIREMENTS
+===================
+* One ("monolithic" installation) or several PCs (distributed installation)
+  or (for testing) virtual machines.
+  - tested on 64-bit systems, though 32-bit systems should also be possible
+* GNU/Linux operating system
+  - tested on Ubuntu 10.04 LTS and 12.04 LTS
+  - the installation installs needed software with the  Debian package manager
+    "apt", so a Debian system (Debian, Ubuntu) is at least necessary for
+    out-of-the-box installation
+* Perl 5.10 or higher
+* Apache 2.x with ModPerl
+
+
+INSTALLATION
+============
+See the file INSTALL  for quick single-server  installation instructions.  For
+more extensive instructions and further installation options,  see the section
+"LetsMT Repository Installation and Configuration Instructions" on the project
+Wiki <http://opus.lingfil.uu.se/letsmt-trac/>, or on the DVD, the files in the
+directory "resource-repository/wiki/install+config".
+
+
+PACKAGE CONTENTS
+================
+admin/ ............. Scripts for administration
+installation/ ...... Scripts & Makefiles for setup & installation
+perllib/ ........... Perl modules and scripts
+perllib/LetsMT/ >... LetsMT package of Perl modules & scripts
+lib/ ............... Third-party packages/libraries
+
+www/ ............... Extra: web interface
+
+
+Detailed contents for perllib/LetsMT/
+-------------------------------------
+  bin/ ....... essential scripts using/used by the LetsMT modules
+  doc/ ....... documentation generated from source (perldoc)
+  lib/ ....... all Perl modules
+  share/ ..... other global files necessary for the Perl modules
+  t/ ......... test scripts
+  xt/ ........ "extra" test scripts (for developers only)
+
+Detailed documentation is generated from the source code (make doc)
+and more has still to be writen.
+
+
+perllib/LetsMT/lib/
+-------------------
+The LetsMT package basically includes modules for several purposes:
+
+* implementation of the repository web-service:
+  LetsMT/Repository
+  LetsMT/Repository/AdminManager ..... administrative functions
+  LetsMT/Repository/GroupManager ..... access to group database
+  LetsMT/Repository/JobManager   ..... access to SGE
+  LetsMT/Repository/StorageManager ... access to the data repository
+
+* an Application Program Interface (API) to the web service (REST calls)
+  LetsMT/Repository/API/Access ....... calls to set group permissions
+  LetsMT/Repository/API/Admin ........ admin calls
+  LetsMT/Repository/API/Group ........ calls to group database
+  LetsMT/Repository/API/Letsmt ....... obsolescent "high-level" calls storage
+  LetsMT/Repository/API/MetaData ..... calls to metadata database
+  LetsMT/Repository/API/Storage ...... calls to storage server
+  LetsMT/WebService .................. entry point for talking to the API in Perl
+
+* modules for data processing (I/O, conversion, ...)
+  LetsMT/Align ....................... wrapper around various sentence aligners
+  LetsMT/Align/GaleChurch
+  LetsMT/Align/HunAlign
+  LetsMT/Corpus ...................... reading/writing data in various formats
+  LetsMT/Import ...................... convert/import data to LetsMT
+  LetsMT/Import/PDF ...................... PDF files
+  LetsMT/Import/DOC ...................... MS word documents
+  LetsMT/Import/TXT ...................... plain text files
+  LetsMT/Import/XML ...................... arbitrary xml files
+  LetsMT/DataProcessing/Normalizer ... normalization
+  LetsMT/DataProcessing/Splitter ..... sentence splitting
+  LetsMT/DataProcessing/Tokenizer .... (de)tokenization (generic, language/specific ...)
+
+
+perllib/LetsMT/bin
+------------------
+Command-line tools:
+
+* letsmt_rest
+  Command-line tool to perform common tasks via the LetsMT webservice API.
+
+* letsmt_fetch
+  Fetch SMT training data (parallel and monolingual) from
+  the repository according to the specifications in a configuration
+  file.
+
+* letsmt_convert
+  Convert between different file formats.
+
+* letsmt_import
+  Validate/convert/import data files that have been uploaded to
+  LetsMT. It can also be used to import OPUS corpora from command-line.
+
+* letsmt_tokenize & letsmt_detokenize
+  Tokenize and de-tokenize a text.
+
+
+
+LICENSE
+=======
+LetsMT! Resource Repository is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+LetsMT! Resource Repository.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,0 +1,170 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          ttservctl
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop Tokyo Tyrant (TT) DB servers.
+# Description:       TT servers provide the LetsMT group and meta databases.
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+# configuration variables
+cmd=/usr/local/bin/ttserver
+params="-le"
+datadir=REPLACE_DBDIR
+case $0 in
+    *_group)
+        database=group
+        port=REPLACE_DBPORT_GROUP
+        mport=REPLACE_REPLICATION_PORT_GROUP
+        mhost=REPLACE_REPLICATION_HOST_GROUP
+	rtsfile="$datadir/group.rts"
+    ;;
+    *_meta)
+        database=metadata
+        port=REPLACE_DBPORT_META
+        mport=REPLACE_REPLICATION_PORT_META
+        mhost=REPLACE_REPLICATION_HOST_META
+	rtsfile="$datadir/meta.rts"
+    ;;
+    *)
+        printf '%s: script name must be *_group or *_meta\n' $0
+        exit 1
+esac
+dbname="$datadir/$database.tct"
+piddir="/var/run/letsmt"
+pidfile="$piddir/tt_$database.pid"
+logfile="$datadir/$database.tct.log"
+ulogdir="$datadir/$database.tct.ulog"
+ulimsiz="256m"
+sid=1
+bnum=1000000
+rtsfile="$datadir/rts"
+
+# environment variables
+LANG=C
+LC_ALL=C
+PATH="$PATH:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+export LANG LC_ALL PATH
+
+# check permission
+if [ -d "$datadir" -a ! -w "$datadir" ] ; then
+    printf 'Directory %s: permission denied\n' $datadir
+    exit 1
+fi
+
+
+# dispatch the command
+case "$1" in
+    start)
+        log_daemon_msg "Starting Tokyo Tyrant '$database' server" || true
+        mkdir -p "$datadir"
+        mkdir -p "$piddir"
+        if     [ -z "$datadir" ] \
+            || [ -z "$port"    ] \
+            || [ -z "$pidfile" ] \
+            || [ -z "$dbname"  ]
+        then
+            printf 'Invalid configuration\n'
+            exit 1
+        elif [ ! -d "$datadir" ] ; then
+            printf 'Directory could not be created: %s\n' $datadir
+            exit 1
+        elif [ ! -d "$piddir" ] ; then
+            printf 'Directory could not be created: %s\n' $piddir
+            exit 1
+        else
+            params="$params -port $port -dmn -pid $pidfile"
+            [ -n "$logfile" ] && params="$params -log $logfile"
+            [ -n "$ulogdir" ] && {
+                mkdir -p "$ulogdir"
+                params="$params -ulog $ulogdir"
+            }
+            [ -n "$ulimsiz" ] && params="$params -ulim $ulimsiz"
+            [ -n "$sid"     ] && params="$params -sid $sid"
+            [ -n "$mhost"   ] && params="$params -mhost $mhost"
+            [ -n "$mport"   ] && params="$params -mport $mport"
+            [ -n "$rtsfile" ] && params="$params -rts $rtsfile"
+            [ -n "$bnum"    ] && dbname="$dbname#bnum=$bnum"
+
+            if [ -n "$(pidofproc -p $pidfile $cmd)" ] ; then
+                printf "   ...server already running -\n"
+                log_end_msg 1 || true
+                exit 1
+            elif [ -e $pidfile ] ; then
+                printf "   ...warning: deleting stale PID file!\n"
+                rm $pidfile
+            fi
+
+            start-stop-daemon --start --quiet --pidfile $pidfile --exec $cmd -- $params $dbname
+            log_end_msg $? || true
+        fi
+    ;;
+    stop)
+        log_daemon_msg "Stopping Tokyo Tyrant '$database' server" || true
+        start-stop-daemon --stop --quiet --oknodo --exec $cmd --pidfile $pidfile
+        for i in `seq 1 100`; do
+            sleep 0.1
+            if [ ! -f $pidfile ]; then
+                log_end_msg 0 || true
+                exit 0
+            fi
+        done
+        pid=$(pidofproc -p $pidfile $cmd)
+        log_failure_msg "process $pid is hanging" || true
+        exit 1
+    ;;
+    restart)
+        $0 stop
+        $0 start
+    ;;
+    reload|hup)
+        log_daemon_msg "Telling Tokyo Tyrant '$database' server to reload for log rotation"
+        pid=$(pidofproc -p $pidfile $cmd)
+        if [ -n "$pid" ]; then
+            printf "   ...sending hangup signal to process #%s\n" $pid
+            kill -HUP "$pid"
+            log_end_msg 0 || true
+        else
+            log_warning_msg 'No process found' || true
+            exit 1
+        fi
+    ;;
+    status)
+        pid=$(pidofproc -p $pidfile $cmd)
+        if [ -n "$pid" ]; then
+            status_of_proc -p $pidfile $cmd "Tokyo Tyrant '$database' server" \
+                && exit 0 || exit $?
+        else
+            printf " * Tokyo Tyrant '%s' server is not running\n" $database
+        fi
+    ;;
+    *)
+        printf 'Usage: %s {start|stop|restart|reload|hup|status}\n' $0
+        exit 1
+esac
+
+
+exit 0
+
+#
+# This file is part of LetsMT! Resource Repository.
+#
+# LetsMT! Resource Repository is free software: you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# LetsMT! Resource Repository is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with LetsMT! Resource Repository.  If not, see
+# <http://www.gnu.org/licenses/>.
+#

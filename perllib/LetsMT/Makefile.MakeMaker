@@ -1,0 +1,40 @@
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME              => 'LetsMT',
+    VERSION_FROM      => 'lib/LetsMT.pm',
+    ABSTRACT          => 'A collection of Perl modules for the LetsMT platform.
+                          Check http://www.letsmt.eu/ for more information!',
+    EXE_FILES         => [ 
+	'bin/letsmt_convert',
+#	'bin/letsmt_validate',
+#	'bin/letsmt_align',
+#	'bin/letsmt_db',
+	'bin/letsmt_fetch',
+	'bin/letsmt_import',
+	'bin/letsmt_rest',
+    ],
+    AUTHOR            => 'Joerg Tiedemann <jorg.tiedemann@lingfil.uu.se>',
+    PREREQ_PM         => {
+        'Cwd'     => 0,
+        'Data::Dumper'     => 0,
+        'DBI'     => 0,
+        'Encode'     => 0,
+        'Err' => 0,
+        'File::Basename'     => 0,
+        'File::Copy::Recursive' => 0,
+        'FileHandle'     => 0,
+        'Filesys::DiskUsage' => 0,
+        'File::Temp' => 0,
+        'FindBin'     => 0,
+        'Log::Log4perl' => 0,
+        'LWP::UserAgent'     => 0,
+        'Persistent::MySQL'     => 0,
+        'TokyoCabinet'     => 0,
+        'URI::Escape'     => 0,
+        'XML::Parser'     => 0,
+# 	'HTTP::Request::Common' => 0,
+#        'XML::Writer'     => 0,
+#        'XML::Simple'     => 0,
+    },
+    );

@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+#-*-perl-*-
+
+=head1 NAME
+
+letsmt_tokenize - a script for tokenizing text
+
+=head1 USAGE
+
+ letsmt_tokenize [OPTIONS] infile outfile
+
+OPTIONS
+
+ -i .......... input format (default = xml)
+ -o .......... output format (default = xml)
+
+ -l lang ..... language ID (default = 'en')
+ -m method ... tokenizer method (default = 'europarl')
+ -t type ..... tokenizer type (for example 'Whitespace') ## TOODO
+
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=head1 Description
+
+The script reads through a corpus and tokenizes each sentence. This works only for monolingual data.
+
+=head1 TODO
+
+Add more language-specific tokenizers.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+use Pod::Usage;
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::Export::Reader;
+use LetsMT::Export::Writer;
+
+use LetsMT::DataProcessing::Tokenizer;
+
+use Getopt::Std;
+use vars qw($opt_h $opt_l $opt_m $opt_i $opt_o $opt_t $opt_u $opt_s $opt_V);
+getopts('hl:m:i:o:t:u:s:V');
+
+$| = 1; ## Autoflush STDOUT
+pod2usage(
+    -message => 'letsmt_tokenize - a script for tokenizing text',
+    -verbose => 1,
+) if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+
+my $method    = $opt_m || 'europarl';
+my $lang      = $opt_l || 'en';
+my $informat  = $opt_i || 'xml';
+my $outformat = $opt_o || 'xml';
+
+my $user = $opt_u;
+my $slot = $opt_s;
+
+
+my $infile  = shift or die "no input and output file names!\n";
+my $outfile = shift or die "no output file name!\n";
+
+
+my $inresource  = &LetsMT::Resource::make( $slot, $user, $infile  );
+my $outresource = &LetsMT::Resource::make( $slot, $user, $outfile );
+
+my $input  = new LetsMT::Export::Reader( $inresource , $informat  );
+my $output = new LetsMT::Export::Writer( $outresource, $outformat );
+
+my $tokenizer = new LetsMT::DataProcessing::Tokenizer(
+    lang => $lang,
+    method => $method
+#    -type => $opt_t
+);
+
+
+$input->open() || die "cannot open $inresource!\n";
+$output->open() || die "cannot open $outresource!\n";
+
+while ( my $data = $input->read() ) {
+    $tokenizer->tokenize_data( $data );
+    $output->write( $data );
+}
+
+$input->close();
+$output->close();
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

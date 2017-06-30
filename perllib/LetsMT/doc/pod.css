@@ -1,0 +1,76 @@
+BODY {
+  background: white;
+  color: black;
+  font-family: arial,sans-serif;
+  margin: 0;
+  padding: 1ex;
+}
+
+.menu {
+  font-size: 0.8em;
+}
+
+DIV { border-width: 0; }
+
+P, UL, DL {
+  margin: 0.5em 0 0.5em 2em;
+}
+
+UL UL {
+  margin: 0;
+}
+
+PRE {
+  background: #dddddd;
+  border: 1px solid black;
+  color: black;
+  margin: 0 2em 0 2.5em;
+  padding: 1em 0.5em;
+  white-space: pre;
+}
+
+H1 {
+  color: #006699;
+  font-size: 1.6em;
+  margin-bottom: 0;
+}
+
+H2 {
+  color: #006699;
+  font-size: 1.4em;
+}
+
+LI {
+  line-height: 1.2em;
+  list-style-type: none;
+}
+
+.active {
+  font-weight: bold;
+}
+
+TABLE {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-width: 0;
+  color: inherit;
+}
+
+TD {
+  margin: 0;
+  padding: 0;
+}
+
+DT { margin-top: 0.8em; }
+
+TH {
+  background: #bbbbbb;
+  color: inherit;
+  padding: 0.4ex 1ex;
+  text-align: left;
+}
+
+TH A:link, TH A:visited {
+  background: transparent;
+  color: black;
+}

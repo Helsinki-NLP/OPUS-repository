@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+#-*-perl-*-
+
+=head1 NAME
+
+letsmt_detokenize - detokenize text
+
+=head1 DESCRIPTION
+
+The script reads through a corpus and detokenizes each sentence.
+This works only for monolingual data.
+
+=head1 USAGE
+
+ letsmt_detokenize [OPTIONS] infile outfile
+
+=head1 OPTIONS
+
+ -l lang ..... language ID (default = 'en')
+ -i .......... input format (default = xml)
+ -o .......... output format (default = xml)
+ -m .......... detokenizer method (default = europarl)
+
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=head1 TODO
+
+- Check if it works correctly for annotated data.
+
+- Add language-specific detokenizers (right now only the Moses detokenizer is implemented).
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::Export::Reader;
+use LetsMT::Export::Writer;
+use LetsMT::DataProcessing::Tokenizer;
+
+use Getopt::Std;
+my %opts;
+my $known_opts = 'hi:l:m:o:u:s:V';
+getopts ($known_opts, \%opts);
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_detokenize - detokenize text',
+    -verbose => 1,
+) if ($opts{h});
+
+if ($opts{V}) {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+}
+
+my $infile  = shift || die "No input file given!\n";
+getopts ($known_opts, \%opts);
+my $outfile = shift || die "No output file given!";
+getopts ($known_opts, \%opts);
+
+my $lang      = $opts{l} || 'en';
+my $informat  = $opts{i} || 'xml';
+my $outformat = $opts{o} || 'xml';
+my $method    = $opts{m} || 'europarl';
+
+my $user      = $opts{u};
+my $slot      = $opts{s};
+
+my $inresource  = &LetsMT::Resource::make( $slot, $user, $infile );
+my $outresource = &LetsMT::Resource::make( $slot, $user, $outfile );
+
+my $input  = new LetsMT::Export::Reader($inresource,$informat);
+my $output = new LetsMT::Export::Writer($outresource,$outformat);
+
+my $detokenizer = new LetsMT::DataProcessing::Tokenizer( 
+    method => $method,
+    -lang => $lang );
+
+$input->open()  || die "cannot open $inresource!\n";
+$output->open() || die "cannot open $outresource!\n";
+
+while ( my $data = $input->read() ) {
+    $detokenizer->detokenize_data( $data );
+    $output->write( $data );
+}
+
+$input->close();
+$output->close();
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

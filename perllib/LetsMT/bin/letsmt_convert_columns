@@ -1,0 +1,271 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+letsmt_convert_columns - convert pdftotext column output into block text
+
+=head1 SYNOPSIS
+
+Try to detect and convert columns and tables created by pdftotext in layout mode into running text.
+
+=head1 USAGE
+
+ ./convert_columns < input-file > output-file
+
+ input-file has to be in Unicode UTF-8.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_convert_columns - convert pdftotext column output into block text',
+    -verbose => 1,
+) if -t STDIN;
+
+my $incolumns  = 0;
+my @columntxt  = ();
+my @columnpos  = ();
+my $emptylines = 0;
+
+binmode( STDIN,  ":encoding(utf8)" );
+binmode( STDOUT, ":encoding(utf8)" );
+
+while (<>) {
+
+    #-------------------------------------
+    # we are in a column/table environment (hopefully)
+    #-------------------------------------
+
+    if ($incolumns) {
+        if ( $_ !~ /\S/ ) {
+            $emptylines++;
+        }
+        if ( $emptylines > 1 ) {    # two or more empty lines?!
+            $incolumns  = 0;        # --> stop column environment!
+            $emptylines = 0;
+        }
+        elsif ( compatible_columns( \@columnpos, \@columntxt, $_ ) ) {
+            push( @columntxt, $_ );
+        }
+        else {
+            $incolumns  = 0;        # incompatible columns
+            $emptylines = 0;        # --> stop column environment!
+        }
+    }
+
+    #-------------------------------------
+    # we are not in a column environment!
+    #-------------------------------------
+
+    if ( not $incolumns ) {
+
+        # if there is something in columntxt (previous text)
+        # --> convert to text!
+        if (@columntxt) {
+            convert_columns( \@columntxt, \@columnpos );
+
+            #	    print "------- columns end ---------\n";
+            @columntxt = ();
+            @columnpos = ();
+        }
+
+        ## assume that lines with more than 3 spaces between non-space char's
+        ## are typical text lines in columns/tables
+        ## require at least 5 initial characters to avoid headers to appear
+        if (/^.{5,}\S\s{3,}\S/) {
+            if ( not $incolumns ) {
+
+                # print "------- columns start ---------\n";
+                $incolumns = 1;
+                push( @columntxt, $_ );
+                @columnpos = guess_column_positions($_);
+            }
+        }
+
+        # print "normal" text
+        if ( not $incolumns ) {
+            if (/^\s*[\·\-]\s+/) {    # lists
+                print "\n";
+                print;
+                print "\n";
+            }
+            else {
+                print;
+            }
+
+        }
+    }
+
+}
+if (@columntxt) {
+    convert_columns( \@columntxt, \@columnpos );
+}
+
+sub compatible_columns {
+    my $pos    = shift;
+    my $lines  = shift;
+    my $txt    = shift;
+    my @newpos = guess_column_positions($txt);
+    if ( grep( $_ == 75, @newpos ) ) {
+        print '';
+    }
+
+    my %allpos = ();
+
+    if ( @{$pos} ) {
+        $allpos{ $$pos[0] } = 1;
+        foreach my $x ( 1 .. $#{$pos} ) {
+            if ( not column_pos_is_ok( $$pos[$x], $txt ) ) {
+                return 0;
+            }
+            $allpos{ $$pos[$x] } = 1;
+        }
+    }
+
+    foreach my $p (@newpos) {
+        if ( not exists $allpos{$p} ) {
+            my $is_ok = 1;
+            foreach my $l ( @{$lines} ) {
+                if ( not column_pos_is_ok( $p, $l ) ) {
+                    $is_ok = 0;
+                    last;
+                }
+            }
+            if ($is_ok) {
+                $allpos{$p} = 1;
+            }
+        }
+    }
+
+    @{$pos} = sort { $a <=> $b } keys %allpos;
+    return 1;
+}
+
+sub column_pos_is_ok {
+    my $pos = shift;
+    my $txt = shift;
+    return 1 if ( $pos >= length($txt) );
+    return 1 if ( substr( $txt, $pos - 1, 1 ) eq ' ' );
+    return 0;
+}
+
+#---------------------------------------------------------------
+# extract table cells/columns from the text
+
+sub convert_columns {
+    my $lines = shift;
+    my $pos   = shift;
+
+    #    print join("\n",@{$lines});
+    #    print "\n===============================================\n";
+
+    if ( @{$pos} ) {
+
+        my @cells   = ();       # all table cells
+        my $rownr   = 0;        # row number
+        my @current = ();       # current row of table cells
+        my $filled  = undef;    # number of filled cells from previous line
+
+        foreach my $l ( @{$lines} ) {
+            chomp($l);
+            my $this_filled = 0;
+            my @row         = ();
+
+            my $start = $$pos[0];
+            foreach my $x ( 1 .. $#{$pos} ) {
+                my $txt = substr( $l, $start, $$pos[$x] - $start );
+                if ( $txt =~ /\S/ ) {
+                    $this_filled++;
+                }
+                if ( $txt !~ /\s$/ ) { $txt .= ' '; }
+                $row[ $x - 1 ] = $txt;
+                $start = $$pos[$x];
+            }
+            my $txt = substr( $l, $$pos[-1] );
+            if ( $txt =~ /\S/ ) {
+                $this_filled++;
+
+            }
+            if ( $txt !~ /\s$/ ) { $txt .= ' '; }
+            $row[ $#{$pos} ] = $txt;
+
+            # more cells filled in this row than in previous row?
+            # --> new table row
+            # --> fill cells with current and increment row counter
+            if ( defined $filled ) {
+                if ( $this_filled > $filled ) {
+                    foreach my $c ( 0 .. $#current ) {
+                        $cells[$rownr][$c] = $current[$c];
+                    }
+                    @current = ();
+                    $rownr++;
+                }
+            }
+
+            $filled = $this_filled;    # store number of filled cells
+            foreach my $c ( 0 .. $#row )
+            {                          # move line elements to current cells
+                $current[$c] .= $row[$c];
+            }
+
+        }
+
+        # move current elements to last table cells
+        foreach my $c ( 0 .. $#current ) {
+            $cells[$rownr][$c] = $current[$c];
+        }
+
+        # finally: print the table/columns
+        foreach my $x ( 0 .. $#cells ) {
+            foreach my $y ( 0 .. $#{ $cells[$x] } ) {
+                $cells[$x][$y] =~ s/\s*$//s;
+                $cells[$x][$y] =~ s/^\s*//s;
+                print $cells[$x][$y], "\n\n";
+            }
+            print "\n";
+        }
+
+    }
+    else {
+        print join( "\n", @${lines} );
+    }
+}
+
+sub guess_column_positions {
+    my $line    = shift;
+    my @strings = split( /\s{2,}/, $line );
+    my @pos     = ();
+    foreach my $s (@strings) {
+        push( @pos, index( $line, $s ) );
+    }
+    return @pos;
+}
+
+
+=head1 AUTHOR
+
+Joerg Tiedemann, E<lt>jorg.tiedemann@lingfil.uu.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Joerg Tiedemann
+j.tiedemann@rug.nl
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

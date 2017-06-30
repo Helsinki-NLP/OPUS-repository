@@ -1,0 +1,157 @@
+% layout 'default';
+
+<h2>Edit Metadata</h2>
+
+<div class='button_menu tool_bar'>
+    <ul>        
+        <li><a 
+            % if (stash 'back_link') {
+                href="<%= url_for( 'welcome' ) %>/<%= stash 'back_link' %>"
+            % } else {
+                href="<%= url_for('index') %>/?open=<%= stash 'slot' %>_<%= stash 'branch' %>"
+            % } 
+            title='back' id="icon_link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-triangle-1-w"></span>back</a>
+        </li>
+        <br style="clear: both" />
+    </ul>
+</div>
+
+<div class='ui-widget form_box' style='width:30em;'>
+    <div class='ui-widget-content ui-corner-all'>
+    
+        <div class='ui-widget-header ui-corner-all form_header'>
+            <span>Edit Meta Data for <%= stash 'path' %></span>
+            <a href='#' style='float:right;' onclick='$("#dialog_help_edit_meta_form").dialog("open")'><span class="ui-icon ui-icon-help"></span></a>
+        </div>
+        
+        <div class='form_content'>
+        
+            %= form_for url_for('/edit') => (method => 'post') => begin
+              
+              <div class='form_element'>
+                  Domain:                   
+                  <select name='domain'>
+                      % foreach my $domain ( @{$domain_list} ) {
+                          <option value="<%= $domain->{'name'} =%>" 
+                              % if ($domain->{'selected'}) {
+                                  selected='selected'
+                              % }
+                              >
+                              <%= $domain->{'name'} =%>
+                          </option>
+                   % }
+                   </select>
+              </div>
+              
+              <div class='form_element'>
+              Description: 
+              <textarea name='description' class='ui-corner-all text_area'><%= stash 'description' =%></textarea>
+              <br/>
+              </div>
+              
+              <div class='form_element'>
+              Permission:                 
+                <select name='permission' >
+                    <optgroup label='Standard Groups'>
+                        % foreach my $group ( @{$std_groups} ) {
+                            <option value="<%= $group->{'name'} =%>" 
+                            % if ($group->{'selected'}) {
+                                selected='selected'
+                            % }
+                            ><%= $group->{'name'} =%>
+                            </option>
+                        % }
+                    </optgroup>
+                    <optgroup label='Other Groups'>
+                        % foreach my $group ( @{$other_groups} ) {
+                            <option value="<%= $group->{'name'} =%>" 
+                            % if ($group->{'selected'}) {
+                                selected='selected'
+                            % }
+                            >
+                            <%= $group->{'name'} %>
+                            </option>
+                        % }
+                    </optgroup>
+                </select>
+              </div>
+              
+              <div class='form_element'>
+              Provider: <input name='provider' value="<%= stash 'provider' =%>"/><br/>
+              </div>
+              
+              %= hidden_field update => '1'
+              
+              <hr class='form_seperator_line'/>
+              
+              %################################################################
+              %# Create select boxes from the config file, forms->edit_meta 
+              %################################################################
+              % foreach my $form (keys %{$config->{forms}->{edit_meta}} ) { 
+                  <div class='form_element'>
+                  <%= $config->{forms}->{edit_meta}->{$form}->{display_name} %>:
+                  <select name='<%= $form %>'>
+                      % foreach my $list_item ( @{$config->{forms}->{edit_meta}->{$form}->{options}} ) {
+                          <option value="<%= $list_item->{value} =%>" 
+                              %# Check if $form_fields array contains a matching value at the meta_key of the current form input  
+                              %# that is the same as the current value of the option entry, and if so, select that option, easy 
+                              % if ( $form_fields->{$config->{forms}->{edit_meta}->{$form}->{meta_key}} eq $list_item->{value}) {  
+                                selected='selected'
+                              % }  
+                          >                                                         
+                              <%= $list_item->{name} %>                                        
+                          </option>
+                      % }
+                  </select>
+              </div>
+              % } 
+              
+              
+              <hr class='form_seperator_line'/>
+                            
+              <div class='form_button_box'>
+                 %= submit_button 'Update', class => 'ui-state-default ui-corner-all form_button'
+              </div>                           
+              
+            % end
+
+        </div>
+    </div>
+</div>
+
+<div id="dialog_help_edit_meta_form" class='dialog help_box' title="Help - Edit Meta Data">
+        
+            <h2>Corpus Name</h2>
+            <p>...</p>                    
+            
+            <h2>Description</h2>
+            <p>Give a short optional description of the corpus being created.</p>
+            
+            <h2>Domain</h2>
+            <p>...</p>
+            
+            <h2>Provider</h2>
+            <p>...</p>
+            
+            <h2>Permission</h2>
+            <p>...</p>
+</div>
+
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

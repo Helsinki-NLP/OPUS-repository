@@ -1,0 +1,10 @@
+<letsmt-job>
+  <wallTime>3</wallTime>
+  <queue>letsmt</queue>
+  <commands>
+    <command>ls -la</command>
+    <command>date</command>
+    <command>env</command>
+    <command>cd /asdflkajsdfowiejlksjdflkj</command>
+  </commands>
+</letsmt-job>

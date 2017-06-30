@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+letsmt_chardetect - try to detect the character encoding of a given text
+
+=head1 USAGE
+
+ letsmt_chardetect [-u user] [-s slot] [-l lang] [-p] file
+
+ letsmt_chardetect -h
+ letsmt_chardetect -V
+
+=head1 OPTIONS
+
+ -l lang ..... language
+ -p .......... what follows is the path to the resource
+ -s slot ..... slot ID
+ -u user ..... user ID
+
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+use Pod::Usage;
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::WebService;
+use LetsMT::Lang::Encoding qw/ :all /;
+
+use Getopt::Std;
+use vars qw($opt_h $opt_l $opt_p $opt_s $opt_t $opt_u $opt_V);
+
+getopts('hu:s:p:l:V');
+
+pod2usage(
+    -message => 'letsmt_chardetect - try to detect the character encoding of a given text',
+    -verbose => 1,
+) if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+my $path = $opt_p || shift;
+my $resource = new LetsMT::Resource(
+    user => $opt_u,
+    slot => $opt_s,
+    path => $path
+);
+
+my $type = $resource->type;
+die "This is only for text format!\n" unless ( $type =~ /te?xt/i );
+
+my $lang = $opt_l || $resource->language();
+# die "Please specify the language!\n" unless ($lang);
+
+unless ( -e $resource->local_path ) {
+    &LetsMT::WebService::get_resource($resource)
+        || die "Cannot find the resource!\n";
+}
+
+print join( ' ', &detect_encoding( $resource->local_path, $lang ) ), "\n";
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

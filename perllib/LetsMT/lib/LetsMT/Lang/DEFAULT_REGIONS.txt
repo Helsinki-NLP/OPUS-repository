@@ -1,0 +1,17 @@
+#  mappings from language codes to country codes
+# (default countries in which these languages are spoken)
+# language-codes with default-country that are identical are not necessary
+# to include here!!!
+#
+# format: 
+#
+# lang-code<TAB>country-code[<TAB> comments]
+# 
+# [<TAB>comments] is optional ...
+#
+# ... need to complete this (is that easy to do?)
+
+
+en	US	# American English is the default (not GB)
+af	ZA	# Afrikaans (South Africa)
+sv	SE	# Swedish in Sweden

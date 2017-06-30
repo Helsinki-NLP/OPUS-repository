@@ -1,0 +1,618 @@
+* {
+    margin:0;
+}
+
+html, body { 
+    font: 90% "Trebuchet MS", sans-serif; 
+    height:100%;
+    margin:0;
+    padding:0;
+}
+
+.header {    
+    /* border: 1px solid red; */
+    padding-top:3em;
+    margin-right:4em;
+    margin-left:4em;
+    min-width: 900px;
+}
+
+.content {
+    display: block;
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    margin-top:125px;
+    margin-bottom:50px;
+    margin-right:4em;
+    margin-left:4em;    
+    min-width: 900px;
+    padding-top:6em;  
+}
+
+h1 {
+    float: left;
+    margin-bottom:.3em;
+}
+
+h2 {
+    position:absolute;
+    top:.5em;
+    z-index:1;
+}
+
+right_tab_heading {
+    position:absolute;
+    top:-1.5em;       
+}
+
+h3 {
+    display:inline-block !important;
+    padding-right: 1em;    
+}
+
+
+a {
+    text-decoration: none;
+    color: #1C94C4;   
+}
+
+p {
+    margin-top: 1.5em;    
+}
+
+.footer {
+    display:block;
+    position:absolute;    
+    bottom:0;    
+    left:0;
+    right:0;    
+    margin-bottom:0;
+    margin-right:4em;
+    margin-left:4em;
+    padding-left:1em;
+    padding-right:1em;     
+    height:3em;
+    min-width: 900px;    
+    font-size: 90%;    
+}
+
+.footer hr {
+    width:100%;
+    height: 2px;
+    border: 0;
+    color: #333;
+    background-color: #333;
+    margin-bottom: .5em;
+}
+
+.footer a {
+    text-decoration: none;
+    color: #333;
+}
+
+.float_left {
+    float: left;
+    border: 1px solid blue;
+}
+
+.float_right {
+    float: right;
+    border: 1px solid red;
+}
+
+.clear {
+    clear: both;
+}
+/* ######################################################################### */
+/* ##### Main Menu ##### */
+/* ######################################################################### */
+.main_menu {
+    width: 100%;
+    font-size: 1.1em;
+    background-color: #333;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    clear: both;
+}
+
+.main_menu ul{
+    margin: 0 0 0 1em; 
+    padding: 0;
+    float: left;
+}
+ 
+.main_menu ul li{
+    display: inline;
+}
+ 
+.main_menu ul li a{
+    float: left; 
+    color: white;
+    padding: 10.5px 11px;     
+}
+ 
+.main_menu ul li a:visited{
+    color: white;
+}
+ 
+.main_menu ul li a:hover, .main_menu ul li .current{
+    color: #fff;
+    background-color:#ffa71a;
+}
+
+/* ######################################################################### */
+/* ##### Button Menus ##### */
+/* ######################################################################### */
+.button_menu ul{
+    margin: 0; padding: 0;
+}
+ 
+.button_menu li{
+    display: inline;
+    float: left;
+    padding-left: .4em;
+    padding-right: 0;
+}
+ 
+.button_menu li a:hover, .button_menu li .current{
+    color: #c77405;
+    background-color:#ffa71a;
+    border: 1px solid #fbcb09; 
+    background: #fdf5ce url(ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; 
+    font-weight: bold;  
+}
+
+    
+/* ######################################################################### */
+/* ##### Tool Bar ##### */
+/* ######################################################################### */
+.tool_bar {
+    position:absolute;
+    top:2em;
+    width: 100%;
+    margin-top: 1.75em;
+    margin-bottom: 1.5em;
+}
+
+.tool_bar li {
+    padding-left: 0;
+    padding-right: .4em;
+}
+
+/* ######################################################################### */
+/* ### User Menu ### */
+/* ######################################################################### */
+.user_menu {
+    float:right;
+    padding-top: .6em; 
+}
+
+/* ######################################################################### */
+/* ### Action Menu ### */
+/* ######################################################################### */
+.action_menu {
+    float:right;
+}
+
+.action_menu li {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* ######################################################################### */
+/* ##### Icons ##### */
+/* ######################################################################### */
+#icon_link {
+    padding: .3em .8em .3em 20px;
+    position: relative;
+}
+
+#icon_link span.ui-icon {
+    margin: 0 5px 0 0;
+    position: absolute;
+    left: .2em;
+    top: 50%;
+    margin-top: -8px;
+}
+
+
+/* ######################################################################### */
+/* ##### Resource Table ##### */
+/* ######################################################################### */
+#resource_table {
+    border-collapse:collapse;
+}
+
+#resource_table th {
+    font-size:1.1em;
+    text-align:left;
+    padding: 4px;
+    background-color: #ffa71a; /* orange */
+    border-top: 1px solid #AAAAAA;
+}
+
+#resource_table tr {
+    border: 1px solid #AAAAAA;    
+    cursor: pointer;
+    height: 2.5em;
+}
+
+#resource_table td {    
+    padding: .2em;
+    border: 0px !important;
+}   
+
+#resource_table tr.odd {
+    background-color: #d4d4d4;
+}
+
+#resource_table tr.even {
+    background-color: #f4f4f4;
+}
+
+#resource_table tr.head_row:hover  {
+    background-color: #BDF;
+}
+
+#resource_table #details {
+    font-size: 1em;
+    padding: .4em .4em .4em 1em;
+    cursor: default;
+    vertical-align: top;
+} 
+
+/* Fixing a few properties of the jQuery ThemeRoller styles */
+
+.dataTable {
+    width:100%;
+}
+
+.DataTables_sort_icon {    
+    float:left;
+}
+
+.dataTables_length {
+    float: left; 
+    margin-top:  .6em !important;
+    margin-left: .5em !important;   
+}
+
+.dataTables_filter {
+    float: right;
+    margin: .5em !important;    
+}
+
+.dataTables_info {
+    float: left;
+    margin: 1em !important;
+}
+
+.dataTables_paginate {
+    float: right;
+    margin: .5em 1em .5em .5em !important;
+}
+
+.dataTables_paginate a {
+    margin: 0 7px 0 7px;
+    padding: 5px;
+}
+    
+.search_init {
+    color: grey;    
+}
+
+/* ######################################################################### */
+/* ### File Browser ### */
+/* ######################################################################### */
+
+/* still used? */
+.file_browser_outer_box {
+    min-width:830px;    
+    padding-bottom:30px;
+    /* border: 1px solid red; */
+}
+
+.vsplitbar {
+    width: 5px;
+    background: #aaa;
+}
+
+.tab_panel_left {
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    margin-top:75px;
+    margin-bottom:15px;
+    margin-right:0;
+    margin-left:0;    
+	/* width: 33%; */
+	width:400px;	  
+}
+
+.tab_panel_right {
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    right:0;
+    left:410px;
+    margin-top:75px;
+    margin-bottom:15px;
+    margin-right:0;
+    margin-left:0;  
+    /* width: 66%; 
+    min-width:400px;*/
+}
+
+.browser_content {
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    margin-top:60px;
+    margin-bottom:15px;
+    margin-right:15px;
+    margin-left:15px;
+    padding:.5em 0 0 0 !important;
+}
+
+
+.raw_content {
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;    
+    padding: .5em !important;
+    border: 1px solid black;
+}
+
+.top_margin {
+    margin-top:35px;    
+}
+
+.auto_scroll {
+    overflow:auto;    
+}
+
+.black_border {
+    border: 1px solid black;
+}
+
+.loading_text {
+    height:16px;
+}
+
+.height_100_procent {
+    height:100% !important; 
+    min-height: 100% !important;    
+}
+
+
+/* ######################################################################### */
+/* ### Layout table ### */
+/* ######################################################################### */
+.layout_table {
+    border-collapse:collapse;
+    border: 1px;
+}
+
+.layout_table td {
+    border-left:   0px !important;
+    border-right:  0px !important;
+    border-top:    0px !important;
+    border-bottom: 1px solid #AAAAAA;
+    padding: .2em !important;
+}
+
+/* ######################################################################### */
+/* ### Forms ### */
+/* ######################################################################### */
+
+.form_box {
+    margin-top: 2em !important;
+    /*border: 1px solid #AAAAAA;
+    padding: 1em;*/
+}
+
+.form_header {
+    margin: .2em;
+    padding: .5em 1em ;
+    font-size: .9em; 
+}
+
+.form_content {
+    font-size: 90%;
+    padding: 1em;	
+}
+
+.form_element {
+    margin-top: .7em;	
+}
+
+.form_seperator_line {
+	height: 1px;
+	color: #AAAAAA;
+	background-color: #AAAAAA;
+	border: 0px;
+	width: 100%;
+	margin-top: .9em;
+}
+.form_button_box {
+    width: 100%;
+    overflow:auto;
+}
+
+.form_button {
+    /* float: right; */
+    margin: .4em 0em 0em .4em;	
+    padding: .4em .6em;
+}
+
+.form_button:hover {
+    color: #c77405;
+    background-color:#ffa71a;
+    border: 1px solid #fbcb09; 
+    background: #fdf5ce url(ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; 
+    font-weight: bold;  
+}
+
+.text_area {
+	width: 99%;
+}
+
+.from_to_form {
+    /* width: 26em; */
+}
+
+.from_to_form input{
+    width:4em;
+}
+
+.text_input {
+    width: 95%;    
+}
+
+.submit_button {
+    width: 99%;    
+}
+
+.login_form, .register_form {
+    width: 15em;
+}
+
+.profile_form {
+    width: 15em;   
+    
+}
+
+/* ######################################################################### */
+/* ### Language Matrix Table ### */
+/* ######################################################################### */
+.matrix_table {
+    border-collapse:collapse;
+    border: 1px solid #AAAAAA;
+    background-color: #eee;
+}
+
+.matrix_table tr {
+    height: 1em !important;
+}
+
+.matrix_table td {
+    border: 1px solid #AAAAAA;
+    padding: 3px !important;
+    text-align:center;
+    width: 2.2em;
+}
+
+.matrix_table .matrix_header {
+    font-weight:bold;
+    background-color: #ffa71a;    
+}
+
+.matrix_table .hover { 
+    background-color: #BDF;
+}
+
+.spinner {
+    border:0;
+    padding:0;
+    margin:0;
+    height:12px;
+    width:12px;
+    vertical-align:text-top;
+}
+/* ######################################################################### */
+/* ### Help Dialog ### */
+/* ######################################################################### */
+.help_box h2 {
+	font-size: 1.2em;
+	margin: .7em 0em .2em 0em;
+}
+
+.help_box p {
+	margin: 0px;
+}
+
+/* ######################################################################### */
+/* ### Other ### */
+/* ######################################################################### */
+
+.action_buttons {
+    float:right;
+    margin: .4em .2em .2em .2em;
+}
+
+#path_box {
+    margin-bottom: .5em;
+}
+
+.dialog {
+	font-size:0.8em;
+}
+
+#form_box {
+	margin-top: 3em;
+    /* width: 10em; */
+    border: 1px solid #AAAAAA;
+    padding: 1em;
+}
+
+
+
+.meta_table {
+    border-collapse:collapse;
+    font-size: 90%;
+    width:100%;
+}
+
+#value_field {
+    padding-left: 1em; 
+    padding-right: 1em; 
+}
+
+.meta_table td {
+    border-bottom: 1px solid #AAAAAA;
+    padding: .2em;
+}
+
+.meta_table a {
+    color: #1C94C4;    
+}
+
+.from_header {
+	margin: .3em;
+}
+
+.gray {
+	color: #888;
+}
+
+.centered {
+	margin-left:auto;
+    margin-right:auto;
+    /* object also needs a width for centering to work! */
+}
+
+.message_box {
+     position:absolute;
+     top:0;	 
+	 width:100%;
+	 z-index:2;
+}
+
+.message_box p {
+    margin: .5em;   
+}
+

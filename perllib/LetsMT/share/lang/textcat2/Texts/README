@@ -1,0 +1,16 @@
+
+
+Text files from which language models are generated 
+for our language detection module
+===================================================
+
+
+- generate all language models:
+
+  make all
+
+- move them to the LM directory (to be installed by LetsMT)
+
+  make install
+
+

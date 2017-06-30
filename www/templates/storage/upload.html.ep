@@ -1,0 +1,89 @@
+% layout 'default';
+
+<h2>Upload</h2>
+
+<div class='button_menu tool_bar'>
+    <ul>
+        <li><a 
+        % if (stash 'back_link') {
+            href="<%= url_for('/') %>/<%= stash 'back_link' %>"
+        % } else {
+            href="<%= url_for('/index') %>/?open=<%= stash 'slot' %>_<%= stash 'branch' %>"
+        % } 
+        title='back' id="icon_link" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-triangle-1-w"></span>back</a></li>
+        <br style="clear:both"/>
+    </ul>
+</div>
+
+
+<div class='ui-widget form_box' style='width:30em;'>
+    <div class='ui-widget-content ui-corner-all'>
+    
+        <div class='ui-widget-header ui-corner-all form_header'>
+            <span>File Upload to Corpus '<%= stash 'slot' %>'</span>
+            <a href='#' style='float:right;' onclick='$("#dialog_help_upload_form").dialog("open")'><span class="ui-icon ui-icon-help"></span></a>
+        </div>
+        
+        <div class='form_content'>
+			<form action="<%= url_for('/upload') %>/<%= stash 'slot' %>/<%= stash 'branch' %>" method='post' enctype='multipart/form-data' >
+			  
+			 <!--  <div class='form_element'>
+			     Format <%= select_field 'file_format' => [ @$file_formats ]%><br/>
+			  </div> -->
+			  
+			  <div class='form_element'>
+			  File <%= file_field 'upload_file' %><br/>
+			  </div>
+			  
+              <div class='form_element'>
+              Language <%= select_field 'language' => [ @$lang ] %><br/>
+              </div>
+              
+			  <div class='form_element'>
+			  Description<br>
+			  <%= text_area 'comment',  class => 'ui-corner-all text_area' %><br/>
+			  </div>
+			  
+			  <hr class='form_seperator_line'/>
+			  
+			  <div class='form_button_box'>
+			     %= submit_button 'Upload', class => 'ui-state-default ui-corner-all form_button'
+			  </div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div id="dialog_help_upload_form" class='dialog help_box' title="Help - Upload Form">
+        
+            <h2>Format</h2>
+            <p>Choose the format of the file you want to upload. Depending on the format additional options in the upload form will available.</p>
+            
+            <h2>File</h2>
+            <p>You can choose a single file or archive through a file select dialog.</p>
+            
+            <h2>Description</h2>
+            <p>Give a short optional description of the file being uploaded.</p>
+            
+            <h2>Language</h2>
+            <p>Choose a language code that matches the content of the file. This option is only available if the file format does not provide language information.</p>
+</div>
+
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

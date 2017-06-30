@@ -1,0 +1,9 @@
+# list of non-standard codes (if used somewhere)
+# use same format as in ISO-639-2_8859-1.txt
+#
+# afr||af|Afrikaans|afrikaans
+
+pob||pt_BR|Brasilian Portuguese|brasilian portuguese
+chi_tw||zh_TW|Traditional Chinese; chinese_traditional|Chinese (traditional)
+chi_cn||zh_CN|Simplified Chinese; chinese_simplified|Chinese
+xxx||xx|unknown

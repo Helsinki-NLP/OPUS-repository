@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4">
+    <header creationtool="TAUSDATA" o-tmf="TAUS TM v1.0.0"
+        creationtoolversion="1.0.0" datatype="PlainText"
+        segtype="sentence" adminlang="en-US" srclang="en-US" creationdate="20100202T142404Z"/>
+    <body>
+        <tu srclang="en-US" creationdate="20090121T175658Z"
+            changedate="20090423T080610Z" tuid="531422">
+            <prop type="tda-org">ABBYY</prop>
+            <prop type="tda-industry">Computer Software</prop>
+            <prop type="tda-prod">Default</prop>
+            <prop type="tda-type">Instructions for Use</prop>
+            <tuv12 xml:lang="en-US">
+                <seg>System Administrator’s Guide</seg>
+            </tuv>
+            <tuv xml:lang="sv-SE">
+                <seg>Systemadministratörshandbok</seg>
+            </tuv>
+        </tu>
+        <tu srclang="en-US" creationdate="20090121T175658Z"
+            changedate="20090423T080610Z" tuid="531423">
+            <prop type="tda-org">ABBYY</prop>
+            <prop type="tda-industry">Computer Software</prop>
+            <prop type="tda-prod">Default</prop>
+            <prop type="tda-type">Instructions for Use</prop>
+            <tuv xml:lang="en-US">
+                <seg>A license with this serial number cannot be activated.</seg>
+            </tuv>
+            <tuv xml:lang="sv-SE">
+                <seg>Det går inte att aktivera en licens med det här serienumret.</seg>
+            </tuv>
+        </tu>
+        <tu srclang="en-US" creationdate="20090121T175658Z"
+            changedate="20090423T080610Z" tuid="531425">
+            <prop type="tda-org">ABBYY</prop>
+            <prop type="tda-industry">Computer Software</prop>
+            <prop type="tda-prod">Default</prop>
+            <prop type="tda-type">Instructions for Use</prop>
+            <tuv xml:lang="en-US">
+                <seg>Please do not reply to this message.</seg>
+            </tuv>
+            <tuv xml:lang="sv-SE">
+                <seg>Svara inte på det här meddelandet.</seg>
+            </tuv>
+        </tu>
+    </body>
+</tmx>

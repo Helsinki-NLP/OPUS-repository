@@ -1,0 +1,411 @@
+# -*-makefile-*-
+
+INSTALL = sudo install -c
+INSTALL_BIN = ${INSTALL} -m 755
+INSTALL_DATA = ${INSTALL} -m 644
+
+APTGET = apt-get
+FORCE  = false
+## if you want to force-install all packages:
+## uncomment the following lines instead of the ones above
+# APTGET = apt-get --force-yes
+# FORCE  = true
+
+UBUNTU_BASE_PACKAGES = \
+		apache2 \
+		autoconf \
+		build-essential \
+		bzip2 \
+		curl \
+		default-jre \
+		graphviz \
+		gzip \
+		libalgorithm-diff-perl \
+		libapache2-mod-perl2 \
+		libapache2-reload-perl \
+		libapache2-request-perl \
+		libbz2-dev \
+		libclass-inspector-perl \
+		libcrypt-ssleay-perl \
+		libdbi-perl \
+		libdrmaa-java \
+		libfile-bom-perl \
+		libfile-slurp-perl \
+		libfuse-dev \
+		libhook-lexwrap-perl \
+		libinline-perl \
+		libipc-run-perl \
+		liblog-dispatch-perl \
+		liblog-log4perl-perl \
+		libmodule-install-perl \
+		libparams-util-perl \
+		libppi-perl \
+		libssl-dev \
+		libsub-uplevel-perl \
+		libtest-differences-perl \
+		libtest-nowarnings-perl \
+		libtest-object-perl \
+		libtest-requires-perl \
+		libtest-subcalls-perl \
+		libtest-tester-perl \
+		libtest-use-ok-perl \
+		libtest-warn-perl \
+		libtool \
+		liburi-query-perl \
+		libvariable-magic-perl \
+		libxml-libxml-perl \
+		libxml-perl \
+		libxml-simple-perl \
+		libxml2-utils \
+		libyaml-perl \
+		liblzma-dev \
+		liblzo2-dev \
+		lzma-dev \
+		openjdk-6-jdk \
+		openssl \
+		perl-doc \
+		pkg-config \
+		subversion \
+		tidy \
+		unzip \
+		wget \
+		xinetd \
+		xpdf-utils \
+		zip
+
+# 		libdrmaa-dev \
+
+MYSQL_UBUNTU_PACKAGES = mysql-server mysql-client libdbd-mysql-perl
+
+MOJO_UBUNTU_PACKAGES = ${MYSQL_UBUNTU_PACKAGES} libgd2-xpm-dev
+
+
+CPAN_MODULES = Class::Sniff \
+		Encode::Locale \
+		File::GetLineMaxLength \
+		Filesys::DiskUsage \
+		Lingua::Identify::Blacklists \
+		Lingua::Sentence \
+		Module::Install \
+		Net::SSL \
+		Persistent::Base \
+		Persistent::DBI \
+		Test::More
+# TODO: do we still need the Persistent modules?
+
+MOJO_CPAN_MODULES = Authen::Captcha \
+		Mojolicious \
+		Mojolicious::Plugin::Authentication \
+		DBIx::Simple \
+		SQL::Abstract \
+		DBIx::DataSource \
+		Devel::Size \
+		Encode::Escape::Unicode
+
+
+## until I figure out how to pass mysql login details for the tests of this
+## package, we simply force our way through the tests
+FORCECPAN_MODULES =
+MYSQL_FORCECPAN_MODULES = Persistent::MySQL
+
+# Tokyo Cabinet & Tokyo Tyrant (are included in lib/)
+
+TOKYOCABINET      = tokyocabinet-1.4.47
+TOKYOCABINET_PERL = tokyocabinet-perl-1.34
+TOKYOTYRANT       = tokyotyrant-1.1.41
+TOKYOTYRANT_PERL  = tokyotyrant-perl-1.16
+
+
+# other third-party software
+#   hunalign ... sentence aligner
+#   chared ..... character encoding detection
+
+HUNALIGN = hunalign-1.1
+CHARED   = chared-1.2
+OPENNLP  = apache-opennlp-1.5.2-incubating
+FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
+
+# just in case they are installed: remove the old TokyoCabinet packages
+
+OLD_TOKYO_PACKAGES = libtokyocabinet-dbg libtokyocabinet-dev libtokyocabinet9 \
+		python-pytyrant tokyocabinet-bin tokyocabinet-doc
+
+
+# prerequesites on a server machine (do the same for storage-server & rr-server)
+.PHONY: install-storage-server install-rr-server install-sge-client install
+install-storage-server install-rr-server install-sge-client install: \
+    update-apt-repository server-software install-perlmodules
+
+# prerequesites on a frontend machine
+# TODO: do we need all this on a frontend machine?
+.PHONY: install-frontend
+install-frontend: install-perlmodules frontend-software
+
+
+# prerequesites on a sge exec host
+.PHONY: install-sge-client
+install-sge-client: install-perlmodules sge-client-software
+
+
+# modules for mojolicious webinterface
+.PHONY: install-grenzschnitte
+install-grenzschnitte:
+	$(APTGET) -qq install ${MOJO_UBUNTU_PACKAGES}
+	${MAKE} -f Makefile.prereqs \
+		CPAN_MODULES="${MOJO_CPAN_MODULES}" install-perlmodules
+
+
+.PHONY: install-perlmodules
+install-perlmodules: prepare-cpan
+	for cpanmod in ${CPAN_MODULES}; do \
+		! ( ${FORCE} || ! perl -e "use $$cpanmod" 2>/dev/null ) || \
+		( (	cpanm $$cpanmod && \
+			perl -e "use $$cpanmod" 2>/dev/null ) || \
+			{ echo "*** cpan $$cpanmod" >&2 ; exit 1 ; } ) \
+	done
+
+	for cpanmod in ${FORCECPAN_MODULES}; do \
+		! ( ${FORCE} || ! perl -e "use $$cpanmod" 2>/dev/null ) || \
+		( (	cpanm -f $$cpanmod && \
+			perl -e "use $$cpanmod" 2>/dev/null ) || \
+			{ echo "*** cpan $$cpanmod" >&2 ; exit 1 ; } ) \
+	done
+	if [ "$(PERMISSION_DBMS)" = "mysql" ]; then \
+	    for cpanmod in ${MYSQL_FORCECPAN_MODULES}; do \
+		! ( ${FORCE} || ! perl -e "use $$cpanmod" 2>/dev/null ) || \
+		( (	cpanm -f $$cpanmod && \
+			perl -e "use $$cpanmod" 2>/dev/null ) || \
+			{ echo "*** cpan $$cpanmod" >&2 ; exit 1 ; } ) \
+	    done \
+	fi
+
+## remove IO::Socket::SSL (does not seem to work - we use Net::SSL)
+
+	while M=$$(perl -e 'use IO::Socket::SSL; print $$INC{"IO/Socket/SSL.pm"}' 2>/dev/null); \
+		[ -n "$$M" ]; \
+	do \
+		echo "*** Removing IO::Socket::SSL from path $${M%IO/Socket/SSL.pm}"; \
+		mv $$M $$M~; \
+	done
+
+## Again ... for some strange reason Net::SSL often doesn't install properly at first!
+
+	cpanm Net::SSL
+
+## also special: Inline::Java requires JAVA_HOME
+
+	$(APTGET) -qq install openjdk-6-jdk
+	cpanm Inline
+	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
+
+
+
+.PHONY: prepare-cpan
+prepare-cpan:
+	$(MAKE) PREFIX=${PREFIX} config-cpan || exit 1
+	cpan -i App::cpanminus
+
+
+## install server ubuntu packages (run as sudo!)
+## (add LETSMTHOST as alias for localhost in /etc/hosts/ --> for SGE setup!)
+
+.PHONY: server-software
+server-software: software-base \
+	software-mysql \
+	software-sge-master \
+	software-sge-client \
+	software-sge-exec \
+	software-tokyocabinet \
+	software-tokyotyrant \
+	software-hunalign \
+	software-chared \
+	software-opennlp \
+	software-fusecompress
+
+## software required by the sge-clients
+.PHONY: sge-client-software
+sge-client-software: software-base \
+	software-sge-client \
+	software-sge-exec \
+	software-hunalign \
+	software-chared \
+	software-opennlp
+
+## software required on a frontend
+# Tokyo*: Not at all optimal. In the long run it will be better to remove
+# the relevant dependencies in WebService.
+.PHONY: frontend-software
+frontend-software: software-base \
+	software-tokyocabinet \
+	software-tokyotyrant \
+	software-hunalign \
+	software-chared
+
+
+.PHONY: update-apt-repository
+update-apt-repository:
+#	add-apt-repository "deb http://archive.canonical.com/ lucid partner"
+	$(APTGET) update
+
+
+.PHONY: software-base
+software-base:
+	$(APTGET) -qq install ${UBUNTU_BASE_PACKAGES}
+
+
+.PHONY: software-mysql
+software-mysql:
+	if [ "$(PERMISSION_DBMS)" = "mysql" ]; then \
+		$(APTGET) install ${MYSQL_UBUNTU_PACKAGES}; \
+	fi
+
+
+.PHONY: software-sge-master
+software-sge-master:
+	$(APTGET) -qq install gridengine-master
+
+.PHONY: software-sge-client
+software-sge-client:
+	$(APTGET) -qq install gridengine-client
+
+.PHONY: software-sge-exec
+software-sge-exec:
+	$(APTGET) -qq install gridengine-exec
+
+
+.PHONY: software-tokyocabinet
+software-tokyocabinet:
+	$(APTGET) -qq purge ${OLD_TOKYO_PACKAGES}
+	! ( ${FORCE} || ! which tctmgr ) || \
+	(	cd ../lib; \
+		tar -zxf ${TOKYOCABINET}.tar.gz; \
+		cd ${TOKYOCABINET}; \
+		./configure; \
+		make; \
+		sudo make install; )
+	! ( ${FORCE} || ! perl -e 'use TokyoCabinet;' 2>/dev/null ) || \
+	(	cd ../lib; \
+		tar -zxf ${TOKYOCABINET_PERL}.tar.gz; \
+		cd ${TOKYOCABINET_PERL}; \
+		perl Makefile.PL; \
+		make; \
+		sudo make install; )
+
+
+.PHONY: software-tokyotyrant
+software-tokyotyrant: software-tokyocabinet
+	! ( ${FORCE} || ! which ttserver ) || \
+	(	cd ../lib; \
+		tar -zxf ${TOKYOTYRANT}.tar.gz; \
+		cd ${TOKYOTYRANT}; \
+		./configure; \
+		make; \
+		sudo make install; )
+	! ( ${FORCE} || ! perl -e 'use TokyoTyrant;' 2>/dev/null ) || \
+	(	cd ../lib; \
+		tar -zxf ${TOKYOTYRANT_PERL}.tar.gz; \
+		cd ${TOKYOTYRANT_PERL}; \
+		perl Makefile.PL; \
+		make; \
+		sudo make install; )
+
+
+.PHONY: software-hunalign
+software-hunalign:
+	! ( ${FORCE} || ! which hunalign ) || \
+	(	cd ../lib; \
+		tar -zxf ${HUNALIGN}.tgz; \
+		cd ${HUNALIGN}/src/hunalign; \
+		make CC=g++; \
+		${INSTALL_BIN} hunalign ${PREFIX}/bin/hunalign; )
+
+
+.PHONY: software-chared
+software-chared:
+	! ( ${FORCE} || ! which chared ) || \
+	(	cd ../lib; \
+		tar -zxf ${CHARED}.tar.gz; \
+		cd ${CHARED}; \
+		python setup.py install; )
+
+
+.PHONY: software-opennlp
+software-opennlp:
+	(	cd ../lib; \
+		tar -zxf ${OPENNLP}-bin.tar.gz; \
+		cd ${OPENNLP}; \
+		${INSTALL_BIN} bin/opennlp ${PREFIX}/bin/opennlp; \
+		${INSTALL_BIN} lib/*.jar ${PREFIX}/lib; )
+
+
+.PHONY: software-fusecompress
+software-fusecompress:
+	! ( ${FORCE} || ! which fusecompress ) || \
+	( svn checkout ${FUSECOMPRESS} fusecompress; \
+	  cd fusecompress; \
+	  ./autogen.sh; \
+	  ./configure; \
+	  make install; )
+	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
+
+
+# modules necessary for Grid::Request (not used yet)
+####################################################################
+# installing grid::request directly from cpan fails!
+# --> need to install DRMAAc & Grid::Request by hand
+#
+# !!!! this assumes that libdrmaa-dev is installed and  !!!!!!
+# !!!! drmaa.h is in /usr/include/drmaa.h               !!!!!!
+# !!!! this also assumes that SGE_ROOT is /var/lib/gridengine
+#
+# TODO: make this more general
+####################################################################
+
+CPAN = http://search.cpan.org/CPAN
+DRMAAc_VERSION = 0.81
+DRMAAc_SRC = Schedule-DRMAAc-${DRMAAc_VERSION}
+DRMAAc_TAR = ${DRMAAc_SRC}.tar.gz
+DRMAAc_URL = ${CPAN}/authors/id/T/TH/THARSCH/${DRMAAc_TAR}
+
+.PHONY: software-gridrequest
+software-gridrequest: ${HOME}/.grid_request.conf
+	-cpan -i Grid::Request
+	! ( ${FORCE} || ! perl -e 'use Schedule::DRMAAc;' 2>/dev/null ) || \
+	(	cd /tmp && \
+		wget '${DRMAAc_URL}' && \
+		tar -zxf ${DRMAAc_TAR} && \
+		cd ${DRMAAc_SRC} && \
+		ln -s /usr/include/drmaa.h . && \
+		export SGE_ROOT=/var/lib/gridengine && \
+		perl Makefile.PL PREFIX=/usr/local && \
+		make && \
+		make install; \
+		rm -f /tmp/${DRMAAc_TAR}; \
+		rm -fr /tmp/${DRMAAc_SRC}; )
+	! ( ${FORCE} || ! perl -e "use Grid::Request;" 2>/dev/null ) || \
+		cpan -fi Grid::Request
+
+
+# a simplified grid conf file for Grid::Request ....
+
+${HOME}/.grid_request.conf:
+	echo '[request]' > $@
+	echo 'drm=SGE' >> $@
+	echo 'tempdir=/tmp' >> $@
+
+#########################################################################
+## cleaning up
+
+.PHONY: distclean
+distclean: clean
+	rm -rf ../lib/${TOKYOCABINET}/
+	rm -rf ../lib/${TOKYOCABINET_PERL}/
+	rm -rf ../lib/${TOKYOTYRANT}/
+	rm -rf ../lib/${TOKYOTYRANT_PERL}/
+	rm -rf ../lib/${HUNALIGN}/
+	rm -rf ../lib/${CHARED}/
+	rm -rf ../lib/${OPENNLP}/
+
+.PHONY: clean
+clean:
+	rm -fr fusecompress

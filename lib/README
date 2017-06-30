@@ -1,0 +1,12 @@
+Third-party software that is used by LetsMT! Resource Repository
+
+Package 	License 	Homepage
+
+opennlp 	Apache  	http://opennlp.apache.org/
+chared  	(own)   	http://code.google.com/p/chared/
+hunalign	LGPL    	http://mokk.bme.hu/resources/hunalign/
+tika    	Apache  	http://tika.apache.org/
+tokyocabinet	LGPL    	http://fallabs.com/tokyocabinet/
+tokyotyrant	LGPL    	http://fallabs.com/tokyotyrant/
+
+The applicable license documents are provided in folder "licenses".

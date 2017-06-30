@@ -1,0 +1,2333 @@
+         Elektronisk post är det område som historiskt varit det största,
+med uppkopplingar av Microsoft Mail-baserade system mot Internet.
+I november -94 tog ElektroPost över driften på Microsofts
+mailsystem för Premier Support-kunder och i samband med detta
+drogs en fast Internet-förbindelse in. Två veckor senare var
+Elektroposts första www-server (www.ep.se) i drift med ett
+tjugotal sidor. servern var en av de första i Sverige som var
+helt NT-baserad.
+
+Sommaren -95 fick ElektroPost i uppdrag av Stockholms Fondbörs
+att bygga ett system för presentation av bland annat
+börskurser och allmän information. Systemet baserades på Windows
+NT, MS Mail (för överföring av börskurserna) samt av ElektroPost
+utvecklad programvara. Som partner på den grafiska designen
+valdes New Media Studios med vilken ett antal andra www-system
+byggdes under hösten (bland annat Vingresor, 
+
+I mars -96 startade Elektropost och New Media Studios ett
+gemensamt bolag för internet-
+produktioner, Internetbyrån 17b aktiebolag, och överförde
+personal från respektive bolag.
+Under det senaste året har runt tjugo www-system byggts, där
+ElektroPost svarat för den tekniska biten (databaser,
+serverkonfigureringar, internetförbindelser mm ) och
+Internetbyrån producerat den grafiska layouten. Internetbyrån är
+numera ett fristående bolag
+
+Vi arbetar nära Microsoft och baserar alla våra lösningar på
+Windows NT Server och standardprodukter som SQL Server, MS
+Access. Utvecklingen sker företrädesvis i Visual C++ och Java. Vi
+utvecklar även ActiveX-komponenter.
+
+ElektroPost är Microsoft Solution Provider, Compaq Associerad
+Systemspecialist och försäljningagent för Global One (fd France
+Telecom). Vi kan därför leverera nyckelfärdiga lösningar med
+hårdvara, mjukvara, internetförbindelse, utbildning och support.
+Tillsammans med Internetbyrån kan vi även erbjuda en
+proffesionell design av Internet/Intranet-systemen.
+
+Vi driver även ett www-hotell för våra kunder, med rackmoterade
+NT-baserade Compaq-servrar. Då vi vill koncentrera oss på tyngre
+tekniska lösningar erbjuder vi inte någon modembaserad
+Internet-uppkoppling utan hänvisar i stället till Tele2 för dessa
+tjänster.
+
+Några referenser:
+  Stockholms Fondbörs: system för presentation av
+bland annat börskurser
+ och allmän information.
+ AGA: Migrering från Novell till Windows NT.
+ Vingresor: system med SQL-baserad databas, automatik
+för överföring av
+ "sista-minuten"-resor och automatisk generering av
+katalogbeställningar.
+ Unisource: Helpdesk-system med baserad SQL-teknik
+(Intranet).
+ Holmia: system med SQL-baserad teknik för beräkning
+av
+ motorcykelförsäkringar.
+ Philipson: system med SQL-baserad teknik för sökning
+av begagnade bilar.
+ Microsoft: Internet-utbildning för de nordiska länderna.
+Seminarier. Artiklar i
+ Microsoft Magazine & Microsoft News. Drift av mailsystem
+för Premier Support.  Svenska EUprogramkontoret: System
+för hantering av EU-bidrag. WWW/SQL-baserat.
+
+ElektroPost omsatte 9505-9604 7.1 milj.
+Antal anställda 960921: 6 personer.
+
+Fokus för Elektropost är numera Intranet, där vi utvecklar och
+marknadsför standardprodukter för företagens
+informationshantering.
+
+
+  
+
+  Spegeldörren till kammaren på övervåningen gick inte att
+öppna utan att man lutade sig mot den och tryckte till. Ljudlöst
+kunde ingen ta sig in eller ut ur detta rum, och antagligen var
+det författaren själv som sett till så att dörren aldrig skulle
+kunna öppnas utan att ljudet skulle väcka honom. Han hade
+fiender. Sent på fredagen den 27 december 1907 hade
+författaren gått in genom spegeldörren och stängt den. Ställt
+sig vid skrivbordet och mätt upp en dos sömnmedel, löst det i
+ett glas vatten och hällt i sig lösningen i två klunkar. Därefter
+hade han gått några varv i rummet i väntan på att medlet
+skulle börja verka; plötsligt märkte han att kyrktornet utanför
+fönstret liksom åkte fram och tillbaka i samma takt som
+hjärtat. En besk smak fälldes ut i munnen. Mattheten spred
+sig från magen och ut i armar och ben, den tvingade honom
+att under några sekunder luta sig mot sängkarmen. Han lade
+sig ned, rullade över på sidan och krängde av sig skorna, rev
+av sig halskragen, blåste ut ljuset. Han låg tyst i mörkret. Det
+kändes som om kroppen föll bakåt fastän han i själva verket
+låg alldeles stilla på sängen. Han slöt ögonen och sjönk ned i en
+dröm som i allt väsentligt skulle komma att handla om hans
+mor, Christina Swahn. Författaren Victor Hugo Wickström
+sov djupt i 20 timmar. Hushållerskan Hilda Maria Eriksson
+gick fram till spegeldörren ett par gånger under lördagen och
+lyssnade till hans andning. Vid ett tillfälle under natten mot
+söndagen tyckte hon sig uppfatta steg i rummet. Det gjorde
+henne lugn. Det var samma steg som när han arbetade på
+någon bok. På söndagsförmiddagen den 29 december, efter att
+hon flera gånger bankat hårt på dörren utan att få något svar,
+greps hon av en illavarslande oro och hon kastade sig mot
+dörren och tryckte till. Till en början kändes det som om
+författaren stod där på andra sidan och kämpade emot, som
+om han inte ville att hon skulle komma in i rummet, men så
+knakade det till och dörren fläktes upp. Direkt möttes Hilda av
+en doft av urin och i rummet var det iskallt. Hon gick fram till
+författaren som låg med ansiktet onaturligt upptryckt mot
+väggen, munnen var torr, svart, vidöppen. Hilda lade handen
+på författarens kind, hon nöp i den. - Doktor Wickström,
+vakna! Klockan halv tolv, efter att hon suttit och gråtit i köket,
+svepte hon en sjal över axlarna och gick ut och hissade flaggan
+utanför Jämtlandspostens hus på halvstång. Så länge hon känt
+Doktor Wickström hade hon vetat att den här dagen skulle
+komma. Ute var alldeles vitt, stilla och tyst som det bara kan
+vara i Östersund. Läkaren skulle komma först vid fyratiden på
+eftermiddagen. Victor Hugo Wickström var född i Hedemora
+1854 som första barnet mellan skomakarmästare Johan
+Wickström och Christina Swahn. Han avlade
+mogenhetsexamen (dåtidens benämning för studentexamen) i
+Falun 1875, blev fil kand i Uppsala 1877, Fil lic i Lund 1882
+och året därpå promoverad till fil dr på en avhandling om
+Giordano Bruno. Från 1886 till sin död 1907 var han redaktör
+och utgivare av Jämtlandsposten med redaktion på Kyrkgatan
+i Östersund. 1906-07 var han en av det liberala partiets
+ledamöter i andra kammaren och representerande valkretsen
+Östersund-Hudiksvall. I 1906 års mantalslängd över
+Östersunds stad framgår att Victor Hugo och brodern
+rådmannen Mauritz Wickström bodde i Jämtlandspostens hus
+tillsammans med redaktionssekreterare Erik Verner Bogren,
+tjänstekvinnan Hilda Maria Eriksson samt typografen Johan
+Henning Pettersson. En av de östersundare som minns
+Wickström har beskrivit hur han i sällskap av brodern
+Mauritz brukade ta promenader genom Östersund. Om
+morgnarna kring sekelskiftet kunde man se den välklädde
+redaktör Wickström promenera "[...] trippande, rak i ryggen
+och med ett fylligt anlete vars höga färg skvallrade om tillgång
+på god mat och goda viner; ett par maliciösa ögon spelade
+bakom pincenén. Han var iförd sportdräkt med plusfours och
+rutiga skotska strumpor; en knähund i band, som han styrde
+med upplyft, behandskad hand, fullbordade utstyrseln."
+Klockan halv tolv den 15 oktober 1890 lämnade den tredje
+brodern, Tor Wickström, jordelivet av egen kraft. Självmordet
+skedde i änkefru Holmbergs hus i Östersund. Tor Wickström
+var vid självmordet 36 år gammal och arbetade som
+handelsagent åt vinhandelsfirman Lundgrens i Trondheim.
+Mauritz Wickström gick bort samma år som Victor Hugo. I
+dag finns ingenting i Östersund som minner om de tre
+bröderna Wickström. De vilar i samma grav på norra
+kyrkogården i Östersund. 1874 hade Victor Hugo Wickström
+debuterat under pseudonymen Pleibos med en diktbok kallad
+Hvitsippor. Den andra boken utkom 8 år senare under
+pseudonymen Christer Swahn. Boken, En sjelfmördares
+anteckningar, skildrar en man som just är i färd med att ta
+livet av sig med cyankalium. Pseudonymen Christer Swahn,
+som skulle komma att stå på åtskilliga bokomslag, är en
+anspelning på författarens mor som gick bort när han var
+barn. Modern hette före giftemålet Christina Swahn. Diktaren
+Ola Hansson, som i likhet med Wickström var student i Lund
+vid bokens publicering, har i ett brev till Hans Larsson skrivit
+att han inte tycket det var något vidare smakligt "[...] att så der
+slå upp portarna för sitt inre på vid gavel." Ola Hansson hade
+tydligen fäst sig vid det självutlämnade i En själfmördares
+anteckningar. Även en annan student, som sedermera kom att
+bli en institution inom den svenska litteraturforskningen, fann
+Wickströms En sjelfmördares anteckningar värld en replik.
+Henrik Schück har publicerat en bok med titeln En före detta
+självmördares anteckningar. Med denna bok, vilken alltså var
+en direkt parodi på Wickströms självmordsbok, lär den unge
+Schück ha fått Wickström utskrattad. I slutet av Wickströms
+En sjelfmödares anteckningar återvänder dock - till skillnad
+mot i verkligheten - livsviljan mirakulöst när huvudpersonen
+ensam och uppgiven i sin studentkammare i Uppsala är i färd
+med att hälla i sig det cyankalium som han fått av en bekant
+läkare. När det är som mörkast uppenbarar sig: "Store Gud! -
+Därborta i dunklet nära dörren stod hon ju, så som hon såg ut,
+medan hon lefde. Det var hennes ögon, hennes drag; jag kände
+mitt inre genombäfvas af en outsäglig harmoni." Passagen
+skildrar hur huvudpersonens döda mor kommer in i
+studentkammaren. Huvudpersonen finner genom
+moderskärleken vägen tillbaka till livet. Wickströms
+förhållande till modern framstår ha varit ömt men komplext.
+På flera ställen finner man i författarens verk avsnitt som ger
+uttryck för att just moderskärleken är den dyraste och mest
+beständiga av livets relationer. Denna ömhet får en
+översvallande religiös karaktär i dikterna "Min mor" och
+"Moderskärleken" i debutboken Hvitsippor. För att återgå till
+den där vinterdagen då Victor Hugo gick in i sin kammare, så
+är händelsen olyckligt sammanlänkad med kung Oskar II:s
+död. Redan den 9 december 1907, dagen efter konungens
+bortgång, publicerade Wickström i sin tidning en dödsruna i
+form av en ledare. Oförsynt och utan tanke på att
+formuleringar av nedanstående karaktär kunde fällas för
+majestätsbrott enligt Strafflagens nionde kapitel § 5, skrev
+Wickström i Jämtlandsposten: "Aldrig förr i vår historia torde
+bristen på statsmän varit så i ögonen fallande som under Oskar
+II:s tid." Under dagarna som följde efter att dessa raders
+publicering drog sig Wickström tillbaka och var varken synlig
+på tidningsredaktionen eller ute på stan. Till Hilda lär han i en
+stund av eftertänksamhet ha sagt, att han gjort ett misstag när
+han skrev de där raderna om Oskar II. Med största
+sannolikhet skulle artikeln leda till åtal. En fallande dom skulle
+i så fall både ruinera honom samt för all framtid spoliera hans
+karriär som tidningsman, författare och riksdagsledamot.
+Landshövdingen av Jämtlands län vid denna tid, Johan Widén
+som även var ledamot i lagutskottet, ansåg att Wickström på
+grund av artikeln omedelbart borde avsäga sig sin plats i
+Riksdagen. Det är i sammanhanget rimligt att anta att även
+brodern, rådmannen Mauritz Wickström, väl kände till de
+straff som var att vänta Victor Hugo och följaktligen
+informerat honom om allvaret i den överträdelse han gjort sig
+skyldig till. Bland den unga arbetarpressens redaktörer fanns
+de redan de som hade råkat illa ut efter att ha satt sig upp mot
+överhögheten. Allvaret i Wickströms kritik mot Oskar II bör
+ses mot bakgrund att kungen var populär bland de stora
+skarorna. Han var nästan 80 år och hade regerat Sverige i 35
+år. Ingen svensk kung förutom Gustav Vasa har regerat så
+länge. Efter sig den där vinterdagen lämnade Victor Hugo
+Wickström ett hus, en konstsamling, en dagstidning samt sist
+men inte minst en svåröverskådlig samling romaner, dikter,
+översättningar, pjäser, reseskildringar, akademiska
+avhandlingar och debattartiklar. Det är en lång och
+besynnerlig resa att läsa Wickströms böcker. Under sina 22 år
+i Östersund skrev han inte mindre än 26 böcker.
+Inspirationskällor var Lukianos, Giordano Bruno och Hippolyte
+Taine. Hatobjekt var inte kristendomen i sig, men väl
+prästerskapet. Antipatierna för prästerskapet och den av
+honom kallade "ordkristendomen" kan sättas i samband med
+intresset för renässansfilosofen Giordano Bruno vilken brändes
+på bål i Rom för sina kätterska tankar skull. Fast antipatierna
+hade också en mer personlig orsak. En tvist i Östersund
+angående en rektorstjänst som Wickström aldrig lyckades
+erhålla. Tjänsten gick i stället till C. A. Hägglund. Tvisten
+bottnade i nya "frisinnade" idéer i utbildningsfrågor kontra mer
+konservativa. Det har sagts att Wickströms långa ovilja mot
+Rektor Hägglund gick tillbaka på just det tillfälle då de båda
+hade sökt ett utlyst vikariat vid läroverket. Vikariatet hade
+tilldelats Hägglund med motivationen att Wickström förvisso
+var mycket lärd, men att hans frisinnade idéer inte lämpade
+sig för läraryrket. Wickström som till att börja med genom
+skrivelser till myndighetspersoner försöker få Hägglund avsatt,
+tar till slut saken i egna händer och inleder hösten 1893 en
+kampanj mot Hägglund efter att denne av
+ecklesiastikdepartementet fått ett 5-årigt förordnande som
+rektor. Kampanjen bestod i att varje onsdag under 9 veckor
+publicera en smädande artikel riktad mot Hägglund. Rektorn
+valde dock att besvara utspelet med tystnad. Wickströms
+artiklar i Jämtlandsposten blir till slut så grova, felaktiga och
+sarkastiska att man förundrar sig över att inte den lagkunnige
+brodern Mauritz förmår hejda sin ursinnige bror. Flera av de
+publicerade artiklarna skulle kunna leda till förtal. En annan
+av Wickströms fiender kom att bli John Hagberg. Hagberg
+framträdde i sin år 1893 startade veckotidning Jämtlands
+Veckoblad, i slutet av samma år förändrad till Nya
+Jämtlandsbladet och året därefter förvandlad till Jämtlands
+läns Annonsblad. Den senare lades dock ner redan 1898. Från
+detta år ledde Hagberg Jämtlands-kuriren. Det sena
+1800-talets debatter om politik, religion och moral var hur som
+helst ämnen som intensivt debatterades. Jämtlands Veckoblads
+veckokrönika av torsdagen den 13 juli 1893 är ett exempel på
+den tonart som Wickström och Hagberg använde i
+unionsdedebatten mellan Sverige och Norge. I denna krönika,
+undertecknad med signaturen "Sten", framförde redaktören
+John Hagberg sina åsikter om Wickström. Krönikan börjar:
+"Mitt herrskap! Ni vet nog, att det nu en tid varit en olidlig
+värme med åtföljande torka. Synd är det om landtbrukarne,
+som just för regnets uteblifvande se sina förhoppningar om en
+någorlunda hygglig skörd omintetgjorda; men värst synd är
+det om den på kroppens vägnar blomstrande lille doktor Hugo
+V., som just nu i hundvärmen måste sätta sig ned och skrifva
+en ledare, den skall bliva en varning för de norska
+radikalerna." Under de långsträckta resorna som Wickström
+företog kring sekelskiftet insamlade han konstföremål. Dessa
+föremål finns redovisade i skriften Förteckning öfver Fil d:r
+Victor Hugo Wickströms konstsaker, pretiosa m. m. (1903).
+Författarens upplevelser utomlands är samlade i
+reseskildringarna: Stoft från sandalerna (1895), Som turist
+genom Europa (1897), Italien (1899), I öster- och västerled
+(1900), Som tidningsman jorden rundt (1901) samt Genom sju
+konungariken (1904). I svensk uppslagsbok från 1936 medges
+att Wickström var produktiv, men att hans romaner är utan
+större litterärt värde. Om Wickstöms kontakter med tidens
+kulturpersonligheter vittnar på ett annat sätt hans
+efterlämnade brevsamling. Där återfinns brev från August
+Strindberg, Herman Bang, Hjalmar Branting, Gustaf Fröding,
+Selma Lagerlöf, Carl Snoilsky, Victor Rydberg och Henrik
+Schück. Wickströms mest anmärkningsvärda bok med
+anknytning till Jämtland är När Jesus kom till Östersund. Och
+än mer anmärkningsvärt är, att Jak pán Jeziz prisel do
+Östersunda gavs ut postumt i Prag 1910. Vem i hela
+Tjeckoslovakien kunde förstå den kritik som Wickström utsatt
+det jämtländska prästerskapet för, och hur förbryllande för en
+tjeck torde inte bokens alla jämtar förefalla? Tre år efter att
+När Jesus kom till Östersund utgivits, publicerade Wickström
+en uppföljande kristendomskritisk bok kallad Prästväldets
+satanism. Boken är övermodig och illa skriven. Wickström
+bokstavligen beskriver sig själv i ordalag som vore han den nye
+Messias. Denna senare bok kastar ett f&ouml;rklarande sken
+över den förra, i det att Jesus i När Jesus kom till Östersund
+naturligtvis kan förknippas med den roll som den till
+Östersund inflyttade Wickström tyckte sig ha intagit i stadens
+religiösa, intellektuella och politiska liv. Jesus-karaktären
+utsäger de läror och visioner om frälsning som är Wickströms
+egna. I kapitel 20 kan man läsa om hur Östersund genomgår
+en sällsam metamorfos: "Under den första tiden Jesus vistades
+i Östersund undergingo hela staden och alla dess invånare en
+märklig förvandling. Alla hus glänste som i ett förtroladt ljus,
+alla människor fingo ett utseende av lycka och kärlek. Mer
+och mer började man inse, att skrifterna borde läsas och tolkas
+på ett helt annat sätt än hvad förut skett." Det är just denna
+nya sorts läsning av de heliga skrifterna som Wickström så
+outtröttligt pläderar för i den senare Prästväldets satanism.
+Men det är ändå utifrån en synnerligen stadig grund som
+Wickström famlägger sina idéer. Bakom de stora föresatserna
+i dessa två böcker finns en sanningslidelse och religionskritik
+värd att tas på allvar. Hur törs man betrakta Wickström som
+en dilettant när han konstruerat sitt tankesystem utifrån en så
+gedigen teoretisk och empirisk erfarenhet? Det råder jämvikt
+mellan författarens teoretiska författarskap och de
+erfarenheter han inhämtat under sina långa utlandsresor.
+Man ska heller inte underskatta den ekonomiska kompetens
+som det måste ha krävts för att vara ledare för en lokaltidning,
+som under vissa perioder under 1890-talet drevs med god
+förtjänst. Även om det finns uppgifter om att Wickström
+lämnade Uppsala inte bara spränglärd, utan också med en
+skuld på 30 000 kr. Jämtlandposten bör dock inte jämföras
+med vad vi i dag associerar med en landsortstidning.
+Jämtlansposten utkom tre gånger i veckan i form av ett stort
+dubbelvikt blad. Hela arket mätte 100 cm x 45 cm och höll
+typografiskt sett hög kvalité, men innehållsmässigt var det
+glest mellan nyheterna och tätt mellan skvallerspalter och
+följetonger som för det mesta var författade av Wickström
+själv. Till de kristendomskritiska böckerna När Jesus kom till
+Östersund (1898) och Prästväldets satanism (1903) ska även
+en en tredje bok räknas som kom ut bara två år före hans
+borgång, En ny himmel och en ny jord (1905). I denna bok
+inleder Wickström med att berätta hur ensam han har blivit
+genom sina övertygelser, och hur människorna - med andra
+ord de jämtar som hans förkunnelser i första hand riktat sig
+till - har tröttnat på hans läror. "Söker man steg för steg gå
+framåt på upplysningens väg, tröttnar snart den ena efter den
+andra att följa med, och till sist befinner man sig så sorgligt
+ensam, att ingen hör hvad man har att förkunna och ingen ser
+hvad ens ögon omsider lyckats upptäcka." Karriären vid Lunds
+och Uppsala universitet finns dokumenterad i boken Bildning
+(1886). Den opportunistiske huvudpersonen, studenten John
+Elf, får utstå många anmärkningar angående hans
+affekterade klädessätt som han har lärt sig under resor i
+utlandet, och då i synnerhet i Paris. Just anmärkningar som
+dessa blev någonting som Wickström själv fick utstå när han
+flyttade till Östersund i mitten av 1880-talet. Wickström
+vandrade i Östersunds som en gentleman iförd "svart
+välsittande paletå och nyputsad cylinder - världens mest
+nyputsade - och så blänkte hans pincenez-glas, ja det var en
+perfekt gentleman vår d:r Wickström." Också när redaktören
+unnade sig ett teaterbesök satt det östersundare i publiken som
+fann anledning att anmärka på hans klädesvanor - också när
+han som i detta fall medvetet försökte följa det jämtländska
+klädesvanorna. "Det berättas om att själve dr Victor Hugo
+Wickström, sin tids elegantaste karl i staden, sågs en gång på
+teatern i gråvadmalsskostym. Men malisen gjorde gällande,
+att detta berodde på att det förestod riksdagsmannaval, så det
+var angeläget för dr W. att se gammaljämtsk ut." I en
+artikelserie i Östersunds-Posten berättar Lennart Westlinder
+om sina teaterminnen och om hur Östersunds
+amatörskådespelare gjorde sig roliga på den allt mer ensamme
+Victor Hugo Wickströms bekostnad: "Sålunda gavs på
+Stadshotellet en soaré eller Uberbrettl, där teaterns egna
+krafter levererat dagskupletter. Dessa rörde sig om lokala
+händelser och personer. Redaktör V. Hugo Wickström var
+alltid ett tacksamt föremål för vår satir. Nu hade han som
+riksdagsman i en Stockholmskorrespondens till sin tidning
+beklagat sig över de svenska herrarnas i allmänhet och
+stockholmarnas i synnerhet förfärliga fulhet. Han var ju inom
+parentes sagt ingen beundrare av det svaga könet heller.
+Därför hette det i en kuplett på bekant melodi ur Boccaccio om
+den gode Christer Swahn, som även gjort sig skyldig till en
+komedi, kallad 'Trasmattan' 'Trasmattsfilosofen Christer/
+uppå Stockholms gator gick/ för att tadla männens brister/ uti
+skönhet växt och skick./ Inga vackra karar mera/ utom jag
+men knappast flera o. s. v.'" Det kan här nämnas att
+Wickströms teaterstycken, i likhet med ett antal av hans
+skrifter, blev föga uppskattade. Den ovan nämnda pjäsen
+"Trasmattan" spelades på Folkteatern i Stockholm och lär ha
+blivit ett dundrande fiasko. Pjäsen spelades av den anledningen
+inte som planerat i Östersund. Onda tungor har menat att
+östersundspubliken redan hade fått nog av den några år
+tidigare uppförda pjäsen "Antikrist". Dödsannonsen i
+Jämtlandsposten nyårsaftonen 1907 berättar att Wickström
+"[...] enligt all sannolikhet för att få ro oavsiktligt intagit en för
+stark dosis sömnmedel." I Östersunds-Posten någon dag
+senare meddelas att Wickström under natten "häftigt
+insjuknat", och i det kommande måndagsnumret berättas
+under rubriken Dödsfall, att "Enligt hvad dödsattesten upplyser
+förorsakades dödsfallet af olyckshändelse, i det d:r W., som
+senaste tiden lidit af sömnlöshet, i fredags afton intagit en för
+stark dosis sömnmedel." Klockan halv två på eftermiddagen
+den 4 januari 1908 jordfästs författaren och resenären Victor
+Hugo Wickström på norra kyrkogården i Östersund.
+Jordfästningen förättas av regementspastor Sehlin. Ingen
+klockringning förekommer.
+
+I en tid där kulturell och social fragmentisering samt religiös
+sekularisering går hand i hand med en tilltagande
+identitetskris, blir begrepp som till exempel modernitet och
+identitet särskilt problematiska. En människa som lever i en
+sådan värld kanske också med tiden har kommit att erhålla
+ett speciellt sätt att se på såväl sin egen framtid som
+omvärldens? När jag såg paret Jeunet/Caros nya film De
+förlorade barnens stad funderade jag på huruvida den
+moderna människan, i jämförelse med gårdagens, förhåller
+sig till framtiden på ett annorlunda sätt. Jag tänkte på hur
+samtiden och informationssamhället kommit att färga den
+moderna människan. Är det kanske så att hon helt har
+kommit att förlora framtidstron; att det sekulariserade
+samhället ter sig alltför flytande och mångfacetterat? Kanske
+är det så att hon, å ena sidan tycks ha förlorat tron, men att
+hon å andra sidan arbetar på att återvinna den? 
+
+Med Jeunet/Carots nya film i åtanke skulle man kunna säga
+att barnen tycks vara de som har störst chans att möta och
+förstå det nya informationsspäckade samhället. Slående är
+nämligen det faktum att barnen i filmen framställs som
+brådmogna och rationella medan de vuxna presenteras som
+osjälvständiga och irrationella. Vuxenvärlden i De förlorade
+barnens stad möter det nya samhället med en iögonfallande
+tafatthet och frustration. Människorna tycks ha förlorat
+kontrollen över tillvaron i stort. Den verklighet som
+presenteras i filmen är en verklighet som präglas av död och
+föruttnelse, av fallna värden och alienation. Det är en värld
+som fått "slagsida". Men ifall fiktionen tillskriver sin samtid
+symptom som dessa och barnen i filmen lever i och med dessa
+symtom; betyder det att vuxenvärlden och historien
+determinerat barnen till en framtid med sådana premisser?
+Vilken betydelse kan man i sådana fall läsa in i detta sätt att
+förhålla sig till oskulden, det rena och oförstörda; drag som
+barnet (åtminstonde på en symbolisk nivå) kan sägas
+representera? På många sätt kan man se att filmen på ett
+uttalat sätt problematiserar händelser som explicit är möjliga
+att koppla samman med en livsstil som populärt brukar kallas
+konsumistisk. I De förlorade barnens stad är en mänsklig
+kropp eller ett liv inte längre värt något. Det handlar istället
+om makt och status, inget annat. Man konsumerar
+människor på samma sätt som mat, musik eller andra nöjen.
+I den sociokulturella kontext som filmen måste placeras,
+befinner sig tecknet och dess språkliga denoteringar och
+konnoteringar, i centrum. Men på vilket sätt kan man se att
+just barnet som sådant kan kasta ett förståelsens ljus över, inte
+bara den diskuterade filmen utan också över vår samtida
+kultur i allmänhet? 
+
+På många sätt tror jag att vår tillvaro i slutet av det 20:e
+århundradet, ja hela vårt samhälle, präglas av en skräck för
+allvaret och hat till kvalitet. [...] Enligt min mening präglas vår
+tid av en utbredd och genomgripande nihilism som just
+innebär brist på framtidstro och förakt för moraliska värden.
+
+Roy Andersson, Vår tids rädsla för allvar 1
+
+Ovanstående citat kan fungera som en tankens katalysator,
+tillika som ytterligare en utgångspunkt för läsningen av
+Jeunet/Caros film. Bristande framtidstro och fallna, mer
+essentiellt präglade, värden och ideal är vad Roy Andersson
+tycks se i sin samtida kultur. Min tes är att det är möjligt att
+finna motsvarande fatalistiska drag i De förlorade barnens
+stad, men att dessa drag används i syfte att bejaka samtidens
+textuella och referentiella mångfald. Fatalism och nihilism
+förkroppsligas i första hand hos barnen i filmen, vilket i sig
+kan upplevas som en paradox. Traditionellt sett symboliserar,
+eller förkroppsligar, barnet nämligen alla tillvarons
+möjligheter. Barnet växer, är satt i ständig förändring och
+omvandling. Sålunda kan barnet också sägas implicera en idé
+om framtiden och människans potentiella möjligheter. Här
+bör dock ett veto läggas in. Självklart beror det på i vilken
+kontext bilden av barnet förekommer. Ett litet barn, som
+förekommer i ett sammanhang, som exempelvis i den
+diskuterade filmen, kan lika gärna konnotera en mer
+fatalistiskt färgad grundton. I De förlorade barnens stad leker
+paret Jeunet/Carot uttalat med just en sådan problematik.
+Kanske skulle man kunna säga att den diskuterade filmen
+lockar fram, eller skapar, en dikotomi av begreppsparet
+barn/vuxen. Min tes är att barnet, inte bara i denna film utan
+i samhället överhuvud, symboliserar bejakandet av den
+moderna kulturens textuella mångfald. Barnet är det som kan
+möta det nya informationssamhället med öppna sinnen och
+dessutom dra nytta av all den kunskap som är möjlig att sila
+fram genom rastret av, för att låna ett begrepp från
+Baudrillard, "simulacra".2 Vuxenvärlden, eller låt säga
+samma värld som åskådaren tillhör, är en värld som
+framställs som irrationell, en värld präglad av girighet,
+likgiltighet och dekadens. Det finns inte längre några
+bestående värden. Jeunet/Carot låter publiken förstå att
+filmens titel, liksom dess ständiga refererande, är av en dubbel
+ironisk natur. En kultur och ett samhälle där invånarna,
+kollektivet, aldrig till fullo kommit att hantera sin nya roll i det
+informationsteknologiska samhället, föder självklart individer
+som i första hand mer eller mindre desperat söker anpassa sig
+till de nya förhållanden som ges. Barnen är förlorare så
+tillvida att de föds in i en verklighet som i första hand präglas
+av känslokyla och frustration, men barnen är också vinnare
+på så sätt att de redan från början lärt sig hantera den nya
+verklighetens kodex. Kanske kräver en ny verklighet, eller en
+ny typ av samhälle, en ny modifierad kollektiv mentalitet? Att
+se De förlorade barnens stad som en representation av
+moderniteten och det postindustriella samhället i stort ter sig
+alltså som en mycket frukbar utgångspunkt. En sådan läsning
+föder i sin tur ett krav på att söka precisera begreppet
+"modernitet". 
+
+När Charles Baudelaire diskuterade moderniteten i
+diktsamlingen Les fleurs du mal (1861)3 presenterade han en
+samtida modern människa som i första hand präglades av en
+mångfald synintryck. Baudelaire artikulerade moderniteten
+som ögonblicklig, osäker och undflyende. Mediaforskaren
+Håkan Thörn har påpekat att två centrala teman, eller
+begrepp, kan sägas vara intimt sammankopplade med
+modernitetsbegreppet; förnuft och individualism.
+Moderniteten är sålunda något som kan kopplas samman
+med framstegstanken som sådan; tanken förstådd å ena sidan
+som en framåtskridande process, å andra sidan som en myt.4
+Med ett sådant förhållningssätt kan det moderna, eller
+postmoderna, samhället uppfattas som en värld satt i ständig
+förändring och utveckling. Den moderna tidsuppfattningen
+har i allt högre grad kommit att ge upphov till ett uttalat
+framtidsorienterat förhållningssätt. Nuet har, under den
+postindustriella epoken, alltmer uttalat kommit att bli något
+som ständigt övergår i framtid, inte något förflutet. Synsättet
+implicerar sålunda en idé om att människan aktivt kan
+påverka framtiden. Denna nya tidsuppfattning är alltså intimt
+sammankopplad med den postkonsumistiska epok som kom
+att inledas i samband med andra världskrigets slut. Tidigare
+tänkte man i helheter, i totaliteter, nu tänker man i termer av
+dekonstruktion5 och fragmentering. Det finns inte längre
+någon absolut och enhetlig utopi, inget absolut "slutmål", vad
+som däremot finns är en värld satt i ständig förändring och
+utveckling. Modernitetsbegreppet och allt vad detta implicerar
+kan på så sätt ytterligare bekräfta min syn på barnet och dess
+förhållande till samtiden och framtiden.
+
+Under den postindustriella epoken, den postmoderna, har
+studiet av tecken och teckensystem kommit att aktualiseras i
+allt större utsträckning. Tecken och teckensystem
+förekommer i en allt större mångfald. Teckenbetydelser har
+kommit att relativiseras i så hög utsträckning att avkodningen
+av en "text", filmisk eller litterär, i allt högre grad direkt är
+beroende av mottagarens förkunskaper. Jeunet/Carot har
+exempelvis lånat ramhandlingen från Charles Dickens
+1800-talsroman Oliver Twist. Kunskapen om detta påverkar
+förståelsen och läsningen av filmen. På så sätt kan man se att
+yttranden av varierade slag kan betyda olika saker för olika
+läsare, helt beroende på dessas förkunskaper. Filmtiteln tycks
+vilja påstå att här representeras en värld där barnen är de
+uttalade förlorarna. De har helt förlorat sin barnsliga oskuld
+och har tvingats acceptera de villkor som den diegetiska
+världen ställt upp; vargens roll. Huvudpersonen Miette är inte
+mer än nio år, men trots detta framställs hon som en mycket
+rationell och målmedveten flicka. Samtidigt är hon medveten
+om att denna värld inte har någon säker framtid att erbjuda.
+Kanske har hon också förlikat sig med det faktum att hon
+fötts in i en värld där tecken och teckensystem är av en uttalat
+flerdubbel natur? Barnet möter en värld präglad av en
+betecknarnas mångfald, en värld där föränderligheten är det
+enda beständiga. Verkligheten består för Miette mer av en
+representation än av en absolut faktisk värld. Hon har förlikat
+sig med tanken på att språket/kunskapen direkt bestämmer
+förståelsen av den verklighet man lever i. Sålunda är denna
+barnets verklighet att likna vid ett fritt flytande rum. För
+henne finns inte en absolut sanning. Tvärtom lever Miette i en
+verklighet där sanningen direkt beror på hur mottagaren
+väljer att förhålla sig till densamma. Endera kan individen
+välja att möta verkligheten med en konservativt färgad rädsla
+som exempelvis Roy Andersson gör i sin bok, eller så väljer
+individen att möta samma verklighet med öppenhet och
+tillförsikt; som fallet är med Miette. Av den orsaken spelar det
+henne ingen större roll ifall hon lever ytterligare en dag eller
+ett år - hon är fullkomligt införstådd med det moderna
+samhällets kodsystem och accepterar därför, utan förbehåll,
+de livsvillkor som samhället erbjuder. Ur den synvinkeln sätts
+åskådaren själv i centrum. Läsningen och förståelsen av
+filmen tycks helt och hållet bero på betraktaren och dennes
+förkunskaper men framförallt på vilket sätt åskådaren
+förhåller sig till omvärlden och verkligheten.
+
+Allt sedan Thomas Kuhns och Roland Barthes6 banbrytande
+vetenskaps- och kulturteorier har en mängd kulturteoretiker
+förklarat den moderna människan som "språkligt inspärrad".
+Frågan är ifall man nödvändigtvis måste uppfatta henne som
+uttryckligen "inspärrad" i en språkets verklighet? Kan man
+kanske vända på problematiken? Kanske behöver en värld där
+tecken och symboler ständigt omformuleras, refereras och
+omplaceras inte innebära att människan direkt determineras
+av språket och referenternas flytande natur? Kanske kan
+man se den moderna människans kultur som något som
+direkt har kommit att föda en mer påtaglig reflexivitet och
+vakenhet? Reflexion behöver inte innebära att yttrandenas
+mångfald och betecknarnas varierande referenser likställs
+med begrepp som "simulerad" eller "genomskinlig". Bara för
+att tecknen och den samtida människan inte erbjuds en fast
+och absolut verklighet, avseende såväl språkvärld som
+objektsvärld, innebär det inte att hon nödvändigtvis måste
+alieneras från samhället och kulturen som sådana. Tomas
+Ziehe har påpekat detta och menar att reflexivitet också
+innebär självreferens, d.v.s. att individen gör sig själv till
+föremål för reflektion.7 Den moderna kulturen erbjuder, som
+Ziehe ser det, allt bättre möjligheter för självreferens tack vare
+massmedierna, reklamen, filmen o.s.v. Men man kan tänja
+på resonemanget en smula. Denna självreflexion tycks direkt
+hänga samman med bättre kommunikationer och därigenom
+ökade informationsflöden. Självklart har detta kommit att
+skapa en kulturell och social differentiering; men denna
+behöver inte nödvändigtvis vara klassrelaterad. I första hand
+handlar det om, menar jag, en kunskapsrelaterad
+differentiering. 
+
+Utgående från dessa tankar kan man möjligen påstå att den
+textuella mångfald som gör sig gällande i De förlorade barnens
+stad är en mångfald som i allra högsta grad bejakar det
+moderna och det självreflexiva. Kunskapen sätts i centrum.
+Människans möjligheter bejakas. Det handlar alltså om
+åskådaren själv. Genom att kameran gång på gång växlar
+subjekt frammanas en distanserande effekt hos denne. Det är
+en värld som i ena stunden är loppans och i den andra stunden
+hjärnans. Kameraögat tillhör hela tiden ett subjekt som det är
+svårt för åskådaren att identifiera sig med. Jätten One tittar
+på Miette med drogad blick, cykloperna ser artificiellt, och det
+lilla barnet förvrängt och förvridet. Genom att detta
+genomförs konsekvent är det bara för åskådaren att "följa
+med" på en tecknens, symbolernas och metaforernas resa.
+Åskådaren har bara att läsa, och avkoda, det som visas på
+duken (eller det som visas i omvärlden). Den moderna
+människan, inte bara den vuxna utan i synnerhet barnet, har
+bara att ta till sig av informationens mångfald. Ifall denna
+informationens mångfald inhämtas från etermedier,
+litteratur, eller offentliga samtal i diverse intellektuella
+miljöer, är av underordnad betydelse. Betydelsefullt är dock
+det faktum att kunskap och information hela tiden är något
+allestädes närvarande och aktuellt. Inte bara för den lilla
+människan, barnet, utan också för den stora människan, den
+vuxna. 
+
+Kanske är en av orsakerna till att vuxenvärlden kommit att
+tillskrivas egenskaper som själviskhet, främmandeskap och
+cynism, det faktum att människan inte riktigt varit "mogen"
+för denna textuella mångfald. Det är upp till framtidens
+människor att hinna ikapp den nya verklighet som vuxit fram
+ur det samhälle där information och kommunikation kommit
+att bli betydelsefulla begrepp. Jürgen Habermas har påpekat
+att de som i första hand är rädda för den samhälleliga
+moderniseringen och allt vad denna innebär är de
+nykonservativa. Till denna grupp räknar han gängse
+postmoderna språkteoretiker som exempelvis Jean
+Baudrillard. För att kunna förlika sig med den mångfald av
+intryck som det postindustriella samhället erbjuder, måste
+man möta det med öppna sinnen. Den samhälleliga
+moderniseringen och mångfalden är bra, men för att kunna
+tillgodogöra sig alla möjligheter som denna implicerar måste
+individen och kollektivet vara motiverade, möta
+förändringarna med acceptans. Förståelsen bildar så grunden
+för identiteten. Och eftersom livsvärdena är mycket komplexa
+och fragmenterade i det moderna samhället krävs det, som
+tidigare nämnt, erkännande och öppenhet. Möjligen kan man
+påstå att De förlorade barnens stad i första hand vänder sig till
+en betraktare som vågat bejaka vår tids textuella mångfald.
+En betraktare som tack vare denna öppenhet också bär på en
+potential att på ett bättre sätt förstå vår egen tid, och
+därigenom kanske skapa en bättre framtid. Barnet blir i detta
+sammanhang just en sådan betraktare, som nyfiket slukar
+kunskap och accepterar det faktum att språket, som all
+information är beroende av, per definition måste vara
+värderelativt, refererande och föränderligt. Sett på det viset är
+filmen å ena sidan en dystopi, å andra sidan ett försök att
+bejaka individens och människans möjligheter. Alltså är
+Jeunet/Carot inte de kulturkonservativa fatalister som de till
+en början tycktes ge sken av att vara. Tvärtom är filmen ett
+exempel på att de bejakar den moderna tidens mångfald.
+Barnet är det som uttalat bär på en potential att möta
+framtiden. Världen och verkligheten har styrt in på en
+förledande och perverterad kurs, av den orsaken måste
+människan anta samma förledande förhållningssätt gentemot
+denna värld och sin egen framtid. Men! För den samtida
+människan kanske det redan är för sent? Möjligen krävs det
+en helt ny, ren, oförstörd mentalitet för att kunna anta ett
+annat nytt förhållningssätt gentemot, inte bara framtiden,
+utan också omgivningen i största allmänhet. Det handlar om
+en värld där människan är satt i ett desperat sökande efter sin
+egen historia, sina egna förlorade myter.8 Människan minns,
+människan är nostalgisk, människan har fått problem med
+att hantera denna "nya" medierade och omformulerade
+verklighet. Vetenskapen har gjort enorma framsteg inom de
+flesta områden. Men vad som också hänt är att dessa fakta
+blivit abstrakta fakta, människan har inte direkt tillgång till
+dem. En form av simulerade eller medierade bilder av
+verkligheten. Men likväl är dessa medierade bilder verkliga
+och tillhör sålunda samma verklighet. Frågan är ifall detta
+inte är kärnan i De förlorade barnens stad, att acceptera och
+ta denna medierade, ständigt omformulerade och referande
+verklighet som något självklart. I sådana fall representerar
+barnen i Jeunet/Carots film inte förlorarna utan vinnarna. Det
+är barnen som förstår och vågar. Det är barnen som har fötts
+in i en värld där historien, liksom myterna och omvärlden i
+övrigt, till stora delar tillhandahållits genom etermedierna. På
+så sätt uteblir den "bittra klagan" och frappanta cynism som
+präglar de vuxna i filmen. Framtiden och världen tillhör
+morgondagens människor; vår tids barn. 
+
+     
+
+    *
+
+ 
+
+Noter
+1. Citatet sammanfattar på ett utmärkt sätt den
+värdekonservativa kulturuppfattning som är lätt att spåra hos
+gängse postmoderna intellektuella. En så uttalat uppgiven och
+negativ syn på det moderna postindustriella
+informationssamhället finner man i synnerhet hos de franska
+poststrukturalisterna, men i detta fall är det inte en fransman
+som står för uttalandet utan den svenske filmaren och
+författaren Roy Andersson. Se Vår tids rädsla för allvar,
+Filmkonst nr 33, 1995.
+
+2.  I detta fall kan man säga att begrepp ställs mot begrepp;
+modernism mot postmodernism. Postmodernismen innebär,
+till skillnad från modernismen som strävade efter tänkande i
+helheter, ett tänkande som handlar om att bryta sönder och
+montera ned modernismens totaliteter. Det finns nu inte
+längre något gemensamt och övergripande. Baudrillard
+menar att verkligheten i denna postmoderna värld skapas av
+medierna i en ständigt accelerande takt. Alltså tillhandahålls,
+genom medierna, slutligen inte mer än en skenbild
+(simulacrum) av verkligheten. En verklighet som blivit helt
+lösryckt från historien och sina ursprungliga referenter.
+Verkligheten består då inte av mer än denna mångfald av
+simulacra. Jean Baudrillard, Simulations, (1981) eng. övers.
+(1983). 
+
+3.  Kom ursprungligen ut 1857, fyra år senare i en reviderad
+upplaga med ett tillägg på ytterligare ett antal texter. Ett urval
+finns att läsa på svenska: Charles Baudelaire, Det ondas
+blommor, (1986).
+
+4.  Se Håkan Thörn, Vad är "det moderna"?, Häften för
+kritiska studier, nr 4 1992.
+
+5.  Termen "déconstruction" användes för första gången av
+Jaques Derrida. Men kom att tillskrivas en mer essensiell
+betydelse under åttiotalet då amerikanska teoretiker
+"upptäckte" honom och preciserade begreppet mer exakt. Mer
+om detta i David Harvey, The Condition of Postmodernity
+(1989).
+
+6.  Se i synnerhet Thomas S. Kuhns The Structure of Scientific
+revolutions, (1962), som kom att förändra synen på den
+vetenskapliga utvecklingens historia och framtid. Liksom
+Roland Barthes gjorde i sin Elements of Semiology (1964) så
+tog Kuhn starkt intryck av Ferdinand Saussures språkteorier
+som formulerades i början av 1900-talet. Den stora skillnaden
+för Kuhns och Barthes vidkommande var att de såg
+utvecklingen av vetenskap respektive språk som något satt i
+ständig förändring och utveckling. Det handlar om en ständigt
+pågående process. 
+
+7.  Se Thomas Ziehe, Inför avmystifieringen av världen.
+Ungdom och kulturell mordernisering i Postmoderna tider
+red. Löfgren/Molander, (1986).
+
+8.  Det finns ett stort antal psykoanalytiker och sociologer
+som diskuterat myternas betydelse i det moderna samhället.
+En av dom är Rollo May se t. ex. The Cry For Myth, (1991).
+
+
+
+
+
+                                        Hjärnkontoret
+
+
+                    Även om det inte har varit redaktionens ursprungliga avsikt,
+                    så har föreställningar kring förståelse blivit ett nav kring vilket
+                    flera av nummer femtiofyras texter grupperat sig.
+                    "Verkligheten eller, om man så vill, världen utanför oss, har
+                    inte något språk." skriver Joachim Israel i sin essä om Peter
+                    Zinkernagels språkfilosofi. Zinkernagel vars språkteorier
+                    författaren anser vara bland de mest betydelsefulla sedan
+                    Wittgenstein. Läs hans essä och känn er för ett ögonblick
+                    tveksamma om vi överhuvudtaget förstår varandra. Om vi nu
+                    inte skulle förstå varandra när vi samtalar, vad är det då vi
+                    förstår? Språket, framsprunget i möten mellan oss människor,
+                    behandlas även av Svante Karlsson i hans jämförelse mellan
+                    Bubers och Jungs tänkande. De mänskliga möten som Håkan
+                    Forsell i texten "Hemlängtan som stadsbyggare" anser
+                    omöjliggörs i modernitetens bebyggelse. I rationalitetens namn
+                    skyddas vi från möten med obehagliga främlingar, eller
+                    grannar. Håkan Sandell har tolkat tysken Durs Grünbeins
+                    dikter, vilka anknyter till filmen som med anledning av
+                    hundraårsjubileumet avhandlas av Martin Kristenson.
+                    Aforismer av Lars Nyström och en ny medarbetare i
+                    redaktionen, Magnus Westerberg, presenterar sig med tre
+                    dikter. Claes Witting tar er med in i Hugo Balls dikt
+                    "Karawane". En samling meningslösa bokstavskombinationer?
+                    - nej, dikten är ytterst genomtänkt enligt Witting. Dikten finns
+                    med originaltypografi på omslaget till Hjärnstorm nummer 48.
+                    Rulla in er i badrumsmattan, trä den gamla stjärngossestruten
+                    över huvudet, ring på grannens dörr och recitera Hugo Balls
+                    dikt högt och tydligt. 
+
+
+                                      Ur Hjärnstorm nummer 54
+
+                            Hemlängtan som stadsbyggare
+                                    av Håkan Forsell
+
+                     "homesickness, Heimweh, mal du pays, nostalgia della propria
+                                            casa..."
+
+                     
+
+                    1.
+                    Vi har alla varit bland främlingar och längtat hem. Det är som
+                    en förälskelse. Minnet upphöjer det åtrådda hemmet över alla
+                    tvivel, över alla karaktärs- och skönhetsfel. Mitt hem är min
+                    borg. Borta bra men hemma bäst... Man låter utmaningen av
+                    allt det nya och okända skölja över en och tanken på en utväg
+                    - ett hem - växa sig starkare. Till slut, i längden, går tanken
+                    inte att motstå. Plötsligt kan också ett helt samhälle drabbas av
+                    hemlängtan. Det står vid skiljevägen och marken under
+                    fötterna är främmande. Ingen väg verkar leda åt rätt håll och
+                    en önskan att retirera tas i övervägande. Det finns någonting
+                    starkt provinsiellt och småskuret över att längta hem.
+                    Hemmet skulle bli det begärda botemedlet mot den smärta och
+                    förvillelse som det moderna storstadslivet hade att erbjuda.
+                    Varje trädgårdsstadsrörelse, varje subventionerat lån till
+                    egnahemsbyggen under 1900-talets första årtionden
+                    genomsyrades av en stark hemlängtan. Det trygga hemmet
+                    var en synnerligen meningsgivande metafor. Men bilden av ett
+                    tryggt hem kan förvandla allting utanför detta hem till
+                    områden fulla av fara och hot. De som bor utanför "hemmet"
+                    måste hållas borta, hållas på plats, kanske t.o.m. jagas iväg.
+                    Främlingen måste stoppas vid portarna, ante portas. I
+                    städerna skedde det första mötet med det moderna. Den
+                    plötsliga förändring det resulterade i skapade en osäkerhet, en
+                    rädsla, en känsla av okontrollerbarhet. Urbaniseringen och
+                    industrialiseringen gjorde att människor bröts upp från sitt
+                    ursprung, från sin av hävd vunna identitet. Tillsammans med
+                    andra och ofta i kamp med andra måste man finna nya
+                    identiteter, nya grunder att leva sina liv utifrån. I Sverige hade
+                    arbetarrörelsen strax innan l900-talets inträde lyckats
+                    omvandla en "hembygdstillhörighet" hos de tillströmmande
+                    industriarbetargrupperna till ett "klassmedvetande". Utan
+                    staden hade detta inte varit möjligt. För de ortodoxa
+                    marxisterna var storstaden till och med en nödvändighet, då
+                    den stod i nära förbund med kapitalismen och därigenom
+                    utgjorde en övergångsfas till det klasslösa samhället. Men den
+                    egendomslösa proletära massan var hänvisade till ett
+                    kringflackande liv i staden som hyresgäster. Hyreskontrakten
+                    skrevs på ett år i taget, men man bodde ibland ännu kortare tid
+                    på samma ställe. Arbetarna blev de "moderna nomaderna" i
+                    staden, och denna rotlöshet uppfattades som ett hot mot det
+                    borgerliga, rotade samhället. Hyresgästande arbetare var
+                    oroselement. Deras hem hade ingen betydelse för dem. Inte
+                    minst hade händelserna i Paris 1871 senast visat hur illa det
+                    kunde gå när revolutionära strömningar spred sig bland
+                    arbetare inne i en storstad. För många av de
+                    socialreformatorer som var verksamma i europeiska
+                    huvudstäder runt sekelskiftet var därför inte det primära att
+                    få arbetarna rotfasta i stadssamhället, utan att få dem ut ur
+                    staden. Men man ville för den skull inte riskera att förlora
+                    farten gällande samhällets framåtskridande industrialisering.
+                    Det handlade om att få dem att börja längta hem igen.
+
+                    2. 
+                    Den moderna storstaden har alltsedan Tönnies, Simmel och
+                    Spengler genomgående intellektualiserats och abstraherats,
+                    och därigenom fått utgöra en motpol till småstadens eller
+                    landsbygdens "själfullhet" och emotionella karaktär.
+                    Uppfattningen av storstaden som ett förfallets och
+                    degenereringens ort - och storstadsmänniskan som en själsligt
+                    förkrympt varelse - är närmast lika gammal som storstaden
+                    själv. Det har egentligen polemiserats mot den industriella
+                    staden redan innan den överhuvudtaget fanns. I och med den
+                    kraftiga urbaniseringsvågen i Sverige från 1870-talet och
+                    framåt, utbreddes snart ett nät av iakttagelser och
+                    expertutlåtanden för att diskutera och söka fånga in
+                    storstadsfenomenet - och framför allt för att förkasta det;
+                    stämpla det som fördärvligt och människofientligt. Med den
+                    tilltagande trängseln i industristäderna var samhället plötsligt
+                    hotat - inifrån - genom de lägre klassernas dåliga
+                    bostadsförhållanden och låga levnadsstandard, genom
+                    smutsen, sjukdomarna och döden i de kåkstäder som likt
+                    metastaser blommade ut i stadssamhällets utkanter. Staden
+                    hotade att bli människosläktets grav, som Rousseau spådde
+                    redan vid mitten av 1700-talet.
+
+                    3. 
+                    Kring sekelskiftet kom landsbygden att uppvärderas på
+                    storstadens bekostnad i de flesta västerländska samhällen. I
+                    England ledde det till att man försökte föra staden tillbaka ut
+                    på landet i form av anläggandet av trädgårdsstäder. Denna
+                    rörelses idéer hamnade i god jord både i Tyskland och i Sverige.
+                    I Tyskland hade värnandet om landsbygden och bondeklassen
+                    en stark tradition, och när 1800-talet led mot sitt slut hade
+                    denna tradition vuxit sig starkare än någonsin förr och
+                    kommit att inta en central roll i vad som sedermera kallats
+                    Tysklands "anti-modernistiska kall". I slagskuggan av Darwin
+                    försökte naturvetenskapsmän och nationalekonomer, med
+                    hjälp av luddiga evolutionsmodeller, förklara stadsamhällenas
+                    ödesdigra tillväxt. En av dessa många teoribyggare hette
+                    George Hansen, vars bok Die drei Bevölkerungsstufen utkom i
+                    två utgåvor, den första 1889 och den andra 1915. I sin bok
+                    indelade Hansen samhället i tre klasser: den främsta utgjordes
+                    av markinnehavarna, framför allt bönderna. Den mellersta
+                    var den borgerliga medelklassen och den sista och lägsta var de
+                    egendomslösa arbetarna. Den första klassen var så att säga
+                    "alltid varaktig". De andra två var utskott av den ursprungliga
+                    första klassen, och det var ur den första klassens överskott som
+                    stadsbefolkningen bildades. Stadsbefolkningen kunde inte
+                    reproducera sig av egen kraft, utan dog ut efter en eller två
+                    generationer. Städerna var därför beroende av
+                    befolk-ningstillströmningen från landet, som på så sätt - enligt
+                    Hansen - hela tiden på nytt bildade städernas invånare. Nu
+                    diskvalificerade inte Hansen helt och hållet stadsbefolkningens
+                    möjligheter att själva föda fram nya generationer, men
+                    befolkningstillskottet skulle då endast ske inom den tredje
+                    klassen; det egendomslösa proletariatet. Storstaden suger till
+                    sig, likt en malström det bästa bondeblodet, tömmer
+                    landsbygden och låter landsbygdens människor gå under som
+                    stadsproletariat. Till de tidigare lovprisarna av landsbygden och
+                    dess människor på moraliska och politiska grunder, tillfogade
+                    Hansen en biologisk. Bakom dessa teoretiska krumbukter går
+                    det också att spåra en allmänt spridd önskan om att värna om
+                    Tysklands militära styrka. Ett skyddande av landsbygdens folk
+                    - och framför allt de unga män som bodde där - var i så fall i
+                    högsta grad nödvändigt. Endast 10% av den tyska armens
+                    unga värnpliktiga kom nämligen från storstadssamhällen.
+                    Heimat, hembygden, blev nyckelordet för den anti-modernism
+                    och stadshat som med full kraft blommar upp i Tyskland
+                    under l900-talets första årtionden. "Heimat - det var fettet
+                    som gneds in mot världsfrosten", skriver Christoph Meckel i
+                    boken om sin far som var nazianhängare. Och bilden av
+                    hembygden som det skönaste i världen togs upp, med om
+                    möjligt ännu större kraft än tidigare, av den
+                    nationalsocialistiska propagandaapparaten under 1930-talet.
+                    Glorifieringen av landsbygden kan sägas vara ett rationellt
+                    försök att övervinna en irrationell längtan. Men i tidens
+                    agrarromantiska och stadsfientliga yttranden blandade sig inte
+                    bara konservativa och reaktionära tongångar. Här återfanns
+                    också reformistiska och även emancipatoriska strävanden.
+                    Den främsta av dessa var trädgårdsstadsrörelsen, vars
+                    drivande idé var att återgå till en naturligare tillvaro och ett
+                    enklare liv än det som erbjöds i storstaden. Men
+                    trädgårdsstaden skulle inte bara erbjuda lantlivets alla
+                    fördelar, utan den skulle dessutom utstråla urbanitet. I nära
+                    kontakt med staden skulle bostadsoaser omgärdade av grönska
+                    anläggas. Närheten till staden skulle göra det möjligt att
+                    åtnjuta dess många företräden, utan att därför behöva bo i den.
+                    Trädgårdsstadsrörelsens främsta skrift var Ebenezer Howards
+                    Tomorrow. A Peaceful Path to Real Reform, från år 1898.
+                    Redan titeln säger någonting mycket signifikant. Det var
+                    frågan om reform utan revolutionära övergångsfaser. Inte en
+                    förändring i andan av det oregerliga proletariatet, utan en
+                    fredlig förändring för garanterad borgerlig lycka. England blev
+                    ett föregångsland, kanske just för att landet hade innehaft den
+                    rollen under den industriella revolutionens frammarsch. Vad
+                    som ledde fram till trädgårdsstadsrörelsen - såväl i England,
+                    Tyskland som i Sverige - var idéer av stark utopisk karaktär.
+                    Många av dess företrädare uppfattade sig själva som förlösare
+                    av den nervösa och själsligt deformerade storstadsmänniskan.
+
+                    4.
+                    Reaktionen mot den kraftiga urbaniseringen kring sekelskiftet
+                    kom när processen redan var långt framskriden. I Sverige
+                    började en motreaktion på allvar att göra sig hörd först under
+                    1910-talet. I Stockholm upptäcktes den stora inflyttningen och
+                    den efterföljande bostadsnöden alltför sent. Politiker i
+                    Stockholm försökte långt in på 1920-talet att tillgripa gamla
+                    beprövade redskap - som t.ex. upprättandet av nödbostäder
+                    och tillfälliga inkvarteringar i gymnastiksalar - för att bringa
+                    ordning i befolkningskaoset. Men dessa åtgärder var
+                    utformade för mindre och snart övergående kriser... Resultatet
+                    blev att en bedagad plutokratisk maktordning beslutade om
+                    lösningar som var fullkomligt malplacerade i det nya mass-
+                    och industrisamhället. De politiska agerandena i bostadsfrågan
+                    i Stockholm under 1910- och 20-talen utgör ett bra exempel
+                    på den känsla av villrådighet ooh även fasa som många av
+                    stadens makthavare kände inför den forcerade
+                    befolkningsutvecklingen. Stockholms borgmästare vid denna
+                    tid, Carl Lindhagen, var tillika en av trädgårdsstadsrörelsens
+                    främsta förespråkare. I sina memoarer ger han sin
+                    geografiska och sociala drömbild av Stockholm. Staden skulle
+                    vara tydligt uppdelad i en "inre", merkantil stad och en "yttre",
+                    social stad. I stadens centrum skulle sålunda handel, offentliga
+                    instanser, administration, byråkratiska institutioner och
+                    kommersiella nöjesetablisemang ha sin plats. I stadens periferi
+                    skulle därmot det riktiga livet äga rum. Där skulle det finnas
+                    mänsklig värme och gemenskap och närhet till naturen,
+                    undandraget industrialismen och det forcerade storstadslivet.
+                    Där skulle riktiga hem kunna byggas. Det fanns i samtiden
+                    många bud om hur en framtida storstad skulle se ut. Ofta och
+                    från skilda håll återkom bilden av en koncentrisk stad, som i
+                    utåtgående cirkar alltmer skulle förlora i densitet. Gemensamt
+                    var också de antikapitalistiska dragen i denna bild. Lindhagen
+                    sade sig ofta känna ett behov "att göra uppror mot den
+                    industriella, materalistiska tidsströmningen såsom
+                    företrädesvis av godo." Samhällsutvecklingen måste till valje
+                    pris ledas bort från storstaden: Storstaden är
+                    förbränningsugnen för människomaterialet. En sådan skapelse
+                    av den moderna kulturen utgör föremålet för de flestas
+                    längtan, en talande bevis på denna kulturs själlöshet.
+                    Landsbygden var den ideala boendeplatsen för Lindhagen. Han
+                    förkunnade upprepade gånger, att man skulle söka göra
+                    landsbygden mer attraktiv. Där den inre, kapitalistiska stadens
+                    griparmar inringade sina hyresgäster, där dog även
+                    hembygdskänslan. Hans tankar - denna märkliga blandning
+                    av kulturpessimism och socialrefomatorisk framtidsoptimism
+                    - låg i tiden. Under en bostadskongress i Stockholm år 1916
+                    förklarade den framstående stadsarkitekten Albert Lilienberg,
+                    att modellen för det framtida byggandet var tydligt och klart:
+                    Man måste bort från gatan, och börja utgå från husen. Carl
+                    Lindhagen deklamerade i fördömande ordalag under samma
+                    kongress, att man nu skulle vända innerstaden ryggen
+                    gällande det sociala bostadsbyggandet: Den typ, vi skola gå
+                    tillbaka till, är den gamla kulturella småstaden, uppvuxen
+                    under sekler, med fridfulla boningar kringströdda här och var
+                    i grönskan... Det var omöjligt att betrakta storstaden som ett
+                    "hem". Framför allt inte när man bodde i ett hyreshus. Bara
+                    det att dela ingång med andra människor var högst olyckligt
+                    och ödelade varje form av stolthet och omsorg om det egna
+                    hemmet - och det underminerade alla hemlivets dygder. Med
+                    tidsenligt retoriska undergångsbasuner, kallade Lindhagen
+                    storstaden vid dess rätta namn: Storstaden lockar. Där är liv
+                    och rörelse, omväxling i handel, vandel och förströelse. Den
+                    tillfredställer på sitt sätt det yttersta mänskliga behovet av
+                    samvaro, större i samma mån som den inre världen inom oss
+                    förlorar sitt inflytande. Storstaden ger intryck av att vara
+                    huvudsätet för den andliga och materiella kulturen. Därifrån
+                    gå impulserna ut, och dit löpa trådarna samman. Denna
+                    glänsande yta gömmer dock en undre värld, vars nattsidor
+                    länge givit sig tillkänna. Storstaden är ett barn av den
+                    industriella olyckan, det största kräftsåret på den nutida
+                    samhällskroppen, nöden, broffets, ohälsans, hatets,
+                    dödskampens stora tummelplats. Den är onaturens,
+                    bostadseländets, livsmedelsbristens, alkoholismens och
+                    tobaksmissbrukets högsäte. Vid jämförelse mellan ljussidor och
+                    nattsidor sjunka de förra undan som en svag strimma
+                    bortdöende ljus i ett stort mörker. Inte undra på att man var
+                    benägen att gripa till radikalametoder. Redan kring
+                    sekelskiftet hade tongivande politiker, uppmanade där till av
+                    Key-Åbergs undersökning av de miserabla
+                    bostadsforhållandena för arbetarklassen i Stockholm, hävdat
+                    att den stad som skulle komma att byggas måste fostra till
+                    husliga dygder och en känsla för hemlivet. Trädgårdsstäderna
+                    skulle nu öppnas för den mindre bemedlade arbetarklassen
+                    genom statliga subventioner och lån. Staden var trång, smutsig
+                    och oregerlig, och processen hade påbörjats för att återigen
+                    skapa en "hembygdstillhörighet" av den olycksdigra
+                    klassmedvetenheten.
+
+                    5. 
+                    Man kan ändå inte säga att hemlängtans politik tog död på
+                    staden. Under mellankrigstiden frodades ett genuint stadsliv,
+                    vilket på många sätt verkade rakt motsatt tidens strömningar.
+                    Under 1930-talet odlades primitivismen i den svenska
+                    samhällssjälen. Man skulle bort från staden och ut i naturen;
+                    gärna späka sig själv och frivilligt avstå från allt utom det
+                    absolut nödvändigaste. Det var främst kroppen som skulle
+                    fostras, därav mådde även själen bra, resonerade man. Om
+                    Oswald Spenglers ord var riktiga, att "staden krossar det
+                    specifikt mänskliga, samtidigt som den civiliserar
+                    mänskligheten", var det en dubbel uppmaning för
+                    primitivisterna att förkasta storstaden. Man ville ju renodla det
+                    specifikt mänskliga just genom att inte civilisera människan,
+                    åtminstone inte på det sätt som storstaden gjorde det!
+                    Arkitekten Ernst Spolén, som tillsammans med Ragnar
+                    Östberg hade arbetat med Stockholms stadshus på 1920-talet,
+                    var under det sena 30-talet en hängiven vurmare för natur
+                    och timmerkojor. Stridsropen löd: "Bort från telefonen" eller
+                    "Ut till sportstugan". I storstaden malde en grottekvarn och
+                    hon malde sönder människan: Den nervösa arbetshetsen,
+                    överbefolkningen, den förskämda luften - och telefonen -
+                    utföra alltid sitt förstörelseverk. Storstadshemmet kan inte
+                    frigöra människan. Tack vare telefonen stod man i ständig
+                    kontakt med oroshärdar. Det handlade om att isolera sig, att
+                    undvika kontakt. Efter Andra världskriget hade en annan
+                    riktning fått fäste i beslutande kretsar; nya taktiker för att
+                    gripa sig an det urbana. Vi kan kalla det "elimineringen av
+                    stadens oförutsägbarhet". Den knyter an till hemlängtans
+                    politik i att den delar dess rädsla för främlingen. Glappet
+                    mellan vad man behöver veta om andra för att kunna
+                    navigera sig i samhället - och vad man tror sig veta om andra
+                    motsvarar ett element av främlingsskap. Det moderna
+                    storstadslivet framskrider bland främlingar. Under
+                    efterkrigstiden började stads- och samhällsplanerare att
+                    bedriva ett utrotningskrig mot främlingen. Det var just det
+                    främmande i främlingen man ville få bort, det oförutsägbara,
+                    det undanglidande. Resultatet blev ett försök att reducera alla
+                    till desamma genom förändring av stadsmiljön. Man ville
+                    bränna bort det överraskande och oberäkneliga i det urbana
+                    rummet. Det mest effektiva sättet var att göra staden så
+                    intetsägande och förutsägbar som möjligt; en rutinvärld
+                    befolkad av främlingar. I publikationen Det framtida
+                    Stockholm från 1945 beskrevs en generalplan över staden, vars
+                    huvuddrag skulle kunna sammanfattas med två imperativ:
+                    konformera och separera! Staden hade för länge sedan upphört
+                    att växa additivt, genom att låta varje ny tidsepok bilda sina
+                    årsringar utanför de föregående, som på ett träd. Nu skulle
+                    staden vara en "ändamålsenligt organiserad helhet". Inom
+                    arkitekturen och politiken har det alltid funnits ordningens
+                    apostlar med drömmar om att mäns och kvinnors liv skulle bli
+                    bättre om bara det tillfälliga och oplanerade kunde tas bort från
+                    den värld de lever i. När Stockholms Fastighetsägarförening
+                    år 1945 triumfatoriskt skrev om den nya "tillvända"
+                    funktionalismen för en borgerlig livsstil som kommit till utryck
+                    i hyreshusen vid Tessinparken, var följande ordalydelser inte
+                    unika: Den, som vill leva tillbakadraget och ostört, kan
+                    ingenstädes tillfredsställa denna passion bättre än i det
+                    moderna hyreshuset, där man kan bo i årtionden utan att
+                    tvingas till kontakt med grannarna. Garanti utlovas mot
+                    oförutsägbara och tillfälliga möten med främlingar. Hemmet
+                    hade blivit en borg; en borg att förskansa sig i och försvara sig
+                    mot allt främmande och oberäknelig. Även mot det plötsliga
+                    mötet i trapphuset.
+
+                    6. 
+                    "Kommunikation" blev snart svaret på frågan hur man skulle
+                    lösa problemet med de växande städerna. Ja, inte bara lösa
+                    problemet, utan fastmer skapa den ideala staden,
+                    "naturstaden". Redan år 1907 höll Centralbadets arkitekt,
+                    Wilhelm Klemming ett tal vid Samfundet S:t Eriks årsmöte i
+                    Stockholm där han lovprisade den framtida kommunikationen
+                    och vilka möjligheter den skulle erbjuda huvudstaden.
+                    Samfärdsmedlen kunna snart föregå och framkalla en allt
+                    snabbare utveck1ing och möjliggöra en helt ny stadstyp i
+                    storstadens närhet, villastaden, den blandning av stad och
+                    landsbygd, som i sin fulländning torde vara den ideellaste form
+                    för stadssamhälle vi kunna tänka oss... Kommunikationerna
+                    är lösenordet för de flesta af våra sociala spörsmål. Denna
+                    övertro på kommunikation och trafikväsende - som stegrades
+                    markant efter Andra världskriget och det svenska
+                    välfärdssamhällets framväxt, för att nå sin kulmen med 1960-
+                    och 70-talets förortskreationer - leder naturligtvis till att
+                    staden utvecklas på kommunikationens premisser. Bilmotorer
+                    och vägmaterial kom att bestämma stadens utformning i
+                    framtiden. Och till detta följer ytterligare ett problem:
+                    förflyttningar i sig skapar sällan möten, och det är ju trots allt
+                    genom möten som människor kommer i kontakt med
+                    varandra. Ser man vad trafiken har gjort med stadsrummet,
+                    kan man konstatera att den inte alls var så frälsande eller ens
+                    frigörande som man först trodde. Det kritiklösa åberopandet av
+                    alla kommunikationens former för att lösa urbana problem
+                    har gjort Stockholm till den "stadslösa storstad" - för att
+                    parafrasera en boktitel av Ingemar Johansson - som den är
+                    idag, där människor transporterar sig själva över
+                    motorvägslandskap med både solen och hemlängtan i ryggen. 
+
+                    7.
+                    Den hemlängtan som låg till grund for mycket av
+                    stadsplanerandet i början av l900-talet öppnade dörrarna för
+                    en tvivelaktig stad. Man kan förvisso hävda att alla samhällen
+                    idag har urbaniserats i så hög grad att det finns svårigheter
+                    med att identifiera det urbana som någonting direkt
+                    kontrasterande till landsbygden. Men det är en urbanisering
+                    på utspriddhetens, isoleringens och trafikens förutsättningar.
+                    Faktum kvarstår att endast 4% av dagens svenska hem
+                    återfinns i tätbebyggd stadsmiljö. När storstaden uppkom som
+                    en ny, spirande samhällsform kring seklet är det slående hur
+                    ofta denna samhällsform formulerades i termer av förlust. Det
+                    räcker med att citera Tönnies när han skriver: "...det
+                    gemenskapsliv som representerades av Gemeinschaft kunde
+                    urskiljas i form av huset, byn och småstaden. Både byn och
+                    småstaden har många av familjens drag. Först när småstaden
+                    växer till storstad förloras dessa drag nästan fullständigt." Man
+                    ville leta sig tillbaka till denna förlorade gemenskap, till det
+                    förlorade hemmet och motsätta sig den forcerade
+                    moderniseringen. Hemlängtan är en dröm att tillhöra - om att
+                    vara, för en gångs skull, från platsen och inte bara på platsen.
+                    Men hemlängtan är någonting mer än så: hemlängtan
+                    handlar om avsaknaden av ett hem, och kanske även om
+                    omöjligheten i att någonsin finna ett. Under den moderna
+                    brytningstiden var det många som upplevde denna avsaknad
+                    av ett riktigt hem - både i metaforiskt och i reellt hänseende.
+                    Men det finns ingen återvändo till ursprunglighet. Det
+                    förflutna finns inte undanstoppat i en röd- och vitmålad stuga
+                    eller i ett igenbommat folkhem någonstans, färdigt att tas fram
+                    och dammas av till sin forna glans. Vad den lyckliga staden
+                    kräver är en kompromiss mellan möjligheter och faror.
+                    Motsägelsefulla krav som dessa måste man handskas varsamt
+                    med - och inte med hjälp av radikala "lösningar", som
+                    historien om våra städer kan uppvisa alldeles för många
+                    exempel på. Kanske har vi för länge sedan passerat en
+                    tidsgräns där vi varken kan eller får längta hem. Så fort vi gör
+                    det kommer vi att isolera oss i våra försök att förverkliga
+                    denna längtan, och främlingen kommer att stå vid porten och
+                    vara ett hot - istället för att vara bland oss alla, en främling
+                    bland främlingar. Främlingen i den moderna storstaden är var
+                    och en av oss som går ut och lever våra liv. Det är
+                    förutsättningen för mötena och alla dagars oförutsägbarhet.
+                    Där är vi alla hemlösa. Ur innehållet
+
+          Christian Chambert "André Derain målar 'den moderna oron'"
+
+          Katarina Davidsson "Samuel Beckett och Alberto Giacometti"
+
+          Bill Romefors "Elmer Diktonius - 100-årig modernist!"
+
+          Ragnar Thoursie, Lennart Rodhe "Dikter och teckningar"
+
+          Björn Billing "Upplysningens räddning"
+
+          Franz Kafka översatt av Håkan Forsell "Kortnoveller"
+
+          Niclas Östlind och Henrik Orrje "Om sökandet efter det absolutas
+          struktur och mötet med Boogie Woogie"
+
+
+                                      Ur Hjärnstorm nummer 58
+
+                               Elmer Diktonius - 100-årig
+                                        modernist!
+
+                                      av Bill Romefors
+
+
+
+                    Elmer Diktonius (1896-1961)
+
+                    Den finlandssvenske modernisten och lyriska förnyaren Elmer
+                    Diktonius föddes den 20 januari 1896 och döden tog honom den
+                    23 september 1961. Diktonius erövrar sitt språk på 1920-talet
+                    och han anknyter till den tyska expressionismen - men han är
+                    hela tiden sig själv! Torsten Ekbom skriver i en DN-artikel
+                    1996-05-31: "Det finns författare som redan efter några rader
+                    avger sitt omisskännliga signalement. Man kan gå in var som
+                    helst och läsa - dikter noveller, essäer. Omedelbart hör man
+                    rösten, tonen. Elmer Diktonius är en sådan författare." Torsten
+                    Ekbom framhåller vidare att Edith Södergran och Gunnar
+                    Björling under de senaste åren varit "föremål för intensiv
+                    uppvaktning av doktorander, romanskrivare, biografer,
+                    förläggare, dramatiker, essäister. Diktonius tycks ha hamnat
+                    på överblivna kartan". Så illa är det dock inte. Olof Enckell
+                    publicerade 1946 monografin Den unge Diktonius1 och 1971
+                    förelåg Thomas Henriksons avhandling Romantik och
+                    marxism, Estetik och politik hos Otto Ville Kuusinen och
+                    Diktonius2. År 1976 utkom i Helsingfors en finskspråkig
+                    avhandling i musikvetenskap av Matti Vainio om Diktonius
+                    som modernist och kompositör.3 År 1978 trycktes min egen
+                    avhandling Expressionisten Diktonius, En studie i hans lyrik
+                    1921-1930.4 Vidare har Kjell Espmark i sin forskning i flera
+                    sammanhang berört Diktonius och vid sidan av dessa
+                    vetenskapliga arbeten finns en mängd artiklar och essäer om
+                    Diktonius. Möjligen har Torsten Ekbom rätt att det under de
+                    senaste femton åren varit ganska tyst om denna
+                    finlandssvenske författare. Dock har teatergruppen Oktober
+                    gjort teater av Diktonius, liksom av mötet mellan Diktonius
+                    och Edith Södergran. I svensk TV sändes i slutet av december
+                    1995 en väldokumenterad film om Diktonius av Jörn Donner
+                    och Svenska litteratursällskapet i Finland gav under 1995 ut
+                    Diktonius' brev, redigerade av Jörn Donner och Marit
+                    Lindqvist. Min avsikt med denna essä är att fästa
+                    uppmärksamheten på den dynamiske Diktonius, så som han
+                    framträdde på 1920-talet. Här är det fråga om avantgardism!
+                    Här handlar det om storm! Hjärnstorm! Skapa nytt! Det gäller
+                    att formulera den nya människan och erövra ett expressivt
+                    språk!
+
+                    Elmer Diktonius var under 1920-talet en banbrytande gestalt
+                    för den nya svenskspråkiga dikten såväl i Finland som i
+                    Sverige. Målsättningen för denna studie är att spegla
+                    bakgrund och egenart vad gäller Diktonius' expressionism.
+                    Den journal över lästa böcker som Diktonius förde 1916-27,
+                    dokumenterar att han var förberedd då han 1919 tog del av
+                    tyska expressionistiska manifest och efter debuten 1921 kom i
+                    kontakt också med tysk expressionistisk lyrik. Diktonius och de
+                    tyska expressionisterna har samma läromästare: Baudelaire,
+                    Whitman, Nietzsche, Dostojevskij, Strindberg, Wedekind,
+                    Mombert och van Gogh. För Diktonius' del är också läsningen
+                    av Ekelund och Fröding sannolikt en viktig stimulans till det
+                    egna lyriska språket och när han
+
+                    inför översättningsvolymen Ungt hav (1923) läser och
+                    engageras av Sandburg, Masters och Pound bör han ha känt
+                    igen egna krav på direkthet och koncentration - krav som
+                    debutanten Diktonius' estetiske handledare från 1915 fram till
+                    början av 1921, den finske vänsterpolitikern Otto Ville
+                    Kuusinen, hade ställt på det poetiska språket. Kuusinen blev
+                    också en handledare i politisk radikalism! Man bör hålla i
+                    minnet att medan Diktonius håller på att bli klar över sin
+                    uppgift som diktare inträffar första världskriget. Den ryska
+                    oktoberrevolutionen 1917 gör det möjligt för Finland att den 6
+                    december förklara sig självständigt. Inbördeskriget
+                    januari-maj 1918, mellan den borgerliga regeringen och
+                    finska arbetare och socialister, som leder till "de rödas"
+                    nederlag, sätter djupa spår hos den blivande författaren.
+                    Diktonius utveckling går från revolutionär socialism under
+                    1920-talet till försonande humansim från 1930-talet.
+                    Utvecklingsgången i Diktonius' lyrik 1921-1930 handlar om
+                    ett möte med såväl den hårde som den mjuke Diktonius, ett
+                    möte med en dynamisk dikt med stark musikalisk accent.
+                    Under denna period utger Diktonius' nio böcker, av vilka fem
+                    är diktsamlingar: 
+                    Min dikt 1921, som består av såväl aforismer som dikter,
+                    Hårda sånger 1922, Taggiga lågor 1924, Stenkol 1927 och
+                    Stark men mörk 1930; en ren aforismsamling Bröder och
+                    elden 1923; två prosaböcker, Onnela 1925 och Ingenting 1928;
+                    en översättningsvolym med ny lyrik, Ungt hav 1923. År 1930
+                    är Diktonius' expressionistiska period slut. Därefter lägger
+                    författaren i sin diktning alltmer vikt vid innerlighet och
+                    enkelhet, både vad gäller form och innehåll. Detta hindrar
+                    dock inte att man kan återfinna den dynamiske Diktonius här
+                    och var, t.o.m. i den sista diktsamlingen, Novembervår 1951.
+                    Under perioden 1920-24 tog den skapande perioden slut inom
+                    den tyska expressionismen.
+
+                    Paradoxalt nog är det vid denna tid expressionismen på allvar
+                    börjar prägla den finlandssvenska modernismen. Ordet
+                    expressionism finns belagt i finskan från 1911. Carl David
+                    Moselius publicerade då i Helsingin Sanomat ett par artiklar:
+                    Impressionismi ja ekspressionismi (2/4 och 5/4). Tidigare hade
+                    man i rikssvensk press kunnat läsa samma artikel (DN 20/3).
+                    Denna artikel är av stort dokumentariskt värde eftersom den
+                    på nordiskt håll är ett första försök att definiera begreppet
+                    expressionism. Det som Moselius anser utmärker
+                    expressionismen är att den fordrar förtätad uttrycksfullhet och
+                    att den arbetar med subjektiv omformning av stoffet. Moselius
+                    syftar på det expressionistiska måleriet och detta måleri kom
+                    tidigt att uppmärksammas i Finland. Der Sturm anordnade
+                    exempelvis en Blaue Reiter-utställning med tavlor bl.a. av
+                    Kandinsky, i Helsingfors under februari-mars 1914. Den nya
+                    konstriktningen mötte dessvärre oförståelse och kritik. Denna
+                    kritik drabbade först också Edith Södergran - som framträdde
+                    1916 med Dikter - och förföljde sedan, med en förvånande
+                    envishet, Diktonius' litterära skapande under 1920-talet.
+
+                    Låt oss dröja ett tag vid år 1917. Detta år är av intresse både
+                    för den tyska expressionismen och för Diktonius' egen
+                    utveckling. Den tyska expressionismen når detta år sin högsta
+                    utveckling både som ångestens och extasens språk. Perioden
+                    1915-1920 är expressionismens mest expansiva period. I
+                    inledningen till antologin Menschheitsdämmerung (Berlin,
+                    1920) betonar Kurt Pinthus inriktningen på "Erneuerung des
+                    Menschen" och han hävdar att de nya uttrycksformerna skall
+                    vara "ganz Eruption, Explosion, Intensität".5 Dessa
+                    formuleringar skall senare ge eko hos Diktonius i
+                    deklarationen Expressionistiskt i tidskriften Ultra 1922.
+
+                    År 1917 upptar musiken Diktonius' intresse i första hand. Han
+                    är sedan 1913 antagen som elev vid Helsingfors Musikinstitut.
+                    Läsåret 1916/17 ägnar han sig åt kompositionsstudier och han
+                    försöker sig på att skriva en radikal pianosvit. En beryktad
+                    konsert i Musikinstitutet den 4/5 1920, med sex sånger av
+                    Diktonius, satte stopp för fortsatt komponerande. Diktonius
+                    överförde därpå sin djupa musikalitet till språket. Hans
+                    grundupplevelse av musik och hans musikaliska skolning
+                    berikar hans ordförråd och hjälper honom till den
+                    expressionistiska teknik han utvecklar i sin lyrik - och som
+                    tydligt markerar hans egenart. I hans dikt finns gott om
+                    allitterationer och assonanser och en huvudlinje i hans poetik
+                    blir tema, variation och upprepning. Diktonius har ett starkt
+                    utvecklat sinne för ordens "inre klang" och han säger själv att
+                    han med sitt lyriska språk spelar på "ordtangenter".
+
+                    År 1917 är Diktonius i en intressant utvecklingsfas. Han
+                    skriver ännu framförallt på finska. Han har fyra år kvar till
+                    debuten med Min dikt (1921). Han har fått en betydelsefull
+                    kontakt med Otto Ville Kuusinen, en av arbetarrörelsens
+                    förgrundsgestalter. Våren 1917 publicerar Diktonius en
+                    finskspråkig artikel Säveltäjän työ (Kompositörens arbete) i
+                    Kevättervehdys (Vårhälsning). Den påminner om att han
+                    börjar sin expressionism i musiken. Denna ungdomsartikel
+                    bildar vidare en viktig etapp på vägen mot den estetik som
+                    Diktonius senare skulle formulera i sina expressionistiska
+                    programdeklarationer i Ultra 1922 och Finsk Tidskrift 1925.
+                    Framförallt betonas relationen konst och liv, mellan vilka en
+                    organisk enhet skall råda. Detta är dessutom en väsentlig
+                    tankegång i tysk expressionism. Vid sammanställningen
+                    Diktonius och tysk expressionism måste man vara medveten
+                    om att man egentligen inte kan tala om den tyska
+                    expressionismen i bestämd form, eftersom den har många
+                    förgreningar. Begreppet expressionism innefattar en
+                    konstriktning, som för att åstadkomma största möjliga
+                    uttrycksfullhet bl.a. hänsynslöst kan omvandla
+                    verklighetsmaterialet. En häftig dynamisk rörlighet och en
+                    subjektiv omvandling av verkligheten är uttryck för den högt
+                    spända expressionistiska livskänslan - vilken både kan rymma
+                    extas och ångest. Expressionisten ville erövra och omforma
+                    verkligheten - och skapa den på nytt ur sig själv.
+
+                    "Skaparviljans tid är inne" hävdar Diktonius i Ultra 1922. I
+                    Diktonius' utveckling innebär vidare år 1922 en avgörande
+                    vändpunkt. Kuusinens direkta inflytande har upphört och den
+                    första utlandsvistelsen i Paris och London är avslutad. År 1922
+                    kommer han i kontakt med tysk expressionistisk lyrik och han
+                    upptäcker på allvar Edith Södergran. Han träffar Hagar
+                    Olsson och genom henne blir han presenterad för det litterära
+                    Finland. Han är tillsammans med henne den drivande kraften
+                    till modernisternas första tidskrift Ultra, vilken utkommer
+                    med sju nummer under hösten 1922.6 Slutligen börjar
+                    Diktonius under detta år också sitt medarbetarskap i det
+                    socialdemokratiska Arbetarbladet, där redaktören Axel
+                    Åhlström blir både vän och rådgivare till den av ekonomiska
+                    trångmål ständigt bekymrade författaren. Speciellt är
+                    Nietzsches Also sprach Zarathustra en betydelsefull impuls för
+                    Södergran och Diktonius liksom för många tyska lyriker.
+                    Nietzsches förkunnelse kan överhuvud spåras bakom flera av
+                    1910-talets ismer. Marinetti och futurismen är exempelvis
+                    starkt påverkade av den tyske filosofens vitalistiska
+                    tankegångar. Den dionysiska livskänslan blir den dominerande
+                    aspekten på Diktonius' expressionism i denna framställning.
+                    Förutom Also sprach Zarathustra läser Diktonius Nietzsche ur
+                    Werke I-XVI (Leipzig 1896-1911) speciellt under år 1918.
+
+                    Diktonius' journal över lästa böcker ger besked. Den avgörande
+                    brottningen med Zarathustra sker dock under den första
+                    utrikesresan, till London och Paris, 1920-21. Nietzsches
+                    dionysiska evangelium är en sida av Diktonius`expressionism,
+                    en annan är "broderskapsförkunnelsen", där han anknyter
+                    direkt till tysk expressionism. Sannolikt spelar hans
+                    ursprungliga panteistiska livskänsla en viktig roll för hans
+                    engagemang för "människans broderskap", liksom läsningen
+                    av Dostojevkij, och naturligtvis finns en tydlig anknytning till
+                    socialismen och Arbetarbladet. En tredje sida i Diktonius'
+                    expressionism är tanken att konsten är ett omedelbart uttryck
+                    för livet, en uppfattning som får stöd hos Nietzsche och tysk
+                    expressionism. Denna tanke är grundläggande i såväl
+                    Diktonius' dynamiska estetik som i den lyriska gestaltningen.
+                    Debutboken Min dikt har gott om aforismer, som varierar
+                    temat konst och liv och poängterar att det inte finns någon
+                    skillnad mellan begreppen: Konst är liv. Följaktligen skall
+                    konsten och dikten stå fria gentemot traditionell form.
+                    "Formerna skall sprängas" fastslår Diktonius i Ultra. Både
+                    Södergran och Diktonius inspirerades alltså av Nietzsches
+                    språk i Zarathustra - av visualiseringen, förmågan att tänka i
+                    bild. Nietzsches symbolspråk gav Diktonius viktiga impulser,
+                    men det nietzscheanska elementet genomgick en djärv
+                    expressionistisk transformering. Nietzsches livsbejakande
+                    förkunnelse som kan sammanfattas i begreppet Dionysos,
+                    möter första gången i Tragedins födelse (1872), men får sin
+                    suveräna gestaltning i en mängd poetiska bilder och liknelser i
+                    Also sprach Zarathustra. Den förestående dionysiska
+                    återuppståndelsen, som skall ersätta det trötta tillstånd i vilket
+                    kulturen råkat, skildras av Nietzsche med hjälp av
+                    stormsymbolen, vilken sedan går igen i expressionismens lyrik,
+                    inte minst hos Diktonius!
+                    Katastrof, kaos, undergång är nödvändiga förutsättningar för
+                    Dionysos' återkomst. I Tragedins födelse manar Nietzsche till
+                    hård strid och detta krav på hårdhet hörsammar Diktonius -
+                    och`skiljer honom från tyska expressionister. Namnen på hans
+                    diktsamlingar under 1920-talet vittnar också om viljan till
+                    hårdhet: Hårda sånger, Taggiga lågot, Stenkol. I november
+                    1930 publiceras Stark men mörk, där de rent expressionistiska
+                    dikterna är mindre markanta och i stället är en mjukhet och
+                    försonande humanism avläsbar. Livsberusning stegrad till
+                    extas, där dans, skratt och skrik uttrycker den våldsamma
+                    känslan, finns såväl i tysk expressionism som hos Södergran
+                    och Diktonius. Den dionysiska livsbejakelsens skrik ingår i
+                    Nietzsches strategi mot ångestkänslan och i en dikt i Min dikt
+                    utslungar Diktonius detta livsbejakande skrik, samtidigt som
+                    Nietzsches lära om "Die ewige Wiederkunft" som den bärande
+                    livsprincipen markeras:
+
+                    Evigt lever jag.
+                    Om människa eller fixstjärna,
+                    solsystem eller en martall
+                    på en öde klippa vid havet,
+                    är detsamma.
+                    Samma kraft genomgår mig,
+                    samma lust får mig att blomma, 
+                    samma stormar dödar mig, 
+                    kläder nya kläder på mitt innersta.
+                    För mig finns ingen flugsmuts
+                    eller Chimborazzo -
+                    allt är i allt.
+                    På toppen av ett ögonblick
+                    står jag och skriker:
+                    det är en fröjd att leva och förvandlas!
+
+                    Man bör dock observera att det hos Diktonius är fråga om ett
+                    evigt liv i förvandlingens tecken och således till en del i
+                    överensstämmelse med Nietzsches uppfattning. Den
+                    nietzscheanska återkomsttanken korsas med upplevelsen av
+                    det biologiska kretsloppet i vilket allt liv ingår. Panteistiskt
+                    förkunnar Diktonius "allt är i allt." Här finns en parallell till
+                    Nitezsches påstående i Tragedins födelse att människan i den
+                    dionysiska extasenkänner samhörighet och enhet med hela
+                    skapelsen, men Diktonius' enhetstanke är också i linje med den
+                    panteistiska livssyn som finns hos Whitman (Diktonius läste
+                    Whitman första gången 1918 på tyska i utgåvan Hymnen für
+                    die Erde men Leaves of grass först 1921).
+
+                    Man kan konstatera att Diktonius' ursprungliga panteistiska
+                    livsuppfattning sammankopplas i de första diktsamlingarna
+                    med Nietzsches ateistiska och hårt spända livsbejakelse. Det är
+                    dock den mjuka, ljusa och socialt förankrade whitmanska
+                    livstron som efterhand får ökat inflytande. Men den ger i
+                    själva verket enbart legitimation åt något djupt personligt hos
+                    Diktonius. Hans naturdikter ger många exempel på den
+                    allivsförälskelse och den identifikation med naturen som från
+                    början är hans signum.
+
+                    I dikten Lidandet I i Hårda sånger ger Diktonius i sannolik
+                    anslutning till Nietzsche uttryck åt tron på lidandet som
+                    förutsättning för skapandet. Lidandet uppfattas naturligtvis
+                    inte här som resultat av sociala missförhållanden. Dikten ger
+                    dessutom prov på Diktonius' förmåga att ge sin text en
+                    musikalisk intonation med allitteration, upprepning, variation
+                    och rytmisk effekt:
+
+                    Naglar stinger mitt hjärta
+                    (borrar och borrar)
+                    rasande lidelse
+                    (eld och lidande) -
+                    orkanflykt.
+                    O skarpa förtvivlan!-
+                    beskaste sötman bubblar.
+                    Störttårar nervslimsor själsflisor - 
+                    stiger ej mänskan fram
+
+                    gudträcken
+                    avfallna avfallet
+                    piskad av ångest
+                    darrande
+                    trampande sig själv i klättringen?
+                    Med naglar i hjärtat
+                    frustande lidelse
+                    (eld och lidande)
+                    störtar jag skapar jag
+                    i ångande rytmer
+                    (borrar och borrar)
+                    mänskan.
+
+                    Om Nietzsche har gett Diktonius stimulans till dikten, så har
+                    expressionisten Diktonius å sin sida omvandlat de
+                    nietzscheanska elementen till häftig dynamik och drastisk,
+                    lidelsefull översättning av det inre.
+
+                    Zarathustra liknar sin brinnande skaparvilja, som driver
+                    honom till människan, vid hammaren som rasar mot den sten
+                    i vilken den nya människans bild sover i sitt fängelse och som
+                    måste hamras fram så att flisorna yr: "Nun wütet mein
+                    Hammer grausam gegen sein Gefängniss. Vom Steine stäuben
+                    Stücke: was schiert mich das? Vollenden will ichs".7
+                    Hammaren behövs för att skapa nytt och samtidigt slå sönder
+                    gammalt, det blir för Nietzsche ett användbart verktyg i
+                    kampen mot instängdheten. Diktonius går ännu längre. En
+                    aforism i Brödet och elden (1923), skriven i London i augusti
+                    1921, bekräftar detta:
+
+                    Hammaren? - bra, Nietzsche i så fall bra -
+                    men vad säger man om släggan?
+                    Hammaren slår - släggan dräper.
+
+                    I Diktonius' diktsamlingar från 20-talet lägger man märke till
+                    ett intensivt jagmedvetande och uttryck för en hänsynslös
+                    självhävdelse. Den ständigt återkommande analysen av jaget
+                    ingår i hans expressionistiska rustning, men
+                    samhörighetskänslan, allivskänslan som efterhand växer sig
+                    allt starkare för med sig att författarens "sociala" jag tränger
+                    undan "individualjaget". Genom hans panteistiska känsla av
+                    alltings sammanhang uppstår ett slags jaglöshet. En analys av
+                    den högexpressionistiska programdikten Jaguaren, skriven i
+                    december 1920, skall få ge exempel på den typ av jagdikt som
+                    hos den tidige Diktonius går i den vitala framrusningens och
+                    rörelsens tecken. I namnet jaguar finns också ordet jag med! I
+                    dikten Granit från 1927 är det fortfarande en vilja till rörelse
+                    som gestaltas, men inom en tragisk ram där den talande
+                    känner sig fången i stagnation och smärtsamt konstaterar:
+                    "rörelse ville jag vara". Jaguaren uttrycker Diktonius'
+                    nietzscheanskt färgade vilja att skapa den nya människan.
+                    Påtagliga nietzscheanska drag är rovdjurssymbolen (som bl.a.
+                    återfinns i Das Lied der Schwermut i Zarathustra) och
+                    skrattet, men i dikten finns åtskilliga bilder och symboler som
+                    senare skulle slungas fram hos nietzscheanen Diktonius: solen,
+                    dansen, blixten, pilen, jorden. Likaså viljan att söndersarga för
+                    att skapa helhet, viljan att bita för att forma liv. Det intressanta
+                    är att byggbitar, både formella och innehållsliga, hämtas från
+                    Zarathustra men omvandlas till hågot oefterhärmligt
+                    diktonianskt. Eftersom Jaguaren I-IV bildar själva
+                    utgångspunkten för Diktonius' expressionistiska lyrik skall den
+                    citeras i sin helhet:
+
+                    I 
+
+                    Ur gröna blad sticker fram
+                    röd nos
+                    ögon med
+                    trekantiga blickar
+                    spräckligt -
+                    morrhår vågrörelse
+                    klotass -
+                    du flyger ju! - mitt hjärtas jaguar! -
+                    så flyg och bit och riv och söndersarga!
+                    Din-min moral: att slå.
+                    Att bita är ett tvång så länge bett ger liv
+                    att riva är en helighet så länge ruttet stinker
+                    och söndersargas måste livets fulhet
+                    tills skönhet-helhet ur dess mull kan gro.
+
+                    Så är vi två, min dikt och jag: en klo
+                    en vilja är vi två, ett gap en tand
+                    tillsammans är vi: en maskin som slår.
+
+                    I
+
+                    Vi vill döda de känslolösas skri
+                    de hjärtlösas medlidande
+                    de otrognas religiositet
+                    det starkas maktlöshet
+                    det godas onda svaghet,
+                    vi vill föda med att döda
+                    vi vill bereda plats
+                    vi vill engång se
+                    solfläckar dansa.
+
+                    II
+
+                    Tror man ej
+                    att starka tassar känner svedan?
+                    Tror man ej att jaguaren har hjärta?
+                    Ack den har fader moder henne ungar -
+                    ödemarken är stor
+
+                    kall är höstens vind
+                    djupt i jaguarens mage bor
+                    ensamhet förtvivlan.
+                    Jaguaren kan kyssa en blomma.
+                    Den har tårar
+                    sentimentalitet.
+
+                    III
+
+                    Natt.
+                    Vattenfall mumlar långt.
+                    Jaguaren sover.
+                    En myra slickar dess klo.
+                    Vem viskar:
+                    morgonen kommer
+                    solfläckar dansa?
+
+                    IV
+
+                    Solfläckar dansa!
+                    Vigt virvlar allt.
+                    Med ett skutt
+                    slungar sig jaguaren över
+                    granarnas toppar -
+                    hör stjärnskrattet i dess rytning! -
+                    en blixtvolt i luften -
+                    som en pil djup i jordens bröst.
+
+                    Diktonius' personliga kännetecken är den hårda direktheten i
+                    uttrycket. En energiladdad vitalism talar ur dikten. Det
+                    ryckiga dityrambiska skrivsättet återfinns i Das Lied der
+                    Schwermut i Zarathustra. I det centrala partiet av Nietzsches
+                    dityramb skildras diktarens längtan som en örn, vilken länge
+                    stirrar i sina avgrunder.8 Nietzsche söker i Zarathustra skapa
+                    en religion med enbart jordelivet som bas. Jordkänslan är
+                    också starkt framhävd i den vitalistiska tyska
+                    expressionismen.Tanken att förbli jorden trogen - trots
+                    livskänslans kosmiska utflykter - är central också hos
+                    Diktonius. I Jaguarsvitens sista del förbinds hans båda poler:
+                    det vitala språnget och den trygga jordkänslan.
+                    Diktonius betonar att Jaguaren har ett öm hjärta, att den har
+                    tårar och sentimentalitet. Det veka och mjuka i hans jag får
+                    genom detta en konkret gestaltning. Det som gör Jaguaren till
+                    en expressionistisk dikt är den extrema accentueringen i
+                    känslointensiteten, i stiliseringen av jaguarbilden, i hyperbolen i
+                    det avslutande partiet - då jaguaren slungar sig över
+                    grantopparna- och framförallt i själva "känsloekvationen": den
+                    sinnliga översättningen av det inre, där jaguaren blir en bild
+                    för den våldsamt dynamiska livskänslan.
+
+                    Hos Diktonius finns vid sidan av rovdjursmotivet också
+                    barnmotivet och paradoxalt nog kan de båda förenas i det
+                    faktum att både rovdjuret och barnet står nära naturen, är
+                    nära det instinktiva och ursprungliga. En god uppfattning av
+                    Diktonius' livsdyrkan får man om man sammanställer den
+                    viljeanspända livsbejakelsen i Jaguaren och den naiva
+                    livsanammelsen i dikten Barnet i trädgården, publicerad i
+                    Taggiga lågor:
+
+                    Barnet i trädgården
+                    är ett underligt ting:
+                    ett litet litet djur
+                    en liten liten blomma.
+                    Det myser som en katt åt nejlikorna
+                    och skubbar sitt lilla huvud
+                    mot solrosens jättestängel.
+                    Tänker kanske: sol är gott -
+                    grönt är gräsfärg.
+                    Vet kanske: jag växer!
+
+                    En stor ömhet utmärker denna dikt. Här är det den mjuke
+                    Diktonius som talar och hans eget jag tränger inte fram, som i
+                    Jaguaren, utan hans dikt skildrar ett barn, vilket som helst.
+                    Barnet är det växande - som står naturen nära. Barnet har
+                    också framtiden i sig och är konkret den nya människan!
+                    Anknytningen till Nietzsches tankegångar kan noteras.
+                    Ja-sägandet till livet innebär att själva tillblivelsen och
+                    växandet blir centrala i den dionysiska förkunnelsen.
+                    "Wachsthum mit Einem Wort - das ist das Leben selber",
+                    förklarar Nietzsche.9 I Barnet i trädgården finns dessutom
+                    Vincent van Goghs favoritblomma, solrosen, med - men utan
+                    att placeras i ett våldsamt dynamiskt sammanhang.
+
+                    Hos Diktonius finns inte bara framrusningens hänryckning,
+                    utan också en centrifugal dynamik som tar sig uttryck i en
+                    önskan om eruption och explosion. Följande rader ur dikten
+                    Stormen i Hårda sånger ger ett tydligt exempel, samtidigt som
+                    de markerar högexpressionismens allmänna Sturm und
+                    Drang-karaktär:
+
+                    Jag vill ha liv som rycker rötter upp,
+                    luft som väsnas, rytande vågor
+                    översvämmning jordbävning vulkaners eruptioner.
+
+                    Mera rött på himlen, mera trasiga svarta moln!
+                    Ännu står några höga träd oböjda mot vinden.
+                    Bryt av dem med! - och jag skall sjunga min jubelsång
+                    om kraftens heliga skräck.
+
+                    Denna explosiva dynamik finns också i tysk expressionism. En
+                    gemensam impulsgivare är Vincent van Gogh, vars
+                    rörelsefyllda "färgexplosioner" avsätter spår också i det
+                    språkliga uttrycket, då man försöker gestalta det egna
+                    eruptiva inre. I Diktonius debutbok Min dikt ägnas en aforism
+                    och en dikt åt den holländske målaren. I båda fallen framhävs
+                    det eruptiva draget. Eftersom Diktonius' van Gogh-dikt är ett
+                    utmärkt exempel på hans dynamiska expressionism citeras
+                    den:
+
+                    Stenar talar, köttet skriker,
+                    lyktstolpar vrider sig av livshunger,
+                    mullen krälar,
+                    med ett väldigt brak exploderar solen
+                    och slungar sina ljuspartiklar
+                    i det jäsande-
+                    en ensam sköka på en bänk,
+                    aftonhimmel, solrosor:-
+                    det är du,
+                    det är van Gogh.
+
+                    Landskapet är med Kjell Espmarks ord gestaltat "som ren
+                    känsloprojektion utan anspråk på att kännas igen som en
+                    topografisk verklighet".10 Dikten är visuell. Abstrakt och
+                    konkret blandas på expressionistiskt vis: ordet "livshunger"
+                    möter mitt i en poetisk bild. Dikten vittnar om en stark
+                    inlevelse i den dynamiska aktiviteten i van Goghs konst - inte
+                    minst hjälper verben fram expressiviteten. Gav Zarathustras
+                    heroiska budskap Diktonius användbara bilder och symboler,
+                    gav van Goghs eruptiva konst impulsen till rörligheten och
+                    farten! Bruket av hyperboler är vidare ett fundamentalt drag i
+                    expressionistisk stil. Huskulisser som tycks ragla och vagga är
+                    vanliga i den expressionistiska konstens storstadsmotiv,
+                    exempelvis hos Ludwig Meidner, vars kända tavla Ich und die
+                    Stadt ger ett åskådligt prov. I Hårda sånger skriver Diktonius:
+
+                    Ingen känner mig.
+                    Jag går på gatorna och vrålar.
+                    Hus reser sig
+                    perspektiv jagar varandra
+
+                    /---/
+
+                    Den emotionella högspänningen understryks ytterligare hos
+                    Diktonius genom att han, med ett närmast futuristiskt uttryck,
+                    betonar att han "går på gatorna och vrålar". Detta futuristiska
+                    "vrål" finns dessutom med i ett annat sammanhang i Hårda
+                    sånger, nämligen i dikt III av diktsviten Stormen. Diktonius
+                    förklarar här: "Hå.håh!- storm du: vi är bröder! -" och han
+                    tillägger:
+
+                    Rent skall vi göra - du här jag där.
+                    Sedan: några varv kring de andra planeterna,
+                    vrålande ur hjärtats lust vårt eviga:
+                    Hå-håh! - Hå-håh!
+
+                    Den våldsamma dynamiken tar sig uttryck i kosmisk
+                    expansion, formulerad på det för Diktonius' typiskt drastiska
+                    och nonchalana sättet. Stormbilden är central hos Diktonius,
+                    liksom i tysk expressionism. Stormen som bild för revolution
+                    och omstörtning är närmast en arketyp! Påpekas bör att den
+                    tyska expressionsimens viktigaste tidskrift hette Der Sturm!
+                    Stormsymbolen är vidare väsentlig i Zarathustra och liksom i
+                    Tragediens födelse är den ett tecken för den dionysiska revolt
+                    som måste föregå den nya människans seger. Stormsymbolen
+                    är hos Diktonius först biologiskt, senare socialt inriktad. En
+                    augustidag 1921 skriver han:
+
+                    En av mina metafysiska önskningar: att vara enstor storms hjärta.
+                    (Brödet och elden, 1923, dat. 6/8 -21)
+
+                    I Min dikt finns Diktonius' första stormdikt - den skulle
+                    senare ingå som den första dikten i sviten Stormen I-IV i
+                    Hårda sånger, med ett par mindre ändringar. Här återges den
+                    efter den slutliga versionen i Hårda sånger:
+
+                    Blåsten skuffar
+                    med kantiga armbågar
+                    omilt till trädgårdsmuren
+                    att rappningen flyger kring:
+                    vansinnet skrattar ihåligt åt förödelsen.
+                    Storm är! - jag skriker med!
+                    En röd blomma
+                    har brutits av på mitten
+                    och stirrar
+                    stående på huvudet
+                    i en vattenpuss.
+
+                    Diktonius' egenart markeras i dikten av djärv personifikation
+                    och fräck vårdslöshet: blåsten har kantiga armbågar,
+                    vansinnet skrattar ihåligt, en röd blomma står på huvudet i en
+                    vattenpuss.Utropet: "Storm är! - jag skriker med!" visar hur
+                    Diktonius identifierar sig med stormen. Dikten innehåller flera
+                    nietzscheanska element som transformeras och formuleras på
+                    Diktonius'drastiska sätt.Inte bara stormbilden utan flera
+                    komponenter i bildspråket har hemortsrätt i Zarathustra.
+
+                    Vansinnet, skrattet och skriket är alla ingredienser i
+                    Zarathustras förkunnelse. Diktonius har alltså skrivit många
+                    stormdikter och en av de märkligaste är Vild morgon II.
+                    Denna dikt är skriven hösten 1924 men publicerad först i
+                    Stenkol 1927. Dikten är en expressionistisk känsloprojektion
+                    där författaren känner med stormen och är uppe och flyger:
+
+                    Den vilda morgonen
+                    bär mig på sina vingar.
+                    I farten avskalas mina lagar.
+                    Ännu är du ej naken,
+                    skriar måsarna;
+                    ännu är du ej fri,
+                    viner de virvlande flisorna;
+                    din själ bär ännu galoscher,
+                    hostar stormen.
+                    Halvfärdig? - låt gå för det!
+                    Helt färdig är blott lugnet - döden.
+
+                    Målsättningen i tysk expressionism var en fullständig
+                    nakenhet, men en sådan uppnår inte Diktonius i dikten, utan
+                    den personifierade stormen "hostar" med en drastisk
+                    formulering "din själ bär ännu galoscher" - en bild som därtill
+                    ger ett åskådligt exempel på den högexpressionistiska
+                    "materialiseringen av själstillståndet".11 De båda avslutande
+                    raderna klargör Diktonius' ståndpunkt: En "helt färdig"
+                    nakenhet är lika med död. Att aldrig vara färdig eller
+                    avrundad är däremot tecken på liv. Då Diktonius i Min dikt
+                    ger följande upplysning: "En fingervisning för mina biografer:
+                    Jag är fyrkantig" är han innepå samma linje. Väsentliga inslag
+                    i såväl tysk expressionism som finlandssvensk modernism är
+                    inriktningen på intuition och irrationalism och den
+                    gemensamma utgångspunkten är Nietzsche och i viss mån
+                    Bergson. I linje med inriktningen på irrationalism ligger
+                    expressionismens dragning till "die Bildkreise der Erde und das
+                    organischen Lebens".12 I Brödet och elden (1923) skriver
+                    Diktonius: "Jag kan ej tala nog jordiskt, jag ville mina ord hade
+                    mull på nosen". Fotbilden är betydelsefull både hos Diktonius
+                    och Zarathustra. Dels bejakar Zarathustra livet genom dansen
+                    - och fötterna har då en central funktion, dels predikar han
+                    vikten av att vara jorden trogen - och människorna måste
+                    därför lära sig använda fötterna. I de avslutande raderna av
+                    Diktonius' deklaration Expressionistiskt i Ultras sista nummer
+                    1922, finns följande drastiska och humoristiska uttryck för den
+                    antiintellektuella inriktningen:
+
+                    Ingen kan ge patenterade skildringar av det kommande - det
+                    kommer med fötterna först, och dess hjärna är dess gravskrift.
+                    Men det är stort att vara dess stortå - och det kan vi.
+
+                    Jordkänslan, som tydligt markeras i Jaguaren, skulle under
+                    20-talets lopp bli mer och mer framträdande hos Diktonius och
+                    få karaktären av en panteistisk jordförälskelse. Sålunda
+                    skriver han prosaboken Onnela 1925, med dess mustiga
+                    hemhörighet i en livsbejakande jordisk verklighet. Efter en
+                    Parisvistelse, på ett och ett halvt år (hösten1925-våren1927),
+                    fylld av ångest och misär, skriver han följande dikt sommaren
+                    1927, som påtagligt visar att fotbilden har fördjupats:
+
+                    Så har jag åter fot mot jord
+                    och jorden är min vän.
+                    Var sten, vart strå jag rör så lätt,
+                    så klumpigt lätt, och markens mull min fot gör varm:
+                    sol bor i mull,
+                    jag bor i mull -
+                    allt vad jag älskar bor i mull
+                    och är en bit av mull.
+
+                    I diktsviten Fot mot jord talar en panteistisk
+                    samhörighetskänsla och en förutsättning för Diktonius' friska
+                    och egenartade naturlyrik är viljan att acceptera naturen på
+                    dess egna villkoroch hans grundupplevelse av musik ger
+                    många naturdikter en unik musikalisk intonation. Ettfint
+                    exempel på denna naturnärhet är följande dikt ur Stenkol, där
+                    en naiv och omedelbar naturkänsla talar! Den poetiska
+                    metoden utmärks av ett viss förmänskligande av naturen och
+                    dikten karaktäriseras av en mjukt gungande rytm som sakta
+                    tonas ner:
+
+                    Får jag kyssa dig på handen, Lilla enrisbuske,
+                    och lägga armen kring dig, stora sten?
+                    Får jag kittla dig i skägget, mossetuva du,
+                    och bita i din silvernäver, björk?
+                    Får jag riktigt vara ljus igen
+                    och riktigt mörk igen?
+                    Och fråglöst växa
+                    svarlöst dö -
+                    som gräs som gror?
+
+                    Elden i olika betydelse har en primär funktion i den
+                    expressionistiska diktningen. Den är framförallt uttryck för en
+                    våldsam själsspänning. I Min dikt framhåller Diktonius i
+                    synnerhet konstskapandets eld:
+
+                    Ett må man aldrig glömma när man talar om "konsten heliga
+                    eld":
+
+                    att den bränner. Och att den mest bränner dem som den
+                    kommer ur.
+
+                    I Nietzsches Zarathustra liksom i den ursprungliga persiska
+                    Zarathustraläran finns elden, i olika former, som livgivande
+                    och renande makt.Zarathustra framhåller exempelvis:
+                    "Verbrennen musst du dich wollen in deiner eignen Flamme:
+                    wie wolltest du neu werden, wenn du nicht erst Asche
+                    geworden bist!".13 Diktonius skriver i januari 1922 följande
+                    visionära dikt i Arbetarbladet (senare publicerad i Hårda
+                    sånger), vilken tycks vara i linje med Nietzsches uppfattning
+                    att man först måste förbrännas till aska för att bli ny:
+
+                    Jag ser den heliga askan
+                    i ansiktet av människor som lidit.
+                    Jag ser den i revolutioner
+                    som blivit till intet
+                    i pyramider som smulats till grus
+                    solar som gödit och slocknat.
+                    Jag ser den och seende jag känner:
+                    så är det, så skall vi gå:
+                    brinnande
+                    ur helveteskval
+                    till ren aska.
+
+                    Elden blir längre fram en viktig revolutionssymbol hos
+                    Diktonius och den diktsamling han utger 1924 heter
+                    betecknande nog Taggiga lågor. I Stenkol 1927 når den
+                    revolutionära linjen bådesin höjdpunkt och vändpunkt. Två
+                    längre revolutionsdikter avslutar diktsamlingen: "Den
+                    storaflyttningsdagen" och "De och den" (senare kallad
+                    "Chimären"). Eldtemat får sitt starkaste uttryck i den sista
+                    delen av "Chimären", som är en visionär fantasi om den stora
+                    universella omstörtningen. Revolutionen sitter och sjunger på
+                    taket av ett brinnande stenhus. Under diktnamnet ges
+                    upplysningen "fragment", som troligen anspelar på det
+                    brottstycke av den revolutionära omstörtningen som dikten
+                    skildrar. Hos Diktonius skildras revolutionen som en chimär
+                    och enutgångspunkt är sannolikt fabelväsendena, chimärerna,
+                    på Notre-Dame kyrkans takkant i Paris, som gjorde intryck
+                    på författaren under hans Parisvistelse 1921. I dikten framstår
+                    "chimären" i sin dubbla betydelse av dels fabelväsen, dels
+                    drömbild, illusion:
+
+                    (På taket av ett brinnande stenhus
+                    sitter revolutionen och sjunger:)
+                    Jag är chimären
+                    med de jordiska fötterna;
+                    Jag är den till mull blivna elden.
+                    Tutta på tutta på! -
+                    i min andedräkt -
+                    i lågorna -
+                    omskapas allt.
+
+                    Unga själar unga själar
+                    så jag älskar er!
+                    Unga själar
+                    så jag omfamnar er
+                    hårt -
+                    passa på:
+                    det är klor på mina händer!
+
+                    Brakande tak klingar sött,
+                    det döendes rosslingar är vällust.
+                    Lågorna susar, säger ni -
+                    bah: jag skrattar!
+
+                    Jag, den grymma gripen,
+                    skall lära er flyga.
+                    Måste jag också lyfta er
+                    vid det ömma hjärtat
+                    skall jag lära er flyga.
+                    Det duggar blod från vår flykt -
+                    men vi flyger.
+
+                    Fråga mig ej om riktningen, målet.
+                    Jag är ingen riktning -
+                    jag är en sprakande fackla.
+                    Gör det ont i ögonen, vasa?
+                    O - du är mitt barn:
+                    de bländade är de djärvaste!
+
+                    Jag sjunger vansinniga visor.
+                    En vansinnig världs klokhet
+                    sjunger alltid vansinniga visor.
+                    Tutta på tutta på! -
+                    förstör, kullkasta, vräk undan!
+                    kanske bottnen gömmer en ny jord.
+
+                    Som framgår har denna vilda sång flera nietzscheanska
+                    kännetecken: de jordiska fötterna, tron på ungdomen,
+                    rovdjurets klotass, det dionysiska skrattet, viljan att flyga,
+                    avsaknaden av ett verkligt mål, den hejdlösa framtidstron och
+                    givetvis törsten efter eld. I chimärens omstörtningsförkunnelse
+                    framhålls likaså i Zarathustras anda att det milda måste bli
+                    hårt - det ömma hjärtat måste lära sig revoltens lag. Den
+                    apokalyptiska visionen låter vansinniga visor uppmana: "Tutta
+                    på tutta på - / förstör, kullkasta, vräk undan!" Dessa rader
+                    återspeglar Zarathustras ord att övermänniskan "ist der
+                    Wahnsinn, mit dem ihr geimpft werden müsstet" 14 och det
+                    önskemål om omstörtning som Nietzsche också låter "der
+                    Wahnsinn" predika: "Alles vergeht, darum ist Alles werth zu
+                    vergehn!".19 I Diktonius hymn till omstörtningen får
+                    Nietzsches biologiskt inriktade revolt ett socialistiskt syfte. Men
+                    varken Diktonius eller Nietzsche ställer upp några ideal ur det
+                    förgångna i detta fall.
+
+                    Båda vill skapa den nya människan och båda ställer sin sak på
+                    framtiden. Båda avvisar hänsynslöst det metafysiska
+                    perspektivet och båda anser att det jordiska är den fasta
+                    punkten i tillvaron. Det som efterhand skulle skilja Diktonius
+                    från Nietzsches radikalism var upplevelsen av social orättvisa.
+                    I ordet chimär ligger en misstro mot revolutionen som konkret
+                    realitet.Diktonius tycks anse att revolutionen är en illusion;
+                    möjligtvis är den en utopi att sträva mot.Redan i Hårda sånger
+                    finns en dikt som uttrycker en vision av universell
+                    omstörtning. Det är den fjärde dikten i sviten "Rast" - en dikt
+                    som Kuusinen ansåg "futuristisk":
+
+                    På taket 
+                    av min revolutionära balkong i Paris
+                    slickar jag solstrålar
+                    omsvänger dem i mitt inre
+                    till jaguardikter
+                    slänger över räcket
+
+                    De föll! - på sina klorika tassar!
+                    Poliser kokotter handkärror
+                    massa
+                    en massa 
+                    som väller fram
+                    vrider sig
+                    bett skrik lidelser
+                    ramlande krossande bristande
+                    (lyktstolpar träd staket)
+                    väggarna bågnar -
+                    det är ej lusar och löss
+                    det är mina jaguarer
+                    som jagar människorna mot Bastiljen -
+                    alla Bastiljer!
+                    Stjärnorna ler:
+                    på taket av min revolutionära balkong
+                    jamar en brunstig katt.
+
+                    I dikten klargör expressionisten Diktonius nästan
+                    programmatiskt hur han "omsvänger" yttre intryck i sitt inre
+                    och sedan "slänger" ut dem. Användandet av hyperboler är
+                    dessutom också ett expressionistiskt drag. Slutraderna blir en
+                    humoristisk coda, som på samma gång ger en ironisk effekt åt
+                    dikten. Det framgår att författaren kan se sina "jaguarer" med
+                    självironi. Förmågan att betrakta sitt motiv på humoristisk
+                    distans skiljer honom från den tyska expressionismens
+                    visionära diktning.
+
+                    Att låta den extatiska livskänslan expandera ut i
+                    rymdvandring bland stjärnor och planeter är en tidstypisk
+                    företeelse som förekommer i tysk expressionism och
+                    finlandssvensk modernism. De gemensamma impulsgivarna
+                    är Whitman, Nietzsche och Mombert. I Song of myself nr 33
+                    möter vi den kosmiske Whitman och Nietzsche talar i
+                    Tragedins födelse om den rusiga och jublande livskänslan, där
+                    individualiteten blir upphävd, och under vilken människan
+                    känner sig som en gud. Förexpressionisten Alfred Mombert
+                    utsträcker dansen till rymden.15 Också hos
+
+                    Pär Lagerkvist och Edith Södergran finns dylika kosmiska
+                    utfärder! Inom bildkonsten återfinns motivet hos Marc
+                    Chagall. Mest känd är kanske "Le musicien" från 1912/13 som
+                    föreställer en fiolspelare i hänryckning dansande över
+                    hustaken. Der Sturm presenterade Chagall 1914. Omslaget till
+                    julinumret (nr 4) av Der Sturm 1918utgöres av en
+                    Chagallteckning med kosmisk vandring. I Diktonius'
+                    debutsamling finns en dikt som lyfter fram den expansiva
+                    livsberusningen till kosmisk extas:
+
+                    Sova?
+                    Hur kan jag sovanär min själ dansar?
+                    Nu lever jag
+                    nu svingar jag mig
+                    från den ena planeten till den andra
+                    genom tonande vågor
+                    genom glödande urmassa.
+                    En mänska, ett stoft, ett intet,
+                    en skapare, en gud - se mitt finger! -
+                    mitt gyllne finger
+                    ur vilket fruktbarhet rinner:
+                    skälvande rykande rött
+                    blod.
+                    Nu har jag allt,
+                    nu kan jag giva allt.
+
+                    Denna lust till kosmisk expansion finns på flera ställen i
+                    Diktonius' första diktsamlingar.I "Ur Den nye Prometheus" i
+                    Taggiga lågor låter författaren gudatrotsaren Prometheus
+                    kastasitt livsraseri över planeterna; i "Fartcykeln" i Stenkol,
+                    som hyllar farten, själva rörelsen, i en desperat protest mot en
+                    hotande ångestfull förlamningskänsla, blir författaren
+                    "sönderskavd knekt/på himlens ystra hingst". Diktonius
+                    markerar sin signatur i en fysiskt påtaglig bild.
+
+                    "Striden för broderskapet i konsten har börjat, striden för
+                    mänskligheten, konstnärenblir människa. Expressionismen är
+                    grannlåtskonstnärens förvandling till människa". Detta skriver
+                    Diktonius i sin programförklaring Expressionistiskt i Ultra nr
+                    7, 1922. Denna aforistiskt hållna upptakt följs tre år senare,
+                    1925, i Finsk Tidskrift av essän Expressionismen, som ger en
+                    grundlig analys både av orsakerna till expressionismens födelse
+                    och av expressionismensväsen. Diktonius har haft stöd av
+                    Kasimir Edschmids uppsats Über den dichterischen
+                    Expressionismus (1917) och i sin essä ansluter Diktonius till
+                    den tyska expressionismens inriktning på "der wesentliche
+                    Mensch", vilken i sin nakenhet är fri att skapa den nödvändiga
+                    förnyelse, som leder till det universella broderskapet. Diktonius
+                    fastslår: "Den självskapandemänskan är naken", och till
+                    skillnad mot Edschmid lägger han vikt vid ordet
+                    "självskapande".
+
+                    Hos Diktonius finns ingen tro på en gud som kan ingripa och
+                    styra, utan människan är hänvisad till sig själv. Edschmid gör
+                    däremot gällande: "Das steht bei Gott, der uns anrührte, dass
+                    wir schufen. Wir haben kein Urteil, nur Glauben".16 Som
+                    tidigare framkommit stimuleras Diktonius latenta
+                    broderskapskänsla av intresset för Whitman och Dostojevskij
+                    och läsningenunder 1922 av Pinthus antologi
+                    Menschheitsdämmerung - och i synnerhet förordet -
+                    hjälperfram den panteistiska och broderskapsinriktade
+                    sidan.17 Diktonius medarbetarskap i det socialdemokratiska
+                    Arbetsbladet under 20-talet bidrarnaturligtvis till hans
+                    framväxande intresse för broderskap. Det finns tidigt hos
+                    Diktonius enstark tro på arbetarklassen och kroppsarbetets
+                    förmåga att härda människan till en utveckling mot allmänt
+                    broderskap. I hans diktsamlingar förekommer flera
+                    arbetardikter. I dessa har det expressionistiska skrivsättet
+                    övergetts till förmån för en sakligt beskrivande dikttyp.
+
+                    Det gäller exempelvis dikter som Tegelbärarna i Stenkol, Den
+                    nye Atlas och Trälens rygg i Stark men mörk. Diktonius'
+                    porträttdikt Dostojevskij i Taggiga lågor ger en god uppfattning
+                    av denna sakliga och hårt komprimerade stil och dikten ger
+                    oss också upplysning om vad den finlandssvenske diktaren
+                    beundrade hos den ryske författaren: 
+
+                    En stad.
+                    En gränd.
+                    En tiggare.
+
+                    En sköka.
+                    Mörkt.
+                    Vått. 
+
+                    Denna skorviga mun!
+                    Detta stripiga hår!
+                    Denna brännvinslallande stämma!
+                    Elände!
+                    Oh-!
+
+                    Då kommer du, tyst.
+                    Du kysser den munnen.
+                    Du lägger din hand på det håret.
+                    Du går.
+                    Tyst.
+
+                    Stämman stummas.
+                    Grinet dör.
+                    Men jag skriker:
+                    vadan allt detta? -i morgon är allt lika!
+
+                    Men allt är icke lika.
+                    Det lever minnet av dig,
+                    din kristusblick
+                    din kristustystnad,hos oss alla som du smekt
+                    hos oss alla som du kysst
+                    lille bror.
+
+                    Diktonius' Dostojevskijdikt har en delvis teatermässig
+                    iscensättning, med människan i centrum. Det första stycket
+                    anger scenen, som ligger i mörker. Det andra är en subjektiv
+                    kommentar, ett känsloladdat utbrott. I det tredje kan man
+                    associera till en iscensättning av Max Reinhardt, där en
+                    ljusstråle riktas mot en gestalt som framträder, handlar och
+                    försvinner. I fjärde stycket möter åter en subjektiv kommentar
+                    av diktens "jag". Det femte är en fortsatt kommentar och det
+                    egentliga porträttet, vilket avslutas med "lille bror". I dikten
+                    förekommer således en växting mellan dramatiska inslag och
+                    lyrisk kommentar.
+
+                    Den person som framträder i tredje strofen verkar ha mest
+                    gemensamt med furst Mysjkin i Dostojevskijs Idioten, vilken
+                    framträder som en "kristusgestalt". Barmhärtighetsverket, den
+                    goda handlingen, lever vidare - en förändring sker, allt är inte
+                    lika. I dikten liknas alltså Dostojevkij vid en av sina
+                    romanfigurer, författaren blir identisk med sitt verk. Ur
+                    dikten talar en tydlig broderskapskänsla!
+
+                    Vi vet att Kristus för Diktonius närmast var en "god människa"
+                    och ingen frälsare. Därför är en kristen tolkning av dikten
+                    knappast adekvat, utan den bör uppfattas allmänt etiskt.
+                    Dikten "Tyst kamrat" i Mull och Moln (1934) visar att linjen
+                    fortsätter. I denna dikt hävdar Diktonius att den gemensakp
+                    som bör råda mellan Kristus och människorna är det
+                    mänskliga broderskapets.Diktonius' Dostojevskijdikt är oerhört
+                    komprimerad. Den språkliga ekonomin visar en parallell till
+                    August Stramms lyriska språk, med dess hårt åtstramade stil.
+                    För både Stramm och Diktonius, liksom för den tidige Ezra
+                    Pound, gäller att allt utanverk skulle bort: enbart det
+                    nakna,väsentliga uttrycket skall bära fram diktens innehåll.
+                    Huvudvikten ligger på det enskilda ordet.
+
+                    Liksom hos det tyska avantgardet finns i Diktonius' lyrik ett
+                    spänningsfält kompression - expansion. Läsningen av
+                    Stramms lyrik stärkte troligen inriktningen på en
+                    koncentrerad diktform.August Stramm odlade en lyrisk
+                    telegramstil och han intog en ledande ställning i kretsen kring
+                    Der Sturm.18 Till saken hör att Diktonius förmodligen också
+                    hade möjlighet att läsa Der Sturm. Expressionismen lade
+                    tonvikt på diktens uttrycksfullhet och inget hindrade att
+                    verkligheten förvreds eller deformerades. Huvudsaken var att
+                    finna ett passande uttryck för den inre upplevelsen. Hos
+                    Diktonius finns i Min dikt och Hårda sånger många
+                    expressionistiska "känsloekvationer" - där känslan översätts i
+                    en hänsynslös verklighetsomvandling - men i "Taggiga lågor"
+                    märks en glidning över till en alltmer saklig lyrik. Två i högsta
+                    grad expressionistiska dikter av Elmer Diktonius skall få
+                    illustrera ovanstående resonemang. I Hårda sånger möter
+                    följande expressionistiska gestaltning av det inre, formulerad
+                    med den drastiska fränhet i bildspråket som är Diktonius'
+                    signalement:
+
+                    Den natten den natten:
+                    himlen som ett djupt svart hål
+                    ingen stjärna
+                    och jag
+                    slagen
+                    krypande på min själs blödande framtassar
+                    till mitt mörka bo.
+
+                    Den natten hade jag förlorat allt.
+                    Den natten fann jag mig själv.
+
+                    Då Diktonius uttrycker det inre med bilden "krypande på min
+                    själs blödande framtassar" konkretiseras med stark effekt på
+                    samma gång en fränt brutal och desperat vädjande attityd.
+                    Expressionistisk stilisering möter i uttrycket "mitt mörka bo"
+                    och reduktion och nakenhet artikuleras i de två avslutande
+                    raderna. En dikt från våren 1924 är "I natt jag går"
+                    (publicerad i Ringar i stubben, 1954):
+
+                    I natt jag går
+                    och efter mig tassar någon.
+
+                    Denna himmel;
+                    söt saftig, nästan kvidande -
+                    kött, nyslaktat kött
+                    svart av det levrade blodet,
+                    de med mörkret kämpande stjärnorna
+                    som ryckande nerver.
+
+                    Och jorden även levande:
+                    gyttjan krälar längs trottoaren
+                    som en slemmig orm,
+                    gatstenarna fjäll,
+                    hala, sliskiga
+
+                    Ett ångesttillstånd gestaltas med en van Goghs dynamik, som
+                    hänsynslöst låter det inre tillståndet omforma den yttre
+                    verklighetsbilden. Landskapet vitaliseras och både himmel,
+                    stjärnor och jord blir levande och fysiskt påtagliga. Bilden av
+                    himlen som "kött, nyslaktat kött/svart av det levrade blodet" är
+                    mycket expressionistisk och det gäller också bilden av
+                    stjärnorna som "ryckande nerver". Uttrycket "gyttjan krälar"
+                    ger exempel på en van Goghs rörelse och dynamik.
+                    Landskapet är således inte realistiskt beskrivet utan är en
+                    uttrycksfull känsloekvation.
+
+                    Avslutningsvis skall en berömd dikt i Stark men mörk citeras.
+                    Den ger en exakt beskrivning av en motvindsmås och kan
+                    tolkas som ett porträtt av Diktonius själv. Den ingår i sviten
+                    Åländsk symfoni IV, ursprungligen publicerad i Arbetarbladet
+                    3/8 1928.
+
+                    Motvindsmås flaxar,
+                    skriar halvkvävd,
+                    tar till gliden.
+                    står still.
+                    Där griper axelbred vindpust
+                    med bärsärksnävar dess axlar,
+                    den sjunker,
+                    darrar, 
+                    vingen bräcks nästan av -
+                    en saltomortal:
+                    den är räddad!
+
+                    Liksom Jaguaren i Min dikt är en bestifiering av det inre, där
+                    rovdjuret symboliserar revoltviljan, är bilden av
+                    motvindsmåsen från 1928 en adekvat översättning av känslan
+                    hos den Diktonius som efter ett stormigt 20-tal äntligen nått
+                    lugn och balans. Elmer Diktonius är i sitt författarskap
+                    egentligen alltför mångsidig för att epitetet expressionistisk
+                    diktare skall vara helt rättvist. Lika litet kan man kalla honom
+                    arbetardiktare, fastän han skrivit arbetardikter och som
+                    kritiker i Arbetarbladet gett arbetardiktningen sitt stöd. Hans
+                    sociala diktning kom att gälla människan överhuvud, där
+                    drömmen om ett universellt broder skap bildade
+                    utgångspunkten. Till saken hör att Diktonius inte är
+                    intellektuellt analyserande, utan han vill i sin diktning
+                    uttrycka en omedelbar känsla. Ett expressionistiskt skrivsätt
+                    passade således under en tid hans temperament. Elmer
+                    Diktonius' diktkonst, speciellt hans 20-talsdiktning, känns
+                    alltjämt oerhört frisk och omedelbar. Där finns ett ja-sägande
+                    till livet, en vitalitet och musikalitet som inte upphör att
+                    imponera på läsaren. Torsten Ekbom betonar i sin DN-artikel
+                    1996-05-31 att Diktonius är "oefterhärmlig och unik med sin
+                    laddade stil". Och i år firar vi Elmer Diktonius' 100-årsminne
+                    och det handlar om en i högsta grad levande
+författare!

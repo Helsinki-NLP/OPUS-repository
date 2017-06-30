@@ -1,0 +1,14 @@
+#!/bin/bash
+
+day=`date +%a`
+
+backupdir=REPLACE_DBDIR/backup/monthly
+
+mkdir -p $backupdir
+
+tcrmgr copy -port REPLACE_META_DB_PORT localhost $backupdir/meta.$day
+tcrmgr copy -port REPLACE_GROUP_DB_PORT localhost $backupdir/group.$day
+
+tcrmgr optimize -port REPLACE_META_DB_PORT localhost
+tcrmgr optimize -port REPLACE_GROUP_DB_PORT localhost
+

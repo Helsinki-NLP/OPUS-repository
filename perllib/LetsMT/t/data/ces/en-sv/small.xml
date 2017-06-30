@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">
+<cesAlign version="1.0">
+<linkGrp targType="s" fromDoc="en/small.xml" toDoc="sv/small.xml">
+<link id="1" xtargets="1;1" />
+<link id="2" xtargets="2;2" />
+<link id="3" xtargets="3;3" />
+</linkGrp>
+</cesAlign>

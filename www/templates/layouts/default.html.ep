@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+  <html>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <head>
+        <title>New OPUS Web Interface</title>
+        
+        <script type="text/javascript" src="/js/jquery-1.8.0.min.js"></script>
+        <script type="text/javascript" src="/js/jquery-ui-1.8.23.custom.min.js"></script>
+        <script type="text/javascript" src="/js/jqueryFileTree.js"></script> 
+<!--         <script type="text/javascript" src="/js/jquery.contextMenu.js"></script> -->        
+        <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>        
+                
+        <script type="text/javascript" src="/js/main.js"></script>
+        
+        <link type="text/css" href="/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />        
+        <link type="text/css" href="/css/jqueryFileTree.css" rel="stylesheet" />
+        <link type="text/css" href="/css/main.css" rel="stylesheet" />           
+    </head>
+    
+    
+    <body>               
+            <div class='header'>
+                <h1>OPUS Grenzschnitte</h1><span style='color: red;'>[beta]</span>
+    	        
+    	        <div class='button_menu user_menu'>
+    	            <ul>
+    	                % if (session 'user') {  
+    	                    <li>Logged in as: <%= session 'user' %></li>                  
+                            <li><%= link_to profile  => ( title=>'edit profile',      id=>"icon_link", class=>"ui-state-default ui-corner-all" ) => begin %><span class="ui-icon ui-icon-contact"></span>Profile<% end %></li>
+    	                    <li><%= link_to logmeout => ( title=>'logout',            id=>"icon_link", class=>"ui-state-default ui-corner-all" ) => begin %><span class="ui-icon ui-icon-close"></span>Logout<% end %></li>
+    	                % } else {
+    	                    <li><%= link_to register => ( title=>'register new user', id=>"icon_link", class=>"ui-state-default ui-corner-all") => begin %><span class="ui-icon ui-icon-check"></span>Register<% end %></li>
+    	                    <li><%= link_to login    => ( title=>'login',             id=>"icon_link", class=>"ui-state-default ui-corner-all") => begin %><span class="ui-icon ui-icon-key"></span>Login<% end %></li>
+    	                % }
+    	            </ul>
+    	        </div>
+    	        
+    	        <hr class='ui-helper-hidden'/>
+    	        
+    	        <div class='main_menu ui-corner-all'>
+    	            <ul>
+    	                <li><%= link_to 'Corpora' => 'welcome' %></li>
+    	                % if (session 'user') {  
+    	                    <!-- <li><%= link_to 'Private Page' => 'foo' %></li> -->                         
+    	                % } 
+    	                <li><%= link_to 'Tools' => 'tools' %></li>
+    	            </ul>
+    	            <br style="clear:both"/>
+    	        </div>
+	        
+            </div>
+            
+	        <hr class='ui-helper-hidden'/>
+	        
+            <div class='content'>
+            
+	        <!-- Print info message if any -->
+	        % if ( (flash 'message_info') ||  (stash 'message_info') ) {
+	            <div id="message_timer" class="ui-widget ui-helper-hidden">
+	                <div class="ui-state-highlight ui-corner-all message_box"> 
+	                    <p>
+                        <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+	                    <strong>Hey! </strong> <%= flash 'message_info' %><%= stash 'message_info' %></p>
+	                </div>
+	            </div>
+	        % }
+	        
+	        <!-- Print error message if any -->        
+	        % if ( (flash 'message_error') || (stash 'message_error') ) {
+		        <div id="message_timer" class="ui-widget ui-helper-hidden">
+		            <div class="ui-state-error ui-corner-all message_box"> 
+		                <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+		                <strong>Alert: </strong> <%= flash 'message_error' =%><%= stash 'message_error' =%></p>
+		            </div>
+		        </div>
+	        % }
+	        
+	        <!-- ############## Here begins the page content! #############-->
+	        
+	        <%= content %>
+	        
+	        <!-- ############## Here ends the page content! #############-->
+	        </div>
+	        
+            <div id="dialog-confirm-delete" class='dialog' title="Delete Resource?">
+                <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>The resource will be permanently deleted and can not be recovered. Are you sure?</p>
+            </div>
+
+	        <!-- <div class='push'></div> -->	        
+	        
+            <!-- <div class="footer">
+                <hr/>
+                <div class='centered' style='width:370px;'>&copy; 2011 <a href="http://www.uu.se">Uppsala University</a> | Email: <a class='obEmail'>jorg.tiedemann<span class="rplcAt">[AT-sign]</span>lingfil.uu.se</a></div>            
+            </div>    -->      
+	     
+    </body>
+  </html>
+  
+  <script type="text/javascript">   
+
+  /* Show message box for a while if there is any */
+    $(document).ready(function() {
+    	if ( $('#message_timer').length > 0 ) {
+    		   $('h2'            ).delay(400).fadeOut(500).delay(3000).fadeIn(500);        
+    		   $('#message_timer').delay(400).fadeIn(500).delay(3000).fadeOut(500);
+    	}
+    });
+</script>
+  
+ 
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

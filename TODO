@@ -1,0 +1,7 @@
+To do as of version 0.50
+========================
+
+* code optimization (svn backend, validation, conversion ...)
+* trainable sentence splitters & tokenizers (openNLP, other?)
+* stable web interface with configuration support
+* automatic load-balancing in distributed setups

@@ -1,0 +1,358 @@
+% layout 'default';
+  
+<h2>Corpora</h2>
+
+<div class='button_menu tool_bar'>
+    <ul>
+    % if (session 'user') {
+        <li><%= link_to '/add_corpus' => ( title=>'add a new corpus', id=>"icon_link", class=>"ui-state-default ui-corner-all") => begin %><span class="ui-icon ui-icon-plus"></span>Add Corpus<% end %></li>
+    % }
+        <!-- <li><a href='#' onClick='activateFilter()' title='show filter fields' id="icon_link" class="ui-state-default ui-corner-all" ><span class="ui-icon ui-icon-plus"></span>Show Filter</a></li>
+        <li><a href='#' id='cleanfilters'>Reset Filter</a></li>
+        <li><a href='#' onClick="$('#resource_table').tableFilterRefresh();"title='update filter' id="icon_link" class="ui-state-default ui-corner-all" ><span class="ui-icon ui-icon-plus"></span>Update Filter</a></li> -->
+        <br style="clear:both"/>
+    </ul>
+</div>
+
+<table id='resource_table'>
+    <thead>
+        <th style='width: 270px;'>Name</th>
+        <th>Domain</th>
+        <th style='width: 150px;'>Permissions</th>
+        <th>Description</th>
+        <th style='width: 180px;'>Sentence Count</th>
+    </thead>
+    <tbody>
+    % my $index = 1;
+    % foreach my $arrays ( @{$branches} ) {
+        % $index++;
+        <tr class='head_row' slot='<%= $arrays->{"slot"} %>' branch='<%= $arrays->{"branch"} %>'>
+            <!-- Column Name -->
+            <td class='head <%= $arrays->{'slot'} %>_<%= $arrays->{'branch'} %>' id='<% if ($index%2) { %>odd_background<% } else {%>even_background<% }%>'>
+                <%= $arrays->{'name'}  %>                              
+            </td>
+            
+            <!-- Column Domain -->        
+            <td class='head <%= $arrays->{'slot'} %>_<%= $arrays->{'branch'} %>' id='<% if ($index%2) { %>odd_background<% } else {%>even_background<% }%>'>
+                <%= $arrays->{'domain'}  %>                              
+            </td>
+            
+            <!-- Column Permissions -->
+            <td class='head <%= $arrays->{'slot'} %>_<%= $arrays->{'branch'} %>' id='<% if ($index%2) { %>odd_background<% } else {%>even_background<% }%>'>
+                <%= $arrays->{'group'} %>                               
+            </td>
+                        
+            <!-- Column Description -->
+            <td class='head <%= $arrays->{'slot'} %>_<%= $arrays->{'branch'} %>' id='<% if ($index%2) { %>odd_background<% } else {%>even_background<% }%>'>
+                <%= $arrays->{'description'}  %>
+            </td>
+            
+            <!-- Column Sentence Counts -->
+            
+            <td class='head <%= $arrays->{'slot'} %>_<%= $arrays->{'branch'} %>' id='<% if ($index%2) { %>odd_background<% } else {%>even_background<% }%>'>
+                <!-- <%= $arrays->{'count_corpus'} =%> -->
+                <span id='sentence_count' slot="<%= $arrays->{'slot'} %>" branch="<%= $arrays->{'branch'} %>" type='corpusfile'>-</span> /
+                <span id='sentence_count' slot="<%= $arrays->{'slot'} %>" branch="<%= $arrays->{'branch'} %>" type='sentalign'>-</span>
+            </td>
+  
+        </tr>
+    % }
+    <tfoot>
+        <tr>
+            <th><input type='text' id='text_filter'name='corpus_name' class='search_init' value='Corpus name'/></th>
+            <th class='select_filter'></th>
+            <th class='select_filter'></th>
+            <th><input type='text' id='text_filter' name='description' class='search_init' value='Description'/></th>
+            <th>&nbsp;</th>
+        </tr>
+    </tfoot>
+    </tbody> 
+  </table>
+ 
+<!-- ########################################################################## 
+Context mouse menu for downloading resources from the language matrix
+########################################################################### -->
+<!-- <ul id="myMenu" class="contextMenu">
+    <li class="edit">
+        <a href="#edit">Edit</a>
+    </li>
+    <li class="cut separator">
+        <a href="#cut">Cut</a>
+    </li>
+    <li class="copy">
+        <a href="#copy">Copy</a>
+    </li>
+    <li class="paste">
+        <a href="#paste">Paste</a>
+    </li>
+    <li class="delete">
+        <a href="#delete">Delete</a>
+    </li>
+    <li class="quit separator">
+        <a href="#quit">Quit</a>
+    </li>
+</ul>
+ -->
+
+
+<script type="text/javascript"> 
+    
+(function($) {
+    /*
+     * Function: fnGetColumnData
+     * Purpose:  Return an array of table values from a particular column.
+     * Returns:  array string: 1d data array 
+     * Inputs:   object:oSettings - dataTable settings object. This is always the last argument past to the function
+     *           int:iColumn - the id of the column to extract the data from
+     *           bool:bUnique - optional - if set to false duplicated values are not filtered out
+     *           bool:bFiltered - optional - if set to false all the table data is used (not only the filtered)
+     *           bool:bIgnoreEmpty - optional - if set to false empty values are not filtered from the result array
+     * Author:   Benedikt Forchhammer <b.forchhammer /AT\ mind2.de>
+     */
+    $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
+        // check that we have a column id
+        if ( typeof iColumn == "undefined" ) return new Array();
+         
+        // by default we only want unique data
+        if ( typeof bUnique == "undefined" ) bUnique = true;
+         
+        // by default we do want to only look at filtered data
+        if ( typeof bFiltered == "undefined" ) bFiltered = true;
+         
+        // by default we do not want to include empty values
+        if ( typeof bIgnoreEmpty == "undefined" ) bIgnoreEmpty = true;
+         
+        // list of rows which we're going to loop through
+        var aiRows;
+         
+        // use only filtered rows
+        if (bFiltered == true) aiRows = oSettings.aiDisplay; 
+        // use all rows
+        else aiRows = oSettings.aiDisplayMaster; // all row numbers
+     
+        // set up data array    
+        var asResultData = new Array();
+         
+        for (var i=0,c=aiRows.length; i<c; i++) {
+            iRow = aiRows[i];
+            var aData = this.fnGetData(iRow);
+            var sValue = aData[iColumn];
+             
+            // ignore empty values?
+            if (bIgnoreEmpty == true && sValue.length == 0) continue;
+     
+            // ignore unique values?
+            else if (bUnique == true && jQuery.inArray(sValue, asResultData) > -1) continue;
+             
+            // else push the value onto the result data array
+            else asResultData.push(sValue);
+        }
+         
+        return asResultData;
+    }}(jQuery));
+     
+     
+    function fnCreateSelect( aData )
+    {
+        var r='<select><option value=""></option>', i, iLen=aData.length;
+        for ( i=0 ; i<iLen ; i++ )
+        {
+            r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
+        }
+        return r+'</select>';
+    }
+
+    
+    //#####################################################################
+    // When document is loaded
+    //#####################################################################
+
+    $(document).ready( function() {
+        
+        //#####################################################################
+        // Ajax function call to fill the language matrix with counts
+        //#####################################################################
+        function fill_matrix(me) {            
+                var slot     = me.attr('slot');
+                var branch   = me.attr('branch');
+                var path     = me.attr('path');
+                var type     = me.attr('type');
+                var language = me.attr('language');                
+                if (type == 'corpusfile' || type == 'sentalign') {
+                    me.html("<img src='/images/ajax-loader.gif' class='spinner' alt='loading...'/>");
+                    me.load('<%= url_for('/language_count') =%>/'+slot+'/'+branch+'/'+path+'?type='+type+'&language='+language);
+                } else if ( type == 'view' ) {
+                    me.html("<img src='/images/ajax-loader.gif' class='spinner' alt='loading...'/>");
+                    me.html('<a href="<%= url_for("show") =%>/'+slot+'/'+branch+'/'+path+'" title="browse">view</a>');
+                } else {
+                    return false;
+                }              
+        }
+          
+        
+        
+        
+        
+           
+        //#####################################################################
+        //Open and close the details tr
+        //#####################################################################        
+        $('.head').click( function () {            
+            var nTr = $(this).parents('tr')[0];
+
+            // if we have clicked on this row already: just toggle the next one
+            if ($(nTr).hasClass('clicked')){
+                 $(nTr).next().toggle();
+            }
+
+	    // otherwise: mark as clicked and open a new temporary row
+            else {
+
+		$(nTr).addClass('clicked');
+                /* Open this row */
+                var newRow = oTable.fnOpen( nTr, 'loading...', 'details' );
+                var slot   = nTr.getAttribute("slot"); 
+                var branch = nTr.getAttribute("branch");                
+                $.when(  
+                          $.get(
+                             '<%= url_for("/get_details") =%>/'+slot+'/'+branch,
+                             function(data){
+                                $(newRow).html(data);
+                             }
+                          ) 
+                       ).then(
+                          //function to be executed in case of success     
+                          function() {
+                              //#########################################################################
+                              // Function to higlight the rows and columns of the matrix showing lang
+                              // counts for each lang pair
+                              //#########################################################################
+                              $('.matrix_table').delegate('td','mouseover mouseleave', function(e) {
+                                  if (e.type == 'mouseover') {
+                                     $(this).parent().addClass("hover");
+                                     $(this).parent().parent().siblings("colgroup").eq($(this).index()).addClass("hover");
+                                  }
+                                  else {
+                                     $(this).parent().removeClass("hover");
+                                     $(this).parent().parent().siblings("colgroup").eq($(this).index()).removeClass("hover");
+                                  }
+                              });
+                              
+                              // Fill the language matrix with counts via ajax call
+                              $(newRow).find("td[id^='lang_matrix_field_']").each( function(){fill_matrix($(this))}); 
+                          },
+                          //function to be executed in case of NO success
+                          function() {}
+                        );
+                 
+            }
+        });
+        
+        
+        //#####################################################################
+        // Initialize the plugin for searching and sorting the table
+        //#####################################################################
+        var oTable = $('#resource_table').dataTable({              
+            "bJQueryUI": true, //jQuery UI ThemeRoller               
+			   "bPaginate": false,
+//            "sPaginationType": "full_numbers", 
+            "oLanguage": {
+                "sSearch": "Search all columns:",            
+            },
+            "aaSorting" : [[ 4, "desc"]]
+        });        
+
+        /* Add a select menu for each .select_filter element in the table footer */
+        $(".select_filter").each( function ( i ) {
+            this.innerHTML = fnCreateSelect( oTable.fnGetColumnData(i+1) );
+            $('select', this).change( function () {
+                oTable.fnFilter( $(this).val(), i+1 );
+            } );
+        } );
+        
+        
+
+        $("tfoot input").keyup( function () {
+            /* Filter on the column (the index) of this element */            
+            oTable.fnFilter( this.value, $(this).parent().prevAll().length, false, false );
+        } );
+     
+        // Take away prefilled 'help' value in column search fields on focus
+        $("tfoot input").focus( function () {
+            if ( this.className == "search_init" )
+            {
+                this.className = "";
+                this.value = "";
+            }
+        } );
+        
+       
+    
+        
+        //#####################################################################
+        // Ajax function call to fill in sentence counts per slot
+        //#####################################################################
+        $("span[id='sentence_count']").each( function(){
+            var slot   = $(this).attr('slot');
+            var branch = $(this).attr('branch');
+            var type   = $(this).attr('type');
+            
+             if (type) {
+                $(this).html("<img src='/images/ajax-loader.gif' class='spinner' alt='loading...'/>");
+                $(this).load('<%= url_for('/language_count') =%>/'+slot+'/'+branch+'?type='+type);
+            } else {
+                return false;
+            }   
+        });     
+        
+        /* $(oTable.fnGetNodes()).each(function(){
+            var rowIndex = $(this)[0].sectionRowIndex;
+            oTable.fnUpdate( 'index: '+rowIndex, rowIndex, 4 ); 
+        }); */
+        
+        //#####################################################################
+        // open the details view of a slot if it was given in parameter of url (via stash) 
+        //#####################################################################
+        $(".<%= stash 'slot_to_open' =%>").trigger('click');
+         
+        
+        //#####################################################################
+        //Add context menu to every td field in matrix table
+        //#####################################################################
+        /*
+        $('td[id^="lang_matrix_field_"]').contextMenu({
+            menu: 'myMenu'
+        },
+            function(action, el, pos) {
+            alert(
+                'Action: ' + action + '\n\n' +
+                'Element ID: ' + $(el).attr('id') + '\n\n' + 
+                'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
+                'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)'
+                );
+        });
+        */
+        
+    });
+    
+</script>
+
+
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

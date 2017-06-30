@@ -1,0 +1,73 @@
+% layout 'default';
+
+<script>
+	$(function() {
+		$("input:submit, a, button", "#login_box").button();
+		$("a", ".demo").click(function() {
+			return false;
+		});
+	});
+</script>
+
+<div id='form_box'
+    class='ui-state-default ui-corner-all register_form centered'>
+    %= form_for url_for('/registration_check') => (method => 'post') => begin
+
+    <div class='form_element'>
+        Name:<br/> 
+        <!-- %= text_field 'user' => flash 'user', class => 'text_input' -->
+        <input name='user' value="<%= flash 'user' %>" class='text_input' />
+    </div>
+
+    <div class='form_element'>
+        Email:<br/> 
+        <!-- %= text_field 'email' => flash 'email' , class => 'text_input' -->
+        <input name='email' value="<%= flash 'email' %>" class='text_input' />
+    </div>
+
+    <div class='form_element'>
+        Password:<br/> 
+        %= password_field 'pass1', class => 'text_input'
+    </div>
+
+    <div class='form_element'>
+        Password Repeat:<br/> 
+        %= password_field 'pass2', class => 'text_input'
+    </div>
+
+    <div class='form_element'>
+        Code below:<br/> 
+        %= text_field 'code', class => 'text_input'
+    </div>
+
+    <div class='form_element'>
+        <img src="<%= stash 'md5sum' %>.png" />
+    </div>
+
+    <hr class='form_seperator_line' />
+    
+    <div class='form_button_box'>
+        %= submit_button 'Register', class => 'ui-state-default ui-corner-all submit_button form_button centered' 
+    </div>
+     
+    % end
+</div>
+
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

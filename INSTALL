@@ -1,0 +1,41 @@
+===========================================
+| LetsMT! Resource Repository source code |
+===========================================
+Installation (single server)
+-----------------------------
+
+Check your hostname:
+    $ hostname -A
+and edit /etc/hosts to add the host name to the line that starts with 127.0.0.1, like so:
+    127.0.0.1       localhost        <hostname>
+(Attention: This really has to be written on one line!)
+
+Then run the installation:
+    $ sudo make install
+
+Recommended answers for the configuration dialogs:
+    General type of mail configuration ............. Internet Site
+    System mail name ............................... <hostname>.<your domain>
+    Configure SGE automatically? ................... yes
+    SGE cell name .................................. default
+    SGE master hostname ............................ <hostname>
+    SSL server certificate hostname ................ <hostname>
+    Sign the certificate? [y/n] ................................ y
+    1 out of 1 certificate requests certified, commit? [y/n] ... y
+    Sign the certificate? [y/n] ................................ y
+    1 out of 1 certificate requests certified, commit? [y/n] ... y
+
+Optionally, to compile & install the documentation:
+    $ sudo make install-doc
+
+Run the test suite to make sure that the installation is fundamentally
+operational:
+    $ make test
+
+Test the installation more thoroughly (recommended):
+    $ make test-all
+
+
+Installation of Web user interface
+-----------------------------------
+    $ sudo make install-grenzschnitte

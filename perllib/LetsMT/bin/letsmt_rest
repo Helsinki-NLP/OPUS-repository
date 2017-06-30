@@ -1,0 +1,930 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+letsmt_rest - a simple frontend for using the LetsMT REST server
+
+=head1 SYNOPSIS
+
+ letsmt_rest [OPTIONS] command [MORE_OPTIONS] [ARGUMENTS]
+
+=head1 OPTIONS AND ARGUMENTS
+
+=head2 COMMANDS
+
+ add_meta             fetch
+ add_user             group
+ add_user_info        import
+ cat                  permission
+ commit_job           run_import
+ copy                 run_align
+ create               run_realign
+ create_group         set_meta
+ create_user          set_user_info
+ delete               show
+ delete_group         show_meta
+ delete_meta          upload
+ delete_user          user_info
+ delete_user_info
+
+=head2 OPTIONS
+
+ -a ............. (search) list all entries (not only matching resources)
+ -A ............. (fetch) download as archive (do not unpack)
+ -b branch ...... name of the branch within <slot> (default = user)
+ -c copy_dest ... destination for copy (default = user)
+ -d dest ........ **TODO** equivalent with -p
+ -D domain ...... (create) domain of the corpus
+ -f ............. (delete) force - delete without comfirmation
+ -F from ........ (cat) start at line <from>
+ -g group ....... name of the REST group for <user> (default = 'public')
+ -h ............. show the help text
+ -H ............. show the man page
+ -l lang-ID ..... language ID (optional for corpus uploads)
+ -m metadata .... metadata in the form of "key:value"
+ -o operation ... (search) operation to perform on matching data
+ -O owner ....... owner of the data (for create), default = user
+ -p path ........ relative path (directory) inside of the repository
+ -P provider .... provider of the data (for create), default = user
+ -r revisionNr .. revision number (for show, cat, fetch, show_meta)
+ -S server ...... storage-server URL (for create slot)
+ -s slot ........ name of the REST slot (= corpus)
+ -T to .......... (cat) end at line <to>
+ -t type ........ file type (for uploads), backend type (for create)
+ -u user ........ name of the REST user
+ -v ............. verbose output
+ -V ............. display the LetsMT library version
+ -x ............. de-XMLify the returned data (make more human-readable)
+
+=cut
+
+use strict;
+use warnings;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+#if (-t) {  ## for reference - 'use open' with :std above seems to be quite enough
+#    binmode STDIN,  ":encoding(console_in)" ;
+#    binmode STDOUT, ":encoding(console_out)";
+#    binmode STDERR, ":encoding(console_out)";
+#}
+use HTML::Entities;
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::WebService;
+use LetsMT::Import;
+
+use XML::LibXML;
+my $XMLParser = new XML::LibXML;
+
+use Cwd;
+use File::Basename;
+
+use Getopt::Std;
+my %opts;
+my $known_opts = 'aAb:c:d:D:fF:g:hHl:m:o:O:p:P:r:s:S:t:T:u:vVx';
+getopts ($known_opts, \%opts);
+
+my $command = shift || '';
+getopts ($known_opts, \%opts);
+
+&help_message if ($opts{H});
+&usage        if ($opts{h});
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opts{V});
+
+$command ||= shift  or die "No command found!\n";
+
+my $slot   = (defined $opts{s}) ? $opts{s} : '';
+my $user   = (defined $opts{u}) ? $opts{u} : '';
+my $path   = (defined $opts{p}) ? $opts{p}          ## to make flags consistent:
+         : ( (defined $opts{d}) ? $opts{d} : '' );  ## allow to use -p to specify the path
+my $branch = (defined $opts{b}) ? $opts{b} : $user; ## default: branch = user
+my $gid    = (defined $opts{g}) ? $opts{g} : '';
+my $dest   = (defined $opts{c}) ? $opts{c} : $user; ## destination for copy
+my $no_xml = $opts{x};
+
+my $AcceptedUploadTypes = 'tmx|xliff|pdf|doc|txt|srt|moses';
+
+LetsMT::WebService::verbose() if $opts{v};
+
+my $origcommand = $command;
+$command = lc($command);
+$command =~ s/[_-]//g;  ## consider underscore-free command names
+$command =~ s/delete/del/;
+$command =~ s/metadata/meta/;
+$command =~ s/^(cat|create|del|download|fetch|import|sample|show|upload(corpus)?)$/$1resource/;
+$command =~ s/^(group|userinfo)$/show$1/;
+$command =~ s/^(search)$/$1meta/;
+$command =~ s/^createuser$/creategroup/;
+
+## RESOURCE ####################################################################
+
+if ( $command =~ /resource$/ ) {
+    ##die "Missing user name!\n"  unless (length $user);
+
+    #-----------------------------------
+    # create a resource
+    #-----------------------------------
+    if ( $command eq 'createresource' ) {
+        $gid = 'public' unless (length $gid);
+
+        my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+        $resource->set_server( $opts{S} )  if (defined $opts{S});  # optional: storage-URL
+
+        my %arg = ( uid => $user, gid => $gid );       # request arguments
+        $arg{type} = $opts{t}  if (defined $opts{t});  # optional: backend type
+
+        &execute(
+            \&LetsMT::WebService::put,
+            "Create '$resource'",
+            $resource, %arg
+        );
+        if ( !$path ) {
+            my %metadata = ();
+            $metadata{domain}   = $opts{D} if (defined $opts{D});
+            $metadata{owner}    = $opts{O} || $user;
+            $metadata{provider} = $opts{P} || $user;
+            &execute(
+                \&LetsMT::WebService::post_meta,
+                "Set metadata for '$resource'",
+                $resource, %metadata
+            );
+        }
+    }
+
+    #-----------------------------------
+    # copy a branch
+    #-----------------------------------
+    elsif ( $command eq 'copyresource' ) {
+        ##die "Missing branch!\n"       unless (length $branch);
+        ##die "Missing destination!\n"  unless (length $dest);
+        ##die "Missing slot name!\n"    unless (length $slot);
+
+        my $resource = LetsMT::Resource::make( $slot, $branch );
+        &execute(
+            \&LetsMT::WebService::copy,
+            "Copy branch '$slot/$branch' to '$slot/$dest'",
+            $resource, $dest,
+        );
+    }
+
+    #-----------------------------------
+    # upload resources (files)
+    #-----------------------------------
+    elsif ( $command eq 'uploadresource' ) {
+        # only one argument:  $path will be used as path/filename
+        # multiple arguments: upload multiple files
+        #                     ($path will be used as upload directory)
+
+        die "No upload files given!\n"  unless (@ARGV);
+        ##die "Missing slot name!\n"      unless (length $slot);
+        ##die "Missing branch name!\n"    unless (length $branch);
+        ##die "Missing group!\n"          unless (length $gid);
+
+        my $error = 0;
+        foreach my $file (@ARGV) {
+            if ( !-e $file ) {
+                warn "File not found: '$file'\n";
+                $error++;
+                next;
+            }
+
+            my $destination = "";
+            if ( (@ARGV > 1) || ( ! length $path ) ) {
+                # if file name is an absolute path --> use basename only!
+                # otherwise: keep entire relative path
+                $destination =
+                    ( ( length $path   ) ? "$path/" : "" ) .
+                    ( ( $file =~ /^\// ) ? basename($file) : $file );
+            }
+            my $resource = LetsMT::Resource::make( $slot, $user, $destination );
+            $resource->set_server($opts{S}) if ($opts{S});    # optional: storage-URL
+            my %arg = ( gid => $gid );                        # request arguments
+            $arg{type} = $opts{t} if (defined $opts{t});      # optional: backend-type
+
+            &execute(
+                \&LetsMT::WebService::put_file,
+                "Upload '$file' to '$destination'",
+                $resource, $file, %arg
+            );
+        }
+        exit $error;
+    }
+
+    #-----------------------------------
+    # import corpus files (will be placed in uploads!)
+    #-----------------------------------
+    elsif ( $command =~ /^(uploadcorpus|import)resource$/ ) {
+        ##die "No upload files given!\n"  unless (length @ARGV);
+        ##die "Missing slot name!\n"      unless (length $slot);
+        my $lang = defined $opts{l} ? $opts{l} : '';
+
+        my $error = 0;
+        foreach my $file (@ARGV) {
+            if ( !-e $file ) {
+                warn "File not found: '$file'\n";
+                $error++;
+                next;
+            }
+            my $type = (defined $opts{t}) ? $opts{t} : '';
+            unless (length $type) {
+                if ( $file =~ /\.([^\.]+)(\.gz|\.tar|\.tgz|\.zip)?$/ ) {
+                    $type = $1;
+                }
+            }
+            ## NEW: don't skip unknown types anymore, because
+            ## Apache Tika may detect the format anyway ....
+            unless ( LetsMT::Import::supported($type) ) {
+                warn "Don't know this file type '$type' ($file) I try anyway\n";
+            }
+            # make destination path
+            # - add doc-type sub-dir
+            # - add language sub-dir if -l is given
+
+            my $destination =
+                  "uploads/$type/"
+                . ( ( length $lang ) ? "$lang/" : '' )
+                # if file name is an absolute path --> use basename only!
+                # otherwise: keep entire relative path
+                . ( ( $file =~ /^\// ) ? basename($file) : $file );
+
+            my $resource = LetsMT::Resource::make( $slot, $user, $destination );
+            $resource->set_server($opts{S})  if (defined $opts{S});  # optional: storage-URL
+
+            &execute(
+                \&LetsMT::WebService::put_letsmt_file,
+                "Upload '$destination'",
+                $resource, $file,
+            );
+        }
+        exit $error;
+    }
+
+    #-----------------------------------
+    # delete a resource
+    #-----------------------------------
+    elsif ( $command eq 'delresource' ) {
+        ##die "Missing slot name!\n"  unless (length $slot);
+
+        my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+        my $answer = 'n';
+        if ( ! $opts{f} ) {
+            print STDERR "Are you sure you want to delete the entire '$resource'?\n";
+            $answer = <>;
+        }
+        if ( $opts{f} || $answer =~ /^y/i ) {
+            &execute(
+                \&LetsMT::WebService::del_letsmt,
+                "Delete '$resource'",
+                $resource, uid => $user,
+            );
+        }
+        else {
+            print STDERR "doing nothing.\n";
+        }
+    }
+
+    #-----------------------------------
+    # cat a resource from the repository
+    #-----------------------------------
+    elsif ( $command eq 'catresource' ) {
+        ##die "Missing slot name!\n"    unless (length $slot);
+        ##die "Missing branch name!\n"  unless (length $branch);
+        ##die "Missing path name!\n"    unless (length $path);
+
+        my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+        &query(
+            \&LetsMT::WebService::get,
+            "Display content of '$slot/$branch/$path'",
+            $resource,
+            action => 'cat',
+            from   => $opts{F},
+            to     => $opts{T},
+            uid    => $user,
+            rev    => $opts{r},
+        );
+    }
+
+    #-----------------------------------
+    # fetch a resource
+    #-----------------------------------
+    elsif ( $command =~ /^(fetch|download)resource$/ ) {
+        ##die "Missing slot name!\n"    unless (length $slot);
+        ##die "Missing branch name!\n"  unless (length $branch);
+        ##die "Missing path!\n"         unless (length $path);
+
+        my $localDir = '.';
+        my $resource = LetsMT::Resource::make( $slot, $branch, $path, $localDir );
+        my %args       = ( uid => $user );
+        $args{archive} = 'yes'    if ($opts{A});
+        $args{rev}     = $opts{r} if ($opts{r});
+
+        &execute(
+            \&LetsMT::WebService::get_resource,
+            "Fetch '$resource'",
+            $resource, %args
+        );
+    }
+
+    #-----------------------------------
+    # list resources from the repository
+    #-----------------------------------
+    elsif ( $command eq 'showresource' ) {
+        my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+        &query(
+            \&LetsMT::WebService::get,
+            "Show resource '$slot/$branch/$path'",
+            $resource,
+            rev => $opts{r}, # || 'HEAD',
+            uid => $user
+        );
+    }
+
+    ## NOOP
+    else {
+        die "No valid command found: '$origcommand'!\n";
+    }
+}
+
+## METADATA ####################################################################
+
+elsif ( $command =~ /meta$/ ) {
+    ##die "Missing user name!\n"         unless (length $user);
+    ##die "Missing user/branch name!\n"  unless (length $branch);
+    my %meta = defined $opts{m} ? split( /[:=]/, $opts{m} ) : ();
+
+    my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+
+    #-----------------------------------
+    # set key-value pair in metadata DB
+    #-----------------------------------
+    if ( $command eq 'setmeta' ) {
+        $meta{uid} = $user unless (defined $meta{uid});
+        &execute(
+            \&LetsMT::WebService::post_meta,
+            "Set metadata",
+            $resource,
+            %meta,
+        );
+    }
+
+    #-----------------------------------
+    # add key-value pair in metadata DB
+    #-----------------------------------
+    elsif ( $command eq 'addmeta' ) {
+        $meta{uid} = $user unless (defined $meta{uid});
+        &execute(
+            \&LetsMT::WebService::put_meta,
+            "Add metadata",
+            $resource,
+            %meta,
+        );
+    }
+
+    #-----------------------------------
+    # delete metadata (specific keys or all)
+    #-----------------------------------
+    elsif ( $command eq 'delmeta' ) {
+        foreach my $k (keys %meta){
+            $meta{$k} = '*' unless (length $meta{$k});
+        }
+        &execute(
+            \&LetsMT::WebService::del_meta,
+            "Delete metadata",
+            $resource,
+            %meta, 'uid' => $user,
+        );
+    }
+
+    #-----------------------------------
+    # show metadata for a resource
+    #-----------------------------------
+    elsif ( $command eq 'showmeta' ) {
+        $meta{rev} = $opts{r} if (defined $opts{r});
+        &query(
+            \&LetsMT::WebService::get_meta,
+            "Show metadata",
+            $resource,
+            %meta,
+        );
+    }
+
+    #-----------------------------------
+    # search data in the metadata DB
+    #-----------------------------------
+    elsif ( $command eq 'searchmeta' ) {
+        die "Need a search query (-m ...!\n"  unless (defined $opts{m});
+
+        my $resource = (length $slot)
+            ? LetsMT::Resource::make( $slot, $branch, $path )
+            : LetsMT::Resource::make();
+
+        $meta{uid}    = $user       unless (defined $meta{uid});
+        $meta{type}   = 'recursive' if (length $slot);
+        $meta{action} = 'list_all'  if ($opts{a});
+        $meta{action} = $opts{o}    if (defined $opts{o});
+
+        &query(
+            \&LetsMT::WebService::get_meta,
+            "Search metadata",
+            $resource, %meta,
+        );
+    }
+
+    ## NOOP
+    else {
+        die "No valid command found: '$origcommand'!\n";
+    }
+}
+
+## GROUP/USER ##################################################################
+
+elsif ( $command =~ /group$/ ) {
+    $gid  = shift || $user  unless (length $gid);
+    $user = shift || $gid   unless (length $user);
+
+    #-----------------------------------
+    # create users and groups (alias createuser)
+    #-----------------------------------
+    if ( $command eq 'creategroup' ) {
+        ##die "Missing group name!\n"  unless (length $gid);
+        ##die "Missing user name!\n"   unless (length $user);
+        $gid   = $user unless (length $gid);
+        my $owner = (defined $opts{O}) ? $opts{O} : $user;
+
+        &execute(
+            \&LetsMT::WebService::post_group,
+            "create user '$user' in groups "
+                . ( ($gid eq $user) ? "" : "'$gid', " )
+                . "'$user' and 'public'",
+            $gid, $user, $owner
+        );
+    }
+
+    #-----------------------------------
+    # remove a group
+    #-----------------------------------
+    elsif ( $command eq 'delgroup' ) {
+        ##die "Missing group name!\n"  unless (length $gid);
+        ##die "Missing user name!\n"   unless (length $user);
+        my $owner = (defined $opts{O}) ? $opts{O} : $user;
+
+        &execute(
+            \&LetsMT::WebService::del_group,
+            "remove group '$gid'",
+            $gid, undef, $owner,
+        );
+    }
+
+    #-----------------------------------
+    # list members of a group
+    #-----------------------------------
+    elsif ( $command eq 'showgroup' ) {
+        my $owner = (defined $opts{O}) ? $opts{O} : $user || 'none';
+        ##die "Missing owner name!\n"  unless (length $owner);
+
+        &query(
+            \&LetsMT::WebService::get_group,
+            "Show group",
+            $gid, undef, $owner
+        );
+    }
+
+    ## NOOP
+    else {
+        die "No valid command found: '$origcommand'!\n";
+    }
+}
+
+elsif ( $command =~ /user$/ ) {
+    $user = shift || ''         unless (length $user);
+    ##die "Missing user name!\n"  unless (length $user);
+
+    #-----------------------------------
+    # add a user to a group
+    #-----------------------------------
+    if ( $command eq 'adduser' ) {
+        ##die "Missing name of the target group!\n"  unless (length $gid);
+        my $owner = (defined $opts{O}) ? $opts{O} : '';
+        ##die "Missing owner name!\n"                unless (length $owner);
+
+        &execute(
+            \&LetsMT::WebService::put_group,
+            "Add user '$user' to group '$gid'",
+            $gid, $user, $opts{O},
+        );
+    }
+
+    #-----------------------------------
+    # remove a user from a group
+    #-----------------------------------
+    elsif ( $command eq 'deluser' ) {
+        $gid      = $user  unless (length $gid);
+        my $owner = (defined $opts{O}) ? $opts{O} : $user;
+
+        &execute(
+            \&LetsMT::WebService::del_group,
+            "Remove user '$user' from group '$gid'",
+            $gid, $user, $owner,
+            );
+    }
+
+    ## NOOP
+    else {
+        die "No valid command found: '$origcommand'!\n";
+    }
+}
+
+## USER INFO ###################################################################
+
+elsif ( $command =~ /userinfo$/ ) {
+    my %info = defined $opts{m} ? split( /[:=]/, $opts{m} ) : ();
+    ##die "Missing user name!\n"   unless (length $user);
+    ##die "Missing info string!\n" unless (length keys %info);
+
+    #-----------------------------------
+    # set user info
+    #-----------------------------------
+    if ($command eq 'setuserinfo') {
+        &execute(
+            \&LetsMT::WebService::post_group,
+            "Set user info for user '$user'",
+            $user, $user, undef,
+            %info,
+        );
+    }
+
+    #-----------------------------------
+    # add user info
+    #-----------------------------------
+    elsif ($command eq 'adduserinfo') {
+        &execute(
+            \&LetsMT::WebService::put_group,
+            "Add user info for user '$user'",
+            $user, $user, undef,
+            %info,
+        );
+    }
+
+    #-----------------------------------
+    # delete user info
+    #-----------------------------------
+    elsif ($command eq 'deluserinfo') {
+        &execute(
+            \&LetsMT::WebService::del_group,
+            "Delete user info for user '$user'",
+            $user, $user, undef,
+            %info,
+        );
+    }
+
+    #-----------------------------------
+    # show user info
+    #-----------------------------------
+    elsif ( $command eq 'showuserinfo' ) {
+        &query(
+            \&LetsMT::WebService::get_group,
+            "Show user info for user '$user'",
+            $user, $user, undef,
+            action => 'showinfo',
+        );
+    }
+
+    ## NOOP
+    else {
+        die "No valid command found: '$origcommand'!\n";
+    }
+}
+
+
+
+## ACCESS ######################################################################
+
+#-----------------------------------
+# read/set group settings for a slot
+#-----------------------------------
+elsif ( $command =~ /^(perm|permission)$/ ) {
+    ##die "Missing slot name!\n"  unless (length $slot);
+    ##die "Missing user name!\n"  unless (length $user);
+
+    my $resource = LetsMT::Resource::make( $slot, $branch );
+
+    if (length $gid) {
+        &execute(
+            \&LetsMT::WebService::put_access,
+            "Set access in '$slot' to group '$gid'",
+            $resource,
+            uid => $user,
+            gid => $gid,
+        );
+    }
+    else {
+        &query(
+            \&LetsMT::WebService::get_access,
+            "Get access in '$slot'",
+            $resource
+        );
+    }
+}
+
+
+## JOB #########################################################################
+
+#-----------------------------------
+# commit job (file)
+#-----------------------------------
+elsif ( $command eq 'commitjob' ) {
+    ##die "Missing user name!\n"  unless (length $user);
+    ##die "Missing slot name!\n"  unless (length $slot);
+    ##die "Missing path!\n"       unless (length $path);
+
+    my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+    &execute(
+        \&LetsMT::WebService::post_job,
+        "Upload job description file",
+        $resource,
+    );
+}
+
+#-----------------------------------
+# schedule alignment jobs
+#-----------------------------------
+elsif ( $command =~ /^run(import|align|realign)$/ ) {
+    my $run = $1;
+    ##die "Missing user name!\n"  unless (length $user);
+    ##die "Missing slot name!\n"  unless (length $slot);
+
+    my $resource = LetsMT::Resource::make( $slot, $branch, $path );
+    &execute(
+        \&LetsMT::WebService::put_job,
+        "Create $run job",
+        $resource,
+        uid => $user,
+        run => $run,
+    );
+}
+
+
+## NOOP ########################################################################
+
+#-----------------------------------
+# no command found ....
+#-----------------------------------
+else {
+    die "No valid command found: '$origcommand'!\n";
+}
+
+
+################################################################################
+################################################################################
+
+## In particular for GET commands, which return either data or error messages.
+#
+# &query ( \$func_ref, @args );
+#
+sub query
+{
+    my $command_ref = shift  or die "No command given!\n";
+    my $comment = shift || '';
+
+    my ($ok, $data, $http_status, $response_ref) = $command_ref->( @_ );
+    my $status = &xml_content( $data, '//status' );
+    $data = &dexmlify( $data )  if ($no_xml);
+
+    if ($ok) {
+        print $data;
+    } else {
+        print STDERR "$comment ... failed: $status\n";
+        print $data;
+        exit 1;
+    }
+}
+
+#
+## For PUT/POST/COPY/DELETE commands, whose response is usually only relevant
+## in case of errors, when it contains the error message.
+#
+# &execute ( \$func_ref, "comment", @args );
+#
+sub execute
+{
+    my $command_ref = shift  or die "No command given!\n";
+    my $comment = shift || '';
+
+    print STDERR "$comment ... ";
+    my ($ok, $data, $http_status, $response_ref) = $command_ref->( @_ );
+    my $status = &xml_content( $data, '//status' );
+    $data = &dexmlify( $data )  if ($no_xml);
+
+    if ($ok) {
+        printf STDERR "done%s\n", (length $status) ? ": $status" : ".";
+    } else {
+        print STDERR "failed: $status\n";
+        print $data;
+        exit 1;
+    }
+}
+
+################################################################################
+
+sub xml_content
+{
+    my $data = shift or return '';
+    $data =~ /^</ or return $data;
+    my $dom  = $XMLParser->parse_string( $data );
+    my $node = shift or return '(no node specified)';
+
+    return $dom->findnodes( $node )->to_literal;
+}
+
+
+sub dexmlify
+{
+    my $string = shift;
+    # Return directly if first line doesn't declare the data as LetsMT XML!
+    $string =~ s{^<letsmt-ws version="[^"]*">\n}{}s or return $string;
+    $string =~ s{\n*$}{}s;
+
+    $string =~ s{^  }{}mg;                ## de-indent by 2, ...
+    $string =~ s{\s*</[a-z_-]+>}{}mig;    ## ... remove closing tags, ...
+    $string =~ s{^}{\| }mg;               ## add quotation marker ...
+    $string =~ s{^\| (\s*)<}{XML:$1$1}mg; ## ... then double the indentation depth for XML
+
+    $string =~ s{/?>}{:    }mg;           ## tag-closure before content -> colon + spacing
+    $string =~ s{(XML:.*):\s*$}{$1}mg;    ## no colon, space at end of line
+    $string =~ s{,([^\s])}{, $1}g;        ## (at least) single space after commas
+
+    $string =~ s{^(XML:\s*)entry(:    )?$}{$1file content:\n| }mg;
+    $string =~ s{^(XML:\s*)entry kind="([^"]+)"}{$1$2}mg;
+    $string =~ s{^(XML:\s*)entry id="([^"]+)" kind="([^"]+)" owner="([^"]+)"}{$1$3: $2\n        owner:    $4}mg;
+    $string =~ s{^(XML:\s*)commit revision="([^"]*)"}{$1commit:\n$1    revision:    $2}mg;
+    $string =~ s{^XML:\s*revision:\s*\n}{}mg;          ## remove empty "ex-XML" lines
+
+    $string =~ s{^XML:\s*$}{}mg;          ## remove empty "ex-XML" lines
+    $string =~ s{^XML:}{}mg;              ## remove XML line marker
+    return decode_entities( "$string\n" );
+}
+
+################################################################################
+
+sub usage
+{
+    use Pod::Usage;
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -message => 'letsmt_rest - a simple frontend for using the LetsMT REST server',
+        -verbose => 1,
+    );
+    print STDERR $_[0] if @_;
+    exit 1;
+}
+
+sub help_message
+{
+    use Pod::Usage;
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -message => 'letsmt_rest - a simple frontend for using the LetsMT REST server',
+        -verbose => 2,
+    );
+    print STDERR $_[0] if @_;
+    exit 1;
+}
+
+################################################################################
+
+
+=head1 DESCRIPTION
+
+C<letsmt_rest> sends requests to the LetsMT REST server,
+using the L<LetsMT::WebService|LetsMT::WebService> module.
+
+=head2 MANIPULATING RESOURCES
+
+ create ......... create a new resource-directory (slot/user/path)
+                  '-S <server>': use specific storage server <server>
+                  '-t <type>': use specific backend type <type>
+ fetch .......... fetch resources from REST (alias: download)
+ show ........... show files in given slot/branch/path
+ cat ............ show contents of given slot/branch/path (see also -F and -T)
+ permission ..... change group settings of <slot>/<user> to <group>
+ delete ......... delete a resource
+ copy ........... copy a <branch> in <slot> to <slot>/<copy_dest>
+ upload ......... upload files to slot/user/path
+                  If you specify only one file on the command line:
+                  destination = slot/user/path
+                  If you specify multiple upload files (file1 file2):
+                  destinations = slot/user/path/file1, slot/user/path/file2
+ import ......... upload files to 'slot/user' into uploads/type/, where type
+                  is either specified on the command line (-t) or
+                  taken from file extension (check accepted types).
+                  You can specify multiple files on the command-line:
+          letsmt_rest -s slot -u user import file1.tmx en/file2.pdf ...
+                  NOTE: relative paths are kept when uploading
+                  NOTE: absolute paths are removed and only filenames are used
+                  Optional: -l langID (to specify the language of the doc)
+                  --> this will be used to put the doc in a langID-subdir:
+                  e.g. put file2,pdf into uploads/en/ with
+          letsmt_rest -s slot -u user -l en import file2.pdf ...
+
+
+=head2 MANIPULATING GROUPS
+
+ create_user .... create a new user (default group = 'public')
+ create_group ... create a new group <group> owned by <user>
+ add_user ....... add user <user> to group <group> owned by <owner>
+ group .......... show all groups or members of a specific group <group>
+ delete_group ... delete user <user> from group <group> owned by <owner>
+
+
+=head2 MANIPULATING GROUP AND USER INFORMATION
+
+ user_info ...... show information about <user>
+ add_user_info .. add user information for <user> using key-value pairs
+                  specified with -m (see metadata below)
+ set_user_info .. the same as 'add_user_info' but overwrites existing values
+ del_user_info .. delete user information for <user> (using -m keys/values)
+
+
+=head2 MANIPULATING METADATA
+
+ show_meta ...... show metadata for slot/branch/path
+ set_meta ....... set metadata <metadata> for slot/branch[/path]
+                    -m 'key=value'
+ add_meta ....... add metadata <metadata> to slot/branch[/path]
+                    -m 'key=value'
+ delete_meta .... delete all metadata from slot/branch[/path]
+                    -m 'key=value' (delete specific key-value pair)
+                    -m 'key'       (delete all values for key)
+ search ......... search the database using query given by
+                    -m 'key=value'     (search entries with <value> in <key>)
+                    -o 'OPERATION_key' (apply operation on <key>)
+
+Option -m can take more than one key-value pair, for example, 'key1=val1:key2=val2'.
+For search it is possible to add supported search conditions
+such as 'ONE_OF_', 'ALL_OF_', 'STARTS_WITH_', 'ENDS_WITH_',
+'MAX_', 'MIN_', 'NOT_' as prefix of the key to be conditioned.
+
+The optional operation parameter -o can be used to define an operation like
+'SUM_' (summing) over all values listed in matching entries in the <key>
+given after the operation.
+Other supported operations are 'MIN_' and 'MAX_'.
+
+Here is an example:
+
+ letsmt_rest -u user -m 'ONE_OF_language=en' -o 'SUM_size' search
+
+(Search for all entries that include 'en' in the <language> field,
+and sum all values given in their <size> field.)
+
+
+=head2 MANIPULATING JOBS
+
+ commit_job ..... upload an XML job description file to a given path
+                  and execute the jobs or queues them for execution
+ run_import ..... create (re-)import jobs for all files in the given path
+                  (should be somewhere in uploads)
+ run_align .....  create alignment jobs for all parallel documents
+                  in the given path
+ run_realign ...  create alignment jobs for all aligned documents
+                  in the given path
+
+
+=head2 HUMAN-READABLE OUTPUT
+
+With command-line option -x, XML responses are converted into a more
+human-readable format that uses indentation rather than "<tag>...</tag>"
+syntax to show structure.
+
+The lines of multiline text content, such as that returned by "cat",
+are marked by vertical bars "|" at the left.
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

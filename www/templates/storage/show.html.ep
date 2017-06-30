@@ -1,0 +1,194 @@
+<!-- ###################################################################### -->
+<!-- Template for File Browser -->
+<!-- ###################################################################### -->
+
+% layout 'default';
+
+<h2>Browse Corpus '<%= stash 'slot' %>'</h2>
+
+<!--  Menu bar containing buttons for back link and if logged in for upload of 
+files to the current corpus and deletion of the corpus -->
+
+<div class='button_menu tool_bar'>
+    <ul>
+
+        <li><a href="<%= url_for('index') %>/?open=<%= stash 'slot' %>_<%= stash 'branch' %>" title='back' id="icon_link"
+            class="ui-state-default ui-corner-all"><span
+                class="ui-icon ui-icon-triangle-1-w"></span>back</a>
+        </li>
+        <li><a href="#" title='refresh' id="icon_link" onClick="window.location.reload()"
+            class="ui-state-default ui-corner-all">refresh</a>
+        </li>
+
+
+        % if (session 'user') {
+            <li><a href="<%= url_for('/upload') %>/<%= stash 'slot' =%>/<%= stash 'branch' =%>?back=show/<%= stash 'slot' =%>/<%= stash 'branch' =%>"
+                   title='upload data' 
+                   id="icon_link"
+                   class="ui-state-default ui-corner-all">
+                   <span class="ui-icon ui-icon-plus"></span>upload</a>
+            </li>            
+            <li><a href="<%= url_for('/edit') %>/<%= stash 'slot' =%>/<%= stash 'branch' =%>?back=show/<%= stash 'slot' =%>/<%= stash 'branch' =%>" 
+                   title='edit metadata of corpus' 
+                   id="icon_link"
+                   class="ui-state-default ui-corner-all">                   
+                   <span class="ui-icon ui-icon-pencil"></span>edit</a>
+            </li>
+        % }
+        <br style="clear: both" />
+    </ul>
+</div>
+
+<!-- Two div boxes, one for the left tab panel containing the two file browser 
+for uploaded and imported files and the right tab panel showing the details of 
+a selected file like metadata, raw view etc. -->
+    
+<div class='ui-widget tab_panel_left'>
+    <h3 id='left_tab_heading'>&nbsp;</h3>
+    <div id="tabs" class='height_100_procent'>
+    <ul>
+        <li><a href='#imported_files'>XML</a></li>
+        <li><a href='#uploaded_files'>Uploads</a></li>        
+        <!-- <li><a href='#uploaded_files'>Uploaded Files</a></li> -->
+        <!-- <li><a href="#refresh_browser" onClick="window.location.reload()">Refresh</a></li> -->
+    </ul>
+    
+    <div id='imported_files'>
+        <!-- This div gets filled with the 'XML' file browser -->
+        <p><div id='file_browser_imports' class='browser_content black_border auto_scroll'></div></p>
+    </div>
+    <div id='uploaded_files'>
+        <!-- This div gets filled with the 'Uploaded Files' file browser -->
+        <p><div id='file_browser_uploads' class='browser_content black_border auto_scroll'></div></p>
+    </div>
+    </div>        
+</div>
+
+<div class='ui-widget tab_panel_right'>
+    <span id='right_tab_heading'>
+        <h3 id='right_tab_heading_content'>&nbsp;</h3>        
+        <form name='cat_from_to_form' action='/' method='post' style='display:none;'>          
+            Revision:
+            <select name='rev' onchange='load_tabs( $("option:selected", this).attr("link"), $("option:selected", this).attr("rev") )' id='right_tab_revision_dropdown' style='display:inline;'></select>
+        </form>
+   </span>
+    <div id='tabs_right' class='height_100_procent'>
+        <ul>
+            <li><a href='#meta_data'>Meta Data</a></li>                                          
+        </ul>
+        <div id='meta_data' class='browser_content auto_scroll'>
+            no resource selected yet
+        </div>            
+    </div>
+</div>
+
+<br style='clear:both;' /> 
+
+
+<!-- ###################################################################### -->
+<!-- Help Dialogs -->
+<!-- ###################################################################### -->
+<div id="dialog_help_uploaded_files" class='dialog help_box'
+    title="Help - Uploaded Files">
+    <h2>Uploaded Files</h2>
+    <p>This are the files that got uploaded...</p>
+</div>
+
+<div id="dialog_help_imported_files" class='dialog help_box'
+    title="Help - Imported Files">
+    <h2>Importeded Files</h2>
+    <p>This are the files that got imported into the system...</p>
+</div>
+
+
+<!-- ###################################################################### -->
+<!-- Javascript to load the two file browser -->
+<!-- ###################################################################### -->
+<script type="text/javascript">   
+
+    /**************************************************************************
+    Function that takes a path to a file and creates the tabs in the right
+    panel for metadata, (raw) content, error or import script view etc. 
+    **************************************************************************/
+    function load_tabs(file, rev) {        
+    	var parts = file.split(/\//);
+    	var file_name = parts.pop();    	
+    	$('#right_tab_heading_content').html(file_name);    	    	
+    	$('#right_tab_revision_dropdown').load('<%= url_for("get_revision_dropdown") %>?path='+file+'&rev='+rev);
+    	$('#right_tab_heading form').css('display', 'inline'); 
+        $.get('<%= url_for("get_tab_list") %>', {path: file, rev: rev},        		
+            function(data){
+            
+                /* Clear all existing tabs before adding new ones */
+                var number_of_tabs = $('#tabs_right').tabs('length');
+                for (var x=0; x < number_of_tabs; x++) {                                
+                   $('#tabs_right').tabs('remove', 0);
+                }
+                                            
+                /* Add 'loading...' spinning wheel */
+                $('#tabs_right').tabs( "option", "spinner", "Retrieving data..." );
+                
+                /* Go through the json data and add tabs */
+                jQuery.each(data, function(i, val) {  
+                    /* alert('asdf: '+val.url); */
+                    $('#tabs_right').tabs('add', val.url, val.name); 
+                });                                                        
+                                            
+                /* Select and activate the first of the tabs */
+                $('#tabs_right').tabs('select',0);
+                $('#tabs_right').tabs('load',0);
+                
+        }, 'json');
+        
+    };
+    
+
+	$(document).ready(function() {
+		
+	/**************************************************************************
+	Initionalize the file browser(s)
+	**************************************************************************/
+
+	    function loadFileBrowser(){	
+
+	//File browser in tab called 'Uploaded Files'
+	$('#file_browser_uploads').fileTree({
+		  root : '<%= stash 'slot' %>/<%= stash 'branch' %>/uploads/',
+		  script : '<%= url_for("filebrowser") %>',
+		  loadMessage : 'loading...',
+		  downloadOption: 0,
+	   }, function(file) {load_tabs(file);} 
+	);
+	
+	//File browser in tab called 'XML'
+	$('#file_browser_imports').fileTree({
+           root : '<%= stash 'slot' %>/<%= stash 'branch' %>/xml/',
+           script : '<%= url_for("filebrowser") %>',
+           loadMessage : 'loading...',
+           downloadOption: 1,
+        }, function(file) {load_tabs(file);}
+    );
+}
+
+loadFileBrowser();
+	
+	});
+</script>
+
+%#
+%# This file is part of LetsMT! Resource Repository.
+%#
+%# LetsMT! Resource Repository is free software: you can redistribute it
+%# and/or modify it under the terms of the GNU General Public License as
+%# published by the Free Software Foundation, either version 3 of the
+%# License, or (at your option) any later version.
+%#
+%# LetsMT! Resource Repository is distributed in the hope that it will be
+%# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with LetsMT! Resource Repository.  If not, see
+%# <http://www.gnu.org/licenses/>.
+%#

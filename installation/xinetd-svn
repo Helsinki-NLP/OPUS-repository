@@ -1,0 +1,24 @@
+# Begin /etc/xinetd.d/svn
+
+service svn
+{
+        port                    = REPLACE_SVN_PORT
+        socket_type             = stream
+        protocol                = tcp
+        wait                    = no
+        user                    = REPLACE_LETSMTUSER
+        server                  = /usr/bin/svnserve
+        server_args             = -i -r REPLACE_LETSMTDISKROOT
+	##
+	## optional things you may want to set
+	##
+	## - access only from localhost:
+	# only_from		= 127.0.0.1
+	##
+	## - other settings
+	# instances		= 50
+	# max_load		= 50
+	# nice			= 10
+}
+
+# End /etc/xinetd.d/svn

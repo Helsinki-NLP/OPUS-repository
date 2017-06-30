@@ -1,0 +1,267 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+
+=head1 NAME
+
+letsmt_fetch - a script for fetching training data from the LetsMT repositories
+
+=head1 USAGE
+
+ letsmt_fetch [OPTIONS] config_file
+
+=head1 OPTIONS
+
+ -u user ..... user name (overwrite user name in config file)
+ -i .......... "incremental" fetching of aligned data (fetch files one by one)
+
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=head1 DESCRIPTION
+
+letsmt_fetch reads a simple XML-based configuration file and fetches all the data files specified in 'tm', 'lm', 'tuning' and 'evaluation'.
+
+Configuration files have to look like the following example:
+
+ <SMT>
+   <!-- this part is relevant to corpus extraction from repository -->
+   <user>jorgtied</user>
+   <srclang>sv</srclang>
+   <trglang>en</trglang>
+   <tm id="1" name="para1">
+     <corpus>https://host/ws/letsmt/EUconst/xml/en-sv</corpus>
+     <corpus>https://host/ws/letsmt/OpenOffice/xml/en-sv</corpus>
+     <filter>
+       <sample skip="1000" />
+     </filter>
+   </tm>
+   <tm id="2" name="para2">
+     <corpus>https://host/ws/letsmt/KDE4/xml/en-sv</corpus>
+     <corpus>https://host/ws/letsmt/Europarl/xml/en-sv/ep-05-03-07.xml</corpus>
+     <corpus>https://host/ws/letsmt/Europarl/xml/en-sv/ep-05-03-08.xml</corpus>
+     <corpus>https://host/ws/letsmt/Europarl/xml/en-sv/ep-05-03-13.xml</corpus>
+     <filter>
+       <links type="1:1" />
+     </filter>
+   </tm>
+   <lm id="1" name ="mono1">
+     <corpus>https://host/ws/letsmt/EUconst/xml/en</corpus>
+     <corpus>https://host/ws/letsmt/KDE4/xml/en</corpus>
+     <filter>
+       <sample skip="1000" />
+     </filter>
+   </lm>
+   <tuning name="tune">
+     <corpus>https://host/ws/letsmt/EUconst/xml/en-sv</corpus>
+     <filter>
+       <sample size="500" />
+     </filter>
+   </tuning>
+   <evaluation name="eval">
+     <corpus>https://host/ws/letsmt/EUconst/xml/en-sv</corpus>
+     <filter>
+       <sample skip="500" />
+       <sample size="500" />
+     </filter>
+   </evaluation>
+
+   <!-- various training and decoding options begin here -->
+ </SMT>
+
+Note that you can use the filter arguments 'sample - skip' and 'sample - size' to create disjoint sets for training, tuning and evaluation from the same data set!
+In the example above, the first 500 sentence pairs from EUconst will be used for tuning, the following 500 for testing and the remaining for testing.
+
+Caveat: Other filters (like link type) may destroy this feature!
+
+If the corpus is a directory:
+All files XML-files in all its sub-directories will be processed.
+For the skip/size options this should be safe because the files are always processed in alphabetical order.
+
+Some filters are better to apply after fetching.
+For example, a length filter requires tokenzied text!
+Make sure to run the clean-corpus script first before using the output of letsmt_fetch for SMT training!
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use LetsMT;
+use LetsMT::Resource;
+use LetsMT::WebService;
+use LetsMT::Export;
+
+use File::Basename;
+use XML::Simple;
+
+use Getopt::Std;
+use vars qw($opt_h $opt_i $opt_u $opt_V);
+getopts('hiu:V');
+
+use Pod::Usage;
+pod2usage(
+    -message => 'letsmt_fetch - a script for fetching training data from the LetsMT repositories',
+    -verbose => 1,
+) if ($opt_h);
+
+sub usage
+{
+    pod2usage(
+        -message => 'letsmt_fetch - a script for fetching training data from the LetsMT repositories',
+        -verbose => 2,
+    );
+}
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+# show help
+&usage && exit if ($opt_h);
+
+
+my $config   = shift(@ARGV);
+my $exporter = new LetsMT::Export(-verbose => 1);
+
+&usage unless ($config);
+
+
+# check if the config file is a resource in the repository
+# if yes --> fetch it
+if (&LetsMT::Resource::is_letsmt_resource($config)){
+    $config = &LetsMT::WebService::fetch($config,$opt_u,'.') 
+        || die "cannot fetch config file '$config'!\n";
+}
+
+
+&usage && die "cannot open config-file '$config'!\n" unless ( -e $config );
+
+# parse configuration file
+my $xml
+    = XMLin( $config, ForceArray => [ 'tm', 'lm', 'corpus' ], KeyAttr => '' );
+die "cannot parse config-file '$config'!\n" if ( ref($xml) ne 'HASH' );
+
+my $user = $opt_u ? $opt_u : $xml->{user};
+
+#-------------------------------------------
+# fetch all training data sets
+#-------------------------------------------
+
+if ( ref( $xml->{tm} ) eq 'ARRAY' ) {
+    foreach my $tm ( @{ $xml->{tm} } ) {
+        &FetchParallel( $tm, $user );
+    }
+    $exporter->reset();
+}
+if ( ref( $xml->{lm} ) eq 'ARRAY' ) {
+    foreach my $lm ( @{ $xml->{lm} } ) {
+        &FetchMonolingual( $lm, $user );
+    }
+    $exporter->reset();
+}
+if ( ref( $xml->{tuning} ) eq 'HASH' ) {
+    &FetchParallel( $xml->{tuning}, $user );
+    $exporter->reset();
+}
+if ( ref( $xml->{evaluation} ) eq 'HASH' ) {
+    &FetchParallel( $xml->{evaluation}, $user );
+}
+
+###############################################################
+
+sub FetchParallel {
+    my ( $tm, $user ) = @_;
+
+    # need to have at least one corpus
+    return 0 unless ( ref( $$tm{corpus} ) eq 'ARRAY' );
+
+    my $outfile = $$tm{name} || 'para' . $$tm{id};
+    my $output = &LetsMT::Resource::make( undef, $user, $outfile );
+
+    $exporter->max(        get_filter( $tm, 'sample', 'size' ) );
+    $exporter->skip(       get_filter( $tm, 'sample', 'skip' ) );
+    $exporter->link_type(  get_filter( $tm, 'links', 'type' ) );
+
+    my $writer = $exporter->open($output,'moses');
+
+    foreach my $c ( @{ $$tm{corpus} } ) {
+        print "fetch & convert '$c --> $outfile' (may take some time) ...\n";
+        my $input = &LetsMT::Resource::make_from_path( $c, $user );
+        $exporter->export(
+            $writer, $input, undef,
+            download_all_mono => ! $opt_i
+        );
+    }
+    $writer->close();
+}
+
+
+# TODO: implement incremental fetching of monolingual corpora
+
+sub FetchMonolingual {
+    my ( $lm, $user ) = @_;
+
+    # need to have at least one corpus
+    return 0 unless ( ref( $$lm{corpus} ) eq 'ARRAY' );
+
+    my $outfile = $$lm{name} || 'mono' . $$lm{id};
+    my $output = &LetsMT::Resource::make( undef, $user, $outfile );
+
+    $exporter->max(        get_filter( $lm, 'sample', 'size' ) );
+    $exporter->skip(       get_filter( $lm, 'sample', 'skip' ) );
+
+    my $writer = $exporter->open($output,'text');
+
+    foreach my $c ( @{ $$lm{corpus} } ) {
+        print "fetch & convert '$c --> $outfile' (may take some time) ...\n";
+        my $input = &LetsMT::Resource::make_from_path( $c, $user );
+        $exporter->export( $writer, $input );
+    }
+    $writer->close();
+}
+
+
+
+sub get_filter {
+    my $config = shift;
+    my $key    = pop(@_);
+    my @para   = @_;
+
+    return undef unless ( ref($config) eq 'HASH' );
+    return undef unless ( ref( $$config{filter} ) eq 'HASH' );
+    $config = $$config{filter};
+
+    foreach (@para) {
+        return undef unless ( ref( $$config{$_} ) eq 'HASH' );
+        $config = $$config{$_};
+    }
+    return $$config{$key};
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

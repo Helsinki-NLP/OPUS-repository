@@ -1,0 +1,260 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+letsmt_run - execute other LetsMT scripts on SGE
+
+=head1 USAGE
+
+ letsmt_run [OPTION] -u USER -p PATH
+
+=head1 OPTIONS
+
+ -p path ..... relative path to job description file in XML format
+ -u user ..... user ID
+ -s slot ..... name of the slot (if given: add slot/user to the path)
+ -d .......... print debug output
+ -i .......... optinal job ID, used in log file names
+ 
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=head1 DESCRIPTION
+
+This is a script for executing other LetsMT scripts and programs on a cluster like the Oracle (Sun) Grid Engine, SGE.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use vars qw($opt_d $opt_h $opt_i $opt_p $opt_s $opt_u $opt_V);
+use Getopt::Std;
+use XML::LibXML;
+use Data::Dumper;
+use IPC::Run qw( run timeout );
+use IPC::Open3 qw( open3 );
+use File::Temp;
+
+use LetsMT;
+use LetsMT::WebService qw( all );
+use LetsMT::Repository::Result;
+use LetsMT::Resource;
+
+use LetsMT::Tools;
+
+getopts('dhi:p:s:u:');
+
+sub usage {
+    use Pod::Usage;
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -message => 'letsmt_run - execute other LetsMT scripts on SGE',
+        -verbose => 1,
+    );
+    print STDERR $_[0] if @_;
+    exit;
+}
+
+&usage if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+
+my $path = $opt_p || &usage ("Need to specify a path with option -p!\n");
+my $user = $opt_u || &usage ("Need to specify a user with option -u!\n");
+
+# make script arguments compatible with other scripts
+# --> allow to specify the slot as -s slot
+# --> add to path if specified
+
+if ($opt_s) {
+    $path = join( '/', $opt_s, $user, $path );
+}
+
+#Cat job description file via provided path from repository
+my $resource = LetsMT::Resource::make_from_path($path);
+
+my ($ok, $data) = LetsMT::WebService::get(
+    $resource,
+    uid    => $user,
+    action => 'cat',
+);
+die "could not fetch from $path" unless ($ok);
+
+#Parse output form cat and find actual job description
+my $parser  = new XML::LibXML;
+my $dom     = $parser->parse_string( $data );
+my $job_xml = $dom->findvalue('//list/entry');
+
+die "job description not found or empty in $data"
+    unless ($job_xml);
+
+if ($opt_d) {
+    print "Content of job description file:\n" . $job_xml . "\n";
+}
+
+#update meta data about status of fetching
+my %meta = ( job_status => 'fetched job file' );
+LetsMT::WebService::post_meta( $resource, uid => $user, %meta )
+    or die 'could not update meta data.';
+
+#parse job description file
+$parser = XML::LibXML->new;
+$dom    = $parser->parse_string($job_xml);
+my $commands = $dom->findnodes('/letsmt-job/commands/command')
+    or die 'could not find any commands in job description file.';
+
+#update meta data about status of parsing?
+
+my $command_nr = 0;
+my $fail_count = 0;
+
+#start executing tasks
+while ( my $command_element = $commands->shift ) {
+    $command_nr++;
+    my $command = $command_element->string_value;
+
+    if ($opt_d) {
+        print 'starting executing: ' . Dumper($command) . "\n";
+    }
+
+    # update meta data about starting a command
+    undef %meta;
+    %meta = ( 'command_' . $command_nr => 'starting' );
+    LetsMT::WebService::post_meta( $resource, uid => $user, %meta )
+        or die 'could not update meta data.';
+    if ($opt_d) {
+        print 'wrote meta data: ' . Dumper(%meta) . "\n";
+    }
+
+    if ($opt_d) {
+        # print 'command: ' . Dumper(@cmd) ."\n";
+        print 'command: ', $command, "\n";
+    }
+
+    my $job_ID = $opt_i ? $opt_i : int( rand(1000000000) );
+
+    my $out_file = "command_" . $job_ID . "_" . $command_nr . ".o";
+    my $err_file = "command_" . $job_ID . "_" . $command_nr . ".e";
+
+    my $status;
+    eval {
+        $status = system("$command > $out_file 2> $err_file");
+    };
+    warn $@ if $@;
+
+    # update meta data about finishing or failing of the command
+    if ( -s $err_file || $status ) {
+        %meta = ( 'command_' . $command_nr => 'failed' );
+        $fail_count++;
+    }
+    else {
+        %meta = ( 'command_' . $command_nr => 'done' );
+    }
+
+    # open( *OUT, ">$out_file" ) || die ('could not open file for STDOUT.');
+    # open( *ERR, ">$err_file" ) || die ('could not open file for ERROUT.');
+    # ## splitting is not good if there are escaped space symbols in file names
+    # ##    run \@cmd, \undef, \*OUT, \*ERR;
+    # my $pid = open3(undef, \*OUT, \*ERR, $command);
+    # waitpid( $pid, 0 );
+    # close(*OUT) || die ('could not close file for STDOUT.');
+    # close(*ERR) || die ('could not close file for ERROUT.');
+
+ 
+    # # update meta data about finishing or failing of the command
+    # if(-s $err_file) {
+    #     %meta = ( 'command_'.$command_nr => 'failed' );
+    #     $fail_count++;
+    # }
+    # else {
+    #     %meta = ( 'command_'.$command_nr => 'done' );
+    # }
+
+    LetsMT::WebService::post_meta( $resource, uid => $user, %meta )
+        || die 'could not update meta data.';
+
+    #upload stdout and stderr to given location from job description file
+    if ( -e $out_file ) {
+        my $resource_out = LetsMT::Resource::make_from_path( $path . '_out_' . $command_nr );
+        #my $resource_out  = LetsMT::Resource::new( slot=> 'slot', user => 'bob', path => 'out_'.$command_nr );
+        #print 'resource_out'.Dumper($resource_out);
+        LetsMT::WebService::post_file(
+            $resource_out,
+            $out_file,
+            uid => $user,
+        ) or die('could not upload STDOUT file.');
+        print "uploaded: ${path}_out${command_nr}\n"
+            if ($opt_d);
+        unlink($out_file);
+    }
+    else {
+        die('no STDOUT file found for upload');
+    }
+
+    if ( -e $err_file ) {
+        my $resource_err = LetsMT::Resource::make_from_path(
+            "${path}_err_${command_nr}" );
+        LetsMT::WebService::post_file(
+            $resource_err,
+            $err_file,
+            uid => $user,
+        ) or die('could not upload STDERR file.');
+        print "uploaded: ${path}_err_${command_nr}\n"
+            if ($opt_d);
+        unlink($err_file);
+    }
+    else {
+        die('no STDERR file found for upload.');
+    }
+
+}
+
+#update meta data that execution has finished
+if ($fail_count) {
+    %meta = ( job_status => "finished with $fail_count failed command(s)" );
+}
+else {
+    %meta = ( job_status => 'finished' );
+}
+LetsMT::WebService::post_meta( $resource, uid => $user, %meta )
+    || die 'could not update meta data.';
+
+#remove stdout and stderr files
+
+
+END {
+    chdir;
+    File::Temp::cleanup();
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

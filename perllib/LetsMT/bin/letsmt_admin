@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+
+=head1 NAME
+
+letsmt_admin - administrate LetsMT! Resource Repository
+
+=head1 USAGE
+
+ letsmt_admin [OPTIONS] COMMAND
+
+=head2 COMMANDS
+  list_slots ..... list all slots and branches in the repository
+  list_files ..... list all files (recursively) in a given path
+  check_meta ..... check meta data (find files without metadata records)
+  find_parallel .. find and list parallel documents
+
+=head1 OPTIONS
+  -s slot ........ name of the REST-slot (= corpus)
+  -u user ........ name of the REST-user
+  -d path ........ relative path (directory) inside of the repository
+  -f ............. fix problems (repair meta data etc ....)
+  -v ............. verbose output
+
+=head1 DESCRIPTION
+
+With this little script you can execute a few administrative actions.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                         # this is only needed if we use the
+#use lib $FindBin::Bin. '/../lib';    # development version in src ....
+
+use LetsMT::Admin;
+
+use Getopt::Std;
+use vars qw($opt_s $opt_u $opt_d $opt_f $opt_v);
+getopts('d:fs:u:v');
+
+my $command = shift;
+
+LetsMT::Admin::verbose_output if ($opt_v);
+
+if ( $command eq 'list_slots' ) {
+    &LetsMT::Admin::list_slots;
+}
+elsif ( $command eq 'list_files' ) {
+    &LetsMT::Admin::list_files( $opt_s, $opt_u, $opt_d );
+}
+elsif ( $command eq 'check_meta' ) {
+    &LetsMT::Admin::check_meta( $opt_s, $opt_u, $opt_d, $opt_f );
+}
+elsif ( $command eq 'find_parallel' ) {
+    &LetsMT::Admin::find_parallel_documents( $opt_s, $opt_u );
+}
+else {
+    use Pod::Usage;
+    pod2usage(
+        -message => 'letsmt_admin - execute LetsMT! Resource Repository administrative actions',
+        -verbose => 1,
+    );
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

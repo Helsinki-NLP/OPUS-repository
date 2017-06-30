@@ -1,0 +1,17 @@
+
+
+
+Language IDs and country codes
+==============================
+
+ISO639
+
+good documentation:
+http://www.w3.org/International/articles/language-tags/Overview.en.php
+
+More:
+http://www.langtag.net/
+long RFC: http://www.rfc-editor.org/rfc/rfc5646.txt
+t.ex.
+http://www.langtag.net/registries/lsr-language.txt
+http://www.langtag.net/registries/lsr-region.txt
