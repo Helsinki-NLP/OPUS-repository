@@ -664,6 +664,7 @@ sub get_user_parameter {
     my $xml = &LetsMT::WebService::get_group($user, $user, undef,
 					     action => 'showinfo');
 
+    return $para if ($xml=~/500 Can\'t connect/);
     my $data = XMLin($xml);
     if ( ref($data) eq 'HASH' ) {
         if ( ref( $$data{list} ) eq 'HASH' ) {
@@ -696,6 +697,7 @@ sub get_resource_parameter {
 
     my $response = &LetsMT::WebService::get_meta($resource);
 
+    return $para if ($response=~/500 Can\'t connect/);
     my $data = XMLin($response);
     if ( ref($data) eq 'HASH' ) {
         if ( ref( $$data{list} ) eq 'HASH' ) {
