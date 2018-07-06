@@ -14,8 +14,10 @@ FORCE  = false
 UBUNTU_BASE_PACKAGES = \
 		apache2 \
 		autoconf \
+		automake \
 		build-essential \
 		bzip2 \
+		cpanminus \
 		curl \
 		default-jre \
 		graphviz \
@@ -62,6 +64,7 @@ UBUNTU_BASE_PACKAGES = \
 		liblzo2-dev \
 		lzma-dev \
 		openjdk-6-jdk \
+		openjdk-7-jdk \
 		openssl \
 		perl-doc \
 		pkg-config \
@@ -80,17 +83,17 @@ MYSQL_UBUNTU_PACKAGES = mysql-server mysql-client libdbd-mysql-perl
 MOJO_UBUNTU_PACKAGES = ${MYSQL_UBUNTU_PACKAGES} libgd2-xpm-dev
 
 
-CPAN_MODULES = Class::Sniff \
+CPAN_MODULES = 	Archive::Zip \
+		Class::Sniff \
 		Encode::Locale \
 		File::GetLineMaxLength \
-		Filesys::DiskUsage \
-		Lingua::Identify::Blacklists \
 		Lingua::Sentence \
 		Module::Install \
 		Net::SSL \
 		Persistent::Base \
 		Persistent::DBI \
-		Test::More
+		Test::More \
+		Switch
 # TODO: do we still need the Persistent modules?
 
 MOJO_CPAN_MODULES = Authen::Captcha \
@@ -105,7 +108,8 @@ MOJO_CPAN_MODULES = Authen::Captcha \
 
 ## until I figure out how to pass mysql login details for the tests of this
 ## package, we simply force our way through the tests
-FORCECPAN_MODULES =
+FORCECPAN_MODULES = 	Filesys::DiskUsage \
+			Lingua::Identify::Blacklists
 MYSQL_FORCECPAN_MODULES = Persistent::MySQL
 
 # Tokyo Cabinet & Tokyo Tyrant (are included in lib/)
@@ -123,7 +127,9 @@ TOKYOTYRANT_PERL  = tokyotyrant-perl-1.16
 HUNALIGN = hunalign-1.1
 CHARED   = chared-1.2
 OPENNLP  = apache-opennlp-1.5.2-incubating
-FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
+FUSECOMPRESS = https://github.com/hexxellor/fusecompress.git
+# FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
+
 
 # just in case they are installed: remove the old TokyoCabinet packages
 
@@ -194,7 +200,7 @@ install-perlmodules: prepare-cpan
 
 ## also special: Inline::Java requires JAVA_HOME
 
-	$(APTGET) -qq install openjdk-6-jdk
+	$(APTGET) -qq install openjdk-7-jdk
 	cpanm Inline
 	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
 
@@ -341,12 +347,21 @@ software-opennlp:
 .PHONY: software-fusecompress
 software-fusecompress:
 	! ( ${FORCE} || ! which fusecompress ) || \
-	( svn checkout ${FUSECOMPRESS} fusecompress; \
+	( git clone ${FUSECOMPRESS}; \
 	  cd fusecompress; \
 	  ./autogen.sh; \
 	  ./configure; \
 	  make install; )
 	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
+
+# software-fusecompress:
+# 	! ( ${FORCE} || ! which fusecompress ) || \
+# 	( svn checkout ${FUSECOMPRESS} fusecompress; \
+# 	  cd fusecompress; \
+# 	  ./autogen.sh; \
+# 	  ./configure; \
+# 	  make install; )
+# 	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
 
 
 # modules necessary for Grid::Request (not used yet)

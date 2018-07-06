@@ -300,7 +300,7 @@ SITE_CONF = ${APACHE_CONF}/sites-available/$(LETSMTVIRTHOSTFILE)
 
 .PHONY: config-apache2
 config-apache2:
-	a2enmod apreq
+	a2enmod apreq2
 	a2enmod perl
 	a2enmod ssl
 	if \
@@ -312,6 +312,7 @@ config-apache2:
 	        /etc/apache2/ports.conf;\
 	fi
 	sed 	-e 's#REPLACE_LETSMTPORT#$(LETSMTPORT)#' \
+		-e 's#REPLACE_LETSMTDOCROOT#${LETSMTDOCROOT}#' \
 		-e 's#REPLACE_SERVER#$(LETSMTHOST)#' \
 		-e 's#REPLACE_CERTROOT#$(LETSMT_CERTROOT)#' \
 		-e 's#REPLACE_CERTPATH#$(LETSMT_CERTPATH)#' \
@@ -364,13 +365,17 @@ config-apache2:
 	echo "</IfModule>" >> apache.conf
 	echo 'APREQ2_ReadLimit $(SSL_READLIMIT)' > apreq.conf
 	cp --backup=numbered apache.conf $(SITE_CONF)
-	${INSTALL_DATA} -b -S .old apreq.conf ${APACHE_CONF}/conf.d/apreq.conf
+	${INSTALL_DATA} -b -S .old apreq.conf ${APACHE_CONF}/conf-available/apreq.conf
+	( cd ${APACHE_CONF}/conf-enabled && ln -sf ../conf-available/apreq.conf . )
 	a2ensite $(LETSMTVIRTHOSTFILE)
-	mkdir -p ${PREFIX}/www
+	mkdir -p ${LETSMTDOCROOT}
 	sed -i 's/^export LANG=.*/export LANG=${LANG}/' /etc/apache2/envvars
 	grep 'export LC_ALL=${LANG}' /etc/apache2/envvars > /dev/null || \
 	    echo 'export LC_ALL=${LANG}' >> /etc/apache2/envvars
 
+## OLD:
+#	${INSTALL_DATA} -b -S .old apreq.conf ${APACHE_CONF}/conf.d/apreq.conf
+# 	mkdir -p ${PREFIX}/www
 
 # create the general LetsMT configuration file
 # (this is only used for developer-specific settings now)

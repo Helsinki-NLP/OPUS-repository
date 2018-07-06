@@ -12,7 +12,8 @@
         CustomLog /var/log/apache2/ssl_access.log combined
 
         ## got to set this, but it points to nothing
-        DocumentRoot /usr/local/www
+        # DocumentRoot /usr/local/www
+	DocumentRoot REPLACE_LETSMTDOCROOT
         <Directory />
             AllowOverride None
             Options FollowSymLinks
