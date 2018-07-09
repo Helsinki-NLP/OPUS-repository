@@ -218,9 +218,7 @@ prepare-cpan:
 .PHONY: server-software
 server-software: software-base \
 	software-mysql \
-	software-sge-master \
-	software-sge-client \
-	software-sge-exec \
+	${BATCHQUEUE_SERVER_TARGETS} \
 	software-tokyocabinet \
 	software-tokyotyrant \
 	software-hunalign \
@@ -231,8 +229,7 @@ server-software: software-base \
 ## software required by the sge-clients
 .PHONY: sge-client-software
 sge-client-software: software-base \
-	software-sge-client \
-	software-sge-exec \
+	${BATCHQUEUE_CLIENT_TARGETS} \
 	software-hunalign \
 	software-chared \
 	software-opennlp
@@ -265,7 +262,6 @@ software-mysql:
 		$(APTGET) install ${MYSQL_UBUNTU_PACKAGES}; \
 	fi
 
-
 .PHONY: software-sge-master
 software-sge-master:
 	$(APTGET) -qq install gridengine-master
@@ -277,6 +273,31 @@ software-sge-client:
 .PHONY: software-sge-exec
 software-sge-exec:
 	$(APTGET) -qq install gridengine-exec
+
+
+
+## install SLURM and SLURM configuration
+
+.PHONY: software-slurm
+software-slurm: /etc/munge/munge.key \
+		/etc/slurm-llnl/slurm.conf \
+		/etc/slurm-llnl/cgroup.conf
+	$(APTGET) -qq install slurm-llnl
+	service slurm-llnl start
+
+/etc/munge/munge.key:
+	$(APTGET) -qq install munge
+	/usr/sbin/create-munge-key
+	service munge start
+
+/etc/slurm-llnl/cgroup.conf: cgroup.conf
+	${INSTALL_DATA} $< $@
+
+/etc/slurm-llnl/slurm.conf: slurm.conf
+	sed -e "s#REPLACE_SLURM_SERVER#${SLURM_SERVER}#" \
+	    -e "s#REPLACE_SLURM_NODES#${SLURM_NODES}#" \
+	< $< > $@
+
 
 
 .PHONY: software-tokyocabinet

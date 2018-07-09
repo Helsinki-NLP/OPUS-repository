@@ -174,8 +174,8 @@ prepare-directories:
 	mkdir -p ${LETSMTLOG_DIR}
 	chmod ago+w ${LETSMTLOG_DIR}
 	chmod ago+s ${LETSMTLOG_DIR}
-	mkdir -p ${LETSMTLOG_DIR}/sge_jobs
-	chmod ago+rw ${LETSMTLOG_DIR}/sge_jobs
+	mkdir -p ${LETSMTLOG_DIR}/batch_jobs
+	chmod ago+rw ${LETSMTLOG_DIR}/batch_jobs
 	chmod ago+rwxt ${LETSMT_TMP}
 
 
@@ -332,6 +332,7 @@ config-apache2:
 	echo "        PerlSetEnv LETSMTUSER ${LETSMTUSER}" >> apache.conf
 	echo "        PerlSetEnv LETSMTCONF ${LETSMTCONF}" >> apache.conf
 	echo "        PerlSetEnv LETSMTVIRTHOSTFILE ${LETSMTVIRTHOSTFILE}" >> apache.conf
+	echo "        PerlSetEnv LETSMT_BATCHQUEUE_MANAGER ${BATCHQUEUE_MANAGER}" >> apache.conf
 	echo "        PerlSetEnv LOG4PERLCONF ${LOG4PERLCONF}" >> apache.conf
 	echo "        PerlSetEnv LETSMTDISKROOT ${LETSMTDISKROOT}" >> apache.conf
 	echo "        PerlSetEnv LETSMT_URL ${LETSMT_URL}" >> apache.conf
@@ -392,6 +393,7 @@ config-conf:
 	@echo "export LETSMTUSER=${LETSMTUSER}" >> conf.sh
 	@echo "export LETSMTCONF=${LETSMTCONF}" >> conf.sh
 	@echo "export LETSMTVIRTHOSTFILE=${LETSMTVIRTHOSTFILE}" >> conf.sh
+	@echo "export LETSMT_BATCHQUEUE_MANAGER ${BATCHQUEUE_MANAGER}" >> conf.sh
 	@echo "export LOG4PERLCONF=${LOG4PERLCONF}" >> conf.sh
 	@echo "export PERL5LIB=${PERL5LIB}" >> conf.sh
 	@echo "export VC_BACKEND=${VC_BACKEND}" >> conf.sh

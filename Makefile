@@ -6,7 +6,6 @@ include Makefile.conf
 ## Communicate variables to sub-makes
 .EXPORT_ALL_VARIABLES:
 
-
 #########################################################################
 
 ## install:  For "monolithic" installations.

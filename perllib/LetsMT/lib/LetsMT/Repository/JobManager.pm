@@ -469,6 +469,8 @@ sub run_import_resource{
 }
 
 
+
+
 =head2 C<submit>
 
  LetsMT::Repository::JobManager::submit (
@@ -492,7 +494,7 @@ sub submit {
     my $logger = get_logger(__PACKAGE__);
     $logger->debug( "path: " . $path );
 
-    my $logDir = $ENV{'LETSMTLOG_DIR'} . '/sge_jobs';
+    my $logDir = $ENV{'LETSMTLOG_DIR'} . '/batch_jobs';
     my $workDir = $ENV{'UPLOADDIR'};
 
     my $jobID   = "job_" . time() . "_" . int( rand(1000000000) );
@@ -518,14 +520,15 @@ sub submit {
     );
     $metaDB->close();
 
-    #submit job
-    LetsMT::Repository::Safesys::sys(
-        "qsub -N $jobID -S /bin/bash -q letsmt -wd $workDir -e $jobErr -o $jobOut -b y \"$job\""
-    );
-
-    # check if job was submitted
     my $status = undef;
-    check_status( message => \$status, job_id => $jobID );
+
+    ## submit either to SGE ot SLURM
+    if ($ENV{LETSMT_BATCHQUEUE_MANAGER} eq 'sge'){
+	$status = submit_sge_job($job,$jobID,$workDir,$jobOut,$jobErr);
+    }
+    else{
+	$status = submit_slurm_job($job,$jobID,$workDir,$jobOut,$jobErr);
+    }
 
     $logger->debug( 'Job status:' . $status );
 
@@ -549,6 +552,11 @@ sub submit {
 
     return 1;
 }
+
+
+
+
+
 
 
 =head2 C<check_status>
@@ -575,36 +583,17 @@ sub check_status {
     #if jobID was set or could be found in mete data
     if ($jobID) {
 
-        my $statusXML = undef;
-
-        #query for status of the job
-        open( STATUS_XML, "qstat -xml -u $ENV{LETSMTUSER} |" )
-            or raise( 8, "Can't run program: $!\n" );
-        while (<STATUS_XML>) {
-            $statusXML .= $_;
-        }
-        close(STATUS_XML);
-
-        #parse XML status
-        if ($statusXML) {
-            my $parser = new XML::LibXML;
-            my $doc    = $parser->parse_string($statusXML);
-
-            my $status = $doc->findvalue(
-                '//job_list[JB_name="' . $jobID . '"]/@state'
-            );
-
-            #if status string found, return it
-            if ($status) {
-                $$message = $status;
-                return 1;
-            }
-            else {
-                $$message = "no job with ID '$jobID' found";
-                return 0;
-            }
-        }
-
+	my $status = undef;
+	if ($ENV{LETSMT_BATCHQUEUE_MANAGER} eq 'sge'){
+	    $status = check_sge_job_status($jobID);
+	}
+	else{
+	    $status = check_slurm_job_status($jobID);
+	}
+	if ($status){
+	    $$message = $status;
+	    return 1;
+	}
         $$message = 'could not get status xml from qstat';
         return 0;
     }
@@ -640,13 +629,13 @@ sub delete {
     if ($jobID) {
         my $status = undef;
 
-        #try to delete job
-        open( STATUS, "qdel $jobID |" ) or raise( 8, "Can't run program: $!\n" );
-        while (<STATUS>) {
-            $status .= $_;
-        }
-        close(STATUS);
-
+	if ($ENV{LETSMT_BATCHQUEUE_MANAGER} eq 'sge'){
+	    $status = delete_sge_job($jobID);
+	}
+	else{
+	    $status = delete_slurm_job($jobID);
+	}
+	
         #TODO: delete also meta data and old log files!
 
         get_logger(__PACKAGE__)->debug( 'Status:' . $status );
@@ -682,6 +671,136 @@ sub get_ID_from_path {
 
     return $search_result;
 }
+
+
+
+
+## SLURM-specific functions
+
+
+sub submit_slurm_job {
+    my ($job,$jobID,$workDir,$jobOut,$jobErr) = @_;
+
+    my ($fh, $filename) = tempfile();
+    print $fh "#!/bin/bash\n";
+    print $fh $job,"\n";
+    close $fh;
+
+    LetsMT::Repository::Safesys::sys(
+        "sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename"
+    );
+
+    # check if job was submitted
+    my $status = undef;
+    check_status( message => \$status, job_id => $jobID );
+    return $status;
+}
+
+
+sub check_slurm_job_status{
+    my $jobID = shift;
+
+
+    #query for status of the job
+    open( STATUS, "squeue -o '%j %i %T' -n $jobID |" )
+	or raise( 8, "Can't run program: $!\n" );
+
+    <STATUS>;
+    my $output = <STATUS>;
+    close STATUS;
+
+    if ($output){
+	my ($name,$id,$status) = split(/\s/,$output);
+	return wantarray ? ($id,lc($status)) : lc($status);
+    }
+    return wantarray ? (undef,"no job with ID '$jobID' found") : "no job with ID '$jobID' found";
+}
+
+
+sub delete_slurm_job{
+    my $jobID = shift;
+
+    my ($id,$status) = check_slurm_job_status($jobID);
+
+    if ($id){
+	$status = undef;
+
+	#try to delete job
+	open( STATUS, "scancel $id |" ) or raise( 8, "Can't run program: $!\n" );
+	while (<STATUS>) {
+	    $status .= $_;
+	}
+	close(STATUS);
+    }
+    return $status;
+}
+
+
+
+
+## SGE-specific functions
+
+sub submit_sge_job {
+    my ($job,$jobID,$workDir,$jobOut,$jobErr) = @_;
+
+    #submit job
+    LetsMT::Repository::Safesys::sys(
+        "qsub -N $jobID -S /bin/bash -q letsmt -wd $workDir -e $jobErr -o $jobOut -b y \"$job\""
+    );
+
+    # check if job was submitted
+    my $status = undef;
+    check_status( message => \$status, job_id => $jobID );
+    return $status;
+}
+
+
+sub check_sge_job_status{
+    my $jobID = shift;
+
+    my $statusXML = undef;
+
+    #query for status of the job
+    open( STATUS_XML, "qstat -xml -u $ENV{LETSMTUSER} |" )
+	or raise( 8, "Can't run program: $!\n" );
+    while (<STATUS_XML>) {
+	$statusXML .= $_;
+    }
+    close(STATUS_XML);
+
+    #parse XML status
+    if ($statusXML) {
+	my $parser = new XML::LibXML;
+	my $doc    = $parser->parse_string($statusXML);
+
+	my $status = $doc->findvalue(
+	    '//job_list[JB_name="' . $jobID . '"]/@state'
+            );
+
+	return $status;
+    }
+    return  "no job with ID '$jobID' found";
+}
+
+
+sub delete_sge_job{
+    my $jobID = shift;
+
+    my $status = undef;
+
+    #try to delete job
+    open( STATUS, "qdel $jobID |" ) or raise( 8, "Can't run program: $!\n" );
+    while (<STATUS>) {
+	$status .= $_;
+    }
+    close(STATUS);
+    return $status;
+}
+
+
+
+
+
 
 
 1;
