@@ -15,9 +15,9 @@ use LetsMT::WebService;
 use Mojo::Loader;
 
 # Reloadable Model
-my $modules = Mojo::Loader->search('WebInterface::Model');
+my $modules = Mojo::Loader->find_modules('WebInterface::Model');
 for my $module (@$modules) {
-    Mojo::Loader->load($module)
+    Mojo::Loader->load_class($module)
 }
 
 my $DB;

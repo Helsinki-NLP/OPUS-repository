@@ -24,7 +24,7 @@ sub index {
     my $dom = Mojo::DOM->new($meta_result);
 
     if (  !$dom->find('status')->size
-        || $dom->at('status[type]')->attrs('type') eq 'error' )
+        || $dom->at('status[type]')->attr('type') eq 'error' )
     {
         $self->flash( message_error => 'Hopsan! Database error!' );
         $self->redirect_to('/error');

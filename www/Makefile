@@ -40,9 +40,9 @@ install:
 	    /etc/init.d/grenzschnitte
 	update-rc.d grenzschnitte defaults
 	${INSTALL_DATA} -b -S .old etc/apache-vhost.conf \
-	    /etc/apache2/sites-available/grenzschnitte
+	    /etc/apache2/sites-available/grenzschnitte.conf
 	a2enmod headers proxy proxy_http
-	a2ensite grenzschnitte
+	a2ensite grenzschnitte.conf
 	service grenzschnitte start
 	service apache2 reload
 # Inform

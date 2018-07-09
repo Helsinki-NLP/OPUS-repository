@@ -29,7 +29,7 @@ $ENV{MOJO_APP} ||= 'WebInterface';
 # $ENV{MOJO_REVERSE_PROXY} = 1;
 
 # Start commands
-Mojolicious::Commands->start;
+Mojolicious::Commands->start_app($ENV{MOJO_APP}, 'daemon', '-l', 'http://*:8080');
 
 
 

@@ -1,6 +1,6 @@
 package WebInterface;
 
-use strict;
+# use strict;
 use warnings;
 
 use open qw(:std :utf8);
@@ -34,7 +34,7 @@ sub startup {
     # Setup the config file web_interface.json
     my $config = $self->plugin('JSONConfig');
 
-    $self->secret('JkdjUOje74KJDh209');
+    $self->secrets(['JkdjUOje74KJDh209']);
     # $self->mode('development');
     $self->mode('deployment');
     $self->sessions->default_expiration(86400); #one day
@@ -50,7 +50,7 @@ sub startup {
     $self->helper(system_user => sub {return $self->config->{'system_user'}});
 
     # Load and init Model
-    Mojo::Loader->load('WebInterface::Model');
+    Mojo::Loader->load_class('WebInterface::Model');
 
     print STDERR $self->config->{'db-password'};
     WebInterface::Model->init( #$config->{db} ||
@@ -75,17 +75,17 @@ sub startup {
     $self->helper(captcha => sub {
         return new Authen::Captcha (
             data_folder   => $ENV{LETSMT_TMP} || '/tmp',  #$self->home->rel_dir('tmp'),
-            output_folder => $self->home->rel_dir('public'),
+            output_folder => $self->home->rel_file('public'),
             debug         => 0,
         )
     });
 
     my $r = $self->routes;
-    $r->namespace('WebInterface::Controller');
+    $r->namespaces(['WebInterface::Controller']);
 
     # Bridge to check login status of user
     # all routes based on this are only accessible for users that are logged in
-    my $check = $r->bridge('/')->to(cb => sub {
+    my $check = $r->route('/')->to(cb => sub {
         my $self = shift;
 
         unless ( $self->is_user_authenticated ) {
