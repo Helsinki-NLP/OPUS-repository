@@ -6,7 +6,7 @@ LetsMT::Repository::AnyVC - generic storage backend for a version controlled fil
 
 =head1 DESCRIPTION
 
-This module returns an object instance of the selected version-control-system backend (default = SVNServer)
+This module returns an object instance of the selected version-control-system backend (default = Git)
 
 =cut
 
@@ -33,7 +33,10 @@ sub new {
     if ($self{vc}=~/svn[-_]?(local|file)/){
 	return new LetsMT::Repository::Storage::SVNLocal(@_);
     }
-    return new LetsMT::Repository::Storage::SVNServer(@_);
+    if ($self{vc}=~/svn[-_]/){
+	return new LetsMT::Repository::Storage::SVNServer(@_);
+    }
+    return new LetsMT::Repository::Storage::Git(@_);
 }
 
 

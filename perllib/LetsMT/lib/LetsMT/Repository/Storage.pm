@@ -10,6 +10,7 @@ use strict;
 
 use open qw(:std :utf8);
 
+use LetsMT::Repository::Storage::Git;            # git repository
 use LetsMT::Repository::Storage::SVNLocal;       # local svn repositories (don't use!)
 use LetsMT::Repository::Storage::SVNServer;      # svn server on localhost
 use LetsMT::Repository::Storage::FileSystem;     # plain file system
@@ -36,6 +37,7 @@ Implemented backends:
 =cut
 
 our %BACKENDS = (
+    git        => 'LetsMT::Repository::Storage::Git',
     svn_local  => 'LetsMT::Repository::Storage::SVNLocal',
     svn_server => 'LetsMT::Repository::Storage::SVNServer',
     filesystem => 'LetsMT::Repository::Storage::FileSystem',
@@ -95,7 +97,7 @@ sub add_file { return 0; }
 sub commit   { return 0; }
 sub checkout { return 0; }
 sub revisions{ return 0; }
-
+sub revision { return ''; }
 
 1;
 

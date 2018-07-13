@@ -311,11 +311,12 @@ sub list {
     my $path_to_display = join( '/',
         $params{repos}, $params{dir}
     );
+    my $revision = $params{revision} || $self->revision( $owner, $path );
 
     my $content = qq(<?xml version="1.0"?><list path="/$path_to_display">);
 
     if ( -f $path ) {
-        $content .= &_list_file( $path, $owner );
+        $content .= &_list_file( $path, $owner, $revision );
     }
     elsif ( -d $path ) {
         opendir( my $dh, $path )
@@ -327,11 +328,12 @@ sub list {
         while ( my $f = decode( 'utf8', readdir $dh ) ) {
             next if ( $f =~ /^\.+$/ );
             next if ( $f =~ /^\.svn$/ );
+            next if ( $f =~ /^\.git$/ );
             if ( -f "$path/$f" ) {
-                $content .= &_list_file( "$path/$f", $owner );
+                $content .= &_list_file( "$path/$f", $owner, $revision );
             }
             elsif ( -d "$path/$f" ) {
-                $content .= &_list_dir( "$path/$f", $owner );
+                $content .= &_list_dir( "$path/$f", $owner, $revision );
             }
         }
         closedir $dh;
@@ -351,6 +353,8 @@ sub _list_file
 {
     my $file  = shift or return "";
     my $owner = shift or die "invalid input";
+    my $revision = shift;
+
     return "" unless -f $file;
 
     my $f = basename( $file );
@@ -360,7 +364,7 @@ sub _list_file
         <entry kind="file">
             <name>$f</name>
             <size>$size</size>
-            <commit revision="">
+            <commit revision="$revision">
                 <author>$owner</author>
                 <date>$mtime</date>
             </commit>
@@ -371,7 +375,7 @@ sub _list_file
 
 =head2 C<_list_dir>
 
- $entry = &_list_dir( $path, $owner )
+ $entry = &_list_dir( $path, $owner, $revision )
 
 =cut
 
@@ -379,6 +383,8 @@ sub _list_dir
 {
     my $dir   = shift or return "";
     my $owner = shift or die "invalid input";
+    my $revision = shift;
+
     return "" unless -d $dir;
 
     my $f = basename( $dir );
@@ -386,7 +392,7 @@ sub _list_dir
     return qq(
         <entry kind="dir">
             <name>$f</name>
-            <commit revision="">
+            <commit revision="$revision">
                 <author>$owner</author>
                 <date>$mtime</date>
             </commit>
