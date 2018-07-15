@@ -172,10 +172,10 @@ sub _open_linkGrp {
     my $str = '<linkGrp targType="s"';
 
     # add revision attributes if necessary
-    $fromDoc =~ s/@([0-9]+)$// and $str .= ' fromDocRev="'.$1.'"';
-    $toDoc   =~ s/@([0-9]+)$// and $str .= ' toDocRev="'.$1.'"';
-    $fromDoc =~ s/@([0-9]*)$//;
-    $toDoc   =~ s/@([0-9]*)$//;
+    $fromDoc =~ s/@(\S+)$// and $str .= ' fromDocRev="'.$1.'"';
+    $toDoc   =~ s/@(\S+)$// and $str .= ' toDocRev="'.$1.'"';
+    $fromDoc =~ s/@(\S*)$//;
+    $toDoc   =~ s/@(\S*)$//;
 
     return  $str . ' fromDoc="' . $fromDoc . '" toDoc="' . $toDoc . "\">\n";
 }

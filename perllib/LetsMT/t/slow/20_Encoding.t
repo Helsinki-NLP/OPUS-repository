@@ -62,7 +62,7 @@ you can import a file with unicode characters in its name. (import)
 
 my $file = 'tmx/öäå.tmx';
 my $result = `letsmt_rest -u $uid -s $slot import $Bin/data/$file 2>&1`;
-like( $result, qr(^Upload 'uploads/$file' ... done: mkdir add .*,submitted job with ID .*),
+like( $result, qr(^Upload 'uploads/$file' ... done: mkdir .*,submitted job with ID .*),
     "TMX-file with unicode characters using letsmt_rest"
 );
 
@@ -151,7 +151,7 @@ you can import a file with unicode characters in its name. (PUT storage/...&acti
 =cut
 
 my $location = "storage/$slot/$uid/uploads/tmx/$sub_path/kažociņš.tmx";
-$result = `$ENV{LETSMT_CONNECT} --form "payload=\@data/tmx/small.tmx" -X PUT "$host/$location?uid=$uid&action=import"`;
+$result = `$ENV{LETSMT_CONNECT} --form "payload=\@$Bin/data/tmx/small.tmx" -X PUT "$host/$location?uid=$uid&action=import"`;
 is_deeply(
     xml_to_hash( $result ), success_hash( "/$location", 'PUT' ),
     "PUT TMX-file with unicode characters using cURL"
@@ -184,7 +184,7 @@ $file = 'small_downloaded.tmx';
 $result = `$ENV{LETSMT_CONNECT} -o "$tmpdir/$file" -X GET "$host/storage/$slot/$uid/uploads/tmx/$sub_path/kažociņš.tmx?uid=$uid&action=download&archive=0"`;
 
 ok( -f "$tmpdir/$file", "- check downloaded file exists" );
-is( compare( 'data/tmx/small.tmx', "$tmpdir/$file" ),
+is( compare( "$Bin/data/tmx/small.tmx", "$tmpdir/$file" ),
     0, "- check content: content of uploaded and downloaded file match"
 );
 unlink "$tmpdir/$file";

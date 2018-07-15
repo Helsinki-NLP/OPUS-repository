@@ -131,6 +131,8 @@ sub add {
         my $path = join( '/',
             $self->{partition}, $repos, $branch, $dir, $file
         );
+	get_logger(__PACKAGE__)->error("git: $source not found") unless (-e $source);
+	get_logger(__PACKAGE__)->info("git: move $source to $path");
         move( $source, $path ) || raise( 8, $! );
         return $path;
     }
@@ -182,7 +184,6 @@ sub remove {
 
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     # make the target directory
     $self->mkdir(
         '.DELETED.',   $params{repos} . '/' . $params{branch},

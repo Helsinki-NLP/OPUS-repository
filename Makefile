@@ -86,6 +86,10 @@ test:
 	cd ${CURDIR}/perllib/LetsMT/t/fast && bash -c 'prove -r'
 	@echo "For thorough testing, run '$(MAKE) test-all'."
 
+.PHONY: test-slow
+test-slow:
+	cd ${CURDIR}/perllib/LetsMT/t/slow && bash -c 'prove -r'
+
 .PHONY: test-all
 test-all:
 	cd ${CURDIR}/perllib/LetsMT/t && bash -c 'prove -r'

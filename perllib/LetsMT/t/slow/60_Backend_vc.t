@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-60_Backend_svn_local.t - test storage API with vc backend
+60_Backend_vc.t - test storage API with vc backend
 
 =head1 DESCRIPTION
 

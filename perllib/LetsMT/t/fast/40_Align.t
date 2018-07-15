@@ -83,9 +83,11 @@ is( $result, 1, "DOWNLOAD sentence-alignment file" );
 
 =cut
 
-is( compare( $algres->local_path, "$Bin/data/align/en-sv/1988.xml" ),
+my $algfile = $algres->local_path;
+system( "sed -e 's/ fromDocRev=\"[^\"]*\"//' -e 's/ toDocRev=\"[^\"]*\"//' < $algfile > $algfile.tmp ");
+is( compare( "$algfile.tmp", "$Bin/data/align/en-sv/1988.xml" ),
     0, "sentence alignment file is correct" );
-
+unlink( "$algfile.tmp" );
 
 =item *
 
@@ -112,8 +114,13 @@ my $response = LetsMT::WebService::get( $algres, uid => $uid );
 
 $result = LetsMT::WebService::get_resource( $algres, uid => $uid );
 is( $result, 1, "DOWNLOAD sentence alignment file" );
-is( compare( $algres->local_path, "$Bin/data/align/en-sv/1988b.xml" ),
+
+my $algfile = $algres->local_path;
+system( "sed -e 's/ fromDocRev=\"[^\"]*\"//' -e 's/ toDocRev=\"[^\"]*\"//' < $algfile > $algfile.tmp ");
+is( compare( "$algfile.tmp", "$Bin/data/align/en-sv/1988b.xml" ),
     0, "sentence alignment file is correct" );
+unlink( "$algfile.tmp" );
+
 
 # TODO: test alignment with letsmt_align script .....
 

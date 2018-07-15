@@ -1,5 +1,17 @@
 package LetsMT::Repository::Storage::Git;
 
+#
+# TODO's
+# 
+# * should we create empty .gitkeep files to keep 
+#   empty dir's in the repository? 
+#   --> this would also make "git rm -r" work correctly 
+#
+# * do we need repository locks when adding files?
+#  
+#
+
+
 =head1 NAME
 
 LetsMT::Repository::Git - storage backend using Git
@@ -15,6 +27,7 @@ use strict;
 use parent 'LetsMT::Repository::Storage::FileSystem';
 
 use open qw(:std :utf8);
+use Encode qw(decode decode_utf8 is_utf8);
 
 use LetsMT;
 use LetsMT::Repository::Storage::FileSystem;
@@ -27,6 +40,7 @@ use File::Basename qw/ basename dirname /;
 use File::Copy;
 use File::Temp qw(tempfile tempdir);
 use File::Path;
+use File::Touch;
 
 use Log::Log4perl qw(get_logger :levels);
 use Data::Dumper;
@@ -70,6 +84,74 @@ sub init {
 }
 
 
+sub _add_files{
+    my ($self, $user, $repos, $dir) = @_;
+
+    get_logger(__PACKAGE__)->debug("git: add_files $user $repos $dir");
+
+    my $repohome = join( '/', $self->{partition}, $repos );
+
+    my $pwd = getcwd();
+    chdir($repohome);
+    get_logger(__PACKAGE__)->debug("git add $dir in $repohome");
+    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'add', $dir );
+    chdir($pwd);
+
+    unless ($success) {
+	my @err_lines = <$err>;
+	raise( 8, "cannot add files: " . Dumper(@err_lines) );
+    }
+
+    my ( $success, $ret, $out, $err ) = 
+	$self->commit( $user, $repos, $dir, 'add '.$dir);
+
+#    unless ($success) {
+#	my @err_lines = <$err>;
+#	raise( 8, "cannot commit files: " . Dumper(@err_lines) );
+#    }
+    return 1;
+}
+
+
+=head2 C<mkdir>
+
+=cut
+
+sub mkdir {
+    my $self = shift;
+    my ( $repos, $branch, $user, $dir ) = @_;
+
+    get_logger(__PACKAGE__)->debug("git: mkdir $repos $branch $user $dir");
+    if ( $self->SUPER::mkdir(@_) ){
+
+	my $repohome = join( '/', $self->{partition}, $repos );
+	my $file = join( '/', $branch, $dir, '.gitkeep' );
+	touch( join( '/', $repohome, $file ) );
+	$self->_add_files($user, $repos, $file);
+	return 1;
+    }
+}
+
+=head2 C<copy>
+
+ $storage->copy ($user, $slot, $source, $target)
+
+copy an entire sub-tree
+
+Returns: true (an exception is raised on failure).
+
+=cut
+
+sub copy {
+    my $self = shift;
+    my ( $user, $slot, $src, $trg ) = @_;
+
+    if ( $self->SUPER::copy(@_) ){
+	return $self->_add_files( $user, $slot, $trg )
+    }
+    return 0;
+}
+
 
 =head2 C<add>
 
@@ -85,11 +167,13 @@ sub add {
     my $self = shift;
     my ( $user, $repos, $branch, $dir, $file, $source ) = @_;
 
+
     # if ( $self->mkdir( $repos, $branch, $user, $dir ) ) {
     #     my $homedir  = join( '/', $self->{partition}, $repos );
     #     my $fullpath = join( '/', $self->{partition}, $repos, $branch, $dir, $file );
     #     my $relpath  = join( '/', $branch, $dir, $file );
 
+    # 	get_logger(__PACKAGE__)->error("git: $source not found") unless (-e $source);
     # 	get_logger(__PACKAGE__)->info("git: move $source to $fullpath");
     #     move( $source, $fullpath ) || raise( 8, $! );
 
@@ -114,10 +198,10 @@ sub add {
 	}
 
 	my ( $success, $ret, $out, $err ) = 
-	    $self->commit( $user, $fullpath, 'add '.$dir.'/'.$file);
+	    $self->commit( $user, $repos, $relpath, 'add '.$relpath);
 
 	unless ($success) {
-	    unlink($fullpath);
+#	    unlink($fullpath);
 	    my @err_lines = <$err>;
 	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
 	}
@@ -174,38 +258,103 @@ sub remove {
     map { $params{$_} = "" unless ( defined( $params{$_} ) ) }
         qw/ repos dir user /;
 
-    ## use parent if we want to remove the entire repo
-    unless ($params{dir}){
-	return $self->SUPER::remove(@_);
+    my $repohome = join( '/', $self->{partition}, $params{repos} );
+
+    get_logger(__PACKAGE__)->info("git: rm -r $params{dir} in ".$repohome);
+
+    ## delete all files in subtree
+    if ($params{dir}){
+
+	my $pwd = getcwd();
+	chdir( $repohome );
+	my ($success,$ret,$out,$err) = &run_cmd( 'git',
+						 'rm',
+						 '-r',
+						 $params{dir} );
+	chdir($pwd);
+
+	unless ($success) {
+	    my @err_lines = <$err>;
+	    raise( 8, "cannot remove: " . Dumper(@err_lines) );
+	}
+
+	my ( $success, $ret, $out, $err ) = 
+	    $self->commit( $params{user}, $params{repos}, $params{dir}, 'remove '.$params{dir});
+
+	unless ($success) {
+	    my @err_lines = <$err>;
+	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
+	}
+	return 1;
     }
 
-    my $path = join( '/',
-        $self->{partition}, $params{repos}, $params{dir}
-    );
 
+    ## remove entire repository
+    ## make a backup in 
+    else{
 
-    my $pwd = getcwd();
-    chdir( dirname($path) );
-    get_logger(__PACKAGE__)->info("git: remove $path");
-    my ($success,$ret,$out,$err) = &run_cmd( 'git',
-					     'rm',
-					     '-r',
-					     basename($path) );
-    chdir($pwd);
-
-    unless ($success) {
-	my @err_lines = <$err>;
-	raise( 8, "cannot remove: " . Dumper(@err_lines) );
+	## THIS LOOKS QUITE DANGEROUS
+	## TODO: MAKE SURE THAT NOTHING CAN GO WRONG HERE
+	my $backup = join( '/', $self->{partition},'.DELETED.', $params{repos} );
+	if ( -d $backup ) {
+	    if ($params{repos} && $params{repos}!~/^\./ && 
+		$params{repos}!~/\.\.\// && $params{repos}!~/\s/){
+		if ($params{partition} && $params{partition}!~/^\./ 
+		    && $params{partition}!~/\.\.\//){
+		    rmtree($backup)
+			or raise( 8, "cannot remove $backup (" . $! . ')' );
+		}
+	    }
+	}
+	raise( 8, "cannot copy over to $backup") if ( -d $backup );
+	move( $repohome, $backup ) || raise( 8, $! );
+	return 1;
     }
 
-    my ( $success, $ret, $out, $err ) = 
-	$self->commit( $params{user}, $path, 'remove '.$params{dir});
 
-    unless ($success) {
-	my @err_lines = <$err>;
-	raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-    }
-    return 1;
+
+
+    # my $path = join( '/', $self->{partition}, $params{repos}, $params{dir} );
+
+    # if ($self->SUPER::remove(%params)){
+    # 	$self->commit( $params{user}, $path, 'remove '.$params{dir});
+    # 	return 1 unless (-e $path);
+    # }
+    # return 0;
+
+
+    # ## use parent if we want to remove the entire repo
+    # unless ($params{dir}){
+    # 	return $self->SUPER::remove(@_);
+    # }
+
+    # my $path = join( '/',
+    #     $self->{partition}, $params{repos}, $params{dir}
+    # );
+
+    # my $pwd = getcwd();
+    # chdir( dirname($path) );
+    # get_logger(__PACKAGE__)->info("git: rm -r $params{dir} in ".dirname($path));
+    # my ($success,$ret,$out,$err) = &run_cmd( 'git',
+    # 					     'rm',
+    # 					     '-r',
+    # 					     $params{dir} );
+    # chdir($pwd);
+
+    # unless ($success) {
+    # 	my @err_lines = <$err>;
+    # 	raise( 8, "cannot remove: " . Dumper(@err_lines) );
+    # }
+
+    # my ( $success, $ret, $out, $err ) = 
+    # 	$self->commit( $params{user}, $path, 'remove '.$params{dir});
+
+    # unless ($success) {
+    # 	my @err_lines = <$err>;
+    # 	raise( 8, "cannot commit files: " . Dumper(@err_lines) );
+    # }
+    # return $self->SUPER::remove(%params);
+    # return 1;
 }
 
 
@@ -214,7 +363,7 @@ sub remove {
 
 =head2 C<commit>
 
- $storage->commit ($user, $path, $message )
+ $storage->commit ($user, $repos, $path, $message )
 
 Commit all changes in the given path with message $message.
 
@@ -229,11 +378,14 @@ Returns: ( $success, $return_code, $stdout, $stderr )
 
 
 sub commit{
-    my ( $self, $user, $dir, $message) = @_;
+    my ( $self, $user, $repos, $dir, $message) = @_;
+
+    $message = 'unknown reason' unless ($message);
+    my $repohome = join( '/', $self->{partition}, $repos );
 
     my $pwd = getcwd();
-    chdir( dirname($dir) );
-    get_logger(__PACKAGE__)->info("git: commit $dir");
+    chdir( $repohome );
+    get_logger(__PACKAGE__)->info("cd $repohome; git commit -am $message ($dir)");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'commit',
 					     '-am', 
@@ -256,8 +408,8 @@ sub revision{
     chdir($pwd);
 
     if ($success){
-	my $lastrev = <$out>; chomp $lastrev;
-	return $lastrev;
+	chomp $out;
+	return $out;
     }
     return '';
 }
@@ -321,35 +473,39 @@ sub list {
     my $path_to_display = join( '/', $params{repos}, $params{dir} );
     my $revision = $params{revision} || 'HEAD';
 
+    my $path = $params{dir};
+    unless ( $self->_is_file( $repohome, $revision, $path )){
+	$path .= '/';
+    }
+
+    ## get listing from git
     my $pwd = getcwd();
     chdir( $repohome );
-    get_logger(__PACKAGE__)->info("git: list $params{dir} in $repohome ($revision)");
+    get_logger(__PACKAGE__)->info("git: list $path in $repohome ($revision)");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'ls-tree',
-					     '-r',
-					     '-l',
+					     '-lz',
 					     $revision,
-					     $params{dir} );
+					     $path );
     chdir($pwd);
 
+    ## format output
     my $content = qq(<?xml version="1.0"?><list path="/$path_to_display">);
     if ($success){
-	my @info = split(/\n/s,$out);
+	$out = decode( 'utf8', $out );
+	my @info = split(/\x00/s,$out);
 	foreach (@info){
 	    chomp;
 
 	    ## split info string
 	    my ($info,$name) = split(/\t/);
 	    my ($mode,$type,$blob,$size) = split(/\s+/,$info);
+	    my $name = basename( $name );
+	    next if ($name=~/^\.gitkeep/);
 
-	    ## have to get rid of branch name!
-	    my @parts = split(/\//,$name);
-	    shift @parts;
-	    my $name = join('/',@parts);
-
-	    # get_logger(__PACKAGE__)->debug("git: found $_ ($mode,$type,$blob,$size,$name)");
-	    $content .=
-		qq(
+	    if ( $type eq 'blob' ){
+		$content .=
+		    qq(
         <entry kind="file">
             <name>$name</name>
             <size>$size</size>
@@ -359,6 +515,19 @@ sub list {
             </commit>
         </entry>
     );
+	    }
+	    else{
+		$content .=
+		    qq(
+        <entry kind="dir">
+            <name>$name</name>
+            <commit revision="$revision">
+                <author>$owner</author>
+                <date>unknown</date>
+            </commit>
+        </entry>
+     );
+	    }
 	}
     }
     $content .= "</list>\n";
@@ -399,10 +568,14 @@ sub export {
 				$params{src},
 				$params{rev}, 
 				$params{archive} );
+	get_logger(__PACKAGE__)->debug("git: download file $params{src} to ${ $params{trg} }");
+	return 1;
     }
     elsif ( $params{archive} ){
 	${ $params{trg} } = 
 	    $self->_export_subtree($repohome, $params{src}, $params{rev});
+	get_logger(__PACKAGE__)->debug("git: download dir $params{src} to ${ $params{trg} }");
+	return 1;
     }
     else{
 	raise( 8, 'archive=no option only permitted for single files', 'warn' );
@@ -458,6 +631,14 @@ sub _export_file {
 						 'checkout-index',
 						 '--prefix='.$tmp_dir.'/',
 						 $path );
+	## we don't want sub-dir's
+	my @parts = split(/\//,$path);
+	my $basename = pop(@parts);
+	move( $tmp_dir.'/'.$path, $tmp_dir.'/'.$basename ) || raise( 8, $! );
+	while (@parts){
+	    rmdir( join('/',$tmp_dir,@parts) );
+	    pop(@parts);
+	}
     }
     else{
 	## TODO: implement checking out old revisions of single files
@@ -490,7 +671,7 @@ sub _export_file {
 
 	return $target;
     }
-    return join( '/', $tmp_dir, $path );
+    return join( '/', $tmp_dir, basename( $path ) );
 }
 
 
@@ -507,15 +688,18 @@ sub _is_file{
     chdir( $reposdir );
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'ls-tree',
-					     '-r',
-					     '--name-only',
+					     '-l',
 					     $rev,
 					     $path );
     chdir($pwd);
     if ($success){
-	my $file = <$out>;
-	chomp $file;
-	return 1 if ($file eq $path);
+	chomp $out;
+	my ($info,$name) = split(/\t/,$out);
+	my ($mode,$type,$blob,$size) = split(/\s+/,$info);
+
+	get_logger(__PACKAGE__)->debug("cd $reposdir; git ls-tree -l $rev $path");
+	get_logger(__PACKAGE__)->debug("git: _is_file: $name = $type ($path)");
+	return 1 unless ($type eq 'tree');
     }
     return 0;
 }

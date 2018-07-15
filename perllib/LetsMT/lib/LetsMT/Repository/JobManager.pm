@@ -682,10 +682,12 @@ sub submit_slurm_job {
     my ($job,$jobID,$workDir,$jobOut,$jobErr) = @_;
 
     my ($fh, $filename) = tempfile();
+    binmode( $fh, ':encoding(utf8)' );
     print $fh "#!/bin/bash\n";
     print $fh $job,"\n";
     close $fh;
 
+    get_logger(__PACKAGE__)->debug("slurm: sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename");
     LetsMT::Repository::Safesys::sys(
         "sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename"
     );

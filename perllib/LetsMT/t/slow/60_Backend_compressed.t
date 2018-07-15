@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-60_Backend_svn_local.t - test storage API with compressed filesystem backend
+60_Backend_compressed.t - test storage API with compressed filesystem backend
 
 =head1 DESCRIPTION
 

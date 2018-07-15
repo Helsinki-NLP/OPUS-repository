@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">
 <cesAlign version="1.0">
-<linkGrp targType="s" fromDocRev="12" toDocRev="13" fromDoc="en/1988b.xml" toDoc="sv/1988b.xml">
+<linkGrp targType="s" fromDoc="en/1988b.xml" toDoc="sv/1988b.xml">
 <link id="1" xtargets="4;4" certainty="0.530769" />
 <link id="2" xtargets="5;5" certainty="0.24" />
 <link id="3" xtargets="10;9" certainty="0.616944" />
