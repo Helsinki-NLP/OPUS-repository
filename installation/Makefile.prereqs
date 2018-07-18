@@ -87,6 +87,7 @@ CPAN_MODULES = 	Archive::Zip \
 		Class::Sniff \
 		Encode::Locale \
 		File::GetLineMaxLength \
+		File::Touch \
 		Lingua::Sentence \
 		Module::Install \
 		Net::SSL \

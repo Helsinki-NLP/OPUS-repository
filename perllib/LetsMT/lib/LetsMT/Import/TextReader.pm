@@ -13,6 +13,10 @@ use LetsMT::Import;
 use LetsMT::WebService;
 use LetsMT::Tools qw(:all);
 
+use PerlIO::encoding;
+$PerlIO::encoding::fallback = Encode::FB_QUIET;
+# $PerlIO::encoding::fallback = Encode::FB_DEFAULT;
+
 # read lines with length limit
 # (this is much faster than the getc implementation LetsMT::Tools)
 # (File::fgets is even faster but ignores Perl I/O layers)

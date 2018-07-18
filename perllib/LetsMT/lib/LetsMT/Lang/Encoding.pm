@@ -18,6 +18,10 @@ use LetsMT::Lang::ISO639 qw / :all /;
 use LetsMT::Lang::Detect;
 use LetsMT::Tools qw / :all /;
 
+use PerlIO::encoding;
+$PerlIO::encoding::fallback = Encode::FB_QUIET;
+# $PerlIO::encoding::fallback = Encode::FB_DEFAULT;
+
 use File::Temp 'tempfile';
 use File::Copy;
 use FindBin qw($Bin);

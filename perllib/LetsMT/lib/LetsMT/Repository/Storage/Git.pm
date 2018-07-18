@@ -296,6 +296,9 @@ sub remove {
 	## THIS LOOKS QUITE DANGEROUS
 	## TODO: MAKE SURE THAT NOTHING CAN GO WRONG HERE
 	my $backup = join( '/', $self->{partition},'.DELETED.', $params{repos} );
+
+	get_logger(__PACKAGE__)->debug("git: remove slot (backup at $backup)");
+
 	if ( -d $backup ) {
 	    if ($params{repos} && $params{repos}!~/^\./ && 
 		$params{repos}!~/\.\.\// && $params{repos}!~/\s/){
@@ -306,7 +309,12 @@ sub remove {
 		}
 	    }
 	}
+	get_logger(__PACKAGE__)->debug("git: move $repohome to $backup)");
 	raise( 8, "cannot copy over to $backup") if ( -d $backup );
+
+	unless ( -d dirname($backup) ) {
+            mkdir( dirname($backup) )  or raise( 8, "mkdir ".dirname($backup) );
+        }
 	move( $repohome, $backup ) || raise( 8, $! );
 	return 1;
     }

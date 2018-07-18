@@ -84,7 +84,7 @@ my %files = (
     'data/xliff/xliff.tar'                          => 'xliff',
     'data/xliff/xliff.tgz'                          => 'xliff',
     'data/xliff/xliff.zip'                          => 'xliff',
-    'data/language_code_file_names.zip'             => 'txt',   #files names with language codes
+    # 'data/language_code_file_names.zip'             => 'txt',   #files names with language codes
 );
 
 my $parser = new XML::LibXML;

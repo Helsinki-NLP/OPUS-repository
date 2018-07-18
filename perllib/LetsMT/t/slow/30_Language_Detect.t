@@ -94,13 +94,13 @@ $result = detect_encoding('data/txt/ru/rus.utf8.txt','ru');
 is( $result, 'utf-8', "detect character encoding (Russian, utf-8)" );
 
 $result = detect_encoding('data/txt/ru/rus.koi8.txt','ru');
-is( $result, 'koi8_r', "detect character encoding (Russian, koi8)" );
+is( $result, 'koi8-r', "detect character encoding (Russian, koi8)" );
 
 $result = detect_encoding('data/txt/zh/chi.utf8.txt','zh');
 is( $result, 'utf-8', "detect character encoding (Chinese, utf-8)" );
 
 $result = detect_encoding('data/txt/zh/chi.big5.txt','zh');
-is( $result, 'big5', "detect character encoding (Chinese, big5)" );
+is( $result, 'big5-eten', "detect character encoding (Chinese, big5)" );
 
 
 =item *
@@ -120,8 +120,8 @@ is_deeply( \@lang, ['sv'], "detect language (Swedish)" );
 is_deeply( \@lang, ['ru'], "detect language (Russian)" );
 
 @lang = detect_language('data/txt/zh/chi.utf8.txt');
-# is_deeply( \@lang, ['zh'], "detect language (Chinese)" );       # textcat
-is_deeply( \@lang, ['zh-TW'], "detect language (Chinese)" );
+is_deeply( \@lang, ['zh'], "detect language (Chinese)" );       # textcat
+# is_deeply( \@lang, ['zh-TW'], "detect language (Chinese)" );
 
 @lang = detect_language('data/txt/hr/setimes.txt');
 # is_deeply( \@lang, ['hr','bs'], "detect language (Croatian)" ); # textcat
