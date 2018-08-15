@@ -36,6 +36,7 @@ use LetsMT::Tools;
 use LetsMT::Repository::Err;
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use Archive::Tar;
 use File::Basename qw/ basename dirname /;
 use File::Copy;
 use File::Temp qw(tempfile tempdir);
@@ -600,7 +601,7 @@ sub _export_subtree {
     my ( $fh, $target ) = tempfile(
 	'zip_download_XXXXXXXX',
 	DIR    => $ENV{UPLOADDIR},
-	SUFFIX => '.zip',
+	SUFFIX => '.tgz',
 	UNLINK => 1
 	);
     close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
@@ -611,12 +612,26 @@ sub _export_subtree {
     get_logger(__PACKAGE__)->info("git: export $revision:$path to $target");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'archive',
-					     '--format=zip',
+					     '--format=tar.gz',
 					     '-o', $target,
 					     $revision.':'.$path );
     chdir($pwd);
     return $target;
 }
+
+
+## TODO: format=zip does not work for files with unicode names
+## ---> fall back to tar.gz for the moment
+##      this is not nice as single files will be packed into zip-files
+## strange that zip works fine when running git archive on command-line
+## but fails when used with git-archive on apache (locale settings?)
+
+
+## 
+## 					     '--format=zip',
+## 					     '--format=tar.gz',
+## 'LC_ALL="en_US.UTF-8"',
+##					     '--in-archive-path-encoding=UTF-8',
 
 
 sub _export_file {
@@ -655,6 +670,28 @@ sub _export_file {
     chdir($pwd);
 
     if ( $archive ){
+
+	## TODO: do always tar-files?
+	##       code below does not work!
+	## 
+	# # Create temp file to store archive in
+	# my ( $fh, $target ) = tempfile(
+	#     'zip_download_XXXXXXXX',
+	#     DIR    => $ENV{UPLOADDIR},
+	#     SUFFIX => '.tgz',
+	#     UNLINK => 1
+	#     );
+	# close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
+
+	# my $tar = Archive::Tar->new();
+	# $tar->write($target, COMPRESS_GZIP);
+
+	# my @parts = split(/\//,$path);
+	# my $basename = pop(@parts);
+	# $tar->add_files( $basename );
+	# chdir($pwd);
+	# return $target;
+
 	my $zip = Archive::Zip->new();
 
 	# Add temp dir to zip archive
