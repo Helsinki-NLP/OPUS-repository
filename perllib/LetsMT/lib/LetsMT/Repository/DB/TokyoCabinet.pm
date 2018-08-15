@@ -406,7 +406,7 @@ sub get_strict {
 
     # TODO: this decoding business is quite annoying
     # is this really necessary?!?
-    map( $$data{$_} = decode( 'utf8', $$data{$_} ), keys %{$data} );
+    map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
 
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         delete $data->{_ID_};        # (only for internal use!)
@@ -437,7 +437,7 @@ sub get {
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         # TODO: this decoding business is quite annoying
         # is this really necessary?!?
-        map( $$data{$_} = decode( 'utf8', $$data{$_} ), keys %{$data} );
+	map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
 
         # a key is given: return only that value!
         # (as an array if necessary)
@@ -539,7 +539,11 @@ sub search {
     $qry->setlimit( $MaxReturn, $SkipRecords );
 
     # finally: run the query!
-    return $qry->search();
+    # TODO: why do we need to decode everything?
+    my $result = $qry->search();
+    @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
+    return $result;
+    # return $qry->search();
 }
 
 

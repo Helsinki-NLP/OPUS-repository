@@ -17,6 +17,7 @@ use strict;
 use parent 'LetsMT::Repository::DB::TokyoCabinet';
 
 use open qw(:std :utf8);
+use Encode qw(decode);
 
 use TokyoTyrant;
 use Time::HiRes qw (time);
@@ -290,7 +291,11 @@ sub search {
     $qry->setlimit( $MaxReturn, $SkipRecords );
 
     # finally: run the query!
-    return $qry->search();
+    # TODO: why do we need to decode everything?
+    my $result = $qry->search();
+    @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
+    return $result;
+    # return $qry->search();
 }
 
 
