@@ -200,11 +200,12 @@ sub add {
 	my ( $success, $ret, $out, $err ) = 
 	    $self->commit( $user, $repos, $relpath, 'add '.$relpath);
 
-	unless ($success) {
-#	    unlink($fullpath);
-	    my @err_lines = <$err>;
-	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-	}
+## Don't fail if commit fails
+#	unless ($success) {
+##	    unlink($fullpath);
+#	    my @err_lines = <$err>;
+#	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
+#	}
 	return 1;
     }
     return 0;
