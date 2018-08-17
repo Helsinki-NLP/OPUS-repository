@@ -62,7 +62,17 @@ my $MODE_TO_CMD = {
     'standard' => \&convert_standard_cmd,
     'raw'      => \&convert_raw_cmd,
     'layout'   => \&convert_layout_cmd,
+    'combined' => \&convert_pdf2xml_cmd,
 };
+
+## intermediate format used for conversion in each mode
+## (txt will be used as default)
+my %MODE_TMP_FORMAT = (
+    'standard' => 'txt',
+    'raw'      => 'txt',
+    'layout'   => 'txt',
+    'combined' => 'rawxml'
+);
 
 
 =head1 CONSTRUCTOR
@@ -216,9 +226,13 @@ sub convert {
     }
 
     ## try to convert to text
-    my $text_resource = $resource->convert_type( 'pdf', 'txt' );
-    &File::Path::make_path( $text_resource->path_down->local_path );
-    if ( $self->{cmd}->( $resource, $text_resource ) ) {
+    # my $tmp_resource = $resource->clone;
+    my $tmp_format = $MODE_TMP_FORMAT{$self->{mode}} || 'txt';
+    # $tmp_resource->{path} =~s/\.pdf$/.$tmp_format/i;
+    my $tmp_resource = $resource->convert_type( 'pdf', $tmp_format );
+    &File::Path::make_path( $tmp_resource->path_down->local_path );
+
+    if ( $self->{cmd}->( $resource, $tmp_resource ) ) {
 
         ## add pre-processing tools to the importer if necessary
         foreach ('normalizer','splitter','tokenizer'){
@@ -227,9 +241,9 @@ sub convert {
             }
         }
 
-        ## convert text to XML
-        $text_resource->encoding('utf-8');    # set character encoding
-        return $importer->convert_resource( $text_resource, $meta_resource );
+        ## convert to final XML
+        $tmp_resource->encoding('utf-8');    # set character encoding
+        return $importer->convert_resource( $tmp_resource, $meta_resource );
     }
     return [];
 }
@@ -293,6 +307,26 @@ sub convert_layout_cmd {
         [ 'letsmt_convert_columns' ],
         '>', $text_resource->local_path;
 }
+
+
+=head2 C<convert_layout_cmd>
+
+ $data = LetsMT::Import::PDF::convert_layout_cmd ($resourcce, $text_resource)
+
+Convert a pdf to text in C<layout> mode,
+detecting columns with the help of a column-detection script.
+
+=cut
+
+sub convert_pdf2xml_cmd {
+    my ( $resource, $xml_resource ) = @_;
+
+    ## use IPC::Run to pipe the PDF through pdftotext and letsmt_convert_column
+    return run 
+        [ 'pdf2xml',$resource->local_path ],
+	'>', $xml_resource->local_path;
+}
+
 
 
 1;

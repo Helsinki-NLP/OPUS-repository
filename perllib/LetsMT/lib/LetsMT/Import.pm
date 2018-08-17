@@ -34,6 +34,8 @@ use LetsMT::Import::Text;
 # use LetsMT::Import::DOC;
 use LetsMT::Import::SRT;
 use LetsMT::Import::SRTsimple;
+use LetsMT::Import::XML;
+
 
 use LetsMT::Resource;
 use LetsMT::WebService;
@@ -108,14 +110,16 @@ my $TYPES = {
         content_type_pattern => $doc_type_pattern ),
     srt   => new LetsMT::Import::SRT,
     # srt => new LetsMT::Import::SRTsimple
+    xml   => new LetsMT::Import::XML,
     unknown   => new LetsMT::Import::Tika
 };
 
-$TYPES->{text}      = $TYPES->{txt};
+$TYPES->{text}     = $TYPES->{txt};
 $TYPES->{xliff}    = $TYPES->{xlf};
 $TYPES->{tgz}      = $TYPES->{tar};
 $TYPES->{'tar.gz'} = $TYPES->{tar};
 $TYPES->{'docx'}   = $TYPES->{doc};
+$TYPES->{rawxml}   = $TYPES->{xml};
 
 
 # IMPORTANT:
@@ -473,6 +477,7 @@ sub convert_resource {
     my $resource        = shift;                 # resource to be imported
     my $meta_resource   = shift || $resource;    # place where to put metainfo
     my $report_progress = shift;                 # report progress in metadata
+    my $out_resource    = shift;                 # optional output resource
 
     #----------------------------------------------------------
     # get possible resource handlers and try them
@@ -503,7 +508,7 @@ sub convert_resource {
         unless ( scalar @$validation_errors ) {
             my ($new_resources,       $conversion_errors,
                 $conversion_warnings, $log_message
-                ) = $handler->convert( $resource, $self, $meta_resource, $report_progress );
+                ) = $handler->convert( $resource, $self, $meta_resource, $report_progress, $out_resource );
 
             # upload possible warnings (logfiles, messages etc)
             &_upload_errors(
@@ -561,7 +566,7 @@ C<$new_resource> is a pointer to a hash
 C<{ resource => resource_object, meta => \%meta_data }>.
 C<$original_resource> is the resource object that has been converted.
 
-Note: Resource-types 'xml' will be run through language detection before uploading them top the repository!
+Note: Resource-types 'xml' will be run through language detection before uploading them to the repository!
 
 =cut
 

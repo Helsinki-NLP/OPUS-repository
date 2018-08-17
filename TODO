@@ -1,7 +1,26 @@
 To do as of version 0.50
 ========================
 
+* update Apache Tika (plus allow options?)
+* integrate pdf2xml (on-going)
+* slurm job manager (working, parameters, resource management missing)
+* git backend (half done)
 * code optimization (svn backend, validation, conversion ...)
 * trainable sentence splitters & tokenizers (openNLP, other?)
 * stable web interface with configuration support
 * automatic load-balancing in distributed setups
+
+
+Wish-list
+==========
+
+
+* better git backend:
+  - user-subtrees as branches and not copies
+  - remote repositories (master), user-branches as local copies (in compressed filesystem?)
+  - remote on save server?
+* improved pre-processing tools (UDpipe?, optimized sentence splitters, tokenizers)
+* (semi-)automatic identification of parallel documents (without requiring identical file names)
+* more sentence aligners (BLEU align, gargantua, yalign?)
+* user interface (for uploads, OPUS integration)
+* allow manual corrections (alignments and even other things?)

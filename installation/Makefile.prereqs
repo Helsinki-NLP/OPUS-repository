@@ -58,6 +58,7 @@ UBUNTU_BASE_PACKAGES = \
 		libxml-libxml-perl \
 		libxml-perl \
 		libxml-simple-perl \
+		libxml-writer-perl \
 		libxml2-utils \
 		libyaml-perl \
 		liblzma-dev \
@@ -94,6 +95,7 @@ CPAN_MODULES = 	Archive::Zip \
 		Persistent::Base \
 		Persistent::DBI \
 		Test::More \
+		Text::PDF2XML \
 		Switch
 # TODO: do we still need the Persistent modules?
 

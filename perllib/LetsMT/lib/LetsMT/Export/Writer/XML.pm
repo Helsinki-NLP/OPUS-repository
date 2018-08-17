@@ -78,10 +78,11 @@ sub _header {
     #    my $self=shift;
     return '<?xml version="1.0" encoding="utf-8"?>
 <letsmt version="1.0">
-<head></head>
-<body>
 ';
 }
+
+# <head></head>
+# <body>
 
 
 =head2 C<_close_open_tags>
@@ -108,9 +109,10 @@ Close all open tags, then close the body and the C<letsmt> XML.
 
 sub _tail {
     my $self = shift;
-    return $self->_close_open_tags() . '</body>
-</letsmt>
-';
+    return $self->_close_open_tags() . '</letsmt>'."\n";
+#    return $self->_close_open_tags() . '</body>
+# </letsmt>
+# ';
 }
 
 

@@ -452,6 +452,12 @@ sub type {
 
 sub upload_type {
     my $self = shift;
+
+    if ( $self->path =~ /\.([^.]*)$/ ) {
+        my $ext = lc($1);
+        return $ext if ( defined LetsMT::Export::Reader::reader($ext) );
+    }
+
     my @parts = split( /\//, $self->path() );
     if ( $parts[0] eq 'uploads' ) {
         return $parts[1];

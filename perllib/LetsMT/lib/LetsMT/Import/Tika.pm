@@ -25,7 +25,7 @@ use File::Path;
 
 use Log::Log4perl qw(get_logger :levels);
 
-my $path_to_tika = $ENV{LETSMTROOT} . '/lib/tika-app-1.1.jar';
+my $path_to_tika = $ENV{LETSMTROOT} . '/lib/tika-app-1.18.jar';
 
 
 =head1 CONSTRUCTOR
