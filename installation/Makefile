@@ -145,7 +145,7 @@ install-modules:
 .PHONY: install-files
 install-files: ttservctl prepare-directories install-log
 	${INSTALL_BIN} ../admin/*.sh ../admin/*.pl ${PREFIX}/bin/
-	${INSTALL_BIN} ../lib/tika-app-1.1.jar ${PREFIX}/lib/
+	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
 	${INSTALL_BIN} ../perllib/conf_modperl.pl $(LETSMT_MODPERL_STARTUP)
 	${INSTALL_BIN} ttservctl ${PREFIX}/bin
 	ln -sf ${PREFIX}/bin/ttservctl /etc/init.d/ttservctl_group
@@ -181,7 +181,7 @@ prepare-directories:
 
 .PHONY: install-frontend-files
 install-frontend-files: prepare-directories install-log
-	${INSTALL_BIN} ../lib/tika-app-1.1.jar ${PREFIX}/lib
+	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib
 
 
 .PHONY: install-config

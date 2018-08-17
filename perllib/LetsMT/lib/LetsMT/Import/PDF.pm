@@ -182,6 +182,7 @@ sub validate {
     my $self = shift;
     my ($resource) = @_;
 
+    ## TODO: do we ever get tika here?
     if ($self->{mode} eq 'tika'){
 	return $self->{tika}->validate(@_);
     }
@@ -211,13 +212,13 @@ sub convert {
     my $self = shift;
     my ( $resource, $importer, $meta_resource ) = @_;
 
-    if ($self->{mode} eq 'tika'){
-	return $self->{tika}->convert(@_);
-    }
-
     # change conversion mode if necessary
     if ( exists $importer->{mode} ) {
         $self->set_mode( $importer->{mode} );
+    }
+
+    if ($self->{mode} eq 'tika'){
+	return $self->{tika}->convert(@_);
     }
 
     # Get requested resource if necessary
