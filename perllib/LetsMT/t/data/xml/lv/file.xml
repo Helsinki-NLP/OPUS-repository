@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <letsmt version="1.0">
-<head></head>
-<body>
 <p id="1">
 <s id="1">
 Pateicoties pēdējo gadu laikā sasniegtajam, kodoltermiskās enerģijas pētniecība un panākumi tajā ir sasnieguši tādu attīstības stadiju, kurā var paredzēt pakāpenisku faktisku pāreju uz demonstrējumiem, kā kodoltermiskās sintēzes ceļā iespējams ražot neizsīkstošu enerģiju.</s>
@@ -12,5 +10,4 @@ Pateicoties pēdējo gadu laikā sasniegtajam, kodoltermiskās enerģijas pētni
 <s id="4">
 „Neredzamās” datorsistēmas (iegultās sistēmas) ir dažādu mehānismu darbības pamatā, sākot no automašīnām un lidmašīnām, tālruņa aparātiem, enerģētikas tīkliem un fabrikām līdz veļas mašīnām un televizoriem.</s>
 </p>
-</body>
 </letsmt>

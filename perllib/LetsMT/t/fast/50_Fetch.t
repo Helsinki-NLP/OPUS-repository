@@ -30,8 +30,13 @@ use File::Compare;
 use LetsMT::WebService;
 
 my $id = int( rand(999999999999) );
-
 my ($uid, $gid) = Scaffold::add_user;
+
+# my $gid  = 'group_id_1_'  . $id;
+# my $uid  = 'user_id_1_'   . $id;
+# my $result = LetsMT::WebService::post_group( $gid, undef, $uid );
+# is( $result, 1, "POST group, create group $gid with user uid" );
+
 
 =pod
 

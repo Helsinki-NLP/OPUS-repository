@@ -52,7 +52,11 @@ Initialize a new storage path.
 =cut
 
 sub init {
-    my ( $self, $path ) = @_;
+    my ( $self, $slot, $user ) = @_;
+
+    # diskpath = partition/slot
+    my $path = join( '/', ( $self->{partition}, $slot, $user ) );
+
     unless ( -d $path ) {
         get_logger(__PACKAGE__)->info("initialize $path");
         unless ( -d dirname($path) ) {

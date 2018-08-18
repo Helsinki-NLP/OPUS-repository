@@ -610,9 +610,11 @@ sub _export_subtree {
     chdir( $repohome );
     # git archive --format=zip --prefix=... -o output.zip rev:path 
     get_logger(__PACKAGE__)->info("git: export $revision:$path to $target");
+    my $prefix = basename($path);
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'archive',
 					     '--format=zip',
+					     '--prefix='.$prefix.'/',
 					     '-o', $target,
 					     $revision.':'.$path );
     chdir($pwd);
