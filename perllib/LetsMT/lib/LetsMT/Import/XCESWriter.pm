@@ -249,14 +249,22 @@ sub close {
     foreach my $id ( keys %{ $self->{resources} } ) {
         my @lang = split( /\-/, $id );
         if ($#lang) {
-            push(
-                @{ $aligned{ $lang[0] } },
-                $$self{resources}{ $lang[1] }{resource}->path
-            );
-            push(
-                @{ $aligned{ $lang[1] } },
-                $$self{resources}{ $lang[0] }{resource}->path
-            );
+	    if ( exists $$self{resources}{ $lang[1] } ){
+		if ( exists $$self{resources}{ $lang[1] }{resource} ){
+		    push(
+			@{ $aligned{ $lang[0] } },
+			$$self{resources}{ $lang[1] }{resource}->path
+			);
+		}
+	    }
+	    if ( exists $$self{resources}{ $lang[0] } ){
+		if ( exists $$self{resources}{ $lang[0] }{resource} ){
+		    push(
+			@{ $aligned{ $lang[1] } },
+			$$self{resources}{ $lang[0] }{resource}->path
+			);
+		}
+	    }
         }
     }
 

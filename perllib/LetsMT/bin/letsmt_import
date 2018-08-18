@@ -76,8 +76,8 @@ use Encode::Locale;
 Encode::Locale::decode_argv;
 use open qw(:std :locale);
 
-#use FindBin;                       # We use this in order to use the library in the source tree,
-#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+# use FindBin;                       # We use this in order to use the library in the source tree,
+# use lib $FindBin::Bin . '/../lib'; # not the installed one.
 use File::Temp;
 
 use vars qw($opt_a $opt_d $opt_e $opt_f $opt_h $opt_l $opt_L $opt_m $opt_N

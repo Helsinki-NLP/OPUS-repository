@@ -1,17 +1,5 @@
 package LetsMT::Repository::Storage::Git;
 
-#
-# TODO's
-# 
-# * should we create empty .gitkeep files to keep 
-#   empty dir's in the repository? 
-#   --> this would also make "git rm -r" work correctly 
-#
-# * do we need repository locks when adding files?
-#  
-#
-
-
 =head1 NAME
 
 LetsMT::Repository::Git - storage backend using Git
@@ -47,11 +35,15 @@ use Data::Dumper;
 use Cwd;
 
 
+our $GITHOME = $ENV{LETSMTDISKROOT} || '/var/lib';
+$GITHOME .= '/.githome';
+
+
 =head1 METHODS
 
 =head2 C<init>
 
- $storage->init ($path)
+ $storage->init ($slot, $user, $base, $githome)
 
 Initialize a new subversion repository.
 
@@ -60,56 +52,123 @@ Returns: true (an exception is raised on failure).
 =cut
 
 sub init {
-    my ( $self, $slot ) = @_;
+    my $self = shift;
+    my $slot = shift || return 0;
+    my $user = shift || return 0;
+    my $base = shift || 'master';
+    my $githome = shift || $GITHOME;
 
-    # diskpath = partition/slot
-    my $path = join( '/', ( $self->{partition}, $slot ) );
+    ## path to master git
+    my $gitpath = join( '/', ( $githome, $slot ) );
 
-    get_logger(__PACKAGE__)->info("initialize $path");
+    ## create the git master repository
+    unless (-d $gitpath.'/.git'){
+	get_logger(__PACKAGE__)->info("initialize master git at $gitpath");
+	mkdir($githome) unless (-d $githome);
+	my ( $success, $ret, $out, $err ) = run_cmd(
+	    'git',
+	    'init',
+	    $gitpath
+	    );
+	unless ($success){
+	    my @err_lines = <$err>;
+	    raise( 8, "cannot create git-repo $gitpath: " . Dumper(@err_lines) );
+	}
+    }
 
-    # try to create the repository
-    my ( $success, $ret, $out, $err ) = run_cmd(
-        'git',
-        'init',
-        $path
-    );
-    return 1 if ($success);
-
-    # throw an error otherwise
-    my @err_lines = <$err>;
-    raise( 8, "cannot create git-repo $path: " . Dumper(@err_lines) );
-
-    # initialize the compressed files system backend (parent class)
-    return $self->SUPER::init(@_);
+    return $self->_clone( $slot, $user, $base );
+    # return $self->SUPER::init(@_);
 }
 
 
-sub _add_files{
-    my ($self, $user, $repos, $dir) = @_;
+## make a clone of the master repository and create a new branch (=user)
+## (optional: use a given $branch to start the new user branch)
 
-    get_logger(__PACKAGE__)->debug("git: add_files $user $repos $dir");
+sub _clone{
+    my $self = shift;
+    my $slot = shift || return 0;
+    my $user = shift || return 0;
+    my $branch = shift || 'master';
+    my $githome = shift || $GITHOME;
 
-    my $repohome = join( '/', $self->{partition}, $repos );
+    ## path to master git
+    my $mastergit = join( '/', ( $githome, $slot ) );
 
-    my $pwd = getcwd();
-    chdir($repohome);
-    get_logger(__PACKAGE__)->debug("git add $dir in $repohome");
-    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'add', $dir );
-    chdir($pwd);
-
-    unless ($success) {
-	my @err_lines = <$err>;
-	raise( 8, "cannot add files: " . Dumper(@err_lines) );
-    }
+    ## path to local copy with user branch
+    my $localgit = join( '/', ( $self->{partition}, $slot, $user ) );
 
     my ( $success, $ret, $out, $err ) = 
-	$self->commit( $user, $repos, $dir, 'add '.$dir);
+	&run_cmd( 'git', 'clone', $mastergit, $localgit );
+    unless ($success){
+	my @err_lines = <$err>;
+	raise( 8, "cannot clone git-repo $mastergit to $localgit: " . Dumper(@err_lines) );
+    }
 
-#    unless ($success) {
-#	my @err_lines = <$err>;
-#	raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-#    }
-    return 1;
+    my $pwd = getcwd();
+    chdir($localgit);
+
+    ## switch to given branch to start with
+    &run_cmd( 'git', 'checkout', $branch );
+
+    ## create new branch
+    ( $success, $ret, $out, $err ) = 
+	&run_cmd( 'git', 'checkout', '-b', $user );
+
+    chdir($pwd);
+    unless ($success){
+	my @err_lines = <$err>;
+	raise( 8, "cannot create branch $user in git-repo $localgit: " . Dumper(@err_lines) );
+    }
+    return $success;
+}
+
+
+## add and commit a file or subdir to a git repository
+##
+## - slot ...... name of the repo
+## - user ...... user name (also name of the branch)
+## - path ...... relative path to new file/subdir
+## - message ... optional commit message
+
+sub _add_file{
+    my ( $self, $slot, $user, $path ) = @_;
+
+    get_logger(__PACKAGE__)->debug("git: add file $path to repo $slot/$user");
+
+    ## path to local copy with user branch
+    my $gitpath = join( '/', ( $self->{partition}, $slot, $user ) );
+
+    my $pwd = getcwd();
+    chdir($gitpath);
+    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'add', $path );
+    chdir($pwd);
+
+    # $self->_commit( $slot, $user, 'add $path to repository' );
+    return $success;
+}
+
+
+## commit the latest changes and push to origin
+## TODO: do we always have to push?
+
+sub _commit{
+    my ( $self, $slot, $user, $message ) = @_;
+    $message = 'commit all changes' unless ($message);
+
+    get_logger(__PACKAGE__)->debug("git: commit changes in $slot/$user");
+
+    ## path to local copy with user branch
+    my $gitpath = join( '/', ( $self->{partition}, $slot, $user ) );
+
+    my $pwd = getcwd();
+    chdir($gitpath);
+    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'commit', '-am', $message );
+    if ($success){
+	($success,$ret,$out,$err) = &run_cmd( 'git', 'push', 'origin', $user );
+    }
+    chdir($pwd);
+
+    return $success;
 }
 
 
@@ -122,14 +181,16 @@ sub mkdir {
     my ( $repos, $branch, $user, $dir ) = @_;
 
     get_logger(__PACKAGE__)->debug("git: mkdir $repos $branch $user $dir");
-    if ( $self->SUPER::mkdir(@_) ){
 
+    if ( $self->SUPER::mkdir(@_) ){
 	my $repohome = join( '/', $self->{partition}, $repos );
-	my $file = join( '/', $branch, $dir, '.gitkeep' );
-	touch( join( '/', $repohome, $file ) );
-	$self->_add_files($user, $repos, $file);
+	my $file = join( '/', $dir, '.gitkeep' );
+	touch( join( '/', $repohome, $branch, $file ) );
+	$self->_add_file($repos, $user, $file);
+	$self->_commit($repos, $user, 'added subdir $dir');
 	return 1;
     }
+    return 0;
 }
 
 =head2 C<copy>
@@ -146,8 +207,10 @@ sub copy {
     my $self = shift;
     my ( $user, $slot, $src, $trg ) = @_;
 
-    if ( $self->SUPER::copy(@_) ){
-	return $self->_add_files( $user, $slot, $trg )
+    ## make a new sub branch for the user
+    ## TODO: do we need to allow other types of copies?
+    if ( $user eq $trg ){
+	return $self->init( $slot, $trg, $src );
     }
     return 0;
 }
@@ -179,64 +242,15 @@ sub add {
 
 
     if ( $self->SUPER::add(@_) ){
-        my $homedir  = join( '/', $self->{partition}, $repos );
-        my $fullpath = join( '/', $self->{partition}, $repos, $branch, $dir, $file );
-        my $relpath  = join( '/', $branch, $dir, $file );
-
-	my $pwd = getcwd();
-	chdir($homedir);
-	get_logger(__PACKAGE__)->info("git: add $relpath in $homedir");
-	my ($success,$ret,$out,$err) = &run_cmd( 'git',
-						 'add',
-						 $relpath );
-	chdir($pwd);
-
-	unless ($success) {
-	    unlink($fullpath);
-	    my @err_lines = <$err>;
-	    raise( 8, "cannot add files: " . Dumper(@err_lines) );
+        my $path  = $dir ? join( '/', $dir, $file ) : $file;
+	get_logger(__PACKAGE__)->info("git: add file $path to $repos/$branch");
+	if ($self->_add_file( $repos, $branch, $path )){
+	    return $self->_commit( $repos, $branch, 'added new file $file to $dir' );
 	}
-
-	my ( $success, $ret, $out, $err ) = 
-	    $self->commit( $user, $repos, $relpath, 'add '.$relpath);
-
-## Don't fail if commit fails
-#	unless ($success) {
-##	    unlink($fullpath);
-#	    my @err_lines = <$err>;
-#	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-#	}
-	return 1;
     }
     return 0;
 }
 
-
-
-
-=head2 C<add_file>
-
- $storage->add_file ($user, $file )
-
-Register a file (source) to be added to a repository as C<$path>/C<$file>.
-
-Returns: ( $success, $return_code, $stdout, $stderr )
-
- $success = true if successful
- $return_code = return code of the system call
- $stdout = reference to stdout of the system call
- $stderr = reference to stderr of the system call
-
-=cut
-
-
-sub add_file {
-    my ( $self, $user, $path ) = @_;
-    my ($success,$ret,$out,$err) = &run_cmd( 'git',
-					     'add',
-					     $path );
-    return ($success,$ret,$out,$err);
-}
 
 
 =head2 C<remove>
@@ -259,40 +273,15 @@ sub remove {
     map { $params{$_} = "" unless ( defined( $params{$_} ) ) }
         qw/ repos dir user /;
 
-    my $repohome = join( '/', $self->{partition}, $params{repos} );
 
-    get_logger(__PACKAGE__)->info("git: rm -r $params{dir} in ".$repohome);
+    ## (1) remove entire repository
+    ## make a backup in .DELETED.
+    ## TODO: don't we have to check whether the user is allowd to remove all branches?
+    unless ( $params{dir} ){
 
-    ## delete all files in subtree
-    if ($params{dir}){
-
-	my $pwd = getcwd();
-	chdir( $repohome );
-	my ($success,$ret,$out,$err) = &run_cmd( 'git',
-						 'rm',
-						 '-r',
-						 $params{dir} );
-	chdir($pwd);
-
-	unless ($success) {
-	    my @err_lines = <$err>;
-	    raise( 8, "cannot remove: " . Dumper(@err_lines) );
-	}
-
-	my ( $success, $ret, $out, $err ) = 
-	    $self->commit( $params{user}, $params{repos}, $params{dir}, 'remove '.$params{dir});
-
-	unless ($success) {
-	    my @err_lines = <$err>;
-	    raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-	}
-	return 1;
-    }
-
-
-    ## remove entire repository
-    ## make a backup in 
-    else{
+	## path to master git
+	my $mastergit = join( '/', ( $GITHOME, $params{repos} ) );
+	my $localgit  = join( '/', ( $self->{partition}, $params{repos} ) );
 
 	## THIS LOOKS QUITE DANGEROUS
 	## TODO: MAKE SURE THAT NOTHING CAN GO WRONG HERE
@@ -303,68 +292,70 @@ sub remove {
 	if ( -d $backup ) {
 	    if ($params{repos} && $params{repos}!~/^\./ && 
 		$params{repos}!~/\.\.\// && $params{repos}!~/\s/){
-		if ($params{partition} && $params{partition}!~/^\./ 
-		    && $params{partition}!~/\.\.\//){
+		if ($GITHOME && $GITHOME!~/^\./ && $GITHOME!~/\.\.\//){
 		    rmtree($backup)
 			or raise( 8, "cannot remove $backup (" . $! . ')' );
 		}
 	    }
 	}
-	get_logger(__PACKAGE__)->debug("git: move $repohome to $backup)");
+	get_logger(__PACKAGE__)->debug("git: move $mastergit to $backup)");
 	raise( 8, "cannot copy over to $backup") if ( -d $backup );
 
 	unless ( -d dirname($backup) ) {
             mkdir( dirname($backup) )  or raise( 8, "mkdir ".dirname($backup) );
         }
-	move( $repohome, $backup ) || raise( 8, $! );
+	move( $mastergit, $backup ) || raise( 8, $! );
+
+	## delete all branches
+	## TODO: THIS LOOKS QUITE DANGEROUS ...
+	## TODO: IS THIS ALL SAFE ENOUGH?
+	if ($params{repos} && $params{repos}!~/^\./ && 
+	    $params{repos}!~/\.\.\// && $params{repos}!~/\s/){
+	    if ($params{partition} && $params{partition}!~/^\./ 
+		&& $params{partition}!~/\.\.\//){
+		rmtree($localgit)
+		    or raise( 8, "cannot remove $localgit (" . $! . ')' );
+	    }
+	}
 	return 1;
     }
 
+    my @paths = split(/\//,$params{dir});
+
+    ## (2) remove entire branch
+    ## TODO: do we need to check whether the user is allowed to do that? (but how?)
+    ## (allow only if user=branch?))
+    ## ---> just remove the local opy but do not remove the branch from the master copy
+    ## alternative: git branch -d the_local_branch && git push origin :the_remote_branch
+    ## new syntax in git 1.7: git push origin --delete the_remote_branch
+
+    if ( $params{dir} eq $paths[0] ){
+	$self->_commit( $params{repos}, $params{dir}, 
+			"final commit before removing local copy" );
+	return $self->SUPER::remove(@_);
+    }
 
 
+    ## (3) finally: remove subtree or file
 
-    # my $path = join( '/', $self->{partition}, $params{repos}, $params{dir} );
+    my $repohome = join( '/', $self->{partition}, $params{repos}, $params{user} );
+    my $pwd = getcwd();
+    chdir( $repohome );
+    my $branch = shift ( @paths );
+    my $path   = join( '/', @paths );
+    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'rm', '-r', $path );
+    chdir($pwd);
 
-    # if ($self->SUPER::remove(%params)){
-    # 	$self->commit( $params{user}, $path, 'remove '.$params{dir});
-    # 	return 1 unless (-e $path);
-    # }
-    # return 0;
+    unless ($success) {
+	my @err_lines = <$err>;
+	raise( 8, "cannot remove: " . Dumper(@err_lines) );
+    }
 
-
-    # ## use parent if we want to remove the entire repo
-    # unless ($params{dir}){
-    # 	return $self->SUPER::remove(@_);
-    # }
-
-    # my $path = join( '/',
-    #     $self->{partition}, $params{repos}, $params{dir}
-    # );
-
-    # my $pwd = getcwd();
-    # chdir( dirname($path) );
-    # get_logger(__PACKAGE__)->info("git: rm -r $params{dir} in ".dirname($path));
-    # my ($success,$ret,$out,$err) = &run_cmd( 'git',
-    # 					     'rm',
-    # 					     '-r',
-    # 					     $params{dir} );
-    # chdir($pwd);
-
-    # unless ($success) {
-    # 	my @err_lines = <$err>;
-    # 	raise( 8, "cannot remove: " . Dumper(@err_lines) );
-    # }
-
-    # my ( $success, $ret, $out, $err ) = 
-    # 	$self->commit( $params{user}, $path, 'remove '.$params{dir});
-
-    # unless ($success) {
-    # 	my @err_lines = <$err>;
-    # 	raise( 8, "cannot commit files: " . Dumper(@err_lines) );
-    # }
-    # return $self->SUPER::remove(%params);
-    # return 1;
+    $self->_commit( $params{repos}, $branch, "remove $path" );
+    return $success;
 }
+
+
 
 
 
@@ -388,20 +379,7 @@ Returns: ( $success, $return_code, $stdout, $stderr )
 
 sub commit{
     my ( $self, $user, $repos, $dir, $message) = @_;
-
-    $message = 'unknown reason' unless ($message);
-    my $repohome = join( '/', $self->{partition}, $repos );
-
-    my $pwd = getcwd();
-    chdir( $repohome );
-    get_logger(__PACKAGE__)->info("cd $repohome; git commit -am $message ($dir)");
-    my ($success,$ret,$out,$err) = &run_cmd( 'git',
-					     'commit',
-					     '-am', 
-					     $message );
-    chdir($pwd);
-
-    return ($success,$ret,$out,$err);
+    return $self->( $repos, $user, $message );
 }
 
 
@@ -477,14 +455,22 @@ sub list {
 
     # need owner name to set 'author' attribute
     my $owner = length $params{branch} ? $params{branch}->owner() : 'unknown';
+    my @paths = split(/\//,$params{dir});
+    my $user = shift(@paths);
+    my $path = join( '/', @paths );
 
-    my $repohome = join( '/', $self->{partition}, $params{repos} );
+    my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
     my $path_to_display = join( '/', $params{repos}, $params{dir} );
     my $revision = $params{revision} || 'HEAD';
 
-    my $path = $params{dir};
-    unless ( $self->_is_file( $repohome, $revision, $path )){
-	$path .= '/';
+    if ($path){
+	unless ( $self->_is_file( $repohome, $revision, $path )){
+	    $path .= '/';
+	}
+    }
+    else{
+	## root dir
+	$path = '--';
     }
 
     ## get listing from git
@@ -569,12 +555,16 @@ sub export {
 
     # default revision = HEAD (last revision)
     $params{rev} = 'HEAD' unless ($params{rev});
-    my $repohome = join( '/', $self->{partition}, $params{repos} );
 
-    if ( $self->_is_file( $repohome, $params{rev}, $params{src} ) ){
+    my @paths = split(/\//,$params{src});
+    my $user = shift(@paths);
+    my $path = join( '/', @paths );
+
+    my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
+    if ( $path && $self->_is_file( $repohome, $params{rev}, $path ) ){
 	${ $params{trg} } = 
 	    $self->_export_file($repohome, 
-				$params{src},
+				$path,
 				$params{rev}, 
 				$params{archive} );
 	get_logger(__PACKAGE__)->debug("git: download file $params{src} to ${ $params{trg} }");
@@ -582,7 +572,7 @@ sub export {
     }
     elsif ( $params{archive} ){
 	${ $params{trg} } = 
-	    $self->_export_subtree($repohome, $params{src}, $params{rev});
+	    $self->_export_subtree($repohome, $path, $params{rev});
 	get_logger(__PACKAGE__)->debug("git: download dir $params{src} to ${ $params{trg} }");
 	return 1;
     }
@@ -609,14 +599,15 @@ sub _export_subtree {
     my $pwd = getcwd();
     chdir( $repohome );
     # git archive --format=zip --prefix=... -o output.zip rev:path 
-    get_logger(__PACKAGE__)->info("git: export $revision:$path to $target");
     my $prefix = basename($path);
+    $path = ':'.$path if ($path);
+    get_logger(__PACKAGE__)->info("git archive --format=zip --prefix=$prefix -o $target $revision$path");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'archive',
 					     '--format=zip',
 					     '--prefix='.$prefix.'/',
 					     '-o', $target,
-					     $revision.':'.$path );
+					     $revision.$path );
     chdir($pwd);
     return $target;
 }
@@ -636,8 +627,7 @@ sub _export_file {
     my $pwd = getcwd();
     chdir( $repohome );
     if ( $revision eq 'HEAD' ){
-	# git checkout-index --prefix=$tmp_dir/  publications/NAACL2018/nmt-standard.pdf
-	get_logger(__PACKAGE__)->info("git: export $path to $tmp_dir");
+	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
 	my ($success,$ret,$out,$err) = &run_cmd( 'git',
 						 'checkout-index',
 						 '--prefix='.$tmp_dir.'/',
@@ -698,6 +688,7 @@ sub _is_file{
 
     my $pwd = getcwd();
     chdir( $reposdir );
+
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'ls-tree',
 					     '-l',
