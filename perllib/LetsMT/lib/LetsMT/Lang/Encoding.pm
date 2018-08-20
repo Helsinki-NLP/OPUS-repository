@@ -216,16 +216,7 @@ sub detect_encoding {
         close($fh);
     }
 
-    # 2) try the file command
-    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
-    if ($success) {
-	if ($out=~/charset=(\S+)(\s|\Z)/){
-	    my $enc = $1;
-	    return $enc unless ($enc eq 'binary');
-	}
-    }
-
-    # 3) try with chared
+    # 2) try with chared
     # generate a warning if chared is not installed!
     unless ($CHARED){
         get_logger(__PACKAGE__)->warn("chared is not found!");
@@ -298,15 +289,23 @@ sub detect_encoding {
 	    return guess_encoding( $lang, $file );
 	}
     }
-    # if no language is given! --> try the hard way and do language + encoding detection
-    else{
-	my ($lang) = &LetsMT::Lang::Detect::classify_with_textcat($file,$TEXTCAT_LM_DIR,
-								  \%TEXTCAT_MODELS);
-	if ($lang=~/^(.*)\.(.*)$/){
-	    return $2;
+
+    # 3) try the file command
+    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
+    if ($success) {
+	if ($out=~/charset=(\S+)(\s|\Z)/){
+	    my $enc = $1;
+	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
 	}
-	return 'utf-8';
     }
+
+    # last chance: try the hard way and do language + encoding detection
+    my ($lang) = &LetsMT::Lang::Detect::classify_with_textcat($file,$TEXTCAT_LM_DIR,
+							      \%TEXTCAT_MODELS);
+    if ($lang=~/^(.*)\.(.*)$/){
+	return $2;
+    }
+    return 'utf-8';
 }
 
 
@@ -324,9 +323,17 @@ Requires 'file' tool!
 sub guess_encoding {
     my ( $lang, $file ) = @_;
 
-    ## try with file tool first
-    my $filetype = `file $file`;
-    return 'utf-8' if ( $filetype =~ /UTF-8/ );
+#    ## try with file tool first
+#    my $filetype = `file $file`;
+#    return 'utf-8' if ( $filetype =~ /UTF-8/ );
+
+    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
+    if ($success) {
+	if ($out=~/charset=(\S+)(\s|\Z)/){
+	    my $enc = $1;
+	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
+	}
+    }
 
     ## supported by Perl Encode:
     ## use Encode; @all_encodings = Encode->encodings(":all");
