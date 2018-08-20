@@ -734,6 +734,7 @@ Returns a list of handlers to try on C<$resource> based on path and suffix.
 #       instead of getting the first path element and the file suffix
 #       to take appropriate handlers from the TYPES hash ....?
 #
+## changed now ... this is still a bit ad-hoc but is a bit cleaner
 
 sub get_resource_handlers {
     my $self = shift;
@@ -741,25 +742,49 @@ sub get_resource_handlers {
 
     my @handlers;
 
-    #
-    # Add directory typing
-    #
-    my $path_handler = $self->{path_lookup}->( $resource->path );
-    push @handlers, $path_handler if ( defined $path_handler );
+    my $suffix_type = suffix_type( $resource->path );
+    my $path_type   = path_type( $resource->path );
 
-    #
-    # Add suffix typing
-    #
-    my $suffix_handler = $self->{suffix_lookup}->( $resource->path );
-    if ( defined $suffix_handler ) {
-        unless ( grep( $_ eq $suffix_handler, @handlers ) ) { # avoid existing
-            push @handlers, $suffix_handler;
-        }
+    ## moses over-rules suffix-types
+    if ($path_type eq 'moses'){
+	push( @handlers, $$TYPES{$path_type} );
     }
 
-    ## take the generic handler for unknown formats
-    ## if no other handler is found (Apache Tika)
+    ## otherwise: suffix-patterns are first
+    push( @handlers, $$TYPES{$suffix_type} ) if (defined $suffix_type);
+
+    ## path-types are second
+    if ($path_type && $path_type ne 'moses'){
+	if ($path_type ne $suffix_type){
+	    push( @handlers, $$TYPES{$path_type} );
+	}
+    }
+
+    ## add default handler if no other found
     push(@handlers,$TYPES->{unknown}) unless @handlers;
+
+
+## OLD style for lookup functions
+## 
+#     # #
+#     # # Add directory typing
+#     # #
+#     # my $path_handler = $self->{path_lookup}->( $resource->path );
+#     # push @handlers, $path_handler if ( defined $path_handler );
+
+#     # #
+#     # # Add suffix typing
+#     # #
+#     # my $suffix_handler = $self->{suffix_lookup}->( $resource->path );
+#     # if ( defined $suffix_handler ) {
+#     #     unless ( grep( $_ eq $suffix_handler, @handlers ) ) { # avoid existing
+#     #         push @handlers, $suffix_handler;
+#     #     }
+#     # }
+#
+#     ## take the generic handler for unknown formats
+#     ## if no other handler is found (Apache Tika)
+#     push(@handlers,$TYPES->{unknown}) unless @handlers;
 
     ## set additional parameters for each import handler
     foreach my $h (@handlers){
@@ -770,19 +795,54 @@ sub get_resource_handlers {
 }
 
 
+## NEW 2018-08-20: simplify type lookup
+
 sub suffix_lookup{
     my $self = shift;
     my $path = shift;
 
-    return $self->{suffix_lookup}->( $path );
+    if ($path=~/\.(\S+)(\.gz)?$/i){
+	return $TYPES->{$1} if (exists $TYPES->{$1});
+    }
+    return undef;
+    # return $self->{suffix_lookup}->( $path );
 }
 
 sub path_lookup{
     my $self = shift;
     my $path = shift;
 
-    return $self->{path_lookup}->( $path );
+    my @parts = split(/\/+/,$path);
+    return $$TYPES{$parts[1]} if ($parts[0] eq 'uploads' && exists $$TYPES{$parts[1]});
+    return $$TYPES{$parts[0]} if (exists $$TYPES{$parts[0]});
+    return undef;
+#     return $self->{path_lookup}->( $path );
 }
+
+
+
+## return suffix type
+
+sub suffix_type{
+    my $path = shift;
+
+    if ($path=~/\.(\S+)(\.gz)?$/i){
+	return $1 if (supported($1));
+    }
+    return 'gz' if ($path=~/\.(gz)$/i);
+    return undef;
+}
+
+sub path_type{
+    my $path = shift;
+
+    my @parts = split(/\/+/,$path);
+    return $parts[1] if ($parts[0] eq 'uploads' && supported($parts[1]));
+    return $parts[0] if (supported($parts[0]));
+    return undef;
+}
+
+
 
 
 

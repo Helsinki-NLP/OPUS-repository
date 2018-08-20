@@ -269,6 +269,7 @@ sub create_storage_branch {
         $slotobj->type
     ) or raise( 9, "Storage Backend", 'error' );
 
+    $logger->debug( "mkdir $slot/$branch ($uid)");
     $vc->mkdir( $slot, $branch, $uid, '' );
     my $branchobj = new LetsMT::Repository::StorageManager::Branch(
         $diskname,   $branch,    $slot,      $uid,

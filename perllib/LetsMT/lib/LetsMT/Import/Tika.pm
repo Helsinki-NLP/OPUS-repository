@@ -150,7 +150,7 @@ sub convert {
         '-eUTF-8',
         $resource->local_path
     );
-    if (pipe_out_cmd( $text_resource->local_path, @cmd )){
+    if (pipe_out_cmd_quiet( $text_resource->local_path, @cmd )){
 
         ## add pre-processing tools to the importer if necessary
         foreach ('normalizer', 'splitter', 'tokenizer') {

@@ -15,6 +15,7 @@ our @EXPORT = qw( detect_encoding text2utf8 text2utf8_inplace );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 use LetsMT::Lang::ISO639 qw / :all /;
+use LetsMT::Lang::Encoding;
 use LetsMT::Lang::Detect;
 use LetsMT::Tools qw / :all /;
 
@@ -215,7 +216,16 @@ sub detect_encoding {
         close($fh);
     }
 
-    # 2) try with chared
+    # 2) try the file command
+    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
+    if ($success) {
+	if ($out=~/charset=(\S+)(\s|\Z)/){
+	    my $enc = $1;
+	    return $enc unless ($enc eq 'binary');
+	}
+    }
+
+    # 3) try with chared
     # generate a warning if chared is not installed!
     unless ($CHARED){
         get_logger(__PACKAGE__)->warn("chared is not found!");

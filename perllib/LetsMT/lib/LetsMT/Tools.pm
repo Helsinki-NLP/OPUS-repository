@@ -25,6 +25,7 @@ use IPC::Run qw(run start finish timeout);
 
 use Symbol qw(gensym);
 use LetsMT::Repository::Err;
+# use LetsMT::Lang::Encoding;
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -33,7 +34,7 @@ our @EXPORT = qw(
     utf8_to_perl  utf8_to_perl_no_copy
     safe_path  safe_path_utf8
     safe_system
-    open_cmd close_cmd run_cmd pipe_out_cmd
+    open_cmd close_cmd run_cmd pipe_out_cmd pipe_out_cmd_quiet
     cacheopen cacheclose append
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
@@ -110,8 +111,12 @@ the default (C<$DEFAULT_INPUT_ENCODING>) is used.
 
 sub open_bom_file {
     my $file = shift or get_logger(__PACKAGE__)->error('Invalid filename supplied');
-    my $enc  = shift || get_bom_encoding ($file) || $DEFAULT_INPUT_ENCODING;
+    # my $enc  = shift || get_bom_encoding ($file) || $DEFAULT_INPUT_ENCODING;
+    my $enc  = shift || get_bom_encoding ($file);
     my $fh;
+
+    $enc = &LetsMT::Lang::Encoding::detect_encoding($file) unless ($enc);
+    $enc = $DEFAULT_INPUT_ENCODING unless ($enc);
 
     # my $read = _read_mode($file);
     if ( $file =~ /\.gz$/ ) {
@@ -360,6 +365,15 @@ sub pipe_out_cmd {
 
     my $err;
     my $success = run \@cmd, '<', \undef, '>', $out;
+    return wantarray() ? ($success, $? >> 8) : $success;
+}
+
+sub pipe_out_cmd_quiet {
+    my $out = shift;
+    my @cmd=@_;
+
+    my $err;
+    my $success = run \@cmd, '<', \undef, '>', $out, '2>/dev/null';
     return wantarray() ? ($success, $? >> 8) : $success;
 }
 

@@ -76,8 +76,11 @@ sub init {
 	}
     }
 
+    ## don't create branch for the user at this moment ...
     return $self->_clone( $slot, $user, $base );
+    # return 1;
     # return $self->SUPER::init(@_);
+
 }
 
 
@@ -97,6 +100,7 @@ sub _clone{
     ## path to local copy with user branch
     my $localgit = join( '/', ( $self->{partition}, $slot, $user ) );
 
+    get_logger(__PACKAGE__)->info("git clone $mastergit $localgit");
     my ( $success, $ret, $out, $err ) = 
 	&run_cmd( 'git', 'clone', $mastergit, $localgit );
     unless ($success){
@@ -180,7 +184,17 @@ sub mkdir {
     my $self = shift;
     my ( $repos, $branch, $user, $dir ) = @_;
 
+    my $path = join( '/', ( $self->{partition}, $repos, $branch, $dir ) );
+    return 1 if (-d $path);
+
     get_logger(__PACKAGE__)->debug("git: mkdir $repos $branch $user $dir");
+
+    ## no dir given: create a new repository branch
+    unless ($dir){
+	return $self->_clone( $repos, $branch, $user );
+	# return 0 unless ($branch eq $user);
+	# return $self->init( $repos, $branch );
+    }
 
     if ( $self->SUPER::mkdir(@_) ){
 	my $repohome = join( '/', $self->{partition}, $repos );
