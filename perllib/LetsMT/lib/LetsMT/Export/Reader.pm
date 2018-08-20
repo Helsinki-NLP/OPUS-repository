@@ -61,6 +61,7 @@ our %READER = (
     xces        => 'LetsMT::Export::Reader::XCES',
     parallel    => 'LetsMT::Export::Reader::Corpus',
     monolingual => 'LetsMT::Export::Reader::Corpus',
+    rawxml      => 'LetsMT::Import::XMLReader',
     text        => 'LetsMT::Import::TextReader',
     srt         => 'LetsMT::Import::SRTReader',
     tmx         => 'LetsMT::Import::TMXReader',
