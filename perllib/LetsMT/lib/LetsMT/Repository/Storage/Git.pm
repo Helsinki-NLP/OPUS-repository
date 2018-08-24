@@ -75,12 +75,7 @@ sub init {
 	    raise( 8, "cannot create git-repo $gitpath: " . Dumper(@err_lines) );
 	}
     }
-
-    ## don't create branch for the user at this moment ...
     return $self->_clone( $slot, $user, $base );
-    # return 1;
-    # return $self->SUPER::init(@_);
-
 }
 
 
@@ -123,6 +118,11 @@ sub _clone{
 	my @err_lines = <$err>;
 	raise( 8, "cannot create branch $user in git-repo $localgit: " . Dumper(@err_lines) );
     }
+
+    ## create standard dirs xml and uploads (trick to make the git non-empty!)
+    # $self->mkdir( $slot, $user, $user, 'xml' );
+    # $self->mkdir( $slot, $user, $user, 'uploads' );
+
     return $success;
 }
 
@@ -191,7 +191,11 @@ sub mkdir {
 
     ## no dir given: create a new repository branch
     unless ($dir){
-	return $self->_clone( $repos, $branch, $user );
+	if ($user ne $branch){
+	    return $self->init( $repos, $branch, $user );
+	}
+	return $self->init( $repos, $branch );
+	# return $self->_clone( $repos, $branch, $user );
 	# return 0 unless ($branch eq $user);
 	# return $self->init( $repos, $branch );
     }
@@ -312,9 +316,9 @@ sub remove {
 		}
 	    }
 	}
-	get_logger(__PACKAGE__)->debug("git: move $mastergit to $backup)");
 	raise( 8, "cannot copy over to $backup") if ( -d $backup );
 
+	get_logger(__PACKAGE__)->debug("git: move $mastergit to $backup)");
 	unless ( -d dirname($backup) ) {
             mkdir( dirname($backup) )  or raise( 8, "mkdir ".dirname($backup) );
         }
@@ -323,12 +327,14 @@ sub remove {
 	## delete all branches
 	## TODO: THIS LOOKS QUITE DANGEROUS ...
 	## TODO: IS THIS ALL SAFE ENOUGH?
+	get_logger(__PACKAGE__)->debug("git: remove $localgit");
 	if ($params{repos} && $params{repos}!~/^\./ && 
 	    $params{repos}!~/\.\.\// && $params{repos}!~/\s/){
-	    if ($params{partition} && $params{partition}!~/^\./ 
-		&& $params{partition}!~/\.\.\//){
+	    if ($self->{partition} && $self->{partition}!~/^\./ 
+		&& $self->{partition}!~/\.\.\//){
 		rmtree($localgit)
 		    or raise( 8, "cannot remove $localgit (" . $! . ')' );
+		get_logger(__PACKAGE__)->debug("git: remove $localgit done)");
 	    }
 	}
 	return 1;
