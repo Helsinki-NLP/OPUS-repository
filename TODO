@@ -1,10 +1,19 @@
 To do as of version 0.50
 ========================
 
+
+* install and setup Apache Tika as a server and call it from Apache::Tika
+  https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
+  https://metacpan.org/pod/Apache::Tika
 * update Apache Tika (plus allow options?)
 * integrate pdf2xml (on-going)
 * slurm job manager (working, parameters, resource management missing)
-* git backend (half done)
+* git backend (done)
+  better bindings with
+  https://metacpan.org/pod/Git
+  https://metacpan.org/pod/Git::Class
+  https://metacpan.org/pod/Git::Raw
+  https://metacpan.org/pod/Git::XS
 * code optimization (svn backend, validation, conversion ...)
 * trainable sentence splitters & tokenizers (openNLP, other?)
 * stable web interface with configuration support
