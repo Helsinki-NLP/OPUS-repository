@@ -1,0 +1,541 @@
+
+== 0.56 ==
+
+* added support for git as the storage backend (now as default)
+* added support for SLURM as the batch job manager (now as default)
+* integrated pdf2xml from https://bitbucket.org/tiedemann/pdf2xml/
+* updated Apache Tika to v1.18
+* bugfixing and fixed unit tests
+
+
+== 0.52 - 0.55 ==
+
+* undocumented changes
+
+== 0.51 ==
+
+Release date: '''2012-09-20'''.
+
+=== Major changes ===
+
+* Bug fix in installation routines (setting environment variables for the Apache:443 host)
+* Better integration of OpenNLP sentence splitters (using Inline Java)
+* Bug fix in the Text Importer (conversion to UTF-8 in validation step)
+
+
+== 0.50 ==
+
+Release date: '''2012-09-17'''.
+
+The LetsMT! Resource Repository is now officially licensed under the [http://www.gnu.org/licenses/ GNU General Public License].
+
+=== Major changes ===
+
+* improved handling of large imports:
+  * individual files from archives are uploaded from the grid client to the repository as soon as they are processed
+  * creation of import jobs is deferred to a "master job" on the grid (via new //letsmt_make//) so that the user interface is operable again ASAP after a command
+* all temporary files obey the directory choice made in the environment variable $LETSMT_TMP
+* no direct communication between RR server and group database (fixes bug in v 0.44)
+* //letsmt_rest//:
+  * displays more specific error information
+  * displays a bit more verbose status information in the case of setting/deleting commands
+  * command-line option //-x// has XML responses converted into a more human-readable format (vaguely similar to [http://haml.info/ HAML]) that uses indentation rather than "<tag>...</tag>" syntax to show structure (the lines of multiline text content, such as that returned by "cat", are marked by vertical bars "|" at the left)
+* //test suite//:
+  * split into "fast" and "slow" tests
+  * ordered such that fundamental operations are checked before others that rely on them
+  * common operations outsourced into central //Scaffold.pm//
+  * standard operations (user, slot management) are only tested once, so that the number of tests shown at the end gives a better impression of how many individual aspects actually are tested
+* //distributed installation//:
+  * as-installed configuration on Frontend, SGE clients points to server
+  * SSL-transfer hint printed at the end of the installation
+  
+* includes a Web user interface for the resource repository, called the //"Grenzschnitte"//
+  * optional, [RepositorySetup#webui installed separately]
+  * runs as a system service, reachable on port 81 or port 3000
+
+  
+== 0.44 ==
+
+Release date: '''2012-06-29'''.
+
+=== Major changes ===
+
+* more robust handling of UTF-8, not only within files
+  * filenames and metadata with accents work (mostly?) properly
+* //import//: fuzzy name matching for triggering automatic sentence alignment 
+* better cleanup of temporary files
+* better permission handling
+* add handling of group/user info (e.g. default pdf import mode)
+* //test suite//: cleanup of all temporary groups and users
+
+
+== 0.43 ==
+
+=== Major changes ===
+
+* //TokyoTorrent-server// more robust & standard startup 
+  * no manual fixing needed after a crash
+  * process-id files in /var/run/letsmt
+* fix Latvian text for language identification
+* implement better, safer way of calling system commands
+  * used especially in the storage backends
+* //letsmt_rest//: can also show history of metadata
+* //prerequisite installation//: allow forced installation (via flags set in makefile)
+* //installation//: abort if hostname is empty (which would cause trouble with certificates)
+
+
+== 0.42 ==
+
+=== Major changes ===
+
+* correct *.gz, especially *.txt.gz import (Tilde ticket #265)
+* correct detection of UTF-16 (Tilde ticket #264)
+* correct PDF import issue (formfeeds->newlines) (Tilde ticket #247)
+* make testing independent from execution speed (Tilde ticket #233)
+* Hunalign module checks that program is installed
+* less verbose logging
+* extend code documentation, make HTML doc. tree more user-friendly
+
+
+== 0.42rc4 ==
+
+=== Major changes ===
+
+ * relaxed language detection (warning instead of failure)
+ * improved import logging
+ * added incremental download when fetching parallel corpora
+
+
+== 0.42rc3 ==
+
+=== Major changes ===
+
+ * user name can contain @ sign now
+ * Moses imports can have blanks
+ * owner/creator of a slot can change meta data on slot level
+
+
+== 0.41 ==
+
+=== Major changes ===
+
+ * Fixed encoding/utf-8 related issues in file names, paths, username etc.
+ * srt subtitle import format added
+ 
+
+== 0.41rc7 ==
+
+=== Major changes ===
+
+ * Ticket 236, download with archive=no in filesystem backup works now
+ * added character encoding detection (for plain text import)
+ * added language identification (for imports)
+ * added meta-data for aligned documents (aligned-with, fromDoc, toDoc)
+ * text import produces paragraph boundaries, used in length-based sentence alignment (hunalign)
+ * improved (simplified) installation routines with various server roles (still needs to be tested more!)
+ * added Moses normalizer (takes care of special symbols that could crash Moses training)
+ * letsmt_rest supports "cat"
+ * added scripts for off-line language detection (letsmt_langdetect) and character encoding detection (letsmt_chardetect)
+
+=== Known issues ===
+
+ * install character encoding detection software with
+   {{{ sudo make -C installation -f Makefile.prereqs software-chared }}}
+
+
+== 0.41rc6 ==
+
+=== Major changes ===
+
+This release addresses various high-priority bugs identified by Tilde. Here are some comments about each specific bug:
+
+Ticket 192 and 232:
+  * files with UTF8 characters can be uploaded now (automatic import works as well)
+  * files with special characters and spaces are possible as well
+
+Ticket 231:
+  * uploads in Moses format may now include multiple parallel documents
+
+The release includes several other fixes not listed here ....
+
+== 0.41rc4 ==
+
+=== Major changes ===
+
+This release addresses various high-priority bugs identified by Tilde. Here are some comments about each specific bug:
+
+Ticket 222:
+ * error in TMXReader is fixed and import does not fail anymore without raising an error
+ * ulimit calls are changed and should not throw an error anymore on machines > 1GB virtual memory
+ * upload of small.tmx works in our test instance
+
+Ticket 223:
+ * zip archives were not implemented yet for uploads in Moses format (tar archives did work before)
+ * zip is now possible and should work
+
+Ticket 196:
+ * installation procedure is now changed to skip mySQL dependencies
+ * mySQL packages will only be installed if they are required (currently they are not with the standard setup)
+
+Ticket 224:
+ * uploads of large TMX files was tested and seems to work at our test instance
+ * there are validation error for some files, for example, when using control characters (maybe that was the problem?)
+ * logfiles for DTD validation errors and XML validation are now always uploaded
+ * added a new metadata attribute to show the progress of large imports: 'import_progress' attached to the resource to be imported
+
+Ticket 191:
+ * importing empty TMX files did not really fail but just did not produce any output
+ * changed status information to inform about empty output when converting
+ * validation logfiles will be uploaded now
+
+Ticket 186:
+ * removed bug with empty alignment in the Gale&Church alignment module
+
+
+== 0.37rc8 ==
+
+=== Major changes from 0.37rc2 ===
+ - Meta and group DB are using TokyoTyrant server instead of TokyoCabinet and MySQL -> this should solve the import problems
+ - Storage backend is more abstract and allows switching between SVN-file, SVN-server and experimental plain filesystem storage (currently SVN-file is active)
+ - The installation procedure has changed, aptitude packages get installed via the makefiles, not manually 
+ - General improvements to the makefiles and install speed
+
+
+== 0.37rc2 ==
+
+=== Major changes from 0.37rc1 ===
+ - Fixed metadata problems Tilde tickets 118, 132, 165
+ - fixed letsmt_fetch, Tilde ticket 158
+ - Setup problem fixed, 159
+ - Download of files with special characters, 163
+
+
+== 0.37rc1 ==
+
+=== Major changes from 0.36rc5 ===
+ - Naming of branches more flexible, does not need to be the users name any more unless data has to be imported from it
+ - Improved handling of public group, no it is an actually existing group, not just logically
+ - Installation errors fixed (Tilde ticket 159)
+ - Upload via curl works again like before (Tilde ticket 160)
+ - letsmt_fetch not fetching <lm> fixed (Tilde ticket 162)
+
+
+== 0.36rc5 ==
+
+=== Major changes from 0.35rc2 ===
+ - Lots of internal changes, for an overview of user related interface changes see: http://opus.lingfil.uu.se/letsmt-trac/wiki/WebAPI
+
+
+== 0.35rc2 ==
+
+=== Major changes from 0.34 ===
+ - daily metadata backups
+ - transaction log for write operations in metadata
+ - better cleanup in tmp/
+ - admin tool for listing slot contents and checking metadata
+
+
+== 0.34 ==
+
+=== Major changes from 0.33 ===
+ - fixed bug with blanks in file names, directory names
+ - validation log files get uploaded into repository
+ - letsmt_import uses relative paths in repository
+ - letsmt_import for OPUS corpora skips already existing files 
+
+
+== 0.33 ==
+
+PLEASE NOT THAT UPGRADE IS NOT SUPPORTED FOR THIS VERSION. YOU HAVE TO DO A CLEAN INSTALL!!
+
+=== Major changes from 0.31 ===
+ - updated Apache Tika from version 0.8 to 0.9 (for DOC import)
+ - added DOC import (still in testing)
+ - changed mysql DB user and password
+ - moved logs from /tmp to /var/log/letsmt
+ - splitted logs in username_debug.log, username_error.log, username_cluster_debug.log
+ - fixed TMX import
+ - XLIFF validation via schema
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+
+ - https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=110
+ - https://extranet.tilde.lv/letsmt/Lists/Task tracking/DispForm.aspx?ID=102
+ - https://extranet.tilde.lv/letsmt/Lists/Task tracking/DispForm.aspx?ID=99
+
+
+== 0.32 ==
+
+does not exist due to svn code repository problems...
+
+
+== 0.31 ==
+
+=== Major changes from 0.28b ===
+ - Improved logging so one has finer control over amount of logging information per module and moved initialization of logging to earlier stage in startup process 
+ - fixed bug in exception handling and reporting (Can't locate object method "Exception" via package "LetsMT_modperl_handler_exception"... ) 
+ - extended error reporting to reflect source of actual error with package name, filename, line
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+
+none
+
+=== Resolved tickets in UUP issue tracker ===
+
+none
+
+== 0.30 ==
+PLEASE NOTE THAT UPGRADING FROM PREVIOUS VERSION TO 0.29 IS NOT SUPPORTED AT THIS TIME; THIS IS AN EMERGENCY FIX TO GET THE EC2 SERVER READY WHERE NEW INSTALLATION IS THE ONLY OPTION.
+
+=== Major changes from 0.28b ===
+ - Configurable server host name, to allow any name in the SSL server certificate
+ - [update] fixed Makefile to use right user name, $LETSMTUSER instead of $USER
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+
+none
+
+=== Resolved tickets in UUP issue tracker ===
+
+none
+
+
+== 0.28b ==
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ - https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=109
+
+
+== 0.28 ==
+
+=== Upgrading from 0.20 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  sudo apt-get install libapache2-mod-perl2 libapache2-reload-perl libapache2-request-perl
+  tar -xzf LetsMT-0.28.tar.gz
+  cd LetsMT-0.28
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.28
+}}}
+
+=== Major changes from 0.20 ===
+ - The repository is now using mod_perl for speed.
+ - The installation procedure for servers without the repository has been updated.
+ - removed /cgi-bin from request url (from /cgi-bin/ws to /ws)
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ - https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=104
+ - https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=105
+
+=== Resolved tickets in UUP issue tracker ===
+
+none
+
+
+== 0.20 ==
+
+=== Upgrading from 0.19c ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.20.tar.gz
+  cd LetsMT-0.20
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.20
+}}}
+
+=== Major changes from 0.19c ===
+
+ - letsmt_rest can handle metadata via command-line (setmeta, addmeta, delete_meta)
+ - relative paths in fromDoc & toDoc + adjustments in import/fetch scripts
+ - new import modules for TMX (including older versions), XLIFF, tar, gz, zip
+ - found and fixed a branch retrieval bug, which triggered when branchname or slot was included in retrieval key
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=93 93]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=94 94]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=95 95]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=99 99]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=101 101]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=102 102]
+ - [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=103 103]
+
+
+=== Resolved tickets in UUP issue tracker ===
+
+ - [http://opus.lingfil.uu.se/letsmt-trac/ticket/47 47]
+ - [http://opus.lingfil.uu.se/letsmt-trac/ticket/48 48]
+ - [http://opus.lingfil.uu.se/letsmt-trac/ticket/49 49]
+ - [http://opus.lingfil.uu.se/letsmt-trac/ticket/50 50]
+ - [http://opus.lingfil.uu.se/letsmt-trac/ticket/52 52]
+
+
+== 0.19c ==
+
+This is a hotfix for release 0.19b. It could easily be a proper release, as the changes related to ticket 98 were not checked in seperate from other changes that are not ready for release.
+
+=== Upgrading from 0.19b ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.19c.tar.gz
+  cd LetsMT-0.19c
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.19c
+}}}
+
+=== Major changes from 0.19 ===
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ * [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=98 98]
+
+=== Resolved tickets in UUP issue tracker ===
+ * none
+
+== 0.19b ==
+
+This is a hotfix for release 0.19 (just forget about 0.19)
+
+=== Upgrading from 0.18 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.19b.tar.gz
+  cd LetsMT-0.19b
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.19b
+}}}
+
+=== Major changes from 0.18 ===
+ * queue manager includes correct configuration file
+   (automatic TMX conversion should work now for TMX v1.4 in UTF8)
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ * [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=94 94]
+ * [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=95 95]
+
+=== Resolved tickets in UUP issue tracker ===
+ * none
+
+
+== 0.18 ==
+
+=== Upgrading from 0.17 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.18.tar.gz
+  cd LetsMT-0.18
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.18
+}}}
+
+=== Major changes from 0.17 ===
+ * Metadata {{{resource-type}}} is copied to {{{kind}}}
+ * The release notes can now be found in {{{/usr/local/share/doc/resource_repository/Changelog.txt}}}
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ * [https://extranet.tilde.lv/letsmt/Lists/Task%20tracking/DispForm.aspx?ID=89 89]
+
+=== Resolved tickets in UUP issue tracker ===
+ * none
+
+== 0.17 ==
+
+=== Upgrading from 0.16 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.17.tar.gz
+  cd LetsMT-0.17
+  sudo make upgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.17
+}}}
+
+=== Major changes from 0.16 ===
+ * Delete slot is now working.
+ * All metadata responses are now in XML.
+ * Downloading single files can now be done without archiving (using option archive=no). This release has no checks whether the object is a directory or a file, so until that is in place, only do this for objects you know are files.
+ * The test suite now cleans up its slots .
+
+=== Resolved tickets in Tilde extranet issue tracker ===
+ * 80, 84, 86, 87 and 88
+
+=== Resolved tickets in UUP issue tracker ===
+ * none
+
+== 0.16 ==
+
+=== Upgrading from 0.12 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.16.tar.gz
+  cd LetsMT-0.16
+  sudo make upgrade
+  make test (if you accept test slots left in your repository)
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.16
+}}}
+
+=== Downgrading to 0.16 from 0.17 ===
+Download the release file [http://opus.lingfil.uu.se/letsmt-dev/releases/ here] and run the installation procedure:
+{{{
+  tar -xzf LetsMT-0.16.tar.gz
+  cd LetsMT-0.16
+  sudo make downgrade
+  make test
+}}}
+
+You can now remove the installation directory:
+{{{
+   cd ..
+   rm -rf LetsMT-0.16
+}}}
+
+=== Major changes from 0.12 ===
+ * the installation and upgrade procedure has been improved. The main makefile (in the root directory of the release installation directory) includes new targets upgrade, downgrade and test.
+ * the test suite is now working. Please note that the delete slot function is still not activated in the repository, so if you run tests, you will get a number of test slots in your repository.
+ * Status response XML should now be returned for all requests that are not downloading data.
+
+
+== 0.12 ==
+It does not provide the upgrade or test target in the main makefile.
+
+=== Downgrading to 0.12 from 0.16 ===
+As this release did not contain routines for this, please contact Per (per.weijnitz@gmail.com).
