@@ -155,9 +155,7 @@ install-files: ttservctl prepare-directories install-log install-apache-tika
 
 ## install Apache Tika server (should listen on port 9998)
 .PHONY: install-apache-tika
-install-apache-tika:
-	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-1.18.jar
-	${INSTALL_BIN} tika-server-1.18.jar ${PREFIX}/lib/
+install-apache-tika: ${PREFIX}/lib/tika-server-1.18.jar
 	@echo 'description     "Apache Tika Server"'    > tika-server.conf
 	@echo ''                                       >> tika-server.conf
 	@echo 'start on filesystem or runlevel [2345]' >> tika-server.conf
@@ -168,9 +166,13 @@ install-apache-tika:
 	@echo ''                                       >> tika-server.conf
 	@echo "exec java -jar ${PREFIX}/lib/tika-server-1.18.jar" >> tika-server.conf
 	${INSTALL_DATA} -b -S .old tika-server.conf /etc/init/tika-server.conf
-	rm -f tika-server.conf tika-server-1.18.jar
-	service tika-server start
+	rm -f tika-server.conf
+	service tika-server start || true
 
+${PREFIX}/lib/tika-server-1.18.jar:
+	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-1.18.jar
+	${INSTALL_BIN} tika-server-1.18.jar ${PREFIX}/lib/
+	rm -f tika-server-1.18.jar
 
 .PHONY: install-doc
 install-doc:
