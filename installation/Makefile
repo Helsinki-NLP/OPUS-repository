@@ -143,7 +143,7 @@ install-modules:
 ## handy to have as a separate target,
 ## we can call it from frontend installations too (frontend only, no repos)
 .PHONY: install-files
-install-files: ttservctl prepare-directories install-log
+install-files: ttservctl prepare-directories install-log install-apache-tika
 	${INSTALL_BIN} ../admin/*.sh ../admin/*.pl ${PREFIX}/bin/
 	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
 	${INSTALL_BIN} ../perllib/conf_modperl.pl $(LETSMT_MODPERL_STARTUP)
@@ -152,6 +152,24 @@ install-files: ttservctl prepare-directories install-log
 	ln -sf ${PREFIX}/bin/ttservctl /etc/init.d/ttservctl_meta
 	update-rc.d ttservctl_group defaults
 	update-rc.d ttservctl_meta defaults
+
+## install Apache Tika server (should listen on port 9998)
+.PHONY: install-apache-tika
+install-apache-tika:
+	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-1.18.jar
+	${INSTALL_BIN} tika-server-1.18.jar ${PREFIX}/lib/
+	@echo 'description     "Apache Tika Server"'    > tika-server.conf
+	@echo ''                                       >> tika-server.conf
+	@echo 'start on filesystem or runlevel [2345]' >> tika-server.conf
+	@echo 'stop on shutdown'                       >> tika-server.conf
+	@echo ''                                       >> tika-server.conf
+	@echo 'respawn'                                >> tika-server.conf
+	@echo 'respawn limit 3 12'                     >> tika-server.conf
+	@echo ''                                       >> tika-server.conf
+	@echo "exec java -jar ${PREFIX}/lib/tika-server-1.18.jar" >> tika-server.conf
+	${INSTALL_DATA} -b -S .old tika-server.conf /etc/init/tika-server.conf
+	rm -f tika-server.conf tika-server-1.18.jar
+	service tika-server start
 
 
 .PHONY: install-doc

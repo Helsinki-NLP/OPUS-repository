@@ -47,15 +47,16 @@ sub new {
     my $class = shift;
     my %self  = @_;
 
-    if ( $self{format} =~ /doc/i ) {
-        $self{CONVERTER} = new LetsMT::Import::DOC(%self);
-    }
+#    if ( $self{format} =~ /doc/i ) {
+#        $self{CONVERTER} = new LetsMT::Import::DOC(%self);
+#    }
     if ( $self{format} =~ /pdf/i ) {
         $self{CONVERTER} = new LetsMT::Import::PDF(%self);
     }
     # default converter = Tika (can detect document formats!)
     else {
-        $self{CONVERTER} = new LetsMT::Import::Tika(%self);
+#        $self{CONVERTER} = new LetsMT::Import::Tika(%self);
+        $self{CONVERTER} = new LetsMT::Import::ApacheTika(%self);
     }
     $self{READER} = new LetsMT::Export::Reader::XML(%self);
 

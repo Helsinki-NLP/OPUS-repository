@@ -37,8 +37,8 @@ install install-rr-server:  prepare-target stop-db
 	@echo "Installation is finished."
 	@echo
 
-.PHONY: install-storage-server install-sge-client install-frontend
-install-storage-server install-sge-client install-frontend: prepare-target
+.PHONY: install-storage-server install-sge-client install-client install-frontend
+install-storage-server install-sge-client install-client install-frontend: prepare-target
 	$(MAKE) $@ -C installation -f Makefile.prereqs
 	$(MAKE) $@ -C installation
 	@echo

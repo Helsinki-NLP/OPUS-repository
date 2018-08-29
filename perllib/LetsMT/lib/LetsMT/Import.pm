@@ -29,6 +29,7 @@ use LetsMT::Import::Moses;
 use LetsMT::Import::gz;
 use LetsMT::Import::tar;
 use LetsMT::Import::zip;
+use LetsMT::Import::ApacheTika;
 use LetsMT::Import::PDF;
 use LetsMT::Import::Text;
 # use LetsMT::Import::DOC;
@@ -104,14 +105,16 @@ my $TYPES = {
     pdf   => new LetsMT::Import::PDF,
     txt   => new LetsMT::Import::Text,
 #    doc   => new LetsMT::Import::DOC,
-    doc   => new LetsMT::Import::Tika(
+#    doc   => new LetsMT::Import::Tika(
+    doc   => new LetsMT::Import::ApacheTika(
         type => 'doc',
         type_pattern => '(?:doc|docx)',
         content_type_pattern => $doc_type_pattern ),
     srt   => new LetsMT::Import::SRT,
     # srt => new LetsMT::Import::SRTsimple
     xml   => new LetsMT::Import::XML,
-    unknown   => new LetsMT::Import::Tika
+#    unknown   => new LetsMT::Import::Tika
+    unknown   => new LetsMT::Import::ApacheTika
 };
 
 $TYPES->{text}     = $TYPES->{txt};

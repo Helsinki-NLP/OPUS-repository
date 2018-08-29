@@ -19,7 +19,8 @@ use LetsMT::DataProcessing::Splitter;
 use LetsMT::WebService;
 
 # alternative: use Tika!
-use LetsMT::Import::Tika;
+# use LetsMT::Import::Tika;
+use LetsMT::Import::ApacheTika;
 
 # needed for the layout-mode conversion
 use IPC::Run qw(run);
@@ -97,7 +98,8 @@ sub new {
 
     $self{mode} = $DEFAULT_MODE  unless ( defined $self{mode} );
 
-    $self{tika} = new LetsMT::Import::Tika(
+#    $self{tika} = new LetsMT::Import::Tika(
+    $self{tika} = new LetsMT::Import::ApacheTika(
 	type => 'pdf',
 	type_pattern => '(?:pdf|PDF)',
 	content_type_pattern => 'Content-Type: application\/pdf',

@@ -84,7 +84,8 @@ MYSQL_UBUNTU_PACKAGES = mysql-server mysql-client libdbd-mysql-perl
 MOJO_UBUNTU_PACKAGES = ${MYSQL_UBUNTU_PACKAGES} libgd2-xpm-dev
 
 
-CPAN_MODULES = 	Archive::Zip \
+CPAN_MODULES = 	Apache::Tika \
+		Archive::Zip \
 		Class::Sniff \
 		Encode::Locale \
 		File::GetLineMaxLength \
@@ -97,7 +98,9 @@ CPAN_MODULES = 	Archive::Zip \
 		Test::More \
 		Text::PDF2XML \
 		Switch
+
 # TODO: do we still need the Persistent modules?
+
 
 MOJO_CPAN_MODULES = Authen::Captcha \
 		Mojolicious \
