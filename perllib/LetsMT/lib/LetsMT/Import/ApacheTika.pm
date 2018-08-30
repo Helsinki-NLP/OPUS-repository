@@ -68,6 +68,7 @@ sub validate {
     my $type = $self->{type} || $resource->type();
 
     # read content and detect type with TIKA
+    # TODO: do we need to read the whole file for that?
     my $content  = $self->_read_raw_file($resource->local_path);
     my $detected = $TIKA->detect_stream($content);
 
@@ -116,6 +117,7 @@ sub convert {
 
     ## check whether we want rawxml or text from TIKA
     ## NOTE: extracting meta data seems to be very slow!
+    ## TODO: problems with large files that we read into memory?
     if ( $self->{intermediate_format} eq 'rawxml' ){
 	my $parsed = $TIKA->rmeta($RawContent);
 	if (ref($parsed) eq 'ARRAY'){
@@ -135,7 +137,8 @@ sub convert {
 	my $tmp_resource = $resource->convert_type( $type_pattern, $self->{intermediate_format} );
 	File::Path::make_path( $tmp_resource->path_down->local_path );
 
-	open F,$tmp_resource->local_path;
+	## TODO: should add some error if we cannot open/write file!
+	open F,'>',$tmp_resource->local_path;
 	binmode(F,":utf8");
 	print F $ParsedContent;
 	close F;
