@@ -94,8 +94,8 @@ our $IMPORT_REPORT_PROGRESS = 0;
 our $IMPORT_SPLITTER = 'europarl';
 
 # default PDF conversion mode
-# our $IMPORT_PDF_MODE = 'tika';
-our $IMPORT_PDF_MODE = 'combined';
+our $IMPORT_PDF_MODE = 'tika';
+# our $IMPORT_PDF_MODE = 'combined';
 
 
 
