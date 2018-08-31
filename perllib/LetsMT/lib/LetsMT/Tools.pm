@@ -21,7 +21,19 @@ use File::ShareDir;
 use Encode qw(decode decode_utf8 encode);
 
 use IPC::Open3;
-use IPC::Run qw(run start finish timeout);
+use IPC::Run qw(run start pump finish timeout);
+
+
+#########################
+## TODO: not working yet ....
+## from https://metacpan.org/pod/distribution/mod_perl/docs/api/Apache2/SubProcess.pod
+# use Apache;
+# use Apache2::SubProcess ();
+# my $r = shift;
+# use Config;
+# use constant PERLIO_IS_ENABLED => $Config{useperlio};
+#########################
+
 
 use Symbol qw(gensym);
 use LetsMT::Repository::Err;
@@ -48,10 +60,14 @@ Relaxed utf-8 encoding, C<utf8>.
 Accepts characters that are interpretable utf-8 characters, but strictly incorrect.
 Good for reading.
 
+=head2 C<$TIMEOUT>
+
+Timeout for system calls (see run_cmd). Default = 60 seconds.
+
 =cut
 
 our $DEFAULT_INPUT_ENCODING = 'utf8';
-
+our $TIMEOUT = 60;
 
 =head2 C<$DEFAULT_OUTPUT_ENCODING>
 
@@ -347,13 +363,77 @@ sub scrape_cmd_out_err {
 
 ## TODO: run_cmd cannot be used to pipe output/error to files
 
-sub run_cmd {
+sub run_cmd_old {
     my @cmd=@_;
     my ($in,$out,$err);
     # get_logger(__PACKAGE__)->debug( 'run_cmd: ' . join(' ',@cmd) );
     my $success = run \@cmd, \$in, \$out, \$err;
     return wantarray ? ($success ,$? >> 8,$out,$err) : $success;
 }
+
+
+sub run_cmd {
+    my @cmd=@_;
+    my ($in,$out,$err);
+
+    my ($h, $success);
+    eval {
+	$h = start \@cmd, \$in, \$out, \$err, timeout( $TIMEOUT );
+	$success = finish $h;
+    };
+    if ( $@ ) {
+	print STDERR "killed job: ".join(' ',@cmd)."\n";
+	$h->kill_kill if (ref($h));
+	# $success = 0;
+
+	## try another type of system call
+	## TODO: why not always using this one?
+	## TODO: is this safe enough ...?
+	my @outlines = scrape_cmd_out(@cmd);
+	$success = 1;
+	$out = join('',@outlines);
+    }
+    return wantarray ? ($success ,$? >> 8,$out,$err) : $success;
+}
+
+
+# #############################################
+# ## TODO: this does not seem to work ...
+# ##
+# ## run_cmd via Apache::SubProcess
+# sub run_cmd_apache{
+#     my $command = shift;
+#     my @argv = @_;
+
+#     get_logger(__PACKAGE__)->debug( 'run command in apache ' . $command. ' '.join(' ',@argv) );
+#     my $r = new Apache2::SubProcess;
+#     my ($in, $out, $err) = $r->spawn_proc_prog($command,\@argv);
+#     close($in);
+#     my $output = _read_data($out);
+#     my $error = _read_data($err);
+#     close($out);
+#     close($err);
+#     my $success = $error ? 1: 0;
+#     return wantarray ? ($success ,$? >> 8,$output,$error) : $success;
+# }
+
+# # helper function to work w/ and w/o perlio-enabled Perl
+# sub _read_data {
+#     my ($fh) = @_;
+#     my $data;
+#     if (PERLIO_IS_ENABLED || IO::Select->new($fh)->can_read(10)) {
+# 	my @lines = <$fh>;
+# 	$data = join("\n",@lines);
+#     }
+#     return defined $data ? $data : '';
+# }
+
+###############################################################
+
+
+
+
+
 
 
 ## TODO: is it wise to have yet another function to allow piping to files?

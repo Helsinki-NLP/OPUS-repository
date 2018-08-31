@@ -328,7 +328,7 @@ sub get_resource_request {
     # (but if param{archive} is given --> keep it packed)
     unless ( defined $params{archive} ) {
         if ( $res->is_success && $download_archive ) {
-            my ( $success, $ret, $out, $err) = &run_cmd(
+            my $success = &run_cmd(
                 'unzip','-qq','-o','-d',
                 dirname( $resource->local_path ),
                 $target_file,

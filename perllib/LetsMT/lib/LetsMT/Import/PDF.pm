@@ -264,12 +264,11 @@ Convert a pdf to text in C<standard> mode.
 
 sub convert_standard_cmd {
     my ( $resource, $text_resource ) = @_;
-    my ($success,$ret,$out,$err) = &run_cmd(
+    return &run_cmd(
         'pdftotext','-enc','UTF-8',
         $resource->local_path,
         $text_resource->local_path
-    );
-    return $success;
+	);
 }
 
 
@@ -283,11 +282,10 @@ Convert a pdf to text in C<raw> mode.
 
 sub convert_raw_cmd {
     my ( $resource, $text_resource ) = @_;
-    my ($success, $ret, $out, $err) = &run_cmd(
+    return &run_cmd(
         'pdftotext','-raw','-enc','UTF-8',
         $resource->local_path,
         $text_resource->local_path);
-    return $success;
 }
 
 

@@ -40,6 +40,7 @@ UBUNTU_BASE_PACKAGES = \
 		liblog-dispatch-perl \
 		liblog-log4perl-perl \
 		libmodule-install-perl \
+		libmagic-dev \
 		libparams-util-perl \
 		libppi-perl \
 		libssl-dev \
@@ -89,6 +90,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Class::Sniff \
 		Encode::Locale \
 		File::GetLineMaxLength \
+		File::LibMagic \
 		File::Touch \
 		Lingua::Sentence \
 		Module::Install \

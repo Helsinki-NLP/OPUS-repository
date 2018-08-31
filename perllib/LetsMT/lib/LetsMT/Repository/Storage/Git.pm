@@ -71,8 +71,8 @@ sub init {
 	    $gitpath
 	    );
 	unless ($success){
-	    my @err_lines = <$err>;
-	    raise( 8, "cannot create git-repo $gitpath: " . Dumper(@err_lines) );
+	    # my @err_lines = <$err>;
+	    raise( 8, "cannot create git-repo $gitpath: " . $err );
 	}
     }
     return $self->_clone( $slot, $user, $base );
@@ -99,8 +99,8 @@ sub _clone{
     my ( $success, $ret, $out, $err ) = 
 	&run_cmd( 'git', 'clone', $mastergit, $localgit );
     unless ($success){
-	my @err_lines = <$err>;
-	raise( 8, "cannot clone git-repo $mastergit to $localgit: " . Dumper(@err_lines) );
+	# my @err_lines = <$err>;
+	raise( 8, "cannot clone git-repo $mastergit to $localgit: " . $err );
     }
 
     my $pwd = getcwd();
@@ -115,8 +115,8 @@ sub _clone{
 
     chdir($pwd);
     unless ($success){
-	my @err_lines = <$err>;
-	raise( 8, "cannot create branch $user in git-repo $localgit: " . Dumper(@err_lines) );
+	# my @err_lines = <$err>;
+	raise( 8, "cannot create branch $user in git-repo $localgit: " . $err );
     }
 
     ## create standard dirs xml and uploads (trick to make the git non-empty!)
@@ -144,7 +144,7 @@ sub _add_file{
 
     my $pwd = getcwd();
     chdir($gitpath);
-    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'add', $path );
+    my $success = &run_cmd( 'git', 'add', $path );
     chdir($pwd);
 
     # $self->_commit( $slot, $user, 'add $path to repository' );
@@ -166,9 +166,9 @@ sub _commit{
 
     my $pwd = getcwd();
     chdir($gitpath);
-    my ($success,$ret,$out,$err) = &run_cmd( 'git', 'commit', '-am', $message );
+    my $success = &run_cmd( 'git', 'commit', '-am', $message );
     if ($success){
-	($success,$ret,$out,$err) = &run_cmd( 'git', 'push', 'origin', $user );
+	$success = &run_cmd( 'git', 'push', 'origin', $user );
     }
     chdir($pwd);
 
@@ -367,8 +367,8 @@ sub remove {
     chdir($pwd);
 
     unless ($success) {
-	my @err_lines = <$err>;
-	raise( 8, "cannot remove: " . Dumper(@err_lines) );
+	# my @err_lines = <$err>;
+	raise( 8, "cannot remove: " . $err );
     }
 
     $self->_commit( $params{repos}, $branch, "remove $path" );
@@ -415,7 +415,7 @@ sub revision{
     chdir($pwd);
 
     if ($success){
-	chomp $out;
+	chomp($out);
 	return $out;
     }
     return '';
@@ -445,6 +445,7 @@ sub revisions{
     if ($success){
 	my @info = split(/\n/s,$out);
 	foreach (@info){
+	    s/^['"]//;s/['"]$//;
 	    my ($rev,$date) = split(/\|/);
             $revisions{$rev} = $date;
 	}
@@ -622,12 +623,12 @@ sub _export_subtree {
     my $prefix = basename($path);
     $path = ':'.$path if ($path);
     get_logger(__PACKAGE__)->info("git archive --format=zip --prefix=$prefix -o $target $revision$path");
-    my ($success,$ret,$out,$err) = &run_cmd( 'git',
-					     'archive',
-					     '--format=zip',
-					     '--prefix='.$prefix.'/',
-					     '-o', $target,
-					     $revision.$path );
+    my $success = &run_cmd( 'git',
+			    'archive',
+			    '--format=zip',
+			    '--prefix='.$prefix.'/',
+			    '-o', $target,
+			    $revision.$path );
     chdir($pwd);
     return $target;
 }
@@ -648,10 +649,10 @@ sub _export_file {
     chdir( $repohome );
     if ( $revision eq 'HEAD' ){
 	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
-	my ($success,$ret,$out,$err) = &run_cmd( 'git',
-						 'checkout-index',
-						 '--prefix='.$tmp_dir.'/',
-						 $path );
+	my $success = &run_cmd( 'git',
+				'checkout-index',
+				'--prefix='.$tmp_dir.'/',
+				$path );
 	## we don't want sub-dir's
 	my @parts = split(/\//,$path);
 	my $basename = pop(@parts);
@@ -722,6 +723,7 @@ sub _is_file{
 
 	get_logger(__PACKAGE__)->debug("cd $reposdir; git ls-tree -l $rev $path");
 	get_logger(__PACKAGE__)->debug("git: _is_file: $name = $type ($path)");
+
 	return 1 unless ($type eq 'tree');
     }
     return 0;

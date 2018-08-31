@@ -5,6 +5,7 @@
 * added support for SLURM as the batch job manager (now as default)
 * integrated pdf2xml from https://bitbucket.org/tiedemann/pdf2xml/
 * updated Apache Tika to v1.18 and added server mode
+* use LibMagic bindings instead of system calls to file
 * bugfixing and fixed unit tests
 
 

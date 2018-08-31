@@ -98,8 +98,9 @@ sub init {
     return 1 if ($success);
 
     # throw an error otherwise
-    my @err_lines = <$err>;
-    raise( 8, "cannot create svn-repo $path: " . Dumper(@err_lines) );
+    # my @err_lines = <$err>;
+    # raise( 8, "cannot create svn-repo $path: " . Dumper(@err_lines) );
+    raise( 8, "cannot create svn-repo $path: " . $err );
 }
 
 
@@ -158,8 +159,9 @@ sub mkdir {
     );
 
     # throw an error otherwise
-    my @err_lines = <$err>;
-    raise( 8, "mkdir $repos/$branch/$dir: " . Dumper(@err_lines) );
+    # my @err_lines = <$err>;
+    # raise( 8, "mkdir $repos/$branch/$dir: " . Dumper(@err_lines) );
+    raise( 8, "mkdir $repos/$branch/$dir: " . $err );
 }
 
 
@@ -195,8 +197,9 @@ sub copy {
     return 1 if ($success);
 
     # throw an error otherwise
-    my @err_lines = <$err>;
-    raise( 8, "copy $srcpath to $trgpath: " . Dumper(@err_lines) );
+    # my @err_lines = <$err>;
+    # raise( 8, "copy $srcpath to $trgpath: " . Dumper(@err_lines) );
+    raise( 8, "copy $srcpath to $trgpath: " . $err );
 }
 
 
@@ -230,7 +233,7 @@ sub is_path {
         $params{file}
     );
 
-    my ($success, $ret, $out, $err) = run_cmd(
+    my $success = run_cmd(
         $self->{SVN_CMD},
         @{$self->{SVN_PARA}},
         'list',
@@ -597,8 +600,9 @@ sub update {
     unless ($success) {
         chdir($pwd);
         rmtree($workdir);
-        my @err_lines = <$err>;
-        raise( 8, "cannot update '$file': " . Dumper(@err_lines) );
+        # my @err_lines = <$err>;
+        # raise( 8, "cannot update '$file': " . Dumper(@err_lines) );
+	raise( 8, "cannot update '$file': " . $err );
     }
 
     # move the new file into the workdir
@@ -617,8 +621,9 @@ sub update {
     unless ($success) {
         chdir($pwd);
         rmtree($workdir);
-        my @err_lines = <$err>;
-        raise( 8, "cannot update '$file': " . Dumper(@err_lines) );
+        # my @err_lines = <$err>;
+        # raise( 8, "cannot update '$file': " . Dumper(@err_lines) );
+	raise( 8, "cannot update '$file': " . $err );
     }
 
     chdir($pwd);
@@ -661,8 +666,9 @@ sub remove {
             "$self->{base_url}/$path" );
 
         unless ($success) {
-            my @err_lines = <$err>;
-            raise( 8, "cannot delete '$path': " . Dumper(@err_lines) );
+            # my @err_lines = <$err>;
+            # raise( 8, "cannot delete '$path': " . Dumper(@err_lines) );
+	    raise( 8, "cannot delete '$path': " . $err );
         }
     }
     else {
@@ -760,8 +766,9 @@ sub checkout {
     return 1 if ($success);
 
     # throw an error otherwise
-    my @err_lines = <$err>;
-    raise( 8, "checkout $path: " . Dumper(@err_lines) );
+    # my @err_lines = <$err>;
+    # raise( 8, "checkout $path: " . Dumper(@err_lines) );
+    raise( 8, "checkout $path: " . $err );
 }
 
 
@@ -845,7 +852,7 @@ sub export {
         CLEANUP => 1
     );
 
-    my ( $success, $ret, $out, $err ) = run_cmd(
+    my $success = run_cmd(
         $self->{SVN_CMD},
         @{$self->{SVN_PARA}},
         '--quiet',

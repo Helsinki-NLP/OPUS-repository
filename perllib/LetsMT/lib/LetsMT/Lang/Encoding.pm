@@ -15,7 +15,6 @@ our @EXPORT = qw( detect_encoding text2utf8 text2utf8_inplace );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 use LetsMT::Lang::ISO639 qw / :all /;
-use LetsMT::Lang::Encoding;
 use LetsMT::Lang::Detect;
 use LetsMT::Tools qw / :all /;
 
@@ -25,6 +24,7 @@ $PerlIO::encoding::fallback = Encode::FB_QUIET;
 
 use File::Temp 'tempfile';
 use File::Copy;
+use File::LibMagic;
 use FindBin qw($Bin);
 use Encode;
 use File::BOM qw( :all );
@@ -33,6 +33,12 @@ use File::GetLineMaxLength;
 use File::ShareDir 'dist_dir';
 our $LOCAL_MODELS = &dist_dir('LetsMT') . '/lang/chared';
 our $TEXTCAT_LM_DIR = &dist_dir('LetsMT') . '/lang/textcat2';
+
+## create LibMagic handle
+## TODO: this does not seem to work in mod_perl
+## check File::Type?
+# my $LIBMAGIC = File::LibMagic->new();
+
 
 my %TEXTCAT_MODELS = ();
 
@@ -218,14 +224,15 @@ sub detect_encoding {
 
     # 2) try with chared
     # generate a warning if chared is not installed!
-    unless ($CHARED){
-        get_logger(__PACKAGE__)->warn("chared is not found!");
-    }
 
     if ($lang){
 	# use traditional Chinese as standard for chinese
 	if ( $lang eq 'zh' ) {
 	    $lang = 'zh_TW';
+	}
+
+	unless ($CHARED){
+	    get_logger(__PACKAGE__)->warn("chared is not found!");
 	}
 
 	# try without regional variation
@@ -265,22 +272,30 @@ sub detect_encoding {
 	    close $in;
 	    close $out;
 
+	    ## OLD: call with backticks
+	    ##
+	    # my $safename = quotemeta($filename);
+	    # my $result   = `$CHARED -m $CHARED_MODELS{$lang} $safename`;
+	    # chomp $result;
+
 	    # call chared to predict the encoding
+	    my ($success,$ret,$result,$err) =
+		&run_cmd( $CHARED, '-m', $CHARED_MODELS{$lang},$filename );
 
-	    my $safename = quotemeta($filename);
-	    my $result   = `$CHARED -m $CHARED_MODELS{$lang} $safename`;
-	    chomp $result;
-	    my ( $path, $guess ) = split( /\t/, $result );
+	    if ($success) {
+		chomp($result);
+		my ( $path, $guess ) = split( /\t/, $result );
 
-	    # unify encoding names
-	    $guess = 'iso-8859-1' if ( $guess eq 'latin_1' );
-	    $guess =~ s/iso8859_/iso-8859-/;
-	    $guess =~ s/utf_8/utf-8/;
-	    $guess =~ s/koi8_/koi8-/;
-	    $guess =~ s/big5/big5-eten/;
+		# unify encoding names
+		$guess = 'iso-8859-1' if ( $guess eq 'latin_1' );
+		$guess =~ s/iso8859_/iso-8859-/;
+		$guess =~ s/utf_8/utf-8/;
+		$guess =~ s/koi8_/koi8-/;
+		$guess =~ s/big5/big5-eten/;
 
-	    unlink $filename unless ( $filename eq $file );
-	    return $guess;
+		unlink $filename unless ( $filename eq $file );
+		return $guess;
+	    }
 	}
 
 	# 3) use some other ways to guess the encoding
@@ -290,14 +305,33 @@ sub detect_encoding {
 	}
     }
 
-    # 3) try the file command
-    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
-    if ($success) {
-	if ($out=~/charset=(\S+)(\s|\Z)/){
-	    my $enc = $1;
-	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
-	}
+    ## 3) try LibMagic
+    ##    TODO: should that before using chared?
+    ##    TODO: creating new objects is not very efficient
+    ##          but cteating a global handle at the start of the module
+    ##          does not work with mod_perl it seems
+    my $LIBMAGIC = File::LibMagic->new();
+    my $info = $LIBMAGIC->info_from_filename($file);
+    if (ref($info) eq 'HASH'){
+    	if (defined $info->{encoding}){
+    	    return $info->{encoding} unless ($info->{encoding} eq 'binary' ||
+    					     $info->{encoding}=~/unknown/);
+    	}
     }
+
+    # OLD: call file command
+    #
+    # ##    TODO: file causes some memory problems when forking
+    # ##          (does this system call work better?)
+    # # my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
+    # my ($out) = &LetsMT::Tools::scrape_cmd_out( 'file', '-i', $file );
+    # # if ($success) {
+    # 	if ($out=~/charset=(\S+)(\s|\Z)/){
+    # 	    my $enc = $1;
+    # 	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
+    # 	}
+    # # }
+
 
     # last chance: try the hard way and do language + encoding detection
     my ($lang) = &LetsMT::Lang::Detect::classify_with_textcat($file,$TEXTCAT_LM_DIR,
@@ -323,17 +357,30 @@ Requires 'file' tool!
 sub guess_encoding {
     my ( $lang, $file ) = @_;
 
+    # ## use LibMagic to determine character encoding
+    ##    TODO: creating new objects is not very efficient
+    ##          but cteating a global handle at the start of the module
+    ##          does not work with mod_perl it seems
+    my $LIBMAGIC = File::LibMagic->new();
+    my $info = $LIBMAGIC->info_from_filename($file);
+    if (ref($info) eq 'HASH'){
+    	if (defined $info->{encoding}){
+    	    return $info->{encoding} unless ($info->{encoding} eq 'binary' ||
+    					     $info->{encoding}=~/unknown/);
+    	   }
+    }
+
 #    ## try with file tool first
 #    my $filetype = `file $file`;
 #    return 'utf-8' if ( $filetype =~ /UTF-8/ );
 
-    my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
-    if ($success) {
-	if ($out=~/charset=(\S+)(\s|\Z)/){
-	    my $enc = $1;
-	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
-	}
-    }
+    # my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
+    # if ($success) {
+    # 	if ($out=~/charset=(\S+)(\s|\Z)/){
+    # 	    my $enc = $1;
+    # 	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
+    # 	}
+    # }
 
     ## supported by Perl Encode:
     ## use Encode; @all_encodings = Encode->encodings(":all");
