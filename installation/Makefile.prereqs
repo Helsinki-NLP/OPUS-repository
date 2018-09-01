@@ -99,7 +99,8 @@ CPAN_MODULES = 	Apache::Tika \
 		Persistent::DBI \
 		Test::More \
 		Text::PDF2XML \
-		Switch
+		Switch \
+		Ufal::UDPipe
 
 # TODO: do we still need the Persistent modules?
 
@@ -232,6 +233,7 @@ server-software: software-base \
 	software-hunalign \
 	software-chared \
 	software-opennlp \
+	software-udpipe \
 	software-fusecompress
 
 ## software required by the sge-clients
@@ -240,7 +242,8 @@ sge-client-software: software-base \
 	${BATCHQUEUE_CLIENT_TARGETS} \
 	software-hunalign \
 	software-chared \
-	software-opennlp
+	software-opennlp \
+	software-udpipe
 
 ## software required on a frontend
 # Tokyo*: Not at all optimal. In the long run it will be better to remove
@@ -374,6 +377,19 @@ software-opennlp:
 		cd ${OPENNLP}; \
 		${INSTALL_BIN} bin/opennlp ${PREFIX}/bin/opennlp; \
 		${INSTALL_BIN} lib/*.jar ${PREFIX}/lib; )
+
+
+.PHONY: software-udpipe
+software-udpipe: ${PREFIX}/share/UDPipe
+
+${PREFIX}/share/UDPipe:
+	wget -O udpipe-ud-2.0-170801.zip \
+	https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-2364/udpipe-ud-2.0-170801.zip
+	mkdir -p ${PREFIX}/share/UDPipe
+	unzip udpipe-ud-2.0-170801.zip
+	${INSTALL_DATA} udpipe-ud-2.0-170801/* ${LETSMTROOT}/share/UDPipe/
+	rm -fr udpipe-ud-2.0-170801
+	rm -f udpipe-ud-2.0-170801.zip
 
 
 .PHONY: software-fusecompress

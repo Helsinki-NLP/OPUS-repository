@@ -98,6 +98,9 @@ our $IMPORT_PDF_MODE = 'tika';
 # our $IMPORT_PDF_MODE = 'combined';
 
 
+# model dir for UDPipe
+our $UDPIPE_MODEL_DIR = $ENV{LETSMTROOT}.'/share/UDPipe';
+
 
 1;
 

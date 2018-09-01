@@ -2,14 +2,19 @@ To do as of version 0.50
 ========================
 
 
-* add call to job API to start import for individual files
-* install and setup Apache Tika as a server and call it from Apache::Tika
+* add call to job API to start import for individual files			(already works!)
+* install and setup Apache Tika as a server and call it from Apache::Tika 	(done!)
   https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
   https://metacpan.org/pod/Apache::Tika
 * update Apache Tika (plus allow options?)
-* integrate pdf2xml (done)
-* slurm job manager (working, parameters, resource management missing)
-* git backend (done)
+* integrate pdf2xml								(done)
+  (need to improve pdf2xml! too slow! use Tika server!)
+* slurm job manager (parameters, resource management missing)			(working)
+* git backend									(done)
+  - user-subtrees as branches and not copies					(done)
+  - remote repositories (master), 
+  - user-branches as local copies in compressed filesystem?
+  - remote on save server?
 * better bindings for git with (do we need that?)
   https://metacpan.org/pod/Git
   https://metacpan.org/pod/Git::Class
@@ -17,6 +22,9 @@ To do as of version 0.50
   https://metacpan.org/pod/Git::XS
 * code optimization (backends, validation, conversion ...)
 * trainable sentence splitters & tokenizers (openNLP, other?)
+* improved pre-processing tools (
+  - UDpipe									(started)
+  - optimized sentence splitters, tokenizers
 * stable web interface with configuration support
 * automatic load-balancing in distributed setups
 
@@ -24,13 +32,10 @@ To do as of version 0.50
 Wish-list
 ==========
 
-
-* better git backend:
-  - user-subtrees as branches and not copies (done!)
-  - remote repositories (master), user-branches as local copies (in compressed filesystem?)
-  - remote on save server?
-* improved pre-processing tools (UDpipe?, optimized sentence splitters, tokenizers)
 * (semi-)automatic identification of parallel documents (without requiring identical file names)
+  --> fuzzi name matching is already in place?!
 * more sentence aligners (BLEU align, gargantua, yalign?)
 * user interface (for uploads, OPUS integration)
 * allow manual corrections (alignments and even other things?)
+* integrate stanford core NLP?
+  server: https://stanfordnlp.github.io/CoreNLP/corenlp-server.html

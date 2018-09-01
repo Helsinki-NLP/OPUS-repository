@@ -71,6 +71,7 @@ install-targets: \
 	install-files \
 	install-config \
 	install-svnserver \
+	install-swap \
 	restart-apache
 
 # for storage servers: set DB-server-name to access the remote DB host
@@ -520,6 +521,24 @@ config-gridengine:
 	-qconf -as localhost
 	sed    -e "s#REPLACE_HOSTNAME#${LETSMTHOST} localhost#" letsmt.q_conf > letsmt.q
 	-qconf -Aq letsmt.q
+
+
+
+#########################################################################
+# add a swapfile for more flexibility in memory allocation
+# (https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04)
+
+.PHONY: install-swap
+install-swap: /swapfile
+/swapfile:
+	fallocate -l 8G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile
+	swapon /swapfile
+	grep -v '/swapfile' /etc/fstab > fstab.tmp
+	echo '/swapfile   none    swap    sw    0   0' >> fstab.tmp
+	${INSTALL_DATA} -b -S .old fstab.tmp /etc/fstab
+	rm -f fstab.tmp
 
 
 #########################################################################

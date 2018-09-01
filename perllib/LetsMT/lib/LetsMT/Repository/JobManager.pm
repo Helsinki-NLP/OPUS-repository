@@ -687,6 +687,8 @@ sub submit_slurm_job {
     print $fh $job,"\n";
     close $fh;
 
+    ## TODO: more options? -t for time limit? mail when finished?
+
     get_logger(__PACKAGE__)->debug("slurm: sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename");
     LetsMT::Repository::Safesys::sys(
         "sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename"

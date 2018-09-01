@@ -36,7 +36,9 @@ our $TEXTCAT_LM_DIR = &dist_dir('LetsMT') . '/lang/textcat2';
 
 ## create LibMagic handle
 ## TODO: this does not seem to work in mod_perl
-## check File::Type?
+## check File::Type? (does not give encoding)
+## alternative: File::Type::FFI (https://metacpan.org/pod/File::LibMagic::FFI)
+##
 # my $LIBMAGIC = File::LibMagic->new();
 
 
@@ -370,17 +372,8 @@ sub guess_encoding {
     	   }
     }
 
-#    ## try with file tool first
-#    my $filetype = `file $file`;
-#    return 'utf-8' if ( $filetype =~ /UTF-8/ );
 
-    # my ($success,$ret,$out,$err) = &run_cmd( 'file', '-i', $file );
-    # if ($success) {
-    # 	if ($out=~/charset=(\S+)(\s|\Z)/){
-    # 	    my $enc = $1;
-    # 	    return $enc unless ($enc eq 'binary' || $enc=~/unknown/);
-    # 	}
-    # }
+    ## TODO: check (and remove) this strange code below ... 
 
     ## supported by Perl Encode:
     ## use Encode; @all_encodings = Encode->encodings(":all");

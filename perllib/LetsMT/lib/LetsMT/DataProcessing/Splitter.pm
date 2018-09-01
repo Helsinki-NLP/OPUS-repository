@@ -17,6 +17,7 @@ use strict;
 use LetsMT::DataProcessing::Splitter::No;
 use LetsMT::DataProcessing::Splitter::Lingua;
 use LetsMT::DataProcessing::Splitter::Europarl;
+use LetsMT::DataProcessing::Splitter::UDPipe;
 # use LetsMT::DataProcessing::Splitter::OpenNLP;
 
 
@@ -45,6 +46,9 @@ sub new {
         }
         elsif ( $self{method} =~ /lingua/i ) {
             return new LetsMT::DataProcessing::Splitter::Lingua(@_);
+        }
+        elsif ( $self{method} =~ /udpipe/i ) {
+            return new LetsMT::DataProcessing::Splitter::UDPipe(@_);
         }
         elsif ( $self{method} =~ /opennlp/i ) {
 	    ## load on demand with require (to avoid mod_perl load errors)
