@@ -91,7 +91,8 @@ umask $old_umask;
 our $IMPORT_REPORT_PROGRESS = 0;
 
 # default sentence splitter
-our $IMPORT_SPLITTER = 'europarl';
+# our $IMPORT_SPLITTER = 'europarl';
+our $IMPORT_SPLITTER = 'udpipe';
 
 # default PDF conversion mode
 our $IMPORT_PDF_MODE = 'tika';

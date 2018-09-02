@@ -27,6 +27,7 @@ To do as of version 0.50
   - optimized sentence splitters, tokenizers
 * stable web interface with configuration support
 * automatic load-balancing in distributed setups
+* add dehyphenation module (as normalizer)
 
 
 Wish-list

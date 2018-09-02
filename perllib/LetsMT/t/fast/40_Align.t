@@ -115,10 +115,14 @@ my $response = LetsMT::WebService::get( $algres, uid => $uid );
 $result = LetsMT::WebService::get_resource( $algres, uid => $uid );
 is( $result, 1, "DOWNLOAD sentence alignment file" );
 
+## TODO: mke it easier to test in case we change the default sentence aligner
+## now it is hunalign (before it was bisent)
 $algfile = $algres->local_path;
 system( "sed -e 's/ fromDocRev=\"[^\"]*\"//' -e 's/ toDocRev=\"[^\"]*\"//' < $algfile > $algfile.tmp ");
-is( compare( "$algfile.tmp", "$Bin/data/align/en-sv/1988b.xml" ),
+is( compare( "$algfile.tmp", "$Bin/data/align/en-sv/1988-hunalign.xml" ),
     0, "sentence alignment file is correct" );
+# is( compare( "$algfile.tmp", "$Bin/data/align/en-sv/1988b.xml" ),
+#     0, "sentence alignment file is correct" );
 unlink( "$algfile.tmp" );
 
 

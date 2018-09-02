@@ -65,8 +65,8 @@ our %DEFAULT_PARA = (
 
 # default sentence aligner method for all parallel documents
 
-# our $DEFAULT_ALIGNER = 'hunalign';
-our $DEFAULT_ALIGNER = 'bisent';
+our $DEFAULT_ALIGNER = 'hunalign';
+# our $DEFAULT_ALIGNER = 'bisent';
 
 ## default alignment parameters:
 ## - search paramaters for finding parallel documents

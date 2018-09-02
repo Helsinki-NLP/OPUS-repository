@@ -31,27 +31,25 @@ sub split {
     my $self = shift;
     my @lines = @_;
 
-    my $str;
-
-    ## keep separate lines: do not merge with space!
-    ## --> no sentences beyond line breaks!
-    if ( $self->{separate_lines} ) {
-        $str = join( "\n", @lines );
-        $str =~ s/^\s*//s;
-    }
-    else {
-        ## add newlines to empty lines to force sentence breaks between strings
-        map( s/^(\s*)\n?$/$1\n/, @lines );
-
-        # (but remove leading blanks to avoid empty sentences ....)
-        $str = join( ' ', @lines );
-        $str =~ s/^\s*//s;
+    ## join all lines and split on empty lines
+    ## separate_lines: keep lines separate as they are
+    unless ( $self->{separate_lines} ) {
+	my $str = join( "\n", @lines );
+	# @lines = split( /\n\s*\n/, $str );
+	@lines = split( /\n\s+/, $str );
     }
 
-    ## split the joined text string
-    my $sents = $UDPIPE->sentence_splitter($str);
-    return @{$sents} if ( ref($sents) eq 'ARRAY' );
-    return $str;
+    my @sents = ();
+    foreach my $str (@lines){
+	my $new = $UDPIPE->sentence_splitter($str);
+	if ( ref($new) eq 'ARRAY' ){
+	    push(@sents, @{$new});
+	}
+	else {
+	    push(@sents, $str);
+	}
+    }
+    return @sents;
 }
 
 
