@@ -49,7 +49,9 @@ sub split {
     }
 
     ## split the joined text string
-    return $UDPIPE->sentence_splitter($str);
+    my $sents = $UDPIPE->sentence_splitter($str);
+    return @{$sents} if ( ref($sents) eq 'ARRAY' );
+    return $str;
 }
 
 
