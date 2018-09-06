@@ -119,15 +119,54 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot1/user1?uid=user3"
 
 
 
-# Clone an existing branch
+# Cloning branches
 
 
+* create a new slot `slot5` with read permissions for group `group12`
 
-# Delete a branch
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot5/user1?uid=user1&gid=group12"
+```
+
+* `user2` clones the branch of `user1` in slot5
+
+```
+$LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user2&action=copy&dest=user2"
+```
+
+* `user3` cannot do that because that user does not have read permissions for the branch of `user1`
+
+```
+$LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user3&action=copy&dest=user3"
+```
+
+* interestingly, `user2` can do it for `user3` and `user2` cannot take it away from `user3` anymore!
+
+```
+$LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user2&action=copy&dest=user3"
+```
+
+* `user3` can now make his branch public and let other users read it as well
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/access/slot5/user3?uid=user3&gid=public"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/access/slot5/user3?uid=user3"
+```
+
+* `user3` can make changes to his own branch, for example adding a subdir xml, and a new user `user4` can clone the branch of `user3` (with the changes `user3` made after cloning from `user1`)
 
 
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot5/user3/xml?uid=user3"
+$LETSMT_CONNECT -X POST "$LETSMT_URL/group/user4/user4?uid=user4"
+$LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user3?uid=user4&action=copy&dest=user4"
+```
 
-# Delete the entire slot
+* verify that this really worked:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot5/user4?uid=user4"
+```
 
 
 
@@ -136,4 +175,3 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot1/user1?uid=user3"
 
 * creating a slot without branch works but cannot be found by GET
 * other users can create sub-dirs in slots/branches they do not own
-* any user can delete an entire slot

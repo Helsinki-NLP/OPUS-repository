@@ -225,12 +225,15 @@ sub copy {
     my $self = shift;
     my ( $user, $slot, $src, $trg ) = @_;
 
-    ## make a new sub branch for the user
+    my @srcpaths = split(/\//,$src);
+    my @trgpaths = split(/\//,$trg);
+
+    raise( 8, "copy is only implemented for a branch (src)" ) if ($#srcpaths);
+    raise( 8, "copy is only implemented for a branch (dest)" ) if ($#trgpaths);
+
+    ## make a new sub branch for the user $trg cloned from $src
     ## TODO: do we need to allow other types of copies?
-    if ( $user eq $trg ){
-	return $self->init( $slot, $trg, $src );
-    }
-    return 0;
+    return $self->init( $slot, $trg, $src );
 }
 
 
