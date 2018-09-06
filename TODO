@@ -2,13 +2,15 @@ To do as of version 0.50
 ========================
 
 
+* use poppler bindings for PDF (https://metacpan.org/pod/Poppler)
+  --> also in pd2xml!! (check also inline java for pdfxtk)
+  https://github.com/tamirhassan/pdfxtk/blob/master/pdfXtk/src/main/java/at/ac/tuwien/dbai/pdfwrap/ProcessFile.java
+* add dehyphenation module (as normalizer) - see pdf2xml
+* better bindings of chared (python bindings?) + newer version?
+  http://corpus.tools/wiki/Chared
+  via Inline::Python?
+  https://metacpan.org/pod/distribution/Inline-Python/Python.pod
 * add call to job API to start import for individual files			(already works!)
-* install and setup Apache Tika as a server and call it from Apache::Tika 	(done!)
-  https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
-  https://metacpan.org/pod/Apache::Tika
-* update Apache Tika (plus allow options?)
-* integrate pdf2xml								(done)
-  (need to improve pdf2xml! too slow! use Tika server!)
 * slurm job manager (parameters, resource management missing)			(working)
 * git backend									(done)
   - user-subtrees as branches and not copies					(done)
@@ -25,9 +27,15 @@ To do as of version 0.50
 * improved pre-processing tools (
   - UDpipe									(started)
   - optimized sentence splitters, tokenizers
-* stable web interface with configuration support
+* stable web interface with configuration support				(started)
 * automatic load-balancing in distributed setups
-* add dehyphenation module (as normalizer)
+* update Apache Tika (plus allow options?)
+* integrate pdf2xml								(done)
+  (need to improve pdf2xml! too slow! use Tika server!)
+* install and setup Apache Tika as a server and call it from Apache::Tika 	(done!)
+  https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
+  https://metacpan.org/pod/Apache::Tika
+
 
 
 Wish-list
@@ -40,3 +48,5 @@ Wish-list
 * allow manual corrections (alignments and even other things?)
 * integrate stanford core NLP?
   server: https://stanfordnlp.github.io/CoreNLP/corenlp-server.html
+
+
