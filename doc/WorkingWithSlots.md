@@ -140,7 +140,7 @@ $LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user2&action=copy&d
 $LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user3&action=copy&dest=user3"
 ```
 
-* interestingly, `user2` can do it for `user3` and `user2` cannot take it away from `user3` anymore!
+* interestingly, `user2` can do it for `user3` and `user2` cannot take it away from `user3` afterwards!
 
 ```
 $LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user1?uid=user2&action=copy&dest=user3"
@@ -165,10 +165,11 @@ $LETSMT_CONNECT -X POST "$LETSMT_URL/storage/slot5/user3?uid=user4&action=copy&d
 * verify that this really worked:
 
 ```
-$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot5/user4?uid=user4"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user1?uid=user1"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user2?uid=user2"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user3?uid=user3"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user4?uid=user4"
 ```
-
-
 
 
 # BUGS
