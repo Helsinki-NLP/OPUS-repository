@@ -10,4 +10,4 @@ This includes a detailed overview of the LetsMT repository API, command-line too
 
 * [Users and Groups](UsersAndGroups.md)
 * [Working with slots](WorkingWithSlots.md)
-* [Importing files](ImportingFiles.md)
+* [Importing files](ImportingFiles.md) and [configuring import](ImportConfiguration.md)
