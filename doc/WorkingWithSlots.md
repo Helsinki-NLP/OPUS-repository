@@ -1,11 +1,13 @@
 
-# General principles
+# General principles of storage slots
 
-* a slot is a repository with a unique name
+* a slot is a repository with a unique name (different [storage backends](StorageBackends.md) are possible)
 * each slot can have multiple branches, typically named by the user name of the user who owns it
-* each branch in a slot is connected to a group (of users)
+* each branch in a slot is connected to a group (of users), see [users and groups](UsersAndGroups.md) for more details on user management
 * the default group of a branch is `public` (= all users can read)
 * the group can be set when creating a slot/branch (see examples below)
+* every resource in every slot can have arbitrary metadata (see [managing metadata](ManagingMetaData.md))
+
 
 
 # Create a few test users, groups
@@ -170,6 +172,39 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user2?uid=user2"
 $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user3?uid=user3"
 $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user4?uid=user4"
 ```
+
+
+# Search for slots
+
+* list all slots owned by a specific user:
+
+```
+ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?owner=user1&uid=user1"
+
+<letsmt-ws version="55">
+  <list path="">
+    <entry path="slot1/user1" />
+    <entry path="slot2/user1" />
+  </list>
+  <status code="0" location="/metadata" operation="GET" type="ok">Found 2 matching entries</status>
+</letsmt-ws>
+```
+
+* list all storage branches that are public (gid = `public`); note the additional condition of resource-type to skip all other kind of individual resources that are marked as public!
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&gid=public&resource-type=branch"
+
+<letsmt-ws version="55">
+  <list path="">
+    <entry path="slot5/user3" />
+    <entry path="slot5/user4" />
+    ...
+  </list>
+  <status code="0" location="/metadata" operation="GET" type="ok">Found 10 matching entries</status>
+</letsmt-ws>
+```
+
 
 
 # BUGS
