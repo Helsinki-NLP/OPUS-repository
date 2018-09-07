@@ -10,3 +10,6 @@ The document above includes a detailed overview of the LetsMT repository API, co
 * [Users and Groups](UsersAndGroups.md)
 * [Working with slots](WorkingWithSlots.md)
 * [Importing files](ImportingFiles.md) and [configuring import](ImportConfiguration.md)
+
+
+Another technical report from the oiginal project on data formats: [D2.1.pdf](D2.1.pdf)

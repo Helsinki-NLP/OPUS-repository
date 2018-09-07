@@ -70,6 +70,22 @@ sub get {
 
     my $message = undef;
 
+    get_logger(__PACKAGE__)->debug('job '.$self->{path_elements});
+
+    ## no path? --> list all jobs
+    unless (@{$self->{path_elements}}){
+	my $result = LetsMT::Repository::JobManager::get_job_list();
+	my $result_obj = LetsMT::Repository::Result->new(
+	    type      => 'ok',
+	    code      => 0,
+	    operation => 'GET',
+	    location  => 'job',
+	    lists     => \$result,
+	    message   => $message,
+	    );
+	return $result_obj->get_xml_result();
+    }
+
     # Get status
     LetsMT::Repository::JobManager::check_status(
         message => \$message,

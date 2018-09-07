@@ -604,6 +604,16 @@ sub check_status {
 }
 
 
+sub get_job_list {
+    if ($ENV{LETSMT_BATCHQUEUE_MANAGER} eq 'sge'){
+	return get_sge_job_list(@_);
+    }
+    else{
+	return get_slurm_job_list(@_);
+    }
+
+}
+
 =head2 C<delete>
 
  LetsMT::Repository::JobManager::delete (job_id => $jobID, path => $path)
@@ -721,6 +731,29 @@ sub check_slurm_job_status{
 }
 
 
+sub get_slurm_job_list{
+
+    #query for status of the job
+    open( STATUS, "squeue -o '%j %i %T' |" )
+	or raise( 8, "Can't run program: $!\n" );
+
+    my $entries = [];
+    <STATUS>;
+    while (my $output = <STATUS>){
+	my ($name,$id,$status) = split(/\s/,$output);
+	push( @$entries, { name => $name, id => $id, status => $status } );
+    }
+    close STATUS;
+
+    my $result = {
+        'path' => 'jobs',
+        'entry' => $entries,
+    };
+
+    return $result;
+}
+
+
 sub delete_slurm_job{
     my $jobID = shift;
 
@@ -756,6 +789,10 @@ sub submit_sge_job {
     my $status = undef;
     check_status( message => \$status, job_id => $jobID );
     return $status;
+}
+
+sub get_sge_job_list{
+    ## not implemented ...
 }
 
 
