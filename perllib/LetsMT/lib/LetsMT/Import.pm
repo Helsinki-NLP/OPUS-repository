@@ -804,7 +804,7 @@ sub suffix_lookup{
     my $self = shift;
     my $path = shift;
 
-    if ($path=~/\.(\S+)(\.gz)?$/i){
+    if ($path=~/\.([^.]+)(\.gz)?$/i){
 	return $TYPES->{$1} if (exists $TYPES->{$1});
     }
     return undef;
