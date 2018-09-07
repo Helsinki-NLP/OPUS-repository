@@ -90,10 +90,7 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&owner=user1&resource-type
 
 ## return the total size of all corpus files owned by user1
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&owner=user1&resource-type=corpusfile&action=SUM_size"
-``
-
-
-
+```
 
 
 # Other search examples
