@@ -60,6 +60,8 @@ Slot (git repository)
 
 The import can be triggered directly when uploading the file or started later using the `job` API. LetsMT! also supports the upload of zip and tar archives. Files in those archives should then also be organised according to the upload structure above with path names relative to the upload directory.
 
+Importing files and the automatic alignment can be configured in various ways. There is a separate page about [configurations of import and alignment](ImportConfiguration.md).
+
 
 # Supported upload formats
 
