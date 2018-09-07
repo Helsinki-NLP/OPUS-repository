@@ -78,19 +78,13 @@ sub get {
     # If a path is given, and type is not recursive:
     # the entry for that resource is returned if any,
     # otherwise a search by key/values is done
-    ##
-    ## NEW: change this to action=search instead of type
-    ##      (avoid too many keys with special meaning)
 
     if ( length $self->{path_elements}[0] ) {
 
         ## recursive search within a given path
-        # if ( $self->{args}->{type} && $self->{args}->{type} eq "recursive" ) {
+        if ( $self->{args}->{type} && $self->{args}->{type} eq "recursive" ) {
             ## remove 'type' to exclude it from the search
-            # delete $self->{args}->{type};
-
-        if ( $self->{args}->{action} && $self->{args}->{action} eq "search" ) {
-	    delete $self->{args}->{action};
+            delete $self->{args}->{type};
 
             # use the internal _ID_ field as search condition
             $self->{args}->{STARTS_WITH__ID_} = $path . '/';
