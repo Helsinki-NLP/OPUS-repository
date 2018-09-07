@@ -17,14 +17,16 @@ Configuration at a lower level overwrites settings of higher levels. This means 
 ### General parameters for import and conversion: ###
 
 | **parameter** | **type** | **possible values** | **description** |
-| ImportPara_normalizer | string | whitespace|header|ligatures|dos|moses | comma-separated chain of text normalizers |
-| ImportPara_splitter | string | europarl|lingua|opennlp | text splitter (used for sentence boundary detection) |
-| ImportPara_tokenizer | string | europarl|uplug|whitespace | tokenizer (but: standard import does not tokenize) |
+|---------------|----------|---------------------|-----------------|
+| ImportPara_normalizer | string | whitespace/header/ligatures/dos/moses | comma-separated chain of text normalizers |
+| ImportPara_splitter | string | europarl/lingua/opennlp | text splitter (used for sentence boundary detection) |
+| ImportPara_tokenizer | string | europarl/uplug/whitespace | tokenizer (but: standard import does not tokenize) |
 
 ### Parameters for importing PDF documents ###
 
 | **parameter** | **type** | **possible values** | **description** |
-| ImportPara_mode | string | layout|raw|standard|tika | PDF conversion mode (default = layout) |
+|---------------|----------|---------------------|-----------------|
+| ImportPara_mode | string | layout/raw/standard/tika | PDF conversion mode (default = layout) |
 
 
 These parameters are stored in the group database (user-specific configuration) and in the metadata database (corpus-specific and resource-specific configuration). More information about setting and manipulating these settings can be found at the end of this page.
@@ -45,6 +47,7 @@ There are parameters that influence the search for parallel documents and parame
 ### Parameters influencing the search for parallel documents ###
 
 | **parameter** | **type** | **possible values** | **description** |
+|---------------|----------|---------------------|-----------------|
 | AlignPara_search_parallel | string | identical|similar | specifies the method to match documents (identical names or similar names) |
 | AlignPara_search_parallel_min_size_ratio | float | 0.0 - 1.0 | threshold for the document size ratio |
 | AlignPara_search_parallel_min_name_match | float | 0.0 - 1.0 | threshold for the name match |
@@ -54,11 +57,13 @@ There are parameters that influence the search for parallel documents and parame
 ### Parameters influencing the automatic sentence alignment: ###
 
 | **parameter** | **type** | **possible values** | **description** |
-| AlignPara_method | string | one-to-one|!GaleChurch|hunalign|bisent | method to be used for automatic sentence alignment |
+|---------------|----------|---------------------|-----------------|
+| AlignPara_method | string | one-to-one/GaleChurch/hunalign/bisent | method to be used for automatic sentence alignment |
 
 ### Parameters for the Gale & Church alignment method: ###
 
 | **parameter** | **type** | **description** |
+|---------------|----------|-----------------|
 | AlignPara_mean | float | mean length-diff distribution (default=1)  |
 | AlignPara_variance     | float | variance of length-diff distribution (default=6.8)  |
 | AlignPara_search_window | int | max distance from diagonal (default=50)  |
@@ -67,6 +72,7 @@ There are parameters that influence the search for parallel documents and parame
 ### Parameters for hunalign: ###
 
 | **parameter** | **type** | **description** |
+|---------------|----------|-----------------|
 | AlignPara_dic | string | path to bilingual dictionary (default: empty dic) |
 | AlignPara_para | string | hunalign parameters (default for hunalign: '-realign'; default for bisent: '-realign -cautious') |
 
@@ -74,6 +80,7 @@ There are parameters that influence the search for parallel documents and parame
 ## Possible parameters for import and conversion: ##
 
 | **parameter** | **type** | **description** |
+|---------------|----------|-----------------|
 | ImportPara_normalizer | string | comma-separated chain of text normalizers |
 | ImportPara_splitter | string | text splitter (used for sentence boundary detection) |
 | ImportPara_tokenizer | string | tokenizer (but: standard import does not tokenize) |
@@ -81,7 +88,8 @@ There are parameters that influence the search for parallel documents and parame
 ### Parameters for importing PDF documents ###
 
 | **parameter** | **type** | **possible values** | **description** |
-| mode | string | layout|raw|standard | PDF conversion mode (default = layout) |
+|---------------|----------|---------------------|-----------------|
+| mode | string | layout/raw/standard | PDF conversion mode (default = layout) |
 
 
 
