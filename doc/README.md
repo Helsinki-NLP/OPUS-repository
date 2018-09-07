@@ -6,6 +6,6 @@ LetsMT! was a European project on developing an on-line platform for user-tailor
 This documentation is on-going and includes information about typical tasks that need to be performed. Below is the current lists of tutorials:
 
 
-* [UsersAndGroups.md]
-* [WorkingWithSlots.md]
+* [Users and Groups](UsersAndGroups.md)
+* [Working with slots](WorkingWithSlots.md)
 
