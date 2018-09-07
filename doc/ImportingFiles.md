@@ -109,7 +109,8 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot1/user1?uid=user1&gid=user1"
 ```
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot1/user1/uploads/pdf/D2.1.pdf?uid=user1" --form payload=@D2.1.pdf 
 $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot1/user1/uploads/pdf?uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="/slot1/user1/uploads/pdf">
     <entry kind="file">
@@ -131,7 +132,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot1/user1/uploads/pdf?uid=user1"
 
 ```
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/pdf/D2.1.pdf?uid=user1&run=import"
-
+```
+```xml
 <letsmt-ws version="55">
   <status code="0" location="/job/slot1/user1/uploads/pdf/D2.1.pdf" operation="PUT" type="ok">job maker submitted (storage/slot1/user1/jobs/run/uploads/pdf/D2.1.pdf.import)</status>
 </letsmt-ws>
@@ -142,7 +144,8 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/pdf/D2.1.pdf?uid=use
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/uploads/pdf/D2.1.pdf?uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1/user1/uploads/pdf/D2.1.pdf">
@@ -166,7 +169,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/uploads/pdf/D2.1.pdf?ui
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot1/user1/xml/en/D2.1.xml?uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="/slot1/user1/xml/en/D2.1.xml">
     <entry kind="file">
@@ -193,7 +197,8 @@ add `action=import` to the upload request:
 
 ```
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot1/user1/uploads/pdf/D2.1.pdf?uid=user1&action=import" --form payload=@D2.1.pdf 
-
+```
+```xml
 <letsmt-ws version="55">
   <status code="0" location="/storage/slot1/user1/uploads/pdf/D2.1.pdf" operation="PUT" type="ok">update ok /slot1/user1/uploads/pdf/D2.1.pdf,submitted job with ID 'job_1536341031_541180703'</status>
 </letsmt-ws>
@@ -206,6 +211,8 @@ The metadata on branch level includes information about the import queue:
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1?uid=user1"
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1/user1">
@@ -232,6 +239,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1?uid=user1"
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user?uid=user1"
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="corpus/user">
