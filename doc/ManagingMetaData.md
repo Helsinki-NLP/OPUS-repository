@@ -56,10 +56,10 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?owner=user1&uid=user1"
 </letsmt-ws>
 ```
 
-* you can also search within a certain sub-tree of all possible paths by adding the root path to the URL and by adding the special action `type=recursive`
+* you can also search within a certain sub-tree of all possible paths by adding the root path to the URL and by adding the special action `action=search` (NOTE: changed from old API where it used to be `type=recursive`)
 
 ```
-$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/fi-tr?owner=user1&uid=user1&type=recursive"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/fi-tr?owner=user1&uid=user1&action=search"
 
 <letsmt-ws version="55">
   <list path="">
@@ -273,7 +273,7 @@ Note the difference beetween using the conditions `ALL_OF_language=fi,sv` and `l
 * find all files aligned to a certain corpus file (`xml/en/383.xml`)
 
 ```
-$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user?ONE_OF_aligned_with=xml/en/383.xml&uid=user&type=recursive"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user?ONE_OF_aligned_with=xml/en/383.xml&uid=user&action=search"
 
 
 <letsmt-ws version="55">
