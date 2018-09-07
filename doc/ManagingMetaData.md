@@ -13,7 +13,8 @@
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1?uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1">
@@ -43,7 +44,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1?uid=user1"
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?owner=user1&uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1/user1" />
@@ -60,7 +62,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?owner=user1&uid=user1"
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/fi-tr?owner=user1&uid=user1&type=recursive"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1/user1/xml/fi-tr/1.xml" />
@@ -127,7 +130,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&owner=user1&resource-type
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&gid=public&resource-type=branch"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot5/user3" />
@@ -152,8 +156,9 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&ONE_OF_gid=public,user1,m
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?status=imported&uid=user"
-<
-letsmt-ws version="55">
+```
+```xml
+<letsmt-ws version="55">
   <list path="">
     <entry path="corpus2/user/uploads/html/small.tar.gz" />
     <entry path="corpus/user/uploads/html.tar.gz" />
@@ -172,8 +177,9 @@ TODO: How can we search within a specific slot/branch only?
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?status=imported&owner=user&uid=user"
-<
-letsmt-ws version="55">
+```
+```xml
+<letsmt-ws version="55">
   <list path="">
     <entry path="corpus2/user/uploads/html/small.tar.gz" />
     <entry path="corpus/user/uploads/html.tar.gz" />
@@ -190,7 +196,8 @@ letsmt-ws version="55">
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&MIN_size=300&resource-type=corpusfile"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="corpus/user/xml/en/207.xml" />
@@ -218,7 +225,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&MIN_size=300&re
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&resource-type=corpusfile&action=SUM_size"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry type="search result">
@@ -235,7 +243,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&resource-type=c
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&ONE_OF_language=sv&resource-type=sentalign"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="corpus/user/xml/en-sv/4.html.xml" />
@@ -253,7 +262,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&ONE_OF_language
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user&owner=user&ALL_OF_language=fi,sv&resource-type=sentalign"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="corpus/user/xml/fi-sv/4.html.xml" />
@@ -274,8 +284,8 @@ Note the difference beetween using the conditions `ALL_OF_language=fi,sv` and `l
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user?ONE_OF_aligned_with=xml/en/383.xml&uid=user&type=recursive"
-
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="corpus/user/xml/zh/383.xml" />
