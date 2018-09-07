@@ -36,7 +36,9 @@ There is a special command to show information about a specific user including m
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/group/user1?uid=user1&action=showinfo"
+```
 
+```xml
 <letsmt-ws version="55">
   <list path="group/user1">
     <entry id="user1" kind="user info">
@@ -73,7 +75,9 @@ Each user can have specific configurations for importing and aligning data. The 
 $LETSMT_CONNECT -X POST "$LETSMT_URL/group/user1?uid=user1&email=my.email@host.org"
 ...
 $LETSMT_CONNECT -X GET "$LETSMT_URL/group/user1?uid=user1&action=showinfo"
+```
 
+```xml
 <letsmt-ws version="55">
   <list path="group/user1">
     <entry id="user1" kind="user info">
