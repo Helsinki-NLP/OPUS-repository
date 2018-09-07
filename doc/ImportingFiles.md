@@ -1,7 +1,7 @@
 
 # Importing files to the repository
 
-The LetsMT! repository backend can be used to collect, convert and align a variety of different kind of document formats. The main principle is that documents are uploaded in their native format and the backend takes care of the extraction of the textual content and the alignment between translated documents. Most things should run automagically but the import process can still be influenced and configured in various ways.
+The LetsMT! repository backend can be used to collect, convert and align a variety of different kind of document formats. The main principle is that documents are uploaded in their native format and the backend takes care of the extraction of the textual content and the alignment between translated documents. Most things should run automagically but the import process can still be [influenced and configured](ImportConfiguration.md) in various ways.
 
 There is basically two parts in each branch of a storage slot: the `upload` section and the `xml` section. `uploads` contains the files that are uploaded by the user and it should be organised by data format and language. Here is an example:
 
