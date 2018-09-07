@@ -9,6 +9,33 @@
 
 # Retrieve metadata record
 
+* just query the metadata API:
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1?uid=user1"
+
+<letsmt-ws version="55">
+  <list path="">
+    <entry path="slot1">
+      <name>slot1</name>
+      <branches>user1</branches>
+      <creator>user1</creator>
+      <diskname>/slot1</diskname>
+      <locked>0</locked>
+      <owner>user1</owner>
+      <partition>/var/lib/letsmt/www-data</partition>
+      <resource-type>slot</resource-type>
+      <server-url>https://vm0024.kaj.pouta.csc.fi:443/ws</server-url>
+      <storage_type>git</storage_type>
+    </entry>
+  </list>
+  <status code="0" location="/metadata/slot1" operation="GET" type="ok">Found matching path ID. Listing all of its properties</status>
+</letsmt-ws>
+```
+
+# Manipulate meta data records
+
+* use PUT, POST and DELETE to add, overwrite or delete values in specific keys of a given DB record. Multiple key-value pairs can be added in one query. Each key must be a unique string.
 
 # Search the database
 
@@ -110,6 +137,15 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&gid=public&resource-type=
   <status code="0" location="/metadata" operation="GET" type="ok">Found 10 matching entries</status>
 </letsmt-ws>
 ```
+
+* search for all storage-branches that are public or part of certain groups (could retrieve all repositories that a user as read permissions for by listing all of the user's groups)
+
+* search for public storage-branches:
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&ONE_OF_gid=public,user1,mygroup&resource-type=branch"
+```
+
 
 
 * search for imported files (status = imported)
