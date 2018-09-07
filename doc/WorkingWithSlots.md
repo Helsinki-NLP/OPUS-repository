@@ -180,7 +180,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user4?uid=user4"
 
 ```
  $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?owner=user1&uid=user1"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot1/user1" />
@@ -194,7 +195,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user4?uid=user4"
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=user1&gid=public&resource-type=branch"
-
+```
+```xml
 <letsmt-ws version="55">
   <list path="">
     <entry path="slot5/user3" />
