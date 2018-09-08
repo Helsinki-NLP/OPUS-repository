@@ -38,6 +38,36 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 TODO: should we restrict this for admin users only? Is it possible to list only user-specific jobs? Is it easy to find back the actual job description file from the job listing above?
 
 
+* align jobs for selected file pairs: add parameter `trg` to specify target file to be aligned
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi/2.html.xml?uid=user1&trg=xml/sv/2.html.xml&run=align"
+```
+
+* align jobs for alignment candidates for specific resources or for entire subtrees:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en/2.html.xml?uid=user1&run=align-candidates"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=align-candidates"
+```
+
+TODO: take away candidate lists from the metadata to avoid re-aligning them again!
+
+
+## Changes to the import and alignment parameters
+
+* new import parameter: `ImportPara_autoalign = on/off` - automatically detect and align parallel documents (default = on)
+* new PDF import mode: `ImportPara_mode = combined` - use pdf2xml for conversion from PDF
+* new default sentence splitter: `udpipe` (before it was europarl)
+* new default aligner: `hunalign` (it was `bisent` before)
+
+
+If `autoalign` is off the system will still try to find parallel documents and the result will be stored in the metadata for each monolingual corpus file. The key is `align-candidate` and all candidates can be found by issuing this query on the specific slot (`slot1` in this example):
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1?ENDS_WITH_align-candidates=xml&uid=user1&type=recursive&action=list_all"
+```
+
 ## Planned changes
 
 * add support for aligning two given files (extra link parameter + align action)

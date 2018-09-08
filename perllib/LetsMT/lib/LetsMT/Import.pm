@@ -264,7 +264,7 @@ sub import_file {
 
 =head2 C<import_resource>
 
- $importer->import_resource ($resource)
+ $importer->import_resource ($resource[,skip_align[,skip_find_align]])
 
 Fetches a resource from the repository (should be from the C<uploads> directory)
 and attempts to run all possible import handlers to get a new set of resources
@@ -274,8 +274,11 @@ successful and false otherwise.
 =cut
 
 sub import_resource {
-    my $self = shift;
-    my ($resource) = @_;
+    my $self            = shift;
+    my $resource        = shift;
+    my $skip_align      = shift || 0;
+    my $skip_find_align = shift || 0;
+
     $self->{new_resources} = [];
     $resource->local_dir( $self->{local_root} )
         unless ( $resource->local_dir );
@@ -309,7 +312,7 @@ sub import_resource {
             'import_queue' => $resource->path );
         &LetsMT::WebService::put_meta( $corpus,
             'import_failed' => $resource->path );
-        return 0;
+	return wantarray ? () : 0;
     }
 
     #-------------------------------------------------------------------
@@ -359,13 +362,26 @@ sub import_resource {
         ## (need to skip pre-aligned data by adding them 
         ##  to the SKIP_AUTO_ALIGN list)
 
-        my $upload_type = $resource->upload_type;
-        unless (grep ($_ eq $upload_type, @SKIP_AUTO_ALIGN ) ){
-            &align_documents( $corpus, @$new_resources );
-        }
+	unless ($skip_find_align){
+	    my $upload_type = $resource->upload_type;
+	    unless (grep ($_ eq $upload_type, @SKIP_AUTO_ALIGN ) ){
+		## if skip_align: do not align but still look for translated documents
+		## and save alignment candidates in metadata
+		unless ($skip_align){
+		    my %para = &get_import_parameter($corpus);
+		    $skip_align = 1 if ($para{autoalign} eq 'off');
+		}
+		if ( $skip_align ){
+		    &save_align_candidates( $corpus, @$new_resources );
+		}
+		else {
+		    &align_documents( $corpus, @$new_resources );
+		}
+	    }
+	}
         #-------------------------------------------------------------------
 
-        return 1;
+	return wantarray ? @$new_resources : 1;
     }
 
     # import failed!
@@ -378,7 +394,7 @@ sub import_resource {
             $corpus,
             'import_failed'   => $resource->path );
     }
-    return 0;
+    return wantarray ? () : 0;
 }
 
 
@@ -388,23 +404,106 @@ sub import_resource {
 
 sub align_documents {
     my $corpus    = shift;
-    my @resources = @_;
 
-    my @ParallelResources = ();
-    my @MonoResources     = ();
-    my @ParallelPath      = ();
+    my $AlignResources = &find_translations( $corpus, @_ );
 
-    # sort resources and save paths to parallel resources in this import
-    foreach my $nr (@resources) {
-        if ( $nr->{resource}->type() eq 'xces' ) {
-            push( @ParallelResources, $nr->{resource} );
-            push( @ParallelPath,      $nr->{resource}->path() );
-        }
-        else {
-            push( @MonoResources, $nr->{resource} );
-        }
+    return 0 unless ( ref($AlignResources) eq 'ARRAY' );
+
+    my $LastFrom = undef;
+    my %AlignPara = ();
+    my %Langs     = ();
+    my %LangPairs = ();
+
+    my $count = 0;
+    foreach my $a ( @{$AlignResources} ){
+	my $FromRes = $a->{from};
+	my $ToRes   = $a->{to};
+	my $AlgRes  = $a->{align};
+
+	my $logger = get_logger(__PACKAGE__);
+	$logger->info("align $FromRes with $ToRes ... ");
+
+	## reload align-paras only if we move to a new FromRes
+	%AlignPara = &get_align_parameter( $FromRes ) 
+	    unless ( $LastFrom && ($LastFrom eq $FromRes) );
+
+	my $aligner = new LetsMT::Align( %AlignPara );
+	if ( $aligner->align_resources( $FromRes, $ToRes, $AlgRes ) ) {
+	    $logger->info("done!");
+	    ## save language info for meta data (see below)
+	    my @lang = $AlgRes->language();
+	    my $pair = join( '-', @lang );
+	    $LangPairs{$pair}++;
+	    foreach ( @lang ){ $Langs{$_}++; }
+	    $count++;
+	}
+	else { $logger->error("align $FromRes with $ToRes failed!"); }
     }
-    return 0 unless (@MonoResources);
+
+    ## update corpus metadata about languages and language pairs
+    if ($count){
+        &LetsMT::WebService::put_meta(
+	     $corpus,
+	     'parallel-langs' => join( ',', sort keys %LangPairs ),
+	     'langs'          => join( ',', sort keys %Langs )
+	    );
+    }
+
+    return $count;
+}
+
+
+=head2 C<save_align_candidates>
+
+Find translated documents and store information for each source resource.
+Do not align any document pair!
+
+=cut
+
+sub save_align_candidates {
+    my $corpus    = shift;
+
+    my $AlignResources = &find_translations( $corpus, @_ );
+    return 0 unless ( ref($AlignResources) eq 'ARRAY' );
+
+    # hash of candidates for each resource
+    my %candidates = ();
+    my %resources  = ();
+
+    my $count = 0;
+    foreach my $a ( @{$AlignResources} ){
+	my $from = $a->{from}->path;
+	my $to   = $a->{to}->path;
+	$candidates{$from}{$to}++;
+	$resources{$from} = $a->{from};
+	$count++;
+    }
+
+    foreach my $src ( keys %candidates ){
+	my $trg = join( ',', sort keys %{$candidates{$src}} );
+        &LetsMT::WebService::put_meta(
+	    $resources{$src},
+	    'align-candidates' => $trg );
+    }
+    return $count;
+
+
+}
+
+
+
+=head2 C<find_translations>
+
+=cut
+
+sub find_translations {
+    my $corpus          = shift;
+    my @resources       = @_;
+
+    ## sort the resources
+    my @MonoResources  = get_monolingual_resources( @resources );
+    my @ParallelPath   = get_sentalign_files( @resources );
+    return [] unless (@MonoResources);
 
     # save aligned resources in this hash
     my %AlignedRes = ();
@@ -420,6 +519,10 @@ sub align_documents {
             \@MonoResources,
             %AlignPara
         );
+
+
+    ## initialize return structure
+    my $AlignResources = [];
 
     # find parallel documents for each monolingual resource
     foreach my $SrcRes (@MonoResources) {
@@ -446,21 +549,48 @@ sub align_documents {
             # check if the alignment file is not part of this resource
             next if ( grep ( $AlgPath eq $_, @ParallelPath ) );
 
-            # otherwise: align!
-            my $logger = get_logger(__PACKAGE__);
-            $logger->info("align $FromRes with $ToRes ... ");
-            my %AlignPara = &get_align_parameter( $SrcRes );
-            my $aligner = new LetsMT::Align( %AlignPara );
+	    push( @{$AlignResources}, { from => $FromRes, 
+					to => $ToRes,
+					align => $AlgRes } );
 
-            if ( $aligner->align_resources( $FromRes, $ToRes, $AlgRes ) ) {
-                $logger->info("done!");
-                $AlignedRes{$AlgPath} = $AlgRes;
-                &update_corpus_meta( $corpus, $AlgRes );
-            }
-            else { $logger->error("align $FromRes with $ToRes failed!"); }
+	    $AlignedRes{$AlgPath} = $AlgRes;
         }
     }
+    return $AlignResources;
 }
+
+
+
+
+=head2 C<get_monolingual_resources>
+
+Return all monolingual resources from a list
+of resources created by import_resources
+
+=cut
+
+sub get_monolingual_resources {
+    my @resources     = @_;
+    my @MonoResources = ();
+    foreach my $nr (@resources) {
+        if ( $nr->{resource}->type() ne 'xces' ) {
+            push( @MonoResources, $nr->{resource} );
+        }
+    }
+    return @MonoResources;
+}
+
+sub get_sentalign_files {
+    my @resources     = @_;
+    my @ParallelPath  = ();
+    foreach my $nr (@resources) {
+        if ( $nr->{resource}->type() eq 'xces' ) {
+            push( @ParallelPath,  $nr->{resource}->path() );
+        }
+    }
+    return @ParallelPath;
+}
+
 
 
 =head2 C<convert_resource>

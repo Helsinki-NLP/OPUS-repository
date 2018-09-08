@@ -17,6 +17,8 @@ use open qw(:std :utf8);
 use XML::LibXML;
 use File::Basename 'basename';
 use File::Temp 'tempfile';
+use Encode qw(decode decode_utf8 is_utf8);
+
 
 use LetsMT::Repository::MetaManager;
 use LetsMT::Resource;
@@ -150,7 +152,7 @@ sub job_maker{
         ]
     );
 
-    # and submit alignment job
+    # and submit job
     my $message;
     &submit(
         message => \$message,
@@ -178,6 +180,9 @@ sub run {
 
     if ($command eq 'align'){
         return run_align($path_elements, $args);
+    }
+    if ($command eq 'align-candidates'){
+        return run_align_candidates($path_elements, $args);
     }
     if ($command eq 'realign'){
         return run_realign($path_elements, $args);
@@ -217,6 +222,26 @@ sub run_align {
         )
         : undef;
 
+    ## if trg argument is given: assume that we have two 
+    ## given resources to be aligned (in the same slot/branch)
+
+    if ($resource && (exists $$args{trg}) ){
+	my $SrcRes = $resource;
+	my $TrgRes = LetsMT::Resource::make( $slot, $branch, $$args{trg} );
+	my $AlgRes = LetsMT::Align::make_align_resource($SrcRes, $TrgRes);
+	# delete($$args{trg});
+
+	return &run_align_resource(
+	    $slot, $branch,
+	    $SrcRes->path(), $TrgRes->path(),
+	    $AlgRes->path(),
+	    $args
+            );
+    }
+
+
+    ## otherwise: look for parallel resources and align all of them
+    ## NOTE: this may create lots of align jobs!
     my %parallel = &find_parallel_resources($corpus,$resource,%{$args});
 
     my $count = 0;
@@ -247,6 +272,79 @@ sub run_align {
     return $count;
 }
 
+
+
+=head2 C<run_align_candidates>
+
+ LetsMT::Repository::JobManager::run_align_candidates (
+    $path_elements,
+    $args
+ )
+
+Align documents that have been identified as parallel documents by the name matching heuristics.
+Those candidates are stored in the metadata.
+
+=cut
+
+sub run_align_candidates {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    my @sentalign = ();
+
+    my $slot      = shift(@{$path_elements});
+    my $branch    = shift(@{$path_elements});
+
+    my $corpus    = LetsMT::Resource::make( $slot, $branch );
+    my $resource  = @{$path_elements}
+        ? LetsMT::Resource::make(
+            $slot, $branch, join( '/', @{$path_elements} )
+        )
+        : $corpus;
+
+    ## check whether there is metadata for the resource
+    my $response = LetsMT::WebService::get_meta( $resource );
+
+    ## TODO: why do we need to decode once again?
+    $response = decode( 'utf8', $response );
+
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+
+    ## no corpusfile found: search recursively!
+    unless (@nodes && ($nodes[0]->findvalue('resource-type') eq 'corpusfile') ) {
+	$response = LetsMT::WebService::get_meta(
+	    $resource,
+	    'ENDS_WITH_align-candidates' => 'xml',
+	    type                         => 'recursive',
+	    action                       => 'list_all'
+	    );
+	$dom   = $XmlParser->parse_string( $response );
+	@nodes = $dom->findnodes('//list/entry');
+    }
+
+    my $count=0;
+    foreach my $n (@nodes){
+	my @candidates = split( /,/, $nodes[0]->findvalue('align-candidates') );
+	my @aligned    = split( /,/, $nodes[0]->findvalue('aligned_with') );
+        my $srcfile    = $n->findvalue('@path');
+	my $SrcRes     = LetsMT::Resource::make_from_storage_path($srcfile);
+	foreach my $t (@candidates){
+	    my $TrgRes = LetsMT::Resource::make( $slot, $branch, $t );
+            my $AlgRes = LetsMT::Align::make_align_resource($SrcRes, $TrgRes);
+
+            &run_align_resource(
+                $slot, $branch,
+                $SrcRes->path(), $TrgRes->path(),
+                $AlgRes->path(),
+                $args
+            );
+            $count++;
+	}
+    }
+    return $count;
+}
 
 =head2 C<run_realign>
 

@@ -19,14 +19,15 @@ Configuration at a lower level overwrites settings of higher levels. This means 
 | **parameter** | **type** | **possible values** | **description** |
 |---------------|----------|---------------------|-----------------|
 | ImportPara_normalizer | string | whitespace/header/ligatures/dos/moses | comma-separated chain of text normalizers |
-| ImportPara_splitter | string | europarl/lingua/opennlp | text splitter (used for sentence boundary detection) |
-| ImportPara_tokenizer | string | europarl/uplug/whitespace | tokenizer (but: standard import does not tokenize) |
+| ImportPara_splitter   | string | europarl/lingua/opennlp/udpipe   | text splitter (used for sentence boundary detection) |
+| ImportPara_tokenizer  | string | europarl/uplug/whitespace | tokenizer (but: standard import does not tokenize) |
+| ImportPara_autoalign  | string | on|off                    | automatically detect and align parallel documents (default=on) |
 
 ### Parameters for importing PDF documents ###
 
 | **parameter** | **type** | **possible values** | **description** |
 |---------------|----------|---------------------|-----------------|
-| ImportPara_mode | string | layout/raw/standard/tika | PDF conversion mode (default = layout) |
+| ImportPara_mode | string | layout/raw/standard/tika/combined | PDF conversion mode (default = tika) |
 
 
 These parameters are stored in the group database (user-specific configuration) and in the metadata database (corpus-specific and resource-specific configuration). More information about setting and manipulating these settings can be found at the end of this page.
