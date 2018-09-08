@@ -45,7 +45,7 @@ Tokenize and de-tokenize a text.
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '55';
+$VERSION = '56';
 
 use File::ShareDir;
 use Log::Log4perl qw(get_logger :levels);

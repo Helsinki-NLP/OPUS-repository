@@ -418,7 +418,7 @@ sub list_storage {
 
     # If no slot name given, list all slots
     unless ($slot) {
-        $$result_ref = &list_storage_slots();
+        $$result_ref = &list_storage_slots( $uid );
         return 1;
     }
 
@@ -662,13 +662,37 @@ Returns: an XML-formatted listing string with slots.
 =cut
 
 sub list_storage_slots {
+    my $user    = shift || 'admin';  ## is it wise to have admin as default?
     my @slots   = ();
-    my $slotobj = &_get_slot();    ## no qualifier = all slots
 
-    if ($slotobj) {
-        do { push( @slots, $slotobj->name ) }
+    ## for user 'admin': get all slots in the DB
+    if ( $user eq 'admin' ){
+	my $slotobj = &_get_slot();    ## no qualifier = all slots
+	if ($slotobj) {
+	    do { push( @slots, $slotobj->name ) }
             while ( $slotobj->restore_next() );
+	}
     }
+
+    ## for regular users: get all readable branches
+    ## and store the slots that have at least one of them
+    else{
+	my $groups = &LetsMT::Repository::GroupManager::get_groups_for_user($user);
+	my $metaDB = new LetsMT::Repository::MetaManager();
+	$metaDB->open_read() || raise(
+	    7, "cannot open meta database", 'error'
+	    );
+	my $ids = $metaDB->search( { 'resource-type' => 'branch',
+				     'ONE_OF_gid'    => join(',',@{$groups} ) } );
+	$metaDB->close();
+	my %readable = ();
+	foreach ( @{$ids} ){
+	    my ( $s, $b ) = split( /\// );
+	    $readable{$s}++;
+	}
+	@slots = sort keys %readable;
+    }
+
 
     # Build array ref to store entries for result hash
     my $entries = [];

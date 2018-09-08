@@ -12,6 +12,8 @@ use parent 'LetsMT::Repository::StorageManager::TC';
 use open qw(:std :utf8);
 
 use LetsMT::Repository::MetaManager;
+use LetsMT::Repository::StorageManager::Branch;
+use LetsMT::Repository::GroupManager;
 
 use Log::Log4perl qw(get_logger :levels);
 use LetsMT::Repository::Safesys;
@@ -137,8 +139,6 @@ sub retrieve {
         $query{'_ID_'} = $query{name};
     }
     delete $query{name};
-
-    # retrieve
     return $self->SUPER::retrieve(%query);
 }
 

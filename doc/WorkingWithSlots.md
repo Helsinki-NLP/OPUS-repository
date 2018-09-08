@@ -176,6 +176,28 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/slot5/user4?uid=user4"
 
 # Search for slots
 
+* list all slots that have at least one readable branch for a given user
+
+```
+ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage?uid=user1"
+```
+```xml
+<letsmt-ws version="55">
+  <list path="">
+    <entry path="slot1" />
+    <entry path="slot2" />
+  </list>
+  <status code="0" location="/metadata" operation="GET" type="ok">Found 2 matching entries</status>
+</letsmt-ws>
+```
+
+* list all available slots (use special user `admin`)
+
+```
+ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage?uid=admin"
+```
+
+
 * list all slots owned by a specific user:
 
 ```

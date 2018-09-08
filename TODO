@@ -4,6 +4,7 @@ To do as of version 0.50
 
 * use poppler bindings for PDF (https://metacpan.org/pod/Poppler)
   --> also in pd2xml!! (check also inline java for pdfxtk)
+  --> Poppler may not include text extraction tools in the library?!
   https://github.com/tamirhassan/pdfxtk/blob/master/pdfXtk/src/main/java/at/ac/tuwien/dbai/pdfwrap/ProcessFile.java
 * add dehyphenation module (as normalizer) - see pdf2xml
 * better bindings of chared (python bindings?) + newer version?
