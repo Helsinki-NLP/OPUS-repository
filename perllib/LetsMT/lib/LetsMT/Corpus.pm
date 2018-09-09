@@ -27,7 +27,7 @@ our @EXPORT = qw(
     get_resource_parameter get_user_parameter
     get_align_parameter get_import_parameter
     find_parallel_resources find_all_parallel find_sentence_aligned
-    find_resources find_corpusfiles
+    find_resources find_corpusfiles find_translations resource_type
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -110,6 +110,30 @@ sub find_corpusfiles {
 }
 
 
+=head2 C<resources_type>
+
+Returns resource-type
+
+=cut
+
+sub resource_type {
+    my $resource    = shift;
+
+    ## check whether there is metadata for the resource
+    my $response = LetsMT::WebService::get_meta( $resource );
+    $response = decode( 'utf8', $response );
+
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+
+    if (@nodes){
+	return $nodes[0]->findvalue('resource-type');
+    }
+    return undef;
+}
+
+
 
 =head2 C<find_parallel_resources>
 
@@ -172,6 +196,114 @@ sub find_parallel_resources {
 
     return %parallel;
 }
+
+
+=head2 C<find_translated_resources>
+
+Returns a list of resources that are potential translations
+of the given resources. If no resources are given: search for 
+all matching corpusfiles.
+
+=cut
+
+sub find_translations {
+    my $corpus    = shift;
+    my $resources = shift || [];               # list of resources
+    my %args      = @_ ? @_ : %DEFAULT_PARA;
+
+    ## get parallel corpusfiles
+    my %parallel = ();
+
+    ## if there are given resources:
+    ## search only for those resources (their basename without lang/subdir)
+    ## TODO: this might become expensive if there are many resources!
+    if (@{$resources}){
+	my %basepaths = ();
+	foreach my $r (@{$resources}){
+	    my $base = $r->basename;
+	    $basepaths{$base}++;
+	}
+	foreach my $f (keys %basepaths){
+	    _find_matching_corpusfiles($corpus, \%parallel, $f);
+	}
+    }
+
+    ## otherwise: search in the entire corpus
+    ## TODO: this can be a big query (retrieve all corpusfiles)
+    else{
+	_find_matching_corpusfiles($corpus, \%parallel);
+	my %translations = ();
+	foreach my $base ( keys %parallel ){
+	    my @lang = sort keys %{$parallel{$base}};
+	    while (@lang){
+		my $src = shift(@lang);
+		foreach my $trg (@lang){
+		    $translations{$parallel{$base}{$src}}{$parallel{$base}{$trg}} = 
+			&LetsMT::Resource::make_from_storage_path($parallel{$base}{$trg});
+		}
+	    }
+	}
+	return %translations;
+    }
+
+    ## TODO: do we want to do some more fuzzy matching?
+    ## --> if there is no translation for a specific file 
+    ##     in one of the corpus languages: try to find one?
+    ## --> file names that inlcude language names / IDs?
+    ## (How can we do that efficient with TokyoTyrant?)
+
+    my %translations = ();
+    foreach my $r (@{$resources}){
+	my $base = $r->basename;
+	my $path = $r->storage_path;
+	my $src  = $r->language;
+	if (exists $parallel{$base} ){
+	    foreach my $trg (keys %{$parallel{$base}}){
+		next if ($trg eq $src);
+		## only one direction! TODO: is this OK?
+		if (exists $translations{$parallel{$base}{$trg}}){
+		    next if (exists $translations{$parallel{$base}{$trg}}{$path});
+		}
+		$translations{$path}{$parallel{$base}{$trg}} = 
+		    &LetsMT::Resource::make_from_storage_path($parallel{$base}{$trg});
+	    }
+	}
+    }
+    return %translations;
+}
+
+
+sub _find_matching_corpusfiles{
+    my $corpus   = shift;
+    my $parallel = shift || {};
+    my $filename = shift;
+
+    ## query the meta database
+    my %query = ( 'resource-type'  => 'corpusfile',
+		  type             => 'recursive' );
+    $query{'ENDS_WITH__ID_'} = $filename if ($filename);
+    my $response = LetsMT::WebService::get_meta( $corpus, %query );
+    $response = decode( 'utf8', $response );
+
+    ## parse the query result (matching files in entry-path)
+    my %files     = ();
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string($response);
+    my @nodes     = $dom->findnodes('//list/entry/@path');
+
+    foreach my $n (@nodes) {
+        my $file     = $n->to_literal;
+        my $newres   = LetsMT::Resource::make_from_storage_path($file);
+	my $lang     = $newres->language;
+	my $basename = $newres->basename;
+        unless ( $filename && ($basename ne $filename) ) {
+	    $$parallel{$basename}{$lang} = $file;
+        }
+    }
+    return $parallel;
+}
+
+
 
 
 =head2 C<find_parallel_documents>

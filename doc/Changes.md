@@ -79,6 +79,8 @@ You can also run this command for specific subtrees of the repository, for examp
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/en?ENDS_WITH_align-candidates=xml&uid=user1&type=recursive&action=list_all"
 ```
 
+* the options for fuzzy matching of corpusfilenames are currently switched off (too expensive as a query for large corpora with many corpusfiles!)
+
 
 
 ## Planned changes

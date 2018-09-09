@@ -512,13 +512,22 @@ sub find_translations {
     #       to fetch parameters for searching parallel documents
     my %AlignPara = &get_align_parameter( $MonoResources[0] );
 
-    # find all parallel resources
+    ## find all parallel resources
+    # my %MatchingResources = 
+    #     &LetsMT::Corpus::find_parallel_resources(
+    #        $corpus,
+    #        \@MonoResources,
+    #        %AlignPara
+    #    );
+
+    ## TODO: no align parameters used below anymore!
+    ## --> is this still compatible?
     my %MatchingResources = 
-        &LetsMT::Corpus::find_parallel_resources(
+        &LetsMT::Corpus::find_translations(
             $corpus,
             \@MonoResources,
-            %AlignPara
         );
+
 
 
     ## initialize return structure

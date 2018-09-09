@@ -231,14 +231,19 @@ sub run_detect_translations {
         )
         : $corpus;
 
+
+    my @ResList = ( );
+    if ( resource_type($resource) eq 'corpusfile' ){
+	@ResList = ( $resource );
+    }
     ## find all resources in a subtree if resource is not an XML file
-    my @resources = ( $resource );
-    if ($resource->type ne 'xml'){
-	@resources = &find_corpusfiles( $resource );
+    elsif ( $#{$path_elements} ){
+	@ResList = &find_corpusfiles( $resource );
     }
 
     # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
-    my %parallel = &find_parallel_resources($corpus,\@resources);
+    # my %parallel = &find_parallel_resources($corpus,\@resources);
+    my %parallel = &find_translations( $corpus, \@ResList );
 
     # hash of candidates for each resource
     my %candidates = ();
@@ -246,8 +251,11 @@ sub run_detect_translations {
 
     my $count = 0;
     foreach my $src (sort keys %parallel) {
+
+	next unless (keys %{$parallel{$src}});
 	my $SrcRes = LetsMT::Resource::make_from_storage_path($src);
 	my $SrcPath = $SrcRes->path;
+
 	## if skip_aligned: get all aligned files to skip those
 	my @aligned = ();
 	if ($skip_aligned){
@@ -258,6 +266,7 @@ sub run_detect_translations {
 	    my @nodes     = $dom->findnodes('//list/entry');
 	    @aligned      = split( /,/, $nodes[0]->findvalue('aligned_with') );
 	}
+
         foreach my $trg (sort keys %{$parallel{$src}}) {
 	    my $TrgRes = LetsMT::Resource::make_from_storage_path($trg);
 	    my $TrgPath = $TrgRes->path;
@@ -265,10 +274,10 @@ sub run_detect_translations {
 	    ## skip if we the files is already in the list of aligned resources
             next if ( grep ( $TrgPath eq $_, @aligned ) );
 
-	    ## skip if we already have done the other alignment directions
-            if (exists $candidates{$TrgPath}) {
-                next if (exists $candidates{$TrgPath}{$SrcPath});
-            }
+	    ## skip the other translation direction
+            if (exists $parallel{$trg}) {
+		delete $parallel{$trg}{$src};
+	    }
 	    $candidates{$SrcPath}{$TrgPath}++;
 	    $resources{$SrcPath} = $SrcRes;
 	    $count++;
@@ -343,7 +352,8 @@ sub run_align {
     ## otherwise: look for parallel resources and align all of them
     ## NOTE: this may create lots of align jobs!
     # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
-    my %parallel = &find_parallel_resources($corpus,\@resources);
+    # my %parallel = &find_parallel_resources($corpus,\@resources);
+    my %parallel = &find_translations($corpus,\@resources);
 
     my $count = 0;
     my %done  = (); 
