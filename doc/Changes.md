@@ -59,6 +59,11 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=detect_
 ```
 
 
+## Changes to the metadata API
+
+* add support for new search conditions: `INCLUDES_` (include string), `REGEX_` (matches regular expression)
+
+
 ## Changes to the import and alignment parameters
 
 * new import parameter: `ImportPara_autoalign = on/off` - automatically detect and align parallel documents (default = on)

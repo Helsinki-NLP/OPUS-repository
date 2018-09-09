@@ -515,6 +515,14 @@ sub search {
             $qry->addcond( $key, $qry->QCSTREW,
                 $cond->{ 'ENDS_WITH_' . $key } );
         }
+        elsif ( $key =~ s/^INCLUDES_// ) {
+            $qry->addcond( $key, $qry->QCSTRINC,
+                $cond->{ 'INCLUDES_' . $key } );
+        }
+        elsif ( $key =~ s/^REGEX_// ) {
+            $qry->addcond( $key, $qry->QCSTRRX,
+                $cond->{ 'REGEX_' . $key } );
+        }
         elsif ( $key =~ s/^MIN_// ) {
             $qry->addcond( $key, $qry->QCNUMGE, $cond->{ 'MIN_' . $key } );
         }
