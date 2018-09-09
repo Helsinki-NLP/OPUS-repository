@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-letsmt_make - create import|align|realign jobs and commit them
+letsmt_make - create import|align|realign|align-candidates jobs and commit them
 
 =head1 USAGE
 

@@ -181,16 +181,111 @@ sub run {
     if ($command eq 'align'){
         return run_align($path_elements, $args);
     }
-    if ($command eq 'align-candidates'){
+    if ($command eq 'detect_translations'){
+        return run_detect_translations($path_elements, $args);
+    }
+    if ($command eq 'detect_unaligned'){
+        return run_detect_translations($path_elements, $args, 1);
+    }
+    if ($command eq 'align_candidates'){
         return run_align_candidates($path_elements, $args);
     }
     if ($command eq 'realign'){
         return run_realign($path_elements, $args);
     }
-    elsif ($command eq 'import'){
+    if ($command eq 'import'){
         return run_import($path_elements, $args);
     }
+    return 0;
 }
+
+
+
+
+=head2 C<run_detect_translations>
+
+ LetsMT::Repository::JobManager::run_detect_translations (
+    $path_elements,
+    $args,
+    $skip_aligned
+ )
+
+Try to find parallel documents and store them as align-candidates
+in the metadata of the source corpus files. If skip_aligned is on than
+the system will skip those files that are already aligned.
+
+=cut
+
+sub run_detect_translations {
+    my $path_elements = shift;
+    my $args = shift || {};
+    my $skip_aligned = shift || 0;
+
+    my $slot      = shift(@{$path_elements});
+    my $branch    = shift(@{$path_elements});
+
+    my $corpus    = LetsMT::Resource::make( $slot, $branch );
+    my $resource  = @{$path_elements}
+        ? LetsMT::Resource::make(
+            $slot, $branch, join( '/', @{$path_elements} )
+        )
+        : $corpus;
+
+    ## find all resources in a subtree if resource is not an XML file
+    my @resources = ( $resource );
+    if ($resource->type ne 'xml'){
+	@resources = &find_corpusfiles( $resource );
+    }
+
+    # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
+    my %parallel = &find_parallel_resources($corpus,\@resources);
+
+    # hash of candidates for each resource
+    my %candidates = ();
+    my %resources  = ();
+
+    my $count = 0;
+    foreach my $src (sort keys %parallel) {
+	my $SrcRes = LetsMT::Resource::make_from_storage_path($src);
+	my $SrcPath = $SrcRes->path;
+	## if skip_aligned: get all aligned files to skip those
+	my @aligned = ();
+	if ($skip_aligned){
+	    my $response  = LetsMT::WebService::get_meta( $SrcRes );
+	    $response     = decode( 'utf8', $response );
+	    my $XmlParser = new XML::LibXML;
+	    my $dom       = $XmlParser->parse_string( $response );
+	    my @nodes     = $dom->findnodes('//list/entry');
+	    @aligned      = split( /,/, $nodes[0]->findvalue('aligned_with') );
+	}
+        foreach my $trg (sort keys %{$parallel{$src}}) {
+	    my $TrgRes = LetsMT::Resource::make_from_storage_path($trg);
+	    my $TrgPath = $TrgRes->path;
+
+	    ## skip if we the files is already in the list of aligned resources
+            next if ( grep ( $TrgPath eq $_, @aligned ) );
+
+	    ## skip if we already have done the other alignment directions
+            if (exists $candidates{$TrgPath}) {
+                next if (exists $candidates{$TrgPath}{$SrcPath});
+            }
+	    $candidates{$SrcPath}{$TrgPath}++;
+	    $resources{$SrcPath} = $SrcRes;
+	    $count++;
+	}
+    }
+    foreach my $src ( keys %candidates ){
+	my $trg = join( ',', sort keys %{$candidates{$src}} );
+        &LetsMT::WebService::put_meta(
+	    $resources{$src},
+	    'align-candidates' => $trg );
+    }
+    return $count;
+}
+
+
+
+
 
 
 =head2 C<run_align>
@@ -220,7 +315,7 @@ sub run_align {
         ? LetsMT::Resource::make(
             $slot, $branch, join( '/', @{$path_elements} )
         )
-        : undef;
+        : $corpus;
 
     ## if trg argument is given: assume that we have two 
     ## given resources to be aligned (in the same slot/branch)
@@ -239,10 +334,16 @@ sub run_align {
             );
     }
 
+    ## find all resources in a subtree if resource is not an XML file
+    my @resources = ( $resource );
+    if ($resource->type ne 'xml'){
+	@resources = &find_corpusfiles( $resource );
+    }
 
     ## otherwise: look for parallel resources and align all of them
     ## NOTE: this may create lots of align jobs!
-    my %parallel = &find_parallel_resources($corpus,$resource,%{$args});
+    # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
+    my %parallel = &find_parallel_resources($corpus,\@resources);
 
     my $count = 0;
     my %done  = (); 
@@ -326,8 +427,8 @@ sub run_align_candidates {
 
     my $count=0;
     foreach my $n (@nodes){
-	my @candidates = split( /,/, $nodes[0]->findvalue('align-candidates') );
-	my @aligned    = split( /,/, $nodes[0]->findvalue('aligned_with') );
+	my @candidates = split( /,/, $n->findvalue('align-candidates') );
+	my @aligned    = split( /,/, $n->findvalue('aligned_with') );
         my $srcfile    = $n->findvalue('@path');
 	my $SrcRes     = LetsMT::Resource::make_from_storage_path($srcfile);
 	foreach my $t (@candidates){

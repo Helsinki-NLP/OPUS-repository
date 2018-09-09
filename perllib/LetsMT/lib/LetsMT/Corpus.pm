@@ -27,7 +27,7 @@ our @EXPORT = qw(
     get_resource_parameter get_user_parameter
     get_align_parameter get_import_parameter
     find_parallel_resources find_all_parallel find_sentence_aligned
-    find_resources
+    find_resources find_corpusfiles
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -78,6 +78,39 @@ $ALIGNPARA{method} = $DEFAULT_ALIGNER;
 
 =head1 FUNCTIONS
 
+=head2 C<find_corpusfiles>
+
+Returns a list of corpusfile resources within a given subtree.
+
+=cut
+
+sub find_corpusfiles {
+    my $corpus    = shift;
+
+    ## query the meta database
+    my $response = LetsMT::WebService::get_meta(
+        $corpus,
+        'resource-type'  => 'corpusfile',
+        type             => 'recursive'
+    );
+
+    ## TODO: why do we need to decode once again?
+    $response = decode( 'utf8', $response );
+
+    ## parse the query result (matching files in entry-path)
+    my @resources     = ();
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string($response);
+    my @nodes     = $dom->findnodes('//list/entry/@path');
+    foreach my $n (@nodes) {
+        my $file = $n->to_literal;
+        push (@resources, LetsMT::Resource::make_from_storage_path($file) );
+    }
+    return @resources;
+}
+
+
+
 =head2 C<find_parallel_resources>
 
 Returns a list of matching resources.
@@ -97,30 +130,28 @@ sub find_parallel_resources {
     # always include already aligned documents
     if ( @{$resources} ) {
         foreach my $res ( @{$resources} ) {
-            my @aligned = find_aligned_documents($res);
-            my $file1   = $res->storage_path;
-            foreach my $file2 (@aligned) {
-                $parallel{$file1}{$file2} =
-                  &LetsMT::Resource::make_from_storage_path($file2);
-            }
+	    my @aligned = find_aligned_documents($res);
+	    my $file1   = $res->storage_path;
+	    foreach my $file2 (@aligned) {
+		$parallel{$file1}{$file2} =
+		    &LetsMT::Resource::make_from_storage_path($file2);
+	    }
         }
     }
 
     # find documents with identical names
     if ( @{$resources} && $args{search_parallel} eq 'identical' ) {
         foreach my $res ( @{$resources} ) {
-            my @identical = find_parallel_documents( $corpus, $res );
-            my $file1 = $res->storage_path;
-            foreach my $file2 (@identical) {
-                $parallel{$file1}{$file2} =
-                  &LetsMT::Resource::make_from_storage_path($file2);
-            }
+	    my @identical = find_parallel_documents( $corpus, $res );
+	    my $file1 = $res->storage_path;
+	    foreach my $file2 (@identical) {
+		$parallel{$file1}{$file2} =
+		    &LetsMT::Resource::make_from_storage_path($file2);
+	    }
         }
     }
 
     # search similar names
-
-    #    elsif ($args{search_parallel} eq 'similar'){
     else {
         my %possible = find_all_parallel( $corpus, %args );
         foreach my $file1 ( keys %possible ) {
@@ -312,7 +343,7 @@ sub find_all_parallel {
     my $parallel = {};
 
     ## find all sentence alignment files
-    ## (this is better than trusting the aligned_woth field because
+    ## (this is better than trusting the aligned_with field because
     ##  sentence alignment may be deleted without updating the aligned_with
     ##  field in the metadata of previously aligned documents)
 

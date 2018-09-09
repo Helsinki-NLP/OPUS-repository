@@ -1,18 +1,43 @@
-To do as of version 0.50
+To do as of version 0.56
 ========================
 
+
+High priority:
+
+* improve the way parallel documents are found
+  --> more efficient! (already for identicial names)
+  --> some fuzzy matching on names (but not the complicated way it is now!)
+* (semi-)automatic identification of parallel documents (without requiring identical file names)
+  --> fuzzi name matching is already in place?! --> bad implementation!
+
+
+Medium priority:
+
+* add dehyphenation module (as normalizer) - see pdf2xml
+* improved pre-processing tools
+  - UDpipe									(started)
+  - optimized sentence splitters, tokenizers
+* stable web interface with configuration support				(started)
+* slurm job manager (parameters, resource management missing)			(working)
+  --> distributed setup
+  --> resource configuration and different queues?
+* user interface (for uploads, OPUS integration)
+* allow manual corrections (alignments and even other things?)
+  --> ICA integration?
+* more sentence aligners (BLEU align, gargantua, yalign?)
+* code optimization (backends, validation, conversion ...)
+
+
+Low priority:
 
 * use poppler bindings for PDF (https://metacpan.org/pod/Poppler)
   --> also in pd2xml!! (check also inline java for pdfxtk)
   --> Poppler may not include text extraction tools in the library?!
   https://github.com/tamirhassan/pdfxtk/blob/master/pdfXtk/src/main/java/at/ac/tuwien/dbai/pdfwrap/ProcessFile.java
-* add dehyphenation module (as normalizer) - see pdf2xml
 * better bindings of chared (python bindings?) + newer version?
   http://corpus.tools/wiki/Chared
   via Inline::Python?
   https://metacpan.org/pod/distribution/Inline-Python/Python.pod
-* add call to job API to start import for individual files			(already works!)
-* slurm job manager (parameters, resource management missing)			(working)
 * git backend									(done)
   - user-subtrees as branches and not copies					(done)
   - remote repositories (master), 
@@ -23,31 +48,22 @@ To do as of version 0.50
   https://metacpan.org/pod/Git::Class
   https://metacpan.org/pod/Git::Raw
   https://metacpan.org/pod/Git::XS
-* code optimization (backends, validation, conversion ...)
 * trainable sentence splitters & tokenizers (openNLP, other?)
-* improved pre-processing tools (
-  - UDpipe									(started)
-  - optimized sentence splitters, tokenizers
-* stable web interface with configuration support				(started)
 * automatic load-balancing in distributed setups
 * update Apache Tika (plus allow options?)
+* integrate stanford core NLP?
+  server: https://stanfordnlp.github.io/CoreNLP/corenlp-server.html
+
+
+Done:
+
 * integrate pdf2xml								(done)
   (need to improve pdf2xml! too slow! use Tika server!)
 * install and setup Apache Tika as a server and call it from Apache::Tika 	(done!)
   https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
   https://metacpan.org/pod/Apache::Tika
+* add call to job API to start import for individual files			(already works!)
 
 
-
-Wish-list
-==========
-
-* (semi-)automatic identification of parallel documents (without requiring identical file names)
-  --> fuzzi name matching is already in place?!
-* more sentence aligners (BLEU align, gargantua, yalign?)
-* user interface (for uploads, OPUS integration)
-* allow manual corrections (alignments and even other things?)
-* integrate stanford core NLP?
-  server: https://stanfordnlp.github.io/CoreNLP/corenlp-server.html
 
 

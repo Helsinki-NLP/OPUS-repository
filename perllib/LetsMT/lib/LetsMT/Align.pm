@@ -197,7 +197,7 @@ sub align_resources {
                 $meta{'link-types'} =~ s/\,$//;
             }
 
-            # post ssome meta data
+            # post some meta data
             LetsMT::WebService::post_meta( $AlgResource, %meta );
             LetsMT::WebService::post_meta(
                 $SrcResource,
@@ -216,6 +216,13 @@ sub align_resources {
             LetsMT::WebService::put_meta(
                 $TrgResource,
                 aligned_with => $SrcResource->path
+            );
+
+	    $logger->debug("ALIGN: remove ".$TrgResource->path." from ".$SrcResource->path);
+            # finally, remove target from align-candidates
+            LetsMT::WebService::del_meta(
+                $SrcResource,
+                'align-candidates' => $TrgResource->path
             );
 
             return $AlgResource;

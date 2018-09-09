@@ -44,14 +44,19 @@ TODO: should we restrict this for admin users only? Is it possible to list only 
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi/2.html.xml?uid=user1&trg=xml/sv/2.html.xml&run=align"
 ```
 
-* align jobs for alignment candidates for specific resources or for entire subtrees:
+* align jobs for alignment candidates (the ones detected by import processes or `detect_translations` or `detect_unaligned`) for specific resources or for entire subtrees:
 
 ```
-$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en/2.html.xml?uid=user1&run=align-candidates"
-$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=align-candidates"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en/2.html.xml?uid=user1&run=align_candidates"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=align_candidates"
 ```
 
-TODO: take away candidate lists from the metadata to avoid re-aligning them again!
+* try to find parallel documents by running the commands `detect_translations` (all potentially parallel documents including the ones that are already aligned) or `detect_unaligned` (potentially parallel documents that are not yet aligned):
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en?uid=user1&run=detect_translations"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=detect_untranslated"
+```
 
 
 ## Changes to the import and alignment parameters
@@ -67,6 +72,14 @@ If `autoalign` is off the system will still try to find parallel documents and t
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1?ENDS_WITH_align-candidates=xml&uid=user1&type=recursive&action=list_all"
 ```
+
+You can also run this command for specific subtrees of the repository, for example English files only:
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/en?ENDS_WITH_align-candidates=xml&uid=user1&type=recursive&action=list_all"
+```
+
+
 
 ## Planned changes
 
