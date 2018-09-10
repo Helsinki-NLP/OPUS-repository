@@ -72,6 +72,7 @@ install-targets: \
 	install-config \
 	install-svnserver \
 	install-swap \
+	install-isa \
 	restart-apache
 
 # for storage servers: set DB-server-name to access the remote DB host
@@ -124,6 +125,14 @@ install-sge-client-targets: \
 #.PHONY: install-sge-client
 #install-sge-client: install-frontend
 ## ???
+
+## copy the files for ISA (interactive sentence aligner)
+.PHONY: install-isa
+install-isa:
+	${COPY} ../isa ${LETSMTROOT}/share/
+	mkdir -p /var/www/html/isa
+	chgrp www-data /var/www/html/isa
+	chmod g+sw /var/www/html/isa
 
 .PHONY: install-grenzschnitte
 install-grenzschnitte:

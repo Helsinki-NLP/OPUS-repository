@@ -20,6 +20,7 @@ UBUNTU_BASE_PACKAGES = \
 		cpanminus \
 		curl \
 		default-jre \
+		git \
 		graphviz \
 		gzip \
 		libalgorithm-diff-perl \
@@ -69,6 +70,7 @@ UBUNTU_BASE_PACKAGES = \
 		openjdk-7-jdk \
 		openssl \
 		perl-doc \
+		php5 \
 		pkg-config \
 		subversion \
 		tidy \
@@ -100,7 +102,8 @@ CPAN_MODULES = 	Apache::Tika \
 		Test::More \
 		Text::PDF2XML \
 		Switch \
-		Ufal::UDPipe
+		Ufal::UDPipe \
+		Uplug
 
 # TODO: do we still need the Persistent modules?
 

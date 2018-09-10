@@ -28,6 +28,7 @@ use LetsMT::Repository::Safesys;
 use LetsMT::Corpus;
 use LetsMT::Align;
 
+use Cwd;
 use Data::Dumper;
 use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
@@ -195,6 +196,9 @@ sub run {
     }
     if ($command eq 'import'){
         return run_import($path_elements, $args);
+    }
+    if ($command eq 'setup_isa'){
+        return run_setup_isa($path_elements, $args);
     }
     return 0;
 }
@@ -678,6 +682,46 @@ sub run_import_resource{
 }
 
 
+sub run_setup_isa {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    return 0 unless (ref($path_elements) eq 'ARRAY');
+    return 0 if (@{$path_elements} < 2);
+
+    my $WebRoot    = $$args{WebRoot} || '/var/www/html';
+    my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
+
+    my $slot = shift(@{$path_elements});
+    my $user = shift(@{$path_elements});
+
+    my $IsaHome = join('/',$WebRoot,'isa',$user,$slot);
+
+    if (! -d $IsaHome){
+	system("mkdir -p $IsaHome");
+	system("cp -R $IsaFileDir/* $IsaHome/");
+    }
+
+    ## path should start with xml
+    return 0 if (shift(@{$path_elements}) ne 'xml');
+    my $corpus = join('_',@{$path_elements});
+    $corpus-~s/\.xml$//;
+
+    my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);
+    my $langpair   = shift(@{$path_elements});
+    my ($src,$trg) = split(/\-/,$langpair);
+    my $file       = join('/',@{$path_elements});
+    $file          =~s/\.xml$//;
+
+    return 0 unless ($src && $trg && $file);
+
+    if (! -d $CorpusHome){
+	my $pwd = getcwd();
+	chdir($IsaHome);
+	return system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all");
+    }
+    return 1;
+}
 
 
 =head2 C<submit>

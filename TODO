@@ -9,7 +9,12 @@ High priority:
   --> some fuzzy matching on names (but not the complicated way it is now!)
 * (semi-)automatic identification of parallel documents (without requiring identical file names)
   --> fuzzi name matching is already in place?! --> bad implementation!
-
+  check string comparison matching modules like
+  https://metacpan.org/pod/String::Approx
+  https://metacpan.org/pod/release/GRAY/Tree-Suffix-0.21/lib/Tree/Suffix.pm
+  https://stackoverflow.com/questions/20584536/longest-common-substring-across-multiple-sequences
+  https://metacpan.org/pod/release/JOESUF/Algorithm-LCS-1.04/LCS.pm
+  https://metacpan.org/pod/Algorithm::Diff
 
 Medium priority:
 

@@ -9,6 +9,7 @@ There is quite a lot of changes since the latest release from the original LetsM
 * Apache Tika is updated and uses now version 1.18 and runs via a server
 * UDPipe is integrated for sentence splitting (and more in the future)
 * pdf2xml is integrated as pdf import method `combined` (but this is VERY slow!)
+* experimental sentence alignment interface (ISA)
 
 
 ## Changes to the storage API
@@ -25,6 +26,7 @@ There is quite a lot of changes since the latest release from the original LetsM
 ```
  $LETSMT_CONNECT -X GET "$LETSMT_URL/storage?uid=admin"
 ```
+
 
 
 ## Changes to the job API
@@ -57,6 +59,22 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=align_c
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en?uid=user1&run=detect_translations"
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=detect_untranslated"
 ```
+
+* There is a proof of concept installation of the interactive sentence aligner ISA. The job API can be used to prepare the interface for a particular corpusfile, for example
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-fi/12.xml?uid=user&run=setup_isa"
+```
+
+This would setup the aligner for the sentence alignemnt file `12.xml` from slot `corpus` and branch `user`. The sentence aligner interface is then (hopefully) available from the repository server at the URL
+
+```
+http://servername.pouta.csc.fi/isa/user/corpus/index.php
+```
+
+TODO: There is no upload function yet. The files are stored locally in the html-root dir. There is no password protection yet. There is no limit in files that can be prepared and edited (we should probably limit that!)
+
+
 
 
 ## Changes to the metadata API

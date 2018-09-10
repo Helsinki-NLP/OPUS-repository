@@ -1,0 +1,105 @@
+body{
+  font-size: 12px;
+/*  font-family: arial, helvetica, sans-serif; */
+}
+
+input, select{
+  font-size: 12px;
+}
+
+.title
+{ 
+  position:absolute; 
+  top: 0px;
+  left: 10px;
+}
+
+.log{ 
+      float: left;
+      margin-top: 130px;
+      padding: 20px;
+      border: thin solid #000;
+      background-color: #eef;
+ }
+
+.bitext
+{  
+  border: thin solid #000;
+  background-color: #ccf;
+  clear: both;
+  margin: auto;
+  margin-top: 10px;
+}
+
+.bitext td
+{  
+  vertical-align: top;
+}
+
+.bitext-src
+{  
+  border: 1px dashed #000;
+  background-color: #fff;
+}
+
+.bitext-trg
+{  
+  border: 1px dashed #000;
+  background-color: #fff;
+}
+
+.bitext-src td
+{  
+  border-top: 2pt solid #fff;
+  padding-top: 0px;
+  padding-bottom: 1px;
+  margin: 0px;
+  text-align: right;
+}
+
+.bitext-trg td
+{  
+  border-top: 2pt solid #fff;
+  padding-top: 0px;
+  padding-bottom: 1px;
+  margin: 0px;
+}
+
+.eval
+{  
+  padding-bottom: 1px;
+  border-bottom: 2pt solid #fff;
+}
+
+
+.alignform
+{ 
+  text-align:right;
+margin-top: 40px;
+}
+
+
+.index
+{ 
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  padding: 10px;
+  }
+
+.status {
+           padding: 5px;
+           position: absolute;
+           left: 10px;
+           top: 60px;
+           background-color: #eeaaaa;
+}
+
+.help
+{ 
+  padding:5px;
+  position: absolute;
+  left:10px;
+font-size: 12px;
+  top: 90px;
+ }

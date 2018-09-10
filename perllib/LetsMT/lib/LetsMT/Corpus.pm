@@ -138,6 +138,7 @@ sub resource_type {
 =head2 C<find_parallel_resources>
 
 Returns a list of matching resources.
+NOTE: DEPRECATED FUNCTION!
 
 =cut
 
@@ -455,6 +456,9 @@ sub find_sentence_aligned {
 Find all parallel documents in C<$corpus>.
 
 Returns a hash reference.
+
+NOTE: THIS MAY CAUSE TROUBLE WITH BIG REPOSITORIES THAT INCLUDE MANY FILES
+---> PROBABLY DON'T WANT TO USE THIS IN GENERAL ...
 
 =cut
 

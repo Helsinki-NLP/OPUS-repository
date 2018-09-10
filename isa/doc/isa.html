@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Interactive Sentence Alignment</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<?php include('include/java.inc'); ?>
+</head>
+<body>
+
+<h1>Interactive Sentence Alignment (ISA) - A Short User Guide</h1>
+
+
+<h2>Introduction</h2>
+
+ISA is a PHP based web interface for interactive sentence alignment of
+parallel XML documents. It uses as the backend the length-based Gale&amp;Church
+approach to sentence alignment but it can be used for manual alignment. The
+basic idea is to use the interface for
+
+<ul>
+<li> adding hard boundaries to improve quality and performance of the automatic
+alignment
+<li> correcting existing alignments by removing/adding new segment boundaries
+</ul>
+
+The interface allows you to work only on small portions of the document or the
+entire document. Alignment results can be saved (if not disabled) or sent via
+e-mail (if not disabled) in various formats (XCES align with pointers to
+external sentence IDs, plain text format or simple TMX).
+
+<p>
+
+PHP is a server-side scripting language. Hence, the documents to be aligned are
+stored at the server running the scripts.
+Currently, the location of the documents to be aligned are hard-coded in the
+script (in the config.php file). An upload form could easily be added (but then
+we would need some form of protection).
+
+<p>
+
+The documents may contain any kind of markup (it has to be valid XML though)
+but they <b>must</b> contain sentence boundary tags with unique id
+attributes (e.g. &lt;s id="S1.1"&gt;)!
+
+
+<h2>Getting started</h2>
+
+
+ISA shows the source document on the left-had side and the target document in
+the right-had side of the blue window, sentence by sentence. Both documents are
+split into segments (sequences of one or more sentences). These segments are
+aligned to each other one by one starting with the top-most segment in each
+document. ISA only shows only parts of the document. As default it shows about
+20 sentences for each document (depending on the segmentation). ISA breaks at
+1.5*limit sentences if there is no boundary found. You can go to
+the next page using the links in the upper-right corner. You can also change
+the number of sentences to be shown (10, 20, 50 or all).
+
+<p>
+
+If you start the interface for the first time, ISA will create some
+internal files from both documents (this may take some time depending on the
+size of the documents). The script looks for structural XML tags (all tags
+higher than the sentence boundary tags) in both documents and tries to find the
+best one for breaking them into initial segments. It basically uses the most
+frequent XML tag that occurs the same number of times in both documents. No
+segmentation is done if there is no such tag.
+
+<p>
+
+Now, you can do the following things:
+
+<ul>
+<li><a href="#add_remove">Add or remove segmentation boundaries</a>
+<li><a href="#add_tags">Add segmentation boundaries using XML tags from the
+document</a> 
+<li><a href="#cognates">Add segmentation boundaries using "cognates" (we use
+cognates in terms of
+words that are spelled the same)</a>
+<li><a href="#reset">Reset the segmentation of the <b>entire</b> document
+and go back to some initial segmentation using one of the XML tags available in both documents</a>
+<li><a href="#align">Run the automatic sentence aligner for the current portion
+of the document (using the existing segmentation as "hard boundaries")</a>
+<li><a href="#empty">Add or remove empty sentence alignments</a>
+<li><a href="#send">Send (parts) of the sentence alignments to a given e-mal
+address (if this is not disabled in the script)</a>
+<li><a href="#save">Save the current alignment to a local file (on the server)
+if this feature is not disabled</a>
+<li><a href="#reload">Re-load existing sentence alignment and modify (this
+presumes that an alignment exists and is saved in a local file accessible for the
+server)</a>
+</ul>
+
+
+<a name="add_remove"></a>
+<h2>Adding and removing segment boundaries</h2>
+
+<b>Adding</b> boundaries is simply done by clicking on a sentence that should
+start a 
+new segment. Naturally, you cannot do this for the first sentence of an
+existing segment. Sentence for which this is possible are highlighted with green
+when you move the mouse over the sentence string. Sentence boundaries are
+always added <b>in front</b> of the selected sentence! Wait until the screen is
+re-built again. All segments will be aligned in their order, i.e. adding
+boundaries has consequences for all following segments in the document!
+
+<p>
+
+<b>Removing</b> existing boundaries is done in a similar way. Click on the
+first sentence in a segment and the boundary in front of it will
+disappear. These sentences will be highlighted with red and the entire segment
+will be merged with the previous one. This also has consequences for all
+following segments in the document.
+
+<p>
+
+The changes in segment alignment might feel a little bit confusing in the
+beginning. However, many sentence alignment mistakes are due to follow-up
+errors. Adding or removing boundaries may put things right for a large portion
+following in the document!
+
+<a name="add_tags"></a>
+<h2>Adding XML tag boundaries</h2>
+
+
+You may use any XML tag from the original document that is <b>above and
+including</b> the sentence boundary markup for adding additional segment
+boundaries. Select the XML tag you like to use from the selection box in the
+last row of the form in the upper-right corner of the window. Segment
+boundaries according to the markup in the document will be added
+<b>immediately</b> after selecting a new tag from the box. Note that boundaries
+are <b>added</b> to the existing ones! No segment boundary will disappear,
+regardless if it was added manually or automatically! The only way to remove
+all existing boundaries and to use only one specific XML tag for segmentation
+is to select an XML tag and to press on the 
+<a href="reset">reset button</a> afterwards.
+
+
+<a name="cognates"></a>
+<h2>The cognate filter</h2>
+
+
+Another way of adding segmentation boundaries automatically is to use a "cognate
+filter". Many names and related words are spelled the same in different
+languages. This can be used to adjusted the segmentation of the document. ISA
+implements a simple filter using a sliding window approach to find identical
+words. It adds new boundaries before each sentence pair containing such
+identical words. ISA uses a "sliding-window approach and prefers sentence
+pairs with similar distance from the last segment boundary. You can adjust the
+size of the sliding window (meaning the maximum distance between the two
+sentences from the last boundary) and the length threshold of cognates (meaning
+the minimum number of characters in words to be checked). The script uses a
+length threshold of 5 characters and a window of 10 sentence as default.
+
+<p>
+
+Again, boundaries are <b>added</b> to existing ones. No boundary will disappear
+by this approach!
+
+
+<a name="reset"></a>
+<h2>The reset button</h2>
+
+You can always go back to the initial segmentation by pressing the reset button
+in the form in the upper-right corner. Note that <b>all</b> existing boundaries
+for the <b>entire</b> document will be lost (if you didn't save them before)!
+The segmentation will be initialized using the currently selected XML tag
+(look at the selection box to the left of the reset button).
+
+<a name="align"></a>
+<h2>Run the automatic sentence aligner</h2>
+
+
+The automatic sentence aligner is called if you click on the align button in
+the form in the upper-right corner. ISA runs the aligner <b>only</b> for the
+part of the document currently shown on the screen. All segment boundaries are
+used as "hard boundaries", meaning that the sentence alignment will re-start at
+these boundaries. In other words, sentences from each source document segment
+will be aligned with sentences in the corresponding target segment.
+
+<p>
+
+Note that running the aligner is limited to 5 seconds. The call to the
+external program will be killed if this limit is exceeded!
+
+
+<a name="empty"></a>
+<h2>Add or remove empty sentence alignments</h2>
+
+Sometimes a sentence is not translated at all. In that case you can click on
+the sentence ID next to the sentence to align that sentence with
+nothing. Similarily, you can click on the sentence ID to remove existing empty
+alignments. This works also for blocks larger than 1 sentence. Simply use one
+of the sentence IDs in the block.
+
+
+
+<a name="send"></a>
+<h2>Sending alignment results</h2>
+
+Sentence alignment results can be sent to you via e-mail. You can choose
+between 3 different formats:
+
+<ul>
+<li>XCES align (the alignment for the <b>entire</b> document will be sent)
+<li>TMX (only the currently shown part will be sent)
+<li>plain text (only the currently shown part will be sent)
+</ul>
+
+Select the format you like and type your e-mail address in the box to the left
+of the 'mail' button. Press 'mail' to send the data.
+
+<p>
+
+(This function may be disabled in the script!)
+
+<a name="save"></a>
+<h2>Save alignment results</h2>
+
+You can save the current alignment into a local file on the server. The
+alignment of the entire file will be saved in XCES align format and may be
+<a href="#reload">re-loaded</a> for later modification. There is only
+<b>one</b> alignment file that 
+will be overwritten each time somebody presses 'save'!!!
+
+
+<a name=reload></a>
+<h2>Re-load previous alignments</h2>
+
+Previous alignments <a href="#save">saved in a local file</a> may be re-loaded
+in the same way as <a href="#add_tags">XML tags are used for
+segmentation</a>. Select the 'link' tag 
+from the XML tag selection box and the sentence alignment boundaries from the
+saved alignment file will be <b>added</b> to the existing boundaries. 
+<a href="#reset">Reset</a> the
+document using the XML root tag to use only link-tags for segmentation.
+
+
+
+
+
+<hr>
+<script type="text/javascript">
+  if (Date.parse(document.lastModified) != 0)
+      document.write('last update: ' 
+      + document.lastModified);
+</script>
+
+</body>
+</htnl>

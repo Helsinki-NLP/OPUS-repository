@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>The Interactive Clue Aligner (ICA)</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<?php include('include/java.inc'); ?>
+</head>
+<body>
+
+<h1>The Interactive Clue Aligner (ICA) - A Short User Guide</h1>
+
+
+<h2>Introduction</h2>
+
+ICA is a PHP based web interface for interactive word alignment. It uses as its
+backend the <a href="http://sourceforge.net/projects/uplug">Clue Aligner</a>
+but can be used for manual alignment as well. You can
+
+<ul>
+<li>select clues and clue weights
+<li>inspect alignment strategies and matching clues
+<li>correct the alignment by adding and removing links
+<li>display the contents of clue score databases
+</ul>
+
+ICA works on one sentence pair at a time taken from a pre-defined parallel
+corpus (its location is hard-coded in the script for the time being). PHP is a
+server side scripting language and, therefore, the corpus has to be located on
+the server running the script. An upload function could easily be
+integrated. However, we would then need some form of authentication for
+protection. The
+script also needs to have access to appropriate clues stored in local
+(server-side) database files (one for each type). These files can be produced
+by the Clue Aligner off-line.
+
+<p>
+
+ICA actually calls the Clue Aligner as an external tool, runs it and parses the
+log output to display the alignment results. This can then be modified within
+the interface and the final alignment can be saved to disk (on the server, only
+if this feature is not disabled).
+
+
+
+<h2>Getting started</h2>
+
+
+Initially, ICA shows the main CGI form for selecting clues and starting the
+alignment. The location of the corpus is hard-coded and cannot be
+modified. First, you have to select some clue types to be used for the
+alignment using the check-boxes in front of each clue type name. Select, for
+example, 'dice', 'sim' and 'gw'. Now you can press the 'align' button to run
+the word alignment with the current setup. If everything works, you will see
+the selected sentence pair and the clue matrix in the upcoming screen. The
+combined clue scores are shown in the matrix (multiplied by a certain factor to
+make it look nice). The brightness (or better darkness) of the background color
+indicates the strength of the clue values compared to the others. Cells in the
+matrix that have been colored in red correspond to the word-to-word links that
+have been used for the actual word alignment using the currently selected word
+alignment strategy. 
+
+<p>
+
+If you move the mouse over the clue matrix you will see that corresponding
+source and target language words are highlighted in the frame of the matrix and
+in the sentence pair above. If you move your mouse over aligned word pairs (red
+cells) the corresponding word alignment in the table to the left (or below) is
+highlighted as well.
+
+<p>
+
+You can also see the scores of the individual clues contributing to the final
+score. Move the mouse over the scores in the matrix and you will see a small
+tool-tip window with a list of clues and scores applied to this cell. 
+
+
+
+<h2>Selecting clues and clue weights</h2>
+
+
+You can select any combination of clues fro alignment by checking the
+checkboxes in the alignment form on the top. Change the clue type weight with
+the selection box next to the clue type name. These values will be used
+throughout your session until you change them.
+
+
+<h2>Selecting the sentence pair to be aligned</h2>
+
+You can select the sentence pair by its ID from the selection box to the left
+in the same row as the 'align' button. You can also go to the next pair by
+pressing the 'align next' link. The latter will call the aligner with the
+current settings immediately after clicking on the link. The same applies to the
+'align previous' link that allows you to go back to the previous sentence pair
+and align it. If 'save' is not disabled you will have another short-cut link to
+save the current alignment and to go to the next sentence pair and align it.
+
+
+<h2>Word alignment</h2>
+
+
+The clue aligner is called when pressing the 'align' button (or using the short
+cut links 'align next', 'align previous' or 'save &amp; align next'). The
+aligner is called with the current settings using elected clues and
+weights. You can choose the alignment strategy with the selection box to the
+left of the 'align' button. For more information read the background
+literature. The selection box immediately to the left of the 'align' button can
+be used to set an alignment threshold. Words with a lower score than the chosen
+threshold score will not be aligned. The alignment is only displayed but not
+stored anywhere. You may save the current alignment into a local file (on the
+server) if the 'save' function is not disabled. Note that there is only one
+file for each sentence pair from the corpus. Each time you save an alignment the
+old one will be overwritten.
+
+<p>
+
+Note that running the clue aligner is limited to 5 seconds. The call to the
+external program will be killed if this limit is exceeded!
+
+
+<h2>Manual alignment</h2>
+
+
+ICA is not only a visualization tool - it can also be used to alter the
+alignment. You can click on each cell in the clue matrix to add a word-to-word
+link (if not linked already) or to remove a word-to-word link (if they have
+been aligned already). Word-to-word links that overlap with others will be
+merged (that's how the actual word alignment is done shown in the table to the
+left). Try to be patient and wait for the screen to refresh before clicking
+another time!
+
+<p>
+
+You may save the alignment into a local file (on the sever) if the 'save'
+function is not disabled. There is only one file per sentence pair and saving
+an alignment will overwrite old ones!
+
+
+
+<h2>Inspecting clue databases</h2>
+
+You can have a look at the contents of clue databases. Simply click on the link
+given the name of the clue type you like to inspect. This will give you a list
+of 25 clues from the selected database. You can walk through the database using
+the links surrounding the clue type name ('&lt;&lt;', '&lt;', '&gt;' and
+'&gt;&gt;'). You can sort them by source language
+item (click on source), by target language item (click on target), or by their
+scores (click on score). You may also search for certain items in the database
+using the input fields in the source and the target column. Note that these
+functions use external tools that are limited to an execution time of 5
+seconds. Displaying (and especially sorting) large databases will not work
+correctly! Sorting scores also fail if scores are partly in exponential form.
+
+
+
+<h2>Plans for the future</h2>
+
+<ul>
+<li>sending alignment results via e-mail (necessary?)
+<li>re-loading saved alignments to modify them later on
+<li>make it possible to add your own clues via the interface
+<li>file uploading + user authentication ....maybe integration in UplugWeb?
+</ul>
+
+
+
+<h2>Background literature</h2>
+
+
+<dt>J&ouml;rg Tiedemann, 2003,</dt>
+
+<dd>Recycling Translations - Extraction of Lexical
+    Data from Parallel Corpora and their Application in
+    Natural Language Processing,<br>
+    Doctoral Thesis, <cite>Studia Linguistica
+    Upsaliensia 1</cite>, ISSN 1652-1366, ISBN
+    91-554-5815-7<br>
+    [<a href="http://publications.uu.se/uu/fulltext/nbn_se_uu_diva-3791.pdf">
+    pdf, 1.3MB</a>] [<a href="http://www.let.rug.nl/~tiedeman/phd/html/">
+    html</a>]
+
+
+<dt>J&ouml;rg Tiedemann, 2004</dt>
+<dd>Word to word alignment strategies.<br>
+In <cite>Proceedings of the 20th International
+Conference on Computational Linguistics (COLING
+2004)</cite>. Geneva, Switzerland, August
+23-27.<br>
+<a href="http://www.let.rug.nl/~tiedeman/paper/coling04.pdf">[pdf]</a></dd>
+
+<p>
+
+<hr>
+<script type="text/javascript">
+  if (Date.parse(document.lastModified) != 0)
+      document.write('last update: ' 
+      + document.lastModified);
+</script>
+
+</body>
+</htnl>
