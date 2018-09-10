@@ -102,8 +102,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Test::More \
 		Text::PDF2XML \
 		Switch \
-		Ufal::UDPipe \
-		Uplug
+		Ufal::UDPipe
 
 # TODO: do we still need the Persistent modules?
 
@@ -121,7 +120,8 @@ MOJO_CPAN_MODULES = Authen::Captcha \
 ## until I figure out how to pass mysql login details for the tests of this
 ## package, we simply force our way through the tests
 FORCECPAN_MODULES = 	Filesys::DiskUsage \
-			Lingua::Identify::Blacklists
+			Lingua::Identify::Blacklists \
+			Uplug
 MYSQL_FORCECPAN_MODULES = Persistent::MySQL
 
 # Tokyo Cabinet & Tokyo Tyrant (are included in lib/)
