@@ -112,11 +112,17 @@ $(SENTALIGN):
 
 $(SRCXML): $(SRCRAWXML)
 	mkdir -p ${dir $@}
-	$(UPLUG) pre/tok -l ${SRCLANG} -in $< -out $@
+	cat $< | grep -v '<time ' |\
+	$(UPLUG) pre/tok -l ${SRCLANG} -out $@
+
+#	$(UPLUG) pre/tok -l ${SRCLANG} -in $< -out $@
 
 $(TRGXML): $(TRGRAWXML)
 	mkdir -p ${dir $@}
-	$(UPLUG) pre/tok -l ${TRGLANG} -in $< -out $@
+	cat $< | grep -v '<time ' |\
+	$(UPLUG) pre/tok -l ${TRGLANG} -out $@
+
+#	$(UPLUG) pre/tok -l ${TRGLANG} -in $< -out $@
 
 
 $(CONFIG): $(DATADIR)/%.inc: include/%.in $(SRCXML) $(TRGXML)

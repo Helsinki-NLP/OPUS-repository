@@ -652,6 +652,8 @@ sub convert_resource {
                 $conversion_warnings, $log_message
                 ) = $handler->convert( $resource, $self, $meta_resource, $report_progress, $out_resource );
 
+	    print STDERR "converting: ".$resource->path."\n";
+
             # upload possible warnings (logfiles, messages etc)
             &_upload_errors(
                 $conversion_warnings, $resource,
@@ -968,7 +970,7 @@ sub path_lookup{
 sub suffix_type{
     my $path = shift;
 
-    if ($path=~/\.(\S+)(\.gz)?$/i){
+    if ($path=~/\.([^.]+)(\.gz)?$/i){
 	return $1 if (supported($1));
     }
     return 'gz' if ($path=~/\.(gz)$/i);

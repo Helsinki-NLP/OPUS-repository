@@ -9,7 +9,7 @@ LetsMT::Import::tar - import handler for C<tar> archives
 use strict;
 use parent 'LetsMT::Import::Generic';
 
-use File::Basename;
+use File::Basename qw/basename/;
 use Data::Dumper;
 use XML::LibXML;
 
@@ -85,6 +85,7 @@ sub convert {
 
     while ( my $exfile = &$cmd_reader ) {
         chomp $exfile;
+	next if (basename($exfile)=~/^\./);       # skip files starting with .
         unless ( $exfile =~ /\/$/ ) {
 
             # resource object for extracted file
