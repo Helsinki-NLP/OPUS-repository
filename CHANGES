@@ -7,6 +7,8 @@
 * updated Apache Tika to v1.18 and added server mode
 * use LibMagic bindings instead of system calls to file
 * added UDPipe support (tokenizer and sentence splitter so far)
+* stable srt conversion
+* fuzzy file name matching for detection of parallel texts
 * bugfixing and fixed unit tests
 
 

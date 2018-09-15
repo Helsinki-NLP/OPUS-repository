@@ -17,6 +17,7 @@ use open qw(:std :utf8);
 use XML::LibXML;
 use File::Basename 'basename';
 use File::Temp 'tempfile';
+use File::Path;
 use Encode qw(decode decode_utf8 is_utf8);
 
 
@@ -199,6 +200,12 @@ sub run {
     }
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
+    }
+    if ($command eq 'upload_isa'){
+        return run_upload_isa($path_elements, $args);
+    }
+    if ($command eq 'remove_isa'){
+        return run_remove_isa($path_elements, $args);
     }
     return 0;
 }
@@ -682,6 +689,8 @@ sub run_import_resource{
 }
 
 
+## set up ISA for a specific corpus file
+
 sub run_setup_isa {
     my $path_elements = shift;
     my $args = shift || {};
@@ -722,6 +731,92 @@ sub run_setup_isa {
     }
     return 1;
 }
+
+
+## completely remove ISA for a specific corpus file
+
+sub run_remove_isa {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    return 0 unless (ref($path_elements) eq 'ARRAY');
+    return 0 if (@{$path_elements} < 2);
+
+    my $WebRoot    = $$args{WebRoot} || '/var/www/html';
+    my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
+
+    my $slot = shift(@{$path_elements});
+    my $user = shift(@{$path_elements});
+    my $path = join('/',@{$path_elements});
+    $path    =~s/\.xml$/.isa.xml/;
+
+    return 0 if (shift(@{$path_elements}) ne 'xml');
+
+    unshift( @{$path_elements},$slot );
+    my $corpus = join('_',@{$path_elements});
+    $corpus=~s/\.xml$//;
+
+    my $IsaHome    = join('/',$WebRoot,'isa',$user,$slot);
+    my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);
+    my $CesFile    = $CorpusHome.'.ces';
+
+    ## uload a copy to safe the alignments
+    my $resource = new LetsMT::Resource(
+	slot => $slot,
+	user => $user,
+	path => $path,
+	);
+
+    if (-f $CesFile){
+	LetsMT::WebService::put_file($resource,$CesFile);
+    }
+
+    ## dangerous: remove the whole file system tree ...
+    unlink($CesFile) if (-e $CesFile);
+    if (-d $CorpusHome){
+	rmtree($CorpusHome);
+    }
+}
+
+
+
+## upload the sentence alignment file to the repository
+
+sub run_upload_isa {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    return 0 unless (ref($path_elements) eq 'ARRAY');
+    return 0 if (@{$path_elements} < 2);
+
+    my $WebRoot    = $$args{WebRoot} || '/var/www/html';
+    my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
+
+    my $slot = shift(@{$path_elements});
+    my $user = shift(@{$path_elements});
+    my $path = join('/',@{$path_elements});
+
+    return 0 if (shift(@{$path_elements}) ne 'xml');
+
+    unshift( @{$path_elements},$slot );
+    my $corpus = join('_',@{$path_elements});
+    $corpus=~s/\.xml$//;
+
+    my $IsaHome    = join('/',$WebRoot,'isa',$user,$slot);
+    my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);
+    my $cesfile    = $CorpusHome.'.ces';
+
+    my $resource = new LetsMT::Resource(
+	slot => $slot,
+	user => $user,
+	path => $path,
+	);
+
+    return 0 unless (-f $cesfile);
+    return LetsMT::WebService::put_file($resource,$cesfile);	
+}
+
+
 
 
 =head2 C<submit>

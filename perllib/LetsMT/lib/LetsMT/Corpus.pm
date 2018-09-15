@@ -14,7 +14,9 @@ use XML::Simple;
 use open qw(:std :utf8);
 use Encode qw(decode decode_utf8 is_utf8);
 
+use String::Approx qw/amatch adistr/;
 use File::Basename qw/basename dirname/;
+
 use LetsMT::Tools::Strings;
 use LetsMT::Lang::ISO639;
 use LetsMT::WebService;
@@ -35,7 +37,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT );
 
 ## Default search mode for finding parallel documents
 ## (comment out if you like to use the fuzzy search below)
-my $DEFAULT_SEARCH = 'identical';
+# my $DEFAULT_SEARCH = 'identical';
 
 ## uncomment this one if you want to match similar file names as well
 ## (difference = language ID's + matching thresholds below)
@@ -43,7 +45,7 @@ my $DEFAULT_SEARCH = 'identical';
 ## TODO: searching for similar files is less efficient!
 ##  --> need to check time/space complexities
 ##  --> especially for large corpora (= with many files)
-# my $DEFAULT_SEARCH = 'similar';
+my $DEFAULT_SEARCH = 'similar';
 
 ## default thresholds for size ratio and name match
 my $DEFAULT_SIZE_RATIO_THR = 0.7;
@@ -55,8 +57,10 @@ my $DEFAULT_NAME_MATCH_WEIGHT = 1 - $DEFAULT_SIZE_RATIO_WEIGHT;
 
 # default parameters for searching parallel documents
 
-our %DEFAULT_PARA = (
+our %DEFAULT_SEARCH_PARA = (
     search_parallel                   => $DEFAULT_SEARCH,
+
+## old parameters - not used anymore!
     search_parallel_min_size_ratio    => $DEFAULT_SIZE_RATIO_THR,
     search_parallel_min_name_match    => $DEFAULT_NAME_MATCH_THR,
     search_parallel_weight_size_ratio => $DEFAULT_SIZE_RATIO_WEIGHT,
@@ -72,7 +76,7 @@ our $DEFAULT_ALIGNER = 'hunalign';
 ## - search paramaters for finding parallel documents
 ## - aligner method
 
-our %ALIGNPARA = %DEFAULT_PARA;
+our %ALIGNPARA = %DEFAULT_SEARCH_PARA;
 $ALIGNPARA{method} = $DEFAULT_ALIGNER;
 
 
@@ -145,7 +149,7 @@ NOTE: DEPRECATED FUNCTION!
 sub find_parallel_resources {
     my $corpus    = shift;
     my $resources = shift || [];               # list of resources
-    my %args      = @_ ? @_ : %DEFAULT_PARA;
+    my %args      = @_ ? @_ : %DEFAULT_SEARCH_PARA;
 
     # make sure we have an array of resources
     unless ( ref($resources) eq 'ARRAY' ) { $resources = [$resources]; }
@@ -210,7 +214,7 @@ all matching corpusfiles.
 sub find_translations {
     my $corpus    = shift;
     my $resources = shift || [];               # list of resources
-    my %args      = @_ ? @_ : %DEFAULT_PARA;
+    my %args      = @_ ? @_ : %DEFAULT_SEARCH_PARA;
 
     ## get parallel corpusfiles
     my %parallel = ();
@@ -253,6 +257,11 @@ sub find_translations {
     ## --> file names that inlcude language names / IDs?
     ## (How can we do that efficient with TokyoTyrant?)
 
+    if ($args{search_parallel}=~/(similar|fuzzy)/){
+	&_add_similar_corpusfiles( $corpus, \%parallel, %args );
+    }
+
+
     my %translations = ();
     foreach my $r (@{$resources}){
 	my $base = $r->basename;
@@ -271,6 +280,111 @@ sub find_translations {
 	}
     }
     return %translations;
+}
+
+
+
+## try to find corpus files with similar names
+## for languages that do not have a match yet in the given 
+## hash of parallel documents
+
+sub _add_similar_corpusfiles{
+    my $corpus   = shift;
+    my $parallel = shift || {};
+    my %args     = @_;
+
+    return 0 unless (keys %{$parallel});
+
+
+    ## get all registered languages in the corpus
+
+    my $response  = &LetsMT::WebService::get_meta( $corpus );
+    $response     = decode( 'utf8', $response );
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+    my @langs     = split( /,/, $nodes[0]->findvalue('langs') );
+
+
+    ## for each file base in parallel: check whether a language is missing
+    ## and collect all those languages
+
+    my %missing = ();
+    foreach my $f (keys %{$parallel}){
+	my $filebase = basename($f);
+	$filebase =~s/\.xml$//;
+	next unless ($filebase=~/\p{L}/);  # skip names without any letters
+	foreach my $l (@langs){
+	    $missing{$l}++ unless (exists $$parallel{$f}{$l});
+	}
+    }
+
+
+    ## get all files for all languages with missing documents
+
+    my %query = ( 'resource-type'  => 'corpusfile',
+		  type             => 'recursive' );
+
+    my $slot = $corpus->slot;
+    my $branch = $corpus->user;
+    my %corpusfiles = ();
+    foreach my $l (keys %missing){
+
+	## make the language-specific resource
+	my $langres = LetsMT::Resource::make( $slot, $branch, 'xml/'.$l );
+
+	# query the database
+	my $response  = LetsMT::WebService::get_meta( $langres, %query );
+	$response     = decode( 'utf8', $response );
+	my %files     = ();
+	my $XmlParser = new XML::LibXML;
+	my $dom       = $XmlParser->parse_string($response);
+	my @nodes     = $dom->findnodes('//list/entry/@path');
+
+	$corpusfiles{$l} = [];
+	foreach my $n (@nodes) {
+	    my @path = split( /\/+/, $n->to_literal );
+	    shift(@path); # slot
+	    shift(@path); # branch
+	    shift(@path); # xml
+	    shift(@path); # lang
+	    if (@path){
+		$path[-1]=~s/\.xml$//;
+		push(@{$corpusfiles{$l}},join('/',@path));
+	    }
+	}
+    }
+
+    ## run through the document base names again
+    ## and find similar files for the languages that are missing
+    my $count = 0;
+    foreach my $f (keys %{$parallel}){
+
+	# my $filebase = basename($f);
+	# my $filedir  = dirname($f);
+	my $filebase = $f;
+	$filebase =~s/\.xml$//;
+	next unless (basename($filebase)=~/\p{L}/);  # skip file names without any letters
+
+	foreach my $l (@langs){
+	    next if (exists $$parallel{$f}{$l});
+	    next unless (@{$corpusfiles{$l}});
+	    my @matches = amatch( $filebase, @{$corpusfiles{$l}} );
+	    # more than 1? sorting according to distance!
+	    # see https://metacpan.org/pod/String::Approx
+	    if ($#matches){
+		my %dist;
+		@dist{@matches} = map { abs } adistr( $filebase, @matches );
+		@matches = sort { $dist{$a} <=> $dist{$b} } @matches;
+	    }
+	    if (@matches){
+		$matches[0] .= '.xml';
+		$$parallel{$f}{$l} = join( '/',( $slot, $branch, 'xml', $l, $matches[0]) );
+		$count++;
+	    }
+	}
+    }
+    return $count;
 }
 
 
@@ -467,14 +581,14 @@ sub find_all_parallel {
     my %args   = @_;
 
     my $size_weight = $args{search_parallel_weight_size_ratio}
-      ||      $DEFAULT_PARA{search_parallel_weight_size_ratio};
+      ||      $DEFAULT_SEARCH_PARA{search_parallel_weight_size_ratio};
     my $name_weight = $args{search_parallel_weight_name_match}
-      ||      $DEFAULT_PARA{search_parallel_weight_name_match};
+      ||      $DEFAULT_SEARCH_PARA{search_parallel_weight_name_match};
 
     my $size_threshold = $args{search_parallel_min_size_ratio}
-      ||         $DEFAULT_PARA{search_parallel_min_size_ratio};
+      ||         $DEFAULT_SEARCH_PARA{search_parallel_min_size_ratio};
     my $name_threshold = $args{search_parallel_min_name_match}
-      ||         $DEFAULT_PARA{search_parallel_min_name_match};
+      ||         $DEFAULT_SEARCH_PARA{search_parallel_min_name_match};
 
     my $parallel = {};
 

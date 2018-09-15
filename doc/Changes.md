@@ -72,7 +72,16 @@ This would setup the aligner for the sentence alignemnt file `12.xml` from slot 
 http://servername.pouta.csc.fi/isa/user/corpus/index.php
 ```
 
-TODO: There is no upload function yet. The files are stored locally in the html-root dir. There is no password protection yet. There is no limit in files that can be prepared and edited (we should probably limit that!)
+The files can also be uploaded to the repository now and the setup can also be removed. NOTE: With the `remove_isa` command the whole subdirectory for the corpus in the ISA setup will be removed without any further notification! The system uploads a copy of the sentence alignment file to the repository (added `.isa.` in the file name)
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-fi/12.xml?uid=user&run=upload_isa"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-fi/12.xml?uid=user&run=remove_isa"
+```
+
+TODO: Limit the muber of files a user can open for editing (via group database?)
+
+TODO: Need to support password protection as well (but how - with the same password as the interface ir possible!)
 
 
 
@@ -102,7 +111,7 @@ You can also run this command for specific subtrees of the repository, for examp
 $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/en?ENDS_WITH_align-candidates=xml&uid=user1&type=recursive&action=list_all"
 ```
 
-* the options for fuzzy matching of corpusfilenames are currently switched off (too expensive as a query for large corpora with many corpusfiles!)
+* changes in fuzzy matching of corpus files when looking for translated documents: this is done via String::Approx now and is on by default (AlignPara_search_parallel = similar); old AlignPara_search_parallel_* parameters have no effect
 
 
 

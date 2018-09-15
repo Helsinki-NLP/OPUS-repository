@@ -46,6 +46,7 @@ UBUNTU_BASE_PACKAGES = \
 		libparams-util-perl \
 		libppi-perl \
 		libssl-dev \
+		libstring-approx-perl \
 		libsub-uplevel-perl \
 		libtest-differences-perl \
 		libtest-nowarnings-perl \
@@ -105,6 +106,9 @@ CPAN_MODULES = 	Apache::Tika \
 		Text::SRT::Align \
 		Switch \
 		Ufal::UDPipe
+
+#		String::Approx    # installed via libstring-approx-perl
+
 
 # TODO: do we still need the Persistent modules?
 

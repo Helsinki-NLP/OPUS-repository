@@ -652,7 +652,7 @@ sub convert_resource {
                 $conversion_warnings, $log_message
                 ) = $handler->convert( $resource, $self, $meta_resource, $report_progress, $out_resource );
 
-	    print STDERR "converting: ".$resource->path."\n";
+	    print "converting: ".$resource->path."\n";
 
             # upload possible warnings (logfiles, messages etc)
             &_upload_errors(

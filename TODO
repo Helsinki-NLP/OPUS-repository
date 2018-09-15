@@ -4,21 +4,25 @@ To do as of version 0.56
 
 High priority:
 
-* improve the way parallel documents are found
-  --> more efficient! (already for identicial names)
-  --> some fuzzy matching on names (but not the complicated way it is now!)
-* (semi-)automatic identification of parallel documents (without requiring identical file names)
-  --> fuzzi name matching is already in place?! --> bad implementation!
-  check string comparison matching modules like
-  https://metacpan.org/pod/String::Approx
-  https://metacpan.org/pod/release/GRAY/Tree-Suffix-0.21/lib/Tree/Suffix.pm
-  https://stackoverflow.com/questions/20584536/longest-common-substring-across-multiple-sequences
-  https://metacpan.org/pod/release/JOESUF/Algorithm-LCS-1.04/LCS.pm
-  https://metacpan.org/pod/Algorithm::Diff
+* add dehyphenation module (as normalizer) - see pdf2xml
+* integration of srtalign
+* allow manual corrections (alignments and even other things?)			(started)
+  --> ISA integration?
+  --> limit the number of sentalign files that can be open for edit
+  --> setup ISA									(done)
+  --> upload from ISA (overwrite?)						(done)
+  --> remove corpus from ISA							(done)
+  --> color-coded confidence in ISA
+  --> mark corpus that is already done/saved with ISA
+  --> keep confidence scores for links that are not changed in ISA
+* user interface (for uploads, OPUS integration)				(started)
+
 
 Medium priority:
 
-* add dehyphenation module (as normalizer) - see pdf2xml
+* more sentence aligners (BLEU align, gargantua, yalign?)
+* support moving files (i.e. git mv in backend)
+* allow tagging of releases
 * improved pre-processing tools
   - UDpipe									(started)
   - optimized sentence splitters, tokenizers
@@ -26,15 +30,18 @@ Medium priority:
 * slurm job manager (parameters, resource management missing)			(working)
   --> distributed setup
   --> resource configuration and different queues?
-* user interface (for uploads, OPUS integration)
-* allow manual corrections (alignments and even other things?)
-  --> ICA integration?
-* more sentence aligners (BLEU align, gargantua, yalign?)
 * code optimization (backends, validation, conversion ...)
 
 
 Low priority:
 
+* better fuzzy matching of file names (translation detection)
+  --> lowercased file names
+  --> without non-letter characters
+  --> remove/replace language names/IDs from names
+  --> even match translated names? (difficult)
+* find translated documents based on their contents (difficult)
+  --> use external tools for searching parallel documents?
 * use poppler bindings for PDF (https://metacpan.org/pod/Poppler)
   --> also in pd2xml!! (check also inline java for pdfxtk)
   --> Poppler may not include text extraction tools in the library?!
@@ -55,7 +62,6 @@ Low priority:
   https://metacpan.org/pod/Git::XS
 * trainable sentence splitters & tokenizers (openNLP, other?)
 * automatic load-balancing in distributed setups
-* update Apache Tika (plus allow options?)
 * integrate stanford core NLP?
   server: https://stanfordnlp.github.io/CoreNLP/corenlp-server.html
 
@@ -68,7 +74,18 @@ Done:
   https://stackoverflow.com/questions/31733709/auto-restart-a-tika-server
   https://metacpan.org/pod/Apache::Tika
 * add call to job API to start import for individual files			(already works!)
-
+* improve the way parallel documents are found					(done)
+  --> more efficient! (already for identicial names)				(using String::Approx)
+  --> some fuzzy matching on names (but not the complicated way it is now!)
+* (semi-)automatic identification of parallel documents (without requiring identical file names)
+  --> fuzzi name matching is already in place?! --> bad implementation!
+  check string comparison matching modules like
+  https://metacpan.org/pod/String::Approx
+  https://metacpan.org/pod/release/GRAY/Tree-Suffix-0.21/lib/Tree/Suffix.pm
+  https://stackoverflow.com/questions/20584536/longest-common-substring-across-multiple-sequences
+  https://metacpan.org/pod/release/JOESUF/Algorithm-LCS-1.04/LCS.pm
+  https://metacpan.org/pod/Algorithm::Diff
+* update Apache Tika (plus allow options?)					(done, no options)
 
 
 

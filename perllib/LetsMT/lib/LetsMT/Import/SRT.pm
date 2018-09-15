@@ -88,11 +88,6 @@ sub convert {
 	);
     close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
 
-    ## OLD: use run_cmd
-    # &run_cmd( 'srt2xml','-l',$lang,'-r',$output,'<',$input,'>',$output.'.tok' );
-    # my ($success,$ret,$out,$err) = &run_cmd( 'srt2xml','-l',$lang,'-r',$tmpfile,'<',$input );
-    # raise( 8, "cannot remove: " . $err ) unless ($success);
-
     ## convert to UTF-8
     &text2utf8_inplace($input,undef,$lang);
 
