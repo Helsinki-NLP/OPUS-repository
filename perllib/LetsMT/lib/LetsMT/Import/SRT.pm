@@ -12,16 +12,30 @@ A child of L<LetsMT::Import::Text|LetsMT::Import::Text>.
 
 =cut
 
+
+#----------------------------------------------------------------
+#
+# TODO: integrate Pierre Lison's improved conversion tool for srt2xml
+#
+#
+
+
 use strict;
 use parent 'LetsMT::Import::Text';
 
 use LetsMT::Import;
 use LetsMT::Import::Text;
 use LetsMT::Lang::ISO639;
+use LetsMT::Lang::Encoding qw/:all/;
 use LetsMT::WebService;
 use LetsMT::Tools;
+use LetsMT::Repository::Err;
+
 
 use File::Basename qw/dirname basename/;
+use File::Temp qw(tempfile tempdir);
+use File::Copy;
+
 
 =head1 CONSTRUCTOR
 
@@ -64,13 +78,54 @@ sub convert {
     my $dirname = dirname($output);
     &run_cmd( 'mkdir', '-p', $dirname );
     &run_cmd( 'dos2unix', $input );
-    &run_cmd( 'srt2xml','-l',$lang,'-r',$output,'<',$input,'>',$output.'.tok' );
 
+    ## make a temporary file to avoid problems in the external script
+    my ( $fh, $tmpfile ) = tempfile(
+	'srt2xml_XXXXXXXX',
+	DIR    => $ENV{UPLOADDIR},
+	SUFFIX => '.xml',
+	UNLINK => 1
+	);
+    close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
+
+    ## OLD: use run_cmd
+    # &run_cmd( 'srt2xml','-l',$lang,'-r',$output,'<',$input,'>',$output.'.tok' );
+    # my ($success,$ret,$out,$err) = &run_cmd( 'srt2xml','-l',$lang,'-r',$tmpfile,'<',$input );
+    # raise( 8, "cannot remove: " . $err ) unless ($success);
+
+    ## convert to UTF-8
+    &text2utf8_inplace($input,undef,$lang);
+
+    ## call the external srt2xml script
+    my $tmptok = $tmpfile.'.tok';
+    unless ( &pipe_out_cmd_quiet($tmptok,'srt2xml','-e','utf8','-l',$lang,'-r',$tmpfile,$input) ){
+	raise( 8, $! ) 
+    }
+
+    # make a new resource for the tokenized XML
+    my $new_tokenized = $new_resource->clone;
+    $new_tokenized->base_path('tok');
+    my $tokfile = $new_tokenized->local_path;
+
+    # move the temporary files
+    my $tokdir = dirname($tokfile);
+    &run_cmd( 'mkdir', '-p', $tokdir );
+    move( $tmpfile, $output ) || raise( 8, $! );
+    move( $tmptok, $tokfile ) || raise( 8, $! );
+
+    ## return both of the new resources
     return [
         {   resource => $new_resource,
             meta     => {
                 # size            => $sid,
                 'resource-type' => 'corpusfile',
+                language        => $lang
+            }
+        },
+        {   resource => $new_tokenized,
+            meta     => {
+                # size            => $sid,
+                'resource-type' => 'tokenized corpusfile',
                 language        => $lang
             }
         }

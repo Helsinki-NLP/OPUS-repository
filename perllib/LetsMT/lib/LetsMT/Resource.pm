@@ -573,6 +573,32 @@ sub convert_type {
 }
 
 
+
+=head2 C<base_path>
+
+ $newbasepath = $resource->base_path
+ $oldbasepath = $resource->base_path($new)
+
+Return or set first element in resource path
+
+=cut
+
+sub base_path {
+    my $self = shift;
+    my $new  = shift;
+    my $attr = shift || 'path';    # path attribute
+
+    my @path_elements = $self->path_elements($attr);
+    return undef unless (@path_elements);
+
+    my $base          = $path_elements[0];
+    $path_elements[0] = $new if ($new);
+    $self->{$attr}    = join( '/', @path_elements );
+    return $base;
+}
+
+
+
 =head2 C<path_down>
 
  $resource->path_down

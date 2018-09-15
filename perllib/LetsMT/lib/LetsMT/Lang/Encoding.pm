@@ -142,10 +142,11 @@ sub text2utf8 {
 
     # write to output file
     if   ( $outfile =~ /\.gz/ ) {
-        open $out, "| gzip -c > $outfile";
+	my $safepath = quotemeta($outfile);
+        open $out, "| gzip -c > $safepath";
     }
     else {
-        open $out, "> $outfile";
+        open $out, '>', $outfile;
     }
 
     binmode( $out, ":encoding(utf8)" );

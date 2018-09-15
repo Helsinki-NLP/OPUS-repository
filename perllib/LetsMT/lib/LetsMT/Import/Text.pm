@@ -60,7 +60,7 @@ sub validate {
     # Text::validate is special because it tries to convert a file to
     # utf8 if another character encoding is detected (or assumed)
     # --> operate on a tempfile to avoid overwriting the original file
-    #     with text2utf8 (don use text2utf8_inplace (anymore)
+    #     with text2utf8 (don't use text2utf8_inplace (anymore)
     # 
     # IMPORTANT: keep extension to handle compressed files correctly!
     # TODO: use a more generic tempfile name?!

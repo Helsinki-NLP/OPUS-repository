@@ -46,7 +46,9 @@ our @EXPORT = qw(
     utf8_to_perl  utf8_to_perl_no_copy
     safe_path  safe_path_utf8
     safe_system
-    open_cmd close_cmd run_cmd pipe_out_cmd pipe_out_cmd_quiet
+    open_cmd close_cmd run_cmd 
+    pipe_out_cmd pipe_out_cmd_quiet
+    pipe_in_out_cmd pipe_in_out_cmd_quiet
     cacheopen cacheclose append
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
@@ -448,12 +450,32 @@ sub pipe_out_cmd {
     return wantarray() ? ($success, $? >> 8) : $success;
 }
 
+sub pipe_in_out_cmd {
+    my $in  = shift;
+    my $out = shift;
+    my @cmd=@_;
+
+    my $err;
+    my $success = run \@cmd, '<', $in, '>', $out;
+    return wantarray() ? ($success, $? >> 8) : $success;
+}
+
 sub pipe_out_cmd_quiet {
     my $out = shift;
     my @cmd=@_;
 
     my $err;
     my $success = run \@cmd, '<', \undef, '>', $out, '2>/dev/null';
+    return wantarray() ? ($success, $? >> 8) : $success;
+}
+
+sub pipe_in_out_cmd_quiet {
+    my $in  = shift;
+    my $out = shift;
+    my @cmd=@_;
+
+    my $err;
+    my $success = run \@cmd, '<', $in, '>', $out, '2>/dev/null';
     return wantarray() ? ($success, $? >> 8) : $success;
 }
 
