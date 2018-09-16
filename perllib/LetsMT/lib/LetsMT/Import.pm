@@ -49,6 +49,7 @@ use LetsMT::DataProcessing::Normalizer;
 use LetsMT::DataProcessing::Normalizer::No;
 use LetsMT::DataProcessing::Splitter;
 use LetsMT::DataProcessing::Splitter::No;
+use LetsMT::DataProcessing::UDPipe;
 
 use LetsMT::Corpus;
 use LetsMT::Align;
@@ -276,8 +277,9 @@ successful and false otherwise.
 sub import_resource {
     my $self            = shift;
     my $resource        = shift;
-    my $skip_align      = shift || 0;
-    my $skip_find_align = shift || 0;
+    my $skip_align      = shift;
+    my $skip_find_align = shift;
+    my $skip_parsing    = shift;
 
     $self->{new_resources} = [];
     $resource->local_dir( $self->{local_root} )
@@ -354,6 +356,13 @@ sub import_resource {
             'status'         => $status,
             'import_runtime' => time() - $start);
 
+	## check import parameters (unless they are given already)
+	unless (defined $skip_align && defined $skip_parsing){
+	    my %para = &get_import_parameter($corpus);
+	    $skip_align   = 1 if ($para{autoalign} eq 'off');
+	    $skip_parsing = 1 if ($para{autoparse} eq 'off');
+	}
+
         #-------------------------------------------------------------------
         ## check if we should align some documents
         ## (monolingual documents with the same name but different language)
@@ -362,24 +371,26 @@ sub import_resource {
         ## (need to skip pre-aligned data by adding them 
         ##  to the SKIP_AUTO_ALIGN list)
 
+	my @aligned_resources = ();
 	unless ($skip_find_align){
 	    my $upload_type = $resource->upload_type;
 	    unless (grep ($_ eq $upload_type, @SKIP_AUTO_ALIGN ) ){
 		## if skip_align: do not align but still look for translated documents
 		## and save alignment candidates in metadata
-		unless ($skip_align){
-		    my %para = &get_import_parameter($corpus);
-		    $skip_align = 1 if ($para{autoalign} eq 'off');
-		}
 		if ( $skip_align ){
 		    &save_align_candidates( $corpus, @$new_resources );
 		}
 		else {
-		    &align_documents( $corpus, @$new_resources );
+		    @aligned_resources = &align_documents( $corpus, @$new_resources );
 		}
 	    }
 	}
         #-------------------------------------------------------------------
+
+	unless ($skip_parsing){
+	    my @parsed_resources = &parse_resources( $corpus, @$new_resources );
+	    push ( @$new_resources, @parsed_resources);
+	}
 
 	return wantarray ? @$new_resources : 1;
     }
@@ -415,6 +426,7 @@ sub align_documents {
     my %LangPairs = ();
 
     my $count = 0;
+    my @AlignedResources = ();
     foreach my $a ( @{$AlignResources} ){
 	my $FromRes = $a->{from};
 	my $ToRes   = $a->{to};
@@ -435,6 +447,7 @@ sub align_documents {
 	    my $pair = join( '-', @lang );
 	    $LangPairs{$pair}++;
 	    foreach ( @lang ){ $Langs{$_}++; }
+	    push( @AlignedResources, $AlgRes );
 	    $count++;
 	}
 	else { $logger->error("align $FromRes with $ToRes failed!"); }
@@ -449,7 +462,8 @@ sub align_documents {
 	    );
     }
 
-    return $count;
+    return wantarray ? @AlignedResources : $count;
+    # return $count;
 }
 
 
@@ -569,6 +583,38 @@ sub find_translations {
 }
 
 
+=head2 C<align_resources>
+
+=cut
+
+sub parse_resources {
+    my $corpus    = shift;
+    my @resources = &get_monolingual_resources(@_);
+    my @parsed    = ();
+
+    my $udpipe = new LetsMT::DataProcessing::UDPipe;
+    foreach my $r (@resources) {
+	my $lang = $r->language();
+	if ($udpipe->load_model($lang)){
+
+	    my $pr = $r->clone();
+	    $pr->base_path('ud');
+
+	    my $input  = $r->local_path;
+	    my $output = $pr->local_path;
+	    my $outdir = dirname($output);
+
+	    &run_cmd( 'mkdir', '-p', $outdir );
+	    $udpipe->parse_xml_file($input,$output);
+	    if ( &LetsMT::WebService::put_resource( $pr ) ){
+		&LetsMT::WebService::put_meta( $r,'parsed' => $pr->path );
+		push (@parsed,$pr);
+	    }
+	}
+    }
+    return @parsed;
+}
+
 
 
 =head2 C<get_monolingual_resources>
@@ -583,7 +629,9 @@ sub get_monolingual_resources {
     my @MonoResources = ();
     foreach my $nr (@resources) {
         if ( $nr->{resource}->type() ne 'xces' ) {
-            push( @MonoResources, $nr->{resource} );
+	    if ( $nr->{resource}->base_path() eq 'xml' ) {
+		push( @MonoResources, $nr->{resource} );
+	    }
         }
     }
     return @MonoResources;

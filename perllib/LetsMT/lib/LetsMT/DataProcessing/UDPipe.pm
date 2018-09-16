@@ -16,6 +16,9 @@ use open qw(:std :utf8);
 use File::Basename;
 use Ufal::UDPipe;
 
+use XML::Parser;
+use XML::Writer;
+
 use LetsMT;
 use LetsMT::Lang::ISO639;
 
@@ -27,9 +30,9 @@ sub new {
     my $class = shift;
     my %self  = @_;
 
-    $self{modeldir}  = $UDPIPE_MODEL_DIR unless ($self{modeldir});
-    $self{models}    = {};
-    $self{tokenizer} = {};
+    $self{modeldir}   = $UDPIPE_MODEL_DIR unless ($self{modeldir});
+    $self{models}     = {};
+    $self{tokenizers} = {};
 
     if ( -d $self{modeldir} ){
 	my @models = glob("$self{modeldir}/*-ud-*.udpipe");
@@ -72,7 +75,9 @@ sub load_model{
     my ( $lang, $model ) = @_;
 
     if ( exists $self->{$lang} && ! defined $model){
-	$self->{lang} = $lang;
+	$self->{lang}      = $lang;
+	$self->{model}     = $self->{model};
+	$self->{tokenizer} = $self->{tokenizer};
 	return $self->{$lang};
     }
 
@@ -92,11 +97,13 @@ sub load_model{
 	}
     }
     if ( -e $model ){
-	$self->{$lang} = $model = Ufal::UDPipe::Model::load($model);
+	$self->{$lang} = Ufal::UDPipe::Model::load($model);
 	if ($self->{$lang}){
 	    $self->{lang} = $lang;
-	    $self->{tokenizer}->{$lang} = 
+	    $self->{tokenizers}->{$lang} = 
 		$self->{$lang}->newTokenizer($Ufal::UDPipe::Model::DEFAULT);
+	    $self->{model}     = $self->{$lang};
+	    $self->{tokenizer} = $self->{tokenizers}->{$lang};
 	    return $self->{$lang};
 	}
     }
@@ -124,7 +131,7 @@ sub sentence_splitter{
     my $sents = [] unless (ref($sents) eq 'ARRAY');
 
     my $lang = $self->{lang} || 'en';
-    my $tokenizer = $self->{tokenizer}->{$lang} ||
+    my $tokenizer = $self->{tokenizers}->{$lang} ||
 	return $text;
 
     $tokenizer->setText($text);
@@ -179,11 +186,11 @@ sub tokenize_raw{
     my $text = shift;
 
     my $lang = $self->{lang} || 'en';
-    $self->load_model($lang) unless (defined $self->{tokenizer}->{$lang});
+    $self->load_model($lang) unless (defined $self->{tokenizers}->{$lang});
 
     ## no model loaded? return $text
     ## TODO: should we have some other fallback method?
-    my $tokenizer = $self->{tokenizer}->{$lang} || return $text;
+    my $tokenizer = $self->{tokenizers}->{$lang} || return $text;
 
     $tokenizer->setText($text);
     my @sents = ();
@@ -200,10 +207,10 @@ sub tokenize_conllu{
     my $text = shift;
 
     my $lang = $self->{lang} || 'en';
-    $self->load_model($lang) unless (defined $self->{tokenizer}->{$lang});
+    $self->load_model($lang) unless (defined $self->{tokenizers}->{$lang});
 
     ## no model loaded? return undef
-    my $tokenizer = $self->{tokenizer}->{$lang} || return undef;
+    my $tokenizer = $self->{tokenizers}->{$lang} || return undef;
 
     $tokenizer->setText($text);
     my @sents = ();
@@ -217,6 +224,214 @@ sub tokenize_conllu{
 
 
 ## TODO: other things like parsing and tagging
+
+sub parse_xml_file{
+    my $self      = shift;
+    my $infile    = shift;
+    my $outfile   = shift || $infile.'.ud';
+    my $model     = shift || $self->{model};
+    my $tokenizer = shift || $self->{tokenizer};
+
+    open my $out, '>',$outfile || return 0;
+
+    my $XmlParser = new XML::Parser(Handlers => {Start => \&_XmlStart,
+						 End => \&_XmlEnd,
+						 Char => \&_XmlChar});
+
+    my $XmlWriter = new XML::Writer( OUTPUT      => $out,
+				     DATA_MODE   => 1, 
+				     DATA_INDENT => 2, 
+				     ENCODING    => 'utf-8');
+
+    $XmlParser->{XmlWriter} = $XmlWriter;
+    $XmlParser->{UdModel}   = $model;
+    $XmlParser->{Tokenizer} = $tokenizer;
+    $XmlParser->{Sentence}  = Ufal::UDPipe::Sentence->new();
+    $XmlParser->{ConlluOut} = Ufal::UDPipe::OutputFormat::newOutputFormat('conllu');
+
+    # my $XmlReader = $XmlParser->parse_start;
+    # $XmlReader->{XmlWriter} = $XmlReader;
+
+    $XmlWriter->xmlDecl();
+    eval { $XmlParser->parsefile($infile); };
+    if ($@){
+	warn $@;
+	print STDERR $_;
+    }
+}
+
+
+
+sub _XmlStart{
+    my ($p,$e,%a) = @_;
+    if ($e eq 's'){
+	$$p{SENT} = '';
+	$$p{SENTID} = $a{id};
+	$$p{WIDBASE} = $a{id};
+	$$p{WIDBASE} =~s/^s/w/;
+	$$p{TAGS} = [];
+	$p->{XmlWriter}->startTag($e,%a);
+    }
+    else{
+	unless (exists $$p{SENT}){
+	    $p->{XmlWriter}->startTag($e,%a);
+	}
+	## save sentence-internal tags
+	else{
+	    my $idx = @{$$p{TAGS}};
+	    $$p{TAGS}[$idx]{tag} = $e;
+	    %{$$p{TAGS}[$idx]{attr}} = %a;
+	    $$p{TAGS}[$idx]{type} = 'open';
+	    $$p{TAGS}[$idx]{after} = $$p{SENT};
+	    $$p{TAGS}[$idx]{after}=~s/\s+//sg;
+	}
+    }
+}
+
+sub _XmlEnd{
+    my ($p,$e) = @_;
+    if ($e eq 's'){
+
+	$$p{SENT}=~s/^\s*//;
+	$$p{SENT}=~s/\s*$//;
+	$p->{Tokenizer}->setText($$p{SENT});
+	delete $$p{SENT};
+	my $nrSent=0;
+	my $sentStr = '';
+
+	while ($p->{Tokenizer}->nextSentence($p->{Sentence})) {
+
+	    $p->{UdModel}->tag($p->{Sentence}, $Ufal::UDPipe::Model::DEFAULT);
+	    $p->{UdModel}->parse($p->{Sentence}, $Ufal::UDPipe::Model::DEFAULT);
+	    my $processed = $p->{ConlluOut}->writeSentence($p->{Sentence});
+
+	    ## just in case the tokeniser found additional sentence breaks
+	    if ($nrSent){
+		$p->{XmlWriter}->emptyTag('sentBreak');
+	    }
+	    $nrSent++;
+
+	
+	    my @lines = split(/\n/,$processed);
+	    foreach my $line (@lines){
+		next if ($line=~/^\#/);
+		my ($id,$word,$lemma,$upos,$xpos,$feats,$head,$deprel,$deps,$misc) 
+		    = split(/\t/,$line);
+
+		&_insert_tags($p->{XmlWriter},$sentStr,$word,$$p{TAGS});
+		$sentStr .= $word;
+		$sentStr=~s/\s+//sg; ## do we need this?
+
+		## TODO: do something more clever with multi-span tokens
+		next if ($id=~/\-/);
+		my %attr = (id => "$$p{WIDBASE}.$id");
+		$attr{lemma}=$lemma unless ($lemma eq '_');
+		$attr{upos}=$upos unless ($upos eq '_');
+		$attr{xpos}=$upos unless ($xpos eq '_');
+		$attr{feats}=$feats unless ($feats eq '_');
+		## good to have real word IDs (in case we have multiple sentences 
+		## in one unit
+		if ($head eq '0'){
+		    $attr{head} = 0;
+		}
+		else{
+		    $attr{head}="$$p{WIDBASE}.$head" unless ($head eq '_');
+		}
+		# $attr{head}="$$p{WIDBASE}.$head" unless ($head eq '_');
+		$attr{deprel}=$deprel unless ($deprel eq '_');
+		$attr{secdep}=$deps unless ($deps eq '_');
+		$attr{misc}=$misc unless ($misc eq '_');
+		$p->{XmlWriter}->startTag('w',%attr);
+		$p->{XmlWriter}->characters($word);
+		$p->{XmlWriter}->endTag('w');
+
+		&_insert_tags($p->{XmlWriter},$sentStr,' ',$$p{TAGS});
+
+	    }
+	}
+
+	if (@{$$p{TAGS}}){
+	    print STDERR "Warning: remaining tags found:";
+	    foreach my $t (@{$$p{TAGS}}){
+		print "tag = $$t{tag} ($$t{type})\n";
+	    }
+	}
+
+	$p->{XmlWriter}->endTag($e);
+    }
+    else{
+	unless (exists $$p{SENT}){
+	    $p->{XmlWriter}->endTag($e);
+	}
+	else{
+	    my $idx = @{$$p{TAGS}};
+	    $$p{TAGS}[$idx]{tag} = $e;
+	    $$p{TAGS}[$idx]{type} = 'close';
+	    $$p{TAGS}[$idx]{after} = $$p{SENT};
+	    $$p{TAGS}[$idx]{after}=~s/\s+//sg;
+	}
+    }
+}
+
+sub _XmlChar{
+    my ($p,$c) = @_;
+    $$p{SENT}.=$c if (exists $$p{SENT});
+}
+
+
+
+sub _insert_tags{
+    my ($XmlWriter,$before,$next,$tags)=@_;
+
+    while (@{$tags}){
+
+	## check if we should insert a tag
+	## - string before matches
+	## - token-internal tags: put start-tag before the next token
+	##                        put end-tag after
+	my $insert = 0;
+	if ($before eq $$tags[0]{after}){
+	    $insert = 1;
+	}
+	elsif (length("$before$next") <= length($$tags[0]{after})){
+	    return;  # tags should be sorted by increasing length
+	}
+	## token-internal tags (index should be 0 but 
+	elsif (index("$before$next",$$tags[0]{after})>=0){
+	    $insert = 1 if ($$tags[0]{type} eq 'open');
+	}
+	elsif (index($before,$$tags[0]{after})>=0){
+	    $insert = 1 if ($$tags[0]{type} eq 'close');
+	}
+
+	if ($insert){
+	    if ($$tags[0]{type} eq 'open'){
+		## same place as next closing tag? --> write empty tag
+		if ($$tags[0]{after} eq $$tags[1]{after}){
+		    $XmlWriter->emptyTag($$tags[0]{tag},
+					 %{$$tags[0]{attr}});
+		    shift(@{$tags});
+		}
+		else{
+		    $XmlWriter->startTag($$tags[0]{tag},
+					 %{$$tags[0]{attr}});
+		}
+	    }
+	    elsif ($$tags[0]{type} eq 'close'){
+		$XmlWriter->endTag($$tags[0]{tag});
+	    }
+	    shift(@{$tags});
+	}
+	else{
+	    return;
+	}
+    }
+}
+
+
+
+
+
 
 
 1;

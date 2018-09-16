@@ -103,7 +103,6 @@ CPAN_MODULES = 	Apache::Tika \
 		Persistent::DBI \
 		Test::More \
 		Text::PDF2XML \
-		Text::SRT::Align \
 		Switch \
 		Ufal::UDPipe
 
@@ -123,10 +122,11 @@ MOJO_CPAN_MODULES = Authen::Captcha \
 		Encode::Escape::Unicode
 
 
-## until I figure out how to pass mysql login details for the tests of this
-## package, we simply force our way through the tests
+## some CPAN modules that fail to install
+## TODO: fix modules if possible
 FORCECPAN_MODULES = 	Filesys::DiskUsage \
 			Lingua::Identify::Blacklists \
+			Text::SRT::Align \
 			Uplug
 
 MYSQL_FORCECPAN_MODULES = Persistent::MySQL
