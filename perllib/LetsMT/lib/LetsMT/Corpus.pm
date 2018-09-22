@@ -26,10 +26,11 @@ use Log::Log4perl qw(get_logger :levels);
 
 use Exporter 'import';
 our @EXPORT = qw(
+    is_file resource_type
     get_resource_parameter get_user_parameter
     get_align_parameter get_import_parameter
     find_parallel_resources find_all_parallel find_sentence_aligned
-    find_resources find_corpusfiles find_translations resource_type
+    find_resources find_corpusfiles find_translations
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -137,6 +138,35 @@ sub resource_type {
     return undef;
 }
 
+
+=head2 C<is_file>
+
+Returns 1 if the resource is a file, 0 otherwise
+
+=cut
+
+sub is_file {
+    my $resource    = shift;
+
+    ## TODO: is there no easier way of doing this?
+    ## - get listing of the whole directory
+    ## - find the entry that corresponds to the resource
+    ## - check whether that is a file
+
+    my $dir       = dirname($resource->storage_path);
+    my $dir_res   = LetsMT::Resource::make_from_storage_path($dir);
+    my $response  = LetsMT::WebService::get( $dir_res );
+    $response     = decode( 'utf8', $response );
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry/name[text()="'.basename($resource).'"]');
+
+    if (@nodes == 1){
+	my $parent = $nodes[0]->parentNode;
+	return 1 if ($parent->findvalue('@kind') eq 'file');
+    }
+    return 0;
+}
 
 
 =head2 C<find_parallel_resources>

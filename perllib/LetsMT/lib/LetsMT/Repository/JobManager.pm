@@ -601,19 +601,20 @@ sub run_import{
     my @documents = ();
     my $path      = join('/',@{$path_elements});
 
-    # create a new importer object for type checking
-    # --> check if a certain file type can be handled by the import module!
-    # --> we only use suffix-based lookups to avoid importing logfiles etc
-    # 
-    # (set 'local_root' to avoid creating temp-files)
-    my $importer = new LetsMT::Import(local_root => '/tmp');
 
-    if ($importer->suffix_lookup($path)){
+    my $resource = LetsMT::Resource::make_from_storage_path($path);
+    if (is_file($resource)){
         push(@documents,$path);
     }
     else{
-        my $corpus = LetsMT::Resource::make_from_storage_path($path);
-        my @files = &find_resources($corpus,$args);
+	# create a new importer object for type checking
+	# --> check if a certain file type can be handled by the import module!
+	# --> we only use suffix-based lookups to avoid importing logfiles etc
+	# 
+	# (set 'local_root' to avoid creating temp-files)
+	my $importer = new LetsMT::Import(local_root => '/tmp');
+        my @files    = &find_resources($resource,$args);
+
         foreach my $p (@files){
             if ($importer->suffix_lookup($p)){
                 push(@documents,$p);
