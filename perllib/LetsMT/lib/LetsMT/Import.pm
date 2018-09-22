@@ -20,7 +20,7 @@ use File::Copy;
 use File::Path;
 use Log::Log4perl qw(get_logger :levels);
 use XML::Simple;
-
+use Encode qw(decode decode_utf8 is_utf8);
 
 use LetsMT;
 use LetsMT::Import::TMX;
@@ -285,6 +285,24 @@ sub import_resource {
     $resource->local_dir( $self->{local_root} )
         unless ( $resource->local_dir );
 
+    ## NEW: only import if status != imported and no failed imports
+    my $response = LetsMT::WebService::get_meta( $resource );
+    $response = decode( 'utf8', $response );
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string($response);
+    my @nodes     = $dom->findnodes('//list/entry');
+    if (@nodes){
+	$self->{status} = $nodes[0]->findvalue('status');
+	## for archives: check the count for failed imports
+	if ( $nodes[0]->findvalue('import_failed_count') > 0 ){
+	    $self->{status} = 'partially imported';
+	}
+	if ($self->{status} eq 'imported'){
+	    print "resource ".$resource->path." is already imported\n";
+	    return wantarray ? () : 1;
+	}
+    }
+
     # TODO: shouldn't we check if the resource exists before
     #       we write meta data for it?
     # Make sure there is a meta entry for the resource.
@@ -342,11 +360,6 @@ sub import_resource {
             ? 'imported'
             : 'empty resource (imported nothing)';
 
-        &LetsMT::WebService::post_meta(
-            $resource,
-            'status'         => 'imported',
-            'import_runtime' => time() - $start
-        );
         &LetsMT::WebService::del_meta(
             $corpus,
             'import_queue' => $resource->path,
@@ -440,6 +453,7 @@ sub align_documents {
 	    unless ( $LastFrom && ($LastFrom eq $FromRes) );
 
 	my $aligner = new LetsMT::Align( %AlignPara );
+	print "aligning: ".$FromRes->path." and ".$ToRes->path."\n";
 	if ( $aligner->align_resources( $FromRes, $ToRes, $AlgRes ) ) {
 	    $logger->info("done!");
 	    ## save language info for meta data (see below)

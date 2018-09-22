@@ -198,6 +198,10 @@ sub run {
     if ($command eq 'import'){
         return run_import($path_elements, $args);
     }
+    ## activate overwriting 
+    if ($command eq 'reimport'){
+        return run_import($path_elements, $args, 1);
+    }
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
     }
@@ -576,6 +580,8 @@ sub run_align_resource {
 }
 
 
+
+
 =head2 C<run_import>
 
  LetsMT::Repository::JobManager::run_import (
@@ -590,7 +596,7 @@ or a single resource.
 =cut
 
 sub run_import{
-    my ($path_elements,$args) = @_;
+    my ($path_elements,$args,$overwrite) = @_;
 
     my @documents = ();
     my $path      = join('/',@{$path_elements});
@@ -617,7 +623,7 @@ sub run_import{
 
     my $count=0;
     foreach my $s (@documents){
-        run_import_resource($s,$args);
+        run_import_resource($s,$args,$overwrite);
         $count++;
     }
     return $count;
@@ -636,7 +642,7 @@ Create an import job for a resource given by its path and submit it to the SGE.
 =cut
 
 sub run_import_resource{
-    my ($path,$args) = @_;
+    my ($path,$args,$overwrite) = @_;
 
     my @path_elements = split(/\/+/,$path);
     my $slot = shift(@path_elements);
@@ -668,11 +674,22 @@ sub run_import_resource{
     if ( LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} ) ) {
         my $corpus = LetsMT::Resource::make( $slot, $branch );
         my $res = LetsMT::Resource::make( $slot, $branch, $relative_path );
-        LetsMT::WebService::post_meta(
-            $res,
-            status => 'waiting in import queue',
-            uid    => $args->{uid},
-        );
+	if ($overwrite){
+	    &LetsMT::WebService::post_meta(
+		 $res,
+		 status => 'waiting in import queue',
+		 "import_success"       => '',
+		 "import_failed"        => '',
+		 "import_empty"         => '',
+		 "import_success_count" => 0,
+		 "import_failed_count"  => 0,
+		 "import_empty_count"   => 0);
+	}
+        # LetsMT::WebService::post_meta(
+        #     $res,
+        #     status => 'waiting in import queue',
+        #     uid    => $args->{uid},
+        # );
         LetsMT::WebService::del_meta(
             $corpus,
             import_failed => $relative_path,

@@ -12,6 +12,8 @@ use parent 'LetsMT::Import::Generic';
 use File::Basename qw/basename/;
 use Data::Dumper;
 use XML::LibXML;
+use Encode qw(decode decode_utf8 is_utf8);
+
 
 use LetsMT::Tools;
 use LetsMT::WebService;
@@ -81,11 +83,15 @@ sub convert {
         '-C',
         &safe_path( $local_home ) );
 
+    my @done = @{$self->{success}};
+
+
     # run through all unpacked resources and import them
 
     while ( my $exfile = &$cmd_reader ) {
         chomp $exfile;
 	next if (basename($exfile)=~/^\./);       # skip files starting with .
+	next if grep($_ eq $exfile,@done);        # skip files that have been done already
         unless ( $exfile =~ /\/$/ ) {
 
             # resource object for extracted file
@@ -102,9 +108,15 @@ sub convert {
             $self->update_import_meta($meta_resource, $exfile, $cex_resources);
 
             # add all new resources to our list of imported files
-            foreach my $cex_resource (@$cex_resources) {
-                push @new_resources, $cex_resource;
-            }
+	    if (ref($cex_resources) eq 'ARRAY'){
+		my $origin = &utf8_to_perl( $resource->path.':'.$exfile );
+		foreach my $cex_resource (@$cex_resources) {
+		    push @new_resources, $cex_resource;
+		    &LetsMT::WebService::post_meta(
+			$cex_resource->{resource},
+			"imported_from" => $origin );
+		}
+	    }
         }
     }
     return \@new_resources;
@@ -130,24 +142,41 @@ sub initialize_import{
     # and safe extraction homedir 
     # to make metadata for extracted files accessible
 
+    $self->{success}     = [];
+    $self->{empty}       = [];
+    $self->{failed}      = [];
+
+    $self->{countOK}     = 0;
+    $self->{countEmpty}  = 0;
+    $self->{countFailed} = 0;
+
     if ($meta_resource){
-        &LetsMT::WebService::del_meta(
-             $meta_resource,
-             "import_success"       => undef,
-             "import_failed"        => undef,
-             "import_empty"         => undef,
-             "import_success_count" => undef,
-             "import_failed_count"  => undef,
-             "import_empty_count"   => undef);
+	my $response = LetsMT::WebService::get_meta( $meta_resource );
+	$response = decode( 'utf8', $response );
+	my $XmlParser = new XML::LibXML;
+	my $dom       = $XmlParser->parse_string($response);
+	my @nodes     = $dom->findnodes('//list/entry');
+	if (@nodes){
+	    # $self->{success} = $nodes[0]->findvalue('import_success') || undef;
+	    @{$self->{success}}  = split(/\,/,$nodes[0]->findvalue('import_success'));
+	    @{$self->{failed}}   = split(/\,/,$nodes[0]->findvalue('import_failed'));
+	    @{$self->{empty}}    = split(/\,/,$nodes[0]->findvalue('import_empty'));
+	    $self->{countOK}     = $nodes[0]->findvalue('import_success_count') || 0;
+	    $self->{countFailed} = $nodes[0]->findvalue('import_failed_count') || 0;
+	    $self->{countEmpty}  = $nodes[0]->findvalue('import_empty_count') || 0;
+	}
+        # &LetsMT::WebService::del_meta(
+        #      $meta_resource,
+        #      "import_success"       => undef,
+        #      "import_failed"        => undef,
+        #      "import_empty"         => undef,
+        #      "import_success_count" => undef,
+        #      "import_failed_count"  => undef,
+        #      "import_empty_count"   => undef);
         &LetsMT::WebService::post_meta(
              $meta_resource,
              "import_homedir"       => $resource_path);
     }
-
-    $self->{countOK}=0;
-    $self->{countEmpty}=0;
-    $self->{countFailed}=0;
-
     return ($resource_path, $local_path);
 }
 
@@ -158,25 +187,56 @@ sub update_import_meta{
 
     # do nothing if no resource is given
     return unless $resource;
+    $filename - &utf8_to_perl($filename);  ## TODO: do we need this
+
+    ## check whether there is already some metadata about the file
+    my $MarkedAsSuccess = grep($_ eq $filename, @{$self->{success}} ) ? 1 : 0;
+    my $MarkedAsFailed = grep($_ eq $filename, @{$self->{failed}} ) ? 1 : 0;
+    my $MarkedAsEmpty = grep($_ eq $filename, @{$self->{empty}} ) ? 1 : 0;
 
     if ($imported){
         if (scalar @$imported){
-            $self->{countOK}++;
+	    if ($MarkedAsFailed || $MarkedAsEmpty){
+		&LetsMT::WebService::del_meta(
+		     $resource,
+		     "import_failed" => $filename,
+		     "import_empty" => $filename);
+	    }
             &LetsMT::WebService::put_meta(
                 $resource,
                 "import_success" => $filename);
+	    push(@{$self->{success}},$filename);
         } else {
-            $self->{countEmpty}++;
+	    if ($MarkedAsFailed || $MarkedAsSuccess){
+		&LetsMT::WebService::del_meta(
+		     $resource,
+		     "import_failed" => $filename,
+		     "import_success" => $filename);
+	    }
             &LetsMT::WebService::put_meta(
                 $resource,
                 "import_empty" => $filename);
+	    push(@{$self->{empty}},$filename);
         }
     } else {
-        $self->{countFailed}++;
+	if ($MarkedAsEmpty || $MarkedAsSuccess){
+	    &LetsMT::WebService::del_meta(
+		 $resource,
+		 "import_success" => $filename,
+		 "import_empty" => $filename);
+	}
         &LetsMT::WebService::put_meta(
             $resource,
             "import_failed" => $filename);
+	    push(@{$self->{failed}},$filename);
     }
+
+
+    ## update counts
+
+    $self->{countOK} = scalar @{$self->{success}};
+    $self->{countFailed} = scalar @{$self->{failed}};
+    $self->{countEmpty} = scalar @{$self->{empty}};
 
     &LetsMT::WebService::post_meta(
         $resource,

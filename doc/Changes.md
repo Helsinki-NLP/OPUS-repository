@@ -40,6 +40,15 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 TODO: should we restrict this for admin users only? Is it possible to list only user-specific jobs? Is it easy to find back the actual job description file from the job listing above?
 
 
+* added: `run=reimport`: The normal import will now only do things to files that have not yet been imported. In order to overwrite existing imports, you now have to use the command `reimport`:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/files.tar.gz?uid=user1&run=reimport"
+```
+
+For tar- and zip-files: This also checks whether there were files from the archive that failed to be imported. Normal import will try to import them again (skipping all files that have successfully been imported before). `reimport` resets the status of all files and re-imports all from scratch!
+
+
 * align jobs for selected file pairs: add parameter `trg` to specify target file to be aligned
 
 ```
@@ -115,7 +124,3 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/slot1/user1/xml/en?ENDS_WITH_align-
 
 
 
-## Planned changes
-
-* add support for aligning two given files (extra link parameter + align action)
-* request for listing potentially parallel documents
