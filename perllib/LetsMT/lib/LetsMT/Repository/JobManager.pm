@@ -205,6 +205,9 @@ sub run {
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
     }
+    if ($command eq 'setup_ida'){
+        return run_setup_ida($path_elements, $args);
+    }
     if ($command eq 'upload_isa'){
         return run_upload_isa($path_elements, $args);
     }
@@ -705,6 +708,48 @@ sub run_import_resource{
     }
     return 0;
 }
+
+
+
+## set up IDA for a specific corpus file
+
+sub run_setup_ida {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    return 0 unless (ref($path_elements) eq 'ARRAY');
+    return 0 if (@{$path_elements} < 2);
+
+    my $WebRoot    = $$args{WebRoot} || '/var/www/html';
+    my $IdaFileDir = $$args{IdaFileDir} || $ENV{LETSMTROOT}.'/share/ida';
+
+    my $slot = shift(@{$path_elements});
+    my $user = shift(@{$path_elements});
+
+    my $IdaHome = join('/',$WebRoot,'ida',$user,$slot);
+
+    ## path should start with xml
+    return 0 if (shift(@{$path_elements}) ne 'xml');
+    my $corpus = join('_',@{$path_elements});
+    $corpus-~s/\.xml$//;
+
+    my $CorpusHome = join('/',$IdaHome,'corpora',$corpus);
+    my $langpair   = shift(@{$path_elements});
+    my ($src,$trg) = split(/\-/,$langpair);
+    my $file       = join('/',@{$path_elements});
+    $file          =~s/\.xml$//;
+
+    return 0 unless ($src && $trg && $file);
+
+    # if (! -d $CorpusHome){
+    # 	system("mkdir -p $IdaHome");
+    # 	system("sed 's/%%CORPUSFILE%%/$file/;s/%%SRC%%/$src/;s/%%TRG%%/$trg/;' < $IdaFileDir/index.in $IdaHome/index.php");
+    # }
+
+    return 1;
+}
+
+
 
 
 ## set up ISA for a specific corpus file

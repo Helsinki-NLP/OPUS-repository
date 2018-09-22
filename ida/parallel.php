@@ -22,55 +22,6 @@ LAYOUT:
 
  */
 
-session_start();
-if (isset($_REQUEST['reset'])){
-    session_destroy();
-    session_start();
-}
-
-header('Content-type: text/xml; charset=utf-8');
-// header('Content-type: text/xml');
-
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">  
-<html xmlns="http://www.w3.org/1999/xhtml"> 
-<head>
-<title>Parallel Treebanks</title>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="deprels.css" />
-</head>
-<body>
-<?php
-
-
-// sentence alignments
-// (same as xtargets argument in xcesAlign files)
-// --> should only contain one-to-one links
-// --> TODO: can we automatically jump over other links?
-$AlgFile   = "adrift.fi-sv";
-$StatusDB  = "adrift.fi-sv.status.db";
-
-// original data (for reload function
-$OrgSrcTreeDB = "adrift.fi.db";
-$OrgTrgTreeDB = "adrift.sv.db";
-$OrgWordAlgDB = "adrift.fi-sv.db";
-
-// databases that store changes
-$SrcTreeDB = "adrift-work.fi.db";
-$TrgTreeDB = "adrift-work.sv.db";
-$WordAlgDB = "adrift-work.fi-sv.db";
-
-// source and target language
-// (necssary to read label set)
-$lang  = array('S' => 'fi', 'T' => 'sv');
-
-
-
-include_once('depgraph.php');
-include_once('conll.php');
-include_once('links.php');
-
-
 // make working copies of database files
 if (!file_exists($SrcTreeDB)){
   if (file_exists($OrgSrcTreeDB)){
@@ -394,7 +345,7 @@ foreach ($prefix as $l){     // check arguments for both
     $labels.= '<b>new label:</b><br/>';
     $labels.=show_labels($_SESSION[$l.'label'],
 		      $_SESSION[$l.'deprels'][$_SESSION[$l.'label']],
-		      'ud-deprels.'.$lang[$l],$l.'e',$l.'nl');
+		      $IdaRootDir.'/ud-deprels.'.$lang[$l],$l.'e',$l.'nl');
   }
 
   // label selected
@@ -431,6 +382,9 @@ $boxY1=0;   // view box start Y
 $boxY2=600; // view box end Y
 
 // finally: print dependency graphs
+
+// echo "....".$_SESSION['Sword'];
+// echo "+++".$_SESSION['Slabel'];
 
 $svg .= print_graph($_SESSION['Swords'],
 		    $_SESSION['Sheads'],
@@ -540,11 +494,16 @@ echo '
       <polyline points="0,0 10,5 0,10 1,5" fill="black" />
     </marker>
   </defs>
+  <style>
+    .normal { font: 20px sans-serif; fill: black; }
+    .marked { font: italic 20px sans-serif; fill: red; }
+    .linked { font: italic 20px sans-serif; fill: blue; }
+    .normal-label { font: 12px; fill: blue; }
+    .marked-label { font: 12px; fill: red; }
+  </style>
 ';
 echo $svg;
 echo '</svg></div>';
 
-?>
 
-</body>
-</html>
+?>

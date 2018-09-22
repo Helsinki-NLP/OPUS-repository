@@ -6,7 +6,7 @@ function print_graph($words,$heads,$deprels,
 		     $WordArg='w',$EdgeArg='e',$LabelArg='l'){
 
   global $boxX,$boxY1,$boxY2,$anchorPos;
-
+  
   $svg = '';
   $pos=$PosX;
   $wordpos = array();
@@ -60,22 +60,28 @@ function print_graph($words,$heads,$deprels,
     $pos+=$len;
 
     $color='black';
+    $class='normal';
     if (isset($MarkedWord)){
       if ($MarkedWord == $i){
 	$color='red';
+	$class='marked';
       }
       elseif (isset($heads[$MarkedWord]) && $heads[$MarkedWord]==$i){
 	$color='blue';
+	$class='linked';
       }
     }
     elseif (isset($MarkedLabel)){
       if ($MarkedLabel==$i){
 	$color='blue';
+	$class='linked';
       }
       elseif ($heads[$MarkedLabel]==$i){
 	$color='blue';
+	$class='linked';
       }
     }
+    // echo "color --$i--$word-- ".$color.'<br/>';
 
     // font-family = 'sans-serif'
     // font-family = 'monospace'
@@ -84,7 +90,8 @@ function print_graph($words,$heads,$deprels,
     //    $utf8 = utf8_decode(mb_strtolower($word, 'UTF-8'));
 
     //    $svg.="<text x='$pos' y='$PosY' textLength='$len' lengthAdjust='spacingAndGlyphs' font-size='20' fill='$color' text-anchor='middle'><a xlink:href='?$WordArg=$i'>$word</a></text>";
-    $svg.="<text x='$pos' y='$PosY' font-family='sans-serif' font-size='20' fill='$color' text-anchor='middle'><a xlink:href='?$WordArg=$i'>$word</a></text>";
+    //$svg.="<text class='$class' x='$pos' y='$PosY' font-family='sans-serif' font-size='20' fill='$color' text-anchor='middle'><a class='$class' xlink:href='?$WordArg=$i'>$word</a></text>";
+    $svg.="<text class='$class' x='$pos' y='$PosY' text-anchor='middle'><a class='$class' xlink:href='?$WordArg=$i'>$word</a></text>";
 
 
     //    $svg.="<text x='$pos' y='$PosY' font-size='20' fill='$color' text-anchor='middle'><a xlink:href='?$WordArg=$i'>$utf8</a></text>";
@@ -134,8 +141,10 @@ function print_graph($words,$heads,$deprels,
     $svg.='marker-end="url(#arrow)"/>';
     $svg.="</a>";
 
+    $class='normal-label';
     $color='blue';
     if (isset($MarkedLabel) && $MarkedLabel == $i){
+      $class='marked-label';
       $color='red';
     }
     if ($flip==-1){ $textY = $height+8; }
@@ -147,7 +156,7 @@ function print_graph($words,$heads,$deprels,
     $svg.=$textY;
     // $svg.=$height;
     $svg.="' font-size='12' fill='$color' text-anchor='middle'>";
-    $svg.="<a xlink:href='?$LabelArg=$i'>";
+    $svg.="<a class='$class' xlink:href='?$LabelArg=$i'>";
     $svg.=$deprels[$i];
     $svg.="</a></text>\n";
   }
@@ -159,9 +168,10 @@ function print_graph($words,$heads,$deprels,
 
 function show_labels($i,$OldLabel,$file='ud-deprels.xx',
 		     $EdgeArg='e',$LabelArg='nl'){
+  global $IdaRootDir;
   $html = '';
   if (! file_exists($file)){
-    $file='ud-deprels.xx';
+    $file=$IdaRootDir.'/ud-deprels.xx';
   }
 
   $deprels = file($file);

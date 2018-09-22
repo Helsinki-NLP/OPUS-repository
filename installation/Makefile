@@ -134,6 +134,22 @@ install-isa:
 	chgrp www-data /var/www/html/isa
 	chmod g+sw /var/www/html/isa
 
+
+.PHONY: install-ida
+install-ida:
+	mkdir -p ${LETSMTROOT}/share/ida
+	${INSTALL_DATA} ../ida/index.in ${LETSMTROOT}/share/ida/index.in
+	${INSTALL_DATA} ../ida/Makefile ${LETSMTROOT}/share/ida/Makefile
+	${INSTALL_BIN} ../ida/deprel2db.pl ${LETSMTROOT}/share/ida/deprel2db.pl
+	mkdir -p /var/www/html/ida
+	chgrp www-data /var/www/html/ida
+	chmod g+sw /var/www/html/ida
+	${COPY} ../ida/*.php /var/www/html/ida/
+	${COPY} ../ida/*.css /var/www/html/ida/
+	${COPY} ../ida/ud-depres.* /var/www/html/ida/
+	rm -f /var/www/html/ida/index.php
+
+
 .PHONY: install-grenzschnitte
 install-grenzschnitte:
 	$(MAKE) install -C ../www

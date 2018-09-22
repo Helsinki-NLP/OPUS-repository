@@ -1,0 +1,62 @@
+<?php
+
+session_start();
+if (isset($_REQUEST['reset'])){
+    session_destroy();
+    session_start();
+}
+
+header('Content-type: text/xml; charset=utf-8');
+// header('Content-type: text/xml');
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">  
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>
+<title>Parallel Treebanks</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="../../../deprels.css" />
+</head>
+<body>
+<?php
+
+
+// sentence alignments
+// (same as xtargets argument in xcesAlign files)
+// --> should only contain one-to-one links
+// --> TODO: can we automatically jump over other links?
+$AlgFile   = "%%CORPUSFILE%%.%%SRC%%-%%TRG%%";
+$StatusDB  = "%%CORPUSFILE%%.%%SRC%%-%%TRG%%.status.db";
+
+// original data (for reload function
+$OrgSrcTreeDB = "%%CORPUSFILE%%.%%SRC%%.db";
+$OrgTrgTreeDB = "%%CORPUSFILE%%.%%TRG%%.db";
+$OrgWordAlgDB = "%%CORPUSFILE%%.%%SRC%%-%%TRG%%.db";
+
+// databases that store changes
+$SrcTreeDB = "%%CORPUSFILE%%-work.%%SRC%%.db";
+$TrgTreeDB = "%%CORPUSFILE%%-work.%%TRG%%.db";
+$WordAlgDB = "%%CORPUSFILE%%-work.%%SRC%%-%%TRG%%.db";
+
+// source and target language
+// (necssary to read label set)
+$lang  = array('S' => '%%SRC%%', 'T' => '%%TRG%%');
+
+$IdaRootDir = '../../..';
+
+/*
+include_once('../../../depgraph.php');
+include_once('../../../conll.php');
+include_once('../../../links.php');
+include_once('../../../parallel.php');
+*/
+
+include_once($IdaRootDir.'/depgraph.php');
+include_once($IdaRootDir.'/conll.php');
+include_once($IdaRootDir.'/links.php');
+include_once($IdaRootDir.'/parallel.php');
+
+?>
+
+</body>
+</html>
