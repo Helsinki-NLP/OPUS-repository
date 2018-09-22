@@ -104,7 +104,7 @@ in a path corresponding to the content language.
 
 =cut
 
-my $max_count = 30; # number of tries
+my $max_count = 50; # number of tries
 my $count     = 0;  # counter of tries
 my $content;
 

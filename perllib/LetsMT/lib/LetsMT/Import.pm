@@ -287,6 +287,7 @@ sub import_resource {
 
     ## NEW: only import if status != imported and no failed imports
     my $response = LetsMT::WebService::get_meta( $resource );
+    # eval{ $response = decode( 'utf8', $response ) };
     $response = decode( 'utf8', $response );
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string($response);
@@ -710,11 +711,10 @@ sub convert_resource {
         #--------------------------------------------
 
         unless ( scalar @$validation_errors ) {
+	    print "converting: ".$resource->path." ... ";
             my ($new_resources,       $conversion_errors,
                 $conversion_warnings, $log_message
                 ) = $handler->convert( $resource, $self, $meta_resource, $report_progress, $out_resource );
-
-	    print "converting: ".$resource->path."\n";
 
             # upload possible warnings (logfiles, messages etc)
             &_upload_errors(
@@ -744,9 +744,10 @@ sub convert_resource {
                         $self->upload_new_resource( $nr, $meta_resource );
                     }
                 }
-
+		print "ok\n";
                 return $new_resources;
             }
+	    print "failed\n";
         }
     }
 

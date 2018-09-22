@@ -90,6 +90,7 @@ sub convert {
 
     while ( my $exfile = &$cmd_reader ) {
         chomp $exfile;
+	$exfile = &utf8_to_perl($exfile);
 	next if (basename($exfile)=~/^\./);       # skip files starting with .
 	next if grep($_ eq $exfile,@done);        # skip files that have been done already
         unless ( $exfile =~ /\/$/ ) {
@@ -109,7 +110,8 @@ sub convert {
 
             # add all new resources to our list of imported files
 	    if (ref($cex_resources) eq 'ARRAY'){
-		my $origin = &utf8_to_perl( $resource->path.':'.$exfile );
+		# my $origin = &utf8_to_perl( $resource->path.':'.$exfile );
+		my $origin = $resource->path.':'.$exfile;
 		foreach my $cex_resource (@$cex_resources) {
 		    push @new_resources, $cex_resource;
 		    &LetsMT::WebService::post_meta(
