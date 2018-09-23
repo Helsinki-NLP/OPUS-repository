@@ -129,6 +129,10 @@ install-sge-client-targets: \
 ## copy the files for ISA (interactive sentence aligner)
 .PHONY: install-isa
 install-isa:
+	echo ${HOSTNAME}
+	sed -e "s#%%LETSMT_CONNECT%%#curl --silent --show-error --cacert ${LETSMT_CACERT}  --cert ${LETSMT_USERCERT}:${LETSMT_USERCERTPASS} --key ${LETSMT_USERKEY}#" \
+	    -e "s#%%LETSMT_URL%%#${LETSMT_URL}#" \
+	< ../isa/Makefile.in > ../isa/Makefile
 	${COPY} ../isa ${LETSMTROOT}/share/
 	mkdir -p /var/www/html/isa
 	chgrp www-data /var/www/html/isa

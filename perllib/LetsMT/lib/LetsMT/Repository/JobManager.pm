@@ -758,8 +758,8 @@ sub run_setup_isa {
     my $path_elements = shift;
     my $args = shift || {};
 
-    return 0 unless (ref($path_elements) eq 'ARRAY');
-    return 0 if (@{$path_elements} < 2);
+    return undef unless (ref($path_elements) eq 'ARRAY');
+    return undef if (@{$path_elements} < 2);
 
     my $WebRoot    = $$args{WebRoot} || '/var/www/html';
     my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
@@ -775,7 +775,7 @@ sub run_setup_isa {
     }
 
     ## path should start with xml
-    return 0 if (shift(@{$path_elements}) ne 'xml');
+    return undef if (shift(@{$path_elements}) ne 'xml');
     my $corpus = join('_',@{$path_elements});
     $corpus-~s/\.xml$//;
 
@@ -785,14 +785,19 @@ sub run_setup_isa {
     my $file       = join('/',@{$path_elements});
     $file          =~s/\.xml$//;
 
-    return 0 unless ($src && $trg && $file);
+    return undef unless ($src && $trg && $file);
 
     if (! -d $CorpusHome){
 	my $pwd = getcwd();
 	chdir($IsaHome);
-	return system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all");
+	# return `make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all`;
+	# if (!system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all")){
+	#     return undef;
+	# }
+	system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all");
     }
-    return 1;
+    return "ISA available at http://$ENV{LETSMTHOST}/isa/$user/$slot" if (! -d $CorpusHome);
+    return undef;
 }
 
 
@@ -802,8 +807,8 @@ sub run_remove_isa {
     my $path_elements = shift;
     my $args = shift || {};
 
-    return 0 unless (ref($path_elements) eq 'ARRAY');
-    return 0 if (@{$path_elements} < 2);
+    return undef unless (ref($path_elements) eq 'ARRAY');
+    return undef if (@{$path_elements} < 2);
 
     my $WebRoot    = $$args{WebRoot} || '/var/www/html';
     my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
@@ -813,7 +818,7 @@ sub run_remove_isa {
     my $path = join('/',@{$path_elements});
     $path    =~s/\.xml$/.isa.xml/;
 
-    return 0 if (shift(@{$path_elements}) ne 'xml');
+    return undef if (shift(@{$path_elements}) ne 'xml');
 
     unshift( @{$path_elements},$slot );
     my $corpus = join('_',@{$path_elements});
@@ -839,6 +844,7 @@ sub run_remove_isa {
     if (-d $CorpusHome){
 	rmtree($CorpusHome);
     }
+    return "'$corpus' successfully removed from $ENV{LETSMTHOST}/isa/$user/$slot";
 }
 
 
@@ -849,8 +855,8 @@ sub run_upload_isa {
     my $path_elements = shift;
     my $args = shift || {};
 
-    return 0 unless (ref($path_elements) eq 'ARRAY');
-    return 0 if (@{$path_elements} < 2);
+    return undef unless (ref($path_elements) eq 'ARRAY');
+    return undef if (@{$path_elements} < 2);
 
     my $WebRoot    = $$args{WebRoot} || '/var/www/html';
     my $IsaFileDir = $$args{IsaFileDir} || $ENV{LETSMTROOT}.'/share/isa';
@@ -859,7 +865,7 @@ sub run_upload_isa {
     my $user = shift(@{$path_elements});
     my $path = join('/',@{$path_elements});
 
-    return 0 if (shift(@{$path_elements}) ne 'xml');
+    return undef if (shift(@{$path_elements}) ne 'xml');
 
     unshift( @{$path_elements},$slot );
     my $corpus = join('_',@{$path_elements});
@@ -875,8 +881,11 @@ sub run_upload_isa {
 	path => $path,
 	);
 
-    return 0 unless (-f $cesfile);
-    return LetsMT::WebService::put_file($resource,$cesfile);	
+    return undef unless (-f $cesfile);
+    if (LetsMT::WebService::put_file($resource,$cesfile)){
+	return "successfully uploaded ISA alignment file to ".$resource->storage_path;
+    }
+    return "failed to upload ISA alignment file to ".$resource->storage_path;
 }
 
 

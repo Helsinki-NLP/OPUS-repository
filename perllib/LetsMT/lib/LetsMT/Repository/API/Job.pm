@@ -127,12 +127,14 @@ sub put {
     my $message = undef;
 
     if (exists $self->{args}->{run}){
-        # my $nr_of_jobs = LetsMT::Repository::JobManager::run(
-        #     $self->{args}->{run},
-        #     $self->{path_elements},
-        #     $self->{args});
-        # $message = "number of jobs submitted: $nr_of_jobs";
-	if (my $jobfile = LetsMT::Repository::JobManager::job_maker(
+	## jobs that will be executed immediately (not via batch queues)
+	if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa)$/){
+	    $message = LetsMT::Repository::JobManager::run(
+		$self->{args}->{run},
+		$self->{path_elements},
+		$self->{args});
+	}
+	elsif (my $jobfile = LetsMT::Repository::JobManager::job_maker(
 		$self->{args}->{run},
 		$self->{path_elements},
 		$self->{args})){

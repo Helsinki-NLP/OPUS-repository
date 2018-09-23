@@ -43,6 +43,14 @@ ifndef SENTALIGNER
   SENTALIGNER = $(shell perl -e 'use Uplug::Config;print find_executable("align2");')
 endif
 
+ifndef LETSMT_CONNECT
+  LETSMT_CONNECT = %%LETSMT_CONNECT%%
+endif
+ifndef LETSMT_URL
+  LETSMT_URL = %%LETSMT_URL%%
+endif
+
+
 ALIGN = basic
 
 
