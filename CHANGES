@@ -9,6 +9,8 @@
 * added UDPipe support (tokenizer and sentence splitter so far)
 * stable srt conversion
 * fuzzy file name matching for detection of parallel texts
+* improvements to job API (import/reimport/detect_translations/detect_unaligned)
+* integration of interactive sentence alignment (prototype)
 * bugfixing and fixed unit tests
 
 

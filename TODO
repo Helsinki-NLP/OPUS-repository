@@ -7,7 +7,7 @@ High priority:
 * add dehyphenation module (as normalizer) - see pdf2xml
 * integration of srtalign
 * allow manual corrections (alignments and even other things?)			(started)
-  --> ISA integration?
+  --> ISA integration	   	       	   	      				(prototype)
   --> limit the number of sentalign files that can be open for edit
   --> setup ISA									(done)
   --> upload from ISA (overwrite?)						(done)
@@ -20,7 +20,7 @@ High priority:
 
 Medium priority:
 
-* more sentence aligners (BLEU align, gargantua, yalign?)
+* more sentence aligners (srtalign, BLEU align, gargantua, yalign?)
 * support moving files (i.e. git mv in backend)
 * allow tagging of releases
 * improved pre-processing tools

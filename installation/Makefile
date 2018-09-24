@@ -150,7 +150,7 @@ install-ida:
 	chmod g+sw /var/www/html/ida
 	${COPY} ../ida/*.php /var/www/html/ida/
 	${COPY} ../ida/*.css /var/www/html/ida/
-	${COPY} ../ida/ud-depres.* /var/www/html/ida/
+	${COPY} ../ida/ud-deprels.* /var/www/html/ida/
 	rm -f /var/www/html/ida/index.php
 
 

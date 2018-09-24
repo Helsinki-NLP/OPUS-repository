@@ -28,6 +28,7 @@ use LetsMT::Tools;
 use LetsMT::Repository::Safesys;
 use LetsMT::Corpus;
 use LetsMT::Align;
+use LetsMT::Tools::UD;
 
 use Cwd;
 use Data::Dumper;
@@ -717,9 +718,10 @@ sub run_setup_ida {
     my $path_elements = shift;
     my $args = shift || {};
 
-    return 0 unless (ref($path_elements) eq 'ARRAY');
-    return 0 if (@{$path_elements} < 2);
+    return 'no valid path given' unless (ref($path_elements) eq 'ARRAY');
+    return 'no sentence alignment file given' if (@{$path_elements} < 2);
 
+    my $path       = join('/',@{$path_elements});
     my $WebRoot    = $$args{WebRoot} || '/var/www/html';
     my $IdaFileDir = $$args{IdaFileDir} || $ENV{LETSMTROOT}.'/share/ida';
 
@@ -729,24 +731,69 @@ sub run_setup_ida {
     my $IdaHome = join('/',$WebRoot,'ida',$user,$slot);
 
     ## path should start with xml
-    return 0 if (shift(@{$path_elements}) ne 'xml');
+    return 'not in xml-root of your repository' if (shift(@{$path_elements}) ne 'xml');
     my $corpus = join('_',@{$path_elements});
     $corpus-~s/\.xml$//;
+    $corpus=~tr/'"| $@/_____/;
 
-    my $CorpusHome = join('/',$IdaHome,'corpora',$corpus);
+    my $CorpusHome = join('/',$IdaHome,$corpus);
     my $langpair   = shift(@{$path_elements});
     my ($src,$trg) = split(/\-/,$langpair);
     my $file       = join('/',@{$path_elements});
-    $file          =~s/\.xml$//;
 
-    return 0 unless ($src && $trg && $file);
+    return 'no valid sentence alignment file' unless ($src && $trg && $file);
 
-    # if (! -d $CorpusHome){
-    # 	system("mkdir -p $IdaHome");
-    # 	system("sed 's/%%CORPUSFILE%%/$file/;s/%%SRC%%/$src/;s/%%TRG%%/$trg/;' < $IdaFileDir/index.in $IdaHome/index.php");
-    # }
+    if (! -d $CorpusHome){
+	File::Path::make_path($CorpusHome);
 
-    return 1;
+	my $resource = LetsMT::Resource::make_from_storage_path( $path, $CorpusHome );
+	return "no resource" unless ($resource);
+	&LetsMT::WebService::get_resource($resource, 'archive' => 'no') || return undef;
+	open F,"<",$resource->local_path() || return "cannot read resource";
+	open O,">$CorpusHome/corpus.$src-$trg" || return "cannot write link file";
+	my $srcdoc = undef;
+	my $trgdoc = undef;
+	while (<F>){
+	    chomp;
+	    if (/fromDoc="([^"]+)"/){ $srcdoc = 'ud/'.$1; }
+	    if (/toDoc="([^"]+)"/){ $trgdoc = 'ud/'.$1; }
+	    if (/xtargets="([^ ][^ ]*;[^ ][^ ]*)"/){ print O $1,"\n"; }
+	}
+	close F;
+	close O;
+	unlink($resource->local_path());
+
+	## TODO: should check that UD files actually exist!
+	## or even better: if they don't exists: accept tokenized files!
+	## --> good for annotation projection later on ...
+
+	my $srcres = LetsMT::Resource::make( $slot, $user, $srcdoc, $CorpusHome );
+	my $trgres = LetsMT::Resource::make( $slot, $user, $trgdoc, $CorpusHome );
+	&LetsMT::WebService::get_resource($srcres, 'archive' => 'no') || return "cannot find source UD";
+	&LetsMT::WebService::get_resource($trgres, 'archive' => 'no') || return "cannot find target UD";
+
+	LetsMT::Tools::UD::deprel2db($srcres->local_path(), "$CorpusHome/corpus.$src.db");
+	LetsMT::Tools::UD::deprel2db($trgres->local_path(), "$CorpusHome/corpus.$trg.db");
+
+	unlink($srcres->local_path());
+	unlink($trgres->local_path());
+
+	## finally: create the index file
+	open IN, "<$IdaFileDir/index.in" || return "cannot read index.in";
+	open OUT, ">$CorpusHome/index.php" || return "cannot write index.php";
+	while (<IN>){
+	    s/%%CORPUSFILE%%/corpus/;
+	    s/%%SRC%%/$src/;
+	    s/%%TRG%%/$trg/;
+	    print OUT $_;
+	}
+	close IN;
+	close OUT;
+
+	return "IDA is now available at http://$ENV{LETSMTHOST}/ida/$user/$slot/$corpus";
+    }
+
+    return 'failed to prepare IDA';
 }
 
 
@@ -787,13 +834,18 @@ sub run_setup_isa {
 
     return undef unless ($src && $trg && $file);
 
+    ## TODO: this does not feel very safe!
+    ## change this from calling a makefile to something else
+    ## ---> this should check at least the file names to avoid any problems!
+
+
+    ## TODO: this is probably not good enough.
+    ## some sanity check for file names and strange symbols ...
+    $file=~tr/'| $@/____/;
+
     if (! -d $CorpusHome){
 	my $pwd = getcwd();
 	chdir($IsaHome);
-	# return `make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all`;
-	# if (!system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all")){
-	#     return undef;
-	# }
 	system("make SLOT='$slot' USER='$user' SRCLANG='$src' TRGLANG='$trg' FILE='$file' all");
     }
     return "ISA available at http://$ENV{LETSMTHOST}/isa/$user/$slot" if (! -d $CorpusHome);

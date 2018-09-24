@@ -93,6 +93,13 @@ TODO: Limit the muber of files a user can open for editing (via group database?)
 TODO: Need to support password protection as well (but how - with the same password as the interface ir possible!)
 
 
+* There is another proof-of-concept interface for editing parallel treebanks. The interface can also be set up for aligned documents with the command `setup_ida`:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/subtest/opus/xml/fi-sv/Adrift.xml?uid=opus&run=setup_ida"
+```
+
+TODO: nothing can be done with the annotations yet and automatic word alignment is not yet integrated. There is no check for tree constraints, etc. 
 
 
 ## Changes to the metadata API

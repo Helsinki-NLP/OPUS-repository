@@ -128,7 +128,7 @@ sub put {
 
     if (exists $self->{args}->{run}){
 	## jobs that will be executed immediately (not via batch queues)
-	if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa)$/){
+	if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa|setup_ida)$/){
 	    $message = LetsMT::Repository::JobManager::run(
 		$self->{args}->{run},
 		$self->{path_elements},
