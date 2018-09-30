@@ -53,6 +53,7 @@ use LetsMT::DataProcessing::UDPipe;
 
 use LetsMT::Corpus;
 use LetsMT::Align;
+use LetsMT::Align::Words;
 
 use LetsMT::Repository::GroupManager;
 
@@ -280,6 +281,7 @@ sub import_resource {
     my $skip_align      = shift;
     my $skip_find_align = shift;
     my $skip_parsing    = shift;
+    my $skip_wordalign  = shift;
 
     $self->{new_resources} = [];
     $resource->local_dir( $self->{local_root} )
@@ -373,8 +375,9 @@ sub import_resource {
 	## check import parameters (unless they are given already)
 	unless (defined $skip_align && defined $skip_parsing){
 	    my %para = &get_import_parameter($corpus);
-	    $skip_align   = 1 if ($para{autoalign} eq 'off');
-	    $skip_parsing = 1 if ($para{autoparse} eq 'off');
+	    $skip_align     = 1 if ($para{autoalign} eq 'off');
+	    $skip_parsing   = 1 if ($para{autoparse} eq 'off');
+	    $skip_wordalign = 1 if ($para{autowordalign} eq 'off');
 	}
 
         #-------------------------------------------------------------------
@@ -396,6 +399,7 @@ sub import_resource {
 		}
 		else {
 		    @aligned_resources = &align_documents( $corpus, @$new_resources );
+		    # push ( @$new_resources, @aligned_resources);
 		}
 	    }
 	}
@@ -404,6 +408,11 @@ sub import_resource {
 	unless ($skip_parsing){
 	    my @parsed_resources = &parse_resources( $corpus, @$new_resources );
 	    push ( @$new_resources, @parsed_resources);
+	}
+
+	## now even run word alignment!
+	unless ($skip_wordalign){
+	    push ( @$new_resources, &wordalign_resources( @aligned_resources ) );
 	}
 
 	return wantarray ? @$new_resources : 1;
@@ -598,7 +607,7 @@ sub find_translations {
 }
 
 
-=head2 C<align_resources>
+=head2 C<parse_resources>
 
 =cut
 
@@ -619,6 +628,7 @@ sub parse_resources {
 	    my $output = $pr->local_path;
 	    my $outdir = dirname($output);
 
+	    print "parsing: ".$r->path."\n";
 	    &run_cmd( 'mkdir', '-p', $outdir );
 	    $udpipe->parse_xml_file($input,$output);
 	    if ( &LetsMT::WebService::put_resource( $pr ) ){
@@ -629,6 +639,36 @@ sub parse_resources {
     }
     return @parsed;
 }
+
+
+
+=head2 C<wordalign_resources>
+
+=cut
+
+sub wordalign_resources {
+    my @resources = @_;
+    my @aligned   = ();
+
+    my $aligner = new LetsMT::Align::Words;
+    foreach my $res (@resources){
+	print "word-align: ".$res->path."\n";
+	my @newres = $aligner->wordalign($res);
+	foreach my $n (@newres){
+	    if ( &LetsMT::WebService::put_resource( $n ) ){
+		push (@aligned,$n);
+	    }
+	}
+	if (@newres){
+	    &LetsMT::WebService::put_meta( $res,
+					   'wordaligned'     => $newres[0]->path,
+					   'wordaligned_ids' => $newres[1]->path );
+	}
+    }
+    return @aligned;
+}
+
+
 
 
 

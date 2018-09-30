@@ -200,13 +200,6 @@ sub put {
                 ) ],
             );
 
-            # submit job
-            LetsMT::Repository::JobManager::submit(
-                message => \$message_submit,
-                path    => "$path.import_job",
-                uid     => $self->{args}->{uid},
-            );
-
             # add some information to the meta database
             my $corpus = join( "/", ( $slot, $branch ) );
             my $metaDB = new LetsMT::Repository::MetaManager();
@@ -224,8 +217,13 @@ sub put {
             $metaDB->put( $corpus, { 'import_queue' => $upload } );
             $metaDB->close();
 
+            # submit job
+            LetsMT::Repository::JobManager::submit(
+                message => \$message_submit,
+                path    => "$path.import_job",
+                uid     => $self->{args}->{uid},
+            );
         }
-
     }
 
     # Update meta data

@@ -26,7 +26,7 @@ use Log::Log4perl qw(get_logger :levels);
 
 use Exporter 'import';
 our @EXPORT = qw(
-    is_file resource_type
+    is_file resource_exists resource_type
     get_resource_parameter get_user_parameter
     get_align_parameter get_import_parameter
     find_parallel_resources find_all_parallel find_sentence_aligned
@@ -165,6 +165,25 @@ sub is_file {
 	my $parent = $nodes[0]->parentNode;
 	return 1 if ($parent->findvalue('@kind') eq 'file');
     }
+    return 0;
+}
+
+
+
+=head2 C<resource_exists>
+
+Returns 1 if the resource exists, 0 otherwise
+
+=cut
+
+sub resource_exists {
+    my $resource    = shift;
+    my $response  = LetsMT::WebService::get( $resource );
+    $response     = decode( 'utf8', $response );
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+    return 1 if (@nodes);
     return 0;
 }
 

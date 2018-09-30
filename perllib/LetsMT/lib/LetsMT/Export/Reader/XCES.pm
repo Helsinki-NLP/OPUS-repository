@@ -24,6 +24,7 @@ use LetsMT::Resource;
 use LetsMT::Tools;
 use LetsMT::Tools::XML qw/:all/;
 use LetsMT::Export::Reader::XML;
+use LetsMT::Corpus;
 
 
 =head1 CONSTRUCTOR
@@ -33,6 +34,11 @@ use LetsMT::Export::Reader::XML;
 sub new {
     my $class = shift;
     my %self = ( LID => 0, -encoding => 'utf8', @_ );
+
+    $self{type}     = 'xml'       unless (defined $self{type});
+    $self{src_type} = $self{type} unless (defined $self{src_type});
+    $self{trg_type} = $self{type} unless (defined $self{trg_type});
+    $self{fallback_type} = 'xml'  unless (defined $self{fallback_type});
 
     # XML Parser object for parsing sentence alignments
 
@@ -249,7 +255,10 @@ sub __OpenCorpora {
     # fromDoc (source language)
 
     my $FromResource = $self->{AlignResource}->clone;
-    $FromResource->path( 'xml/' . $fromDoc );
+    $FromResource->path( $self->{src_type} . '/' . $fromDoc );
+    unless (&LetsMT::Corpus::resource_exists($FromResource)){
+	$FromResource->path( $self->{fallback_type} . '/' . $fromDoc );
+    }
 
     if ( ( !-e $FromResource->local_path ) || $self->{-always_fetch} ) {
         unless ( &LetsMT::WebService::get_resource($FromResource) ) {
@@ -267,7 +276,10 @@ sub __OpenCorpora {
     # toDoc (target language)
 
     my $ToResource = $self->{AlignResource}->clone;
-    $ToResource->path( 'xml/' . $toDoc );
+    $ToResource->path( $self->{trg_type} . '/' . $toDoc );
+    unless (&LetsMT::Corpus::resource_exists($ToResource)){
+	$ToResource->path( $self->{fallback_type} . '/' . $toDoc );
+    }
 
     if ( ( !-e $ToResource->local_path ) || $self->{-always_fetch} ) {
         unless ( &LetsMT::WebService::get_resource($ToResource) ) {

@@ -23,8 +23,17 @@ use File::Copy;
 use File::Path;
 
 
-our $EFLOMAL = `which eflomal.py` || undef;
-chomp($EFLOMAL);
+# eflomal
+our $EFLOMAL = $ENV{LETSMTROOT}.'/share/eflomal/align.py';
+# our $EFLOMAL = `which eflomal.py` || undef;
+# chomp($EFLOMAL);
+
+
+## atools for symmetrisation
+our $ATOOLS = `which atools` || undef;
+chomp($ATOOLS);
+
+
 
 =head1 CONSTRUCTOR
 
@@ -36,8 +45,14 @@ sub new {
     my $class = shift;
     my %self  = @_;
 
-    $self{eflomal} = $self{eflomal} || $EFLOMAL;
-    $self{tokenizer} = {};
+    $self{eflomal} = $EFLOMAL unless (defined $self{eflomal});
+    $self{atools}  = $ATOOLS  unless (defined $self{atools});
+
+    $self{prefix}     = '4' unless (exists $self{prefix});
+    $self{src_prefix} = $self{prefix} unless (exists $self{src_prefix});
+    $self{trg_prefix} = $self{prefix} unless (exists $self{trg_prefix});
+
+    $self{symmetrization} = 'grow-diag-final-and' unless ($self{symmetrization});
 
     return bless \%self, $class;
 }
@@ -58,11 +73,10 @@ sub wordalign{
     my $ReverseWordAlgResource = $WordAlgResource->graft_suffix('.reverse');
     my $WordAlgIDsResource     = $WordAlgResource->graft_suffix('.xml');
 
-
-#    my $outdir = dirname($ForwardWordAlgResource->local_path());
-#    &run_cmd( 'mkdir', '-p', $outdir );
-
     my ($source_resource, $target_resource) = $self->_prepare($SentAlgResource,$WordAlgIDsResource);
+    return undef unless (ref($source_resource));
+    return undef unless (ref($target_resource));
+
     my $srcfile = $source_resource->local_path();
     my $trgfile = $target_resource->local_path();
     my $fwdfile = $ForwardWordAlgResource->local_path();
@@ -73,12 +87,28 @@ sub wordalign{
         '-s', $srcfile,
         '-t', $trgfile,
 	'-f', $fwdfile,
-        '-r', $revfile
+        '-r', $revfile,
+	'--source-prefix', $self->{src_prefix},
+	'--target-prefix', $self->{trg_prefix}
     );
+
+    return undef unless ($success);
 
     ## symmetrisation
     ## return all new resource (fwd,rev,symm,xces)
 
+    my $ForwardWordAlgResource = $WordAlgResource->graft_suffix('.forward');
+
+    if (&pipe_out_cmd(
+	     $WordAlgResource->local_path(),
+	     $self->{atools},
+	     '-c', $self->{symmetrization},
+	     '-i', $fwdfile,
+	     '-j', $revfile) ){
+	return ($WordAlgResource, $WordAlgIDsResource, 
+		$ForwardWordAlgResource, $ReverseWordAlgResource);
+    }
+    return undef;
 }
 
 
@@ -91,51 +121,49 @@ sub _prepare{
     my $self=shift;
     my ($algres, $idres) = @_;
 
-    # my ( $src, $srcfile ) = tempfile(
-    #     'align_XXXXXXXX',
-    #     DIR    => $ENV{UPLOADDIR},
-    #     UNLINK => 1
-    # );
-    # binmode( $src, ':encoding(utf8)' );
-    # my ( $trg, $trgfile ) = tempfile(
-    #     'align_XXXXXXXX',
-    #     DIR    => $ENV{UPLOADDIR},
-    #     UNLINK => 1
-    # );
-    # binmode( $trg, ':encoding(utf8)' );
+    ## read and write handlers
+    my ($reader, $xces_writer, $moses_writer);
 
+    ## create a reader with tokenized data as default (UD-parsed as default)
+    unless ( $reader = new LetsMT::Export::Reader( $algres, 'xces', 
+						   type => 'ud', 
+						   fallback_type => 'tok' ) ) {
+        get_logger(__PACKAGE__)->error("cannot read $algres");
+    }
+
+    ## create XCES write for storing aligned sentence IDs
+    ## --> this is necessary because some alignments may be skipped
+    ##     (empty alignments etc)
+    unless ( $xces_writer = new LetsMT::Export::Writer( $idres, 'xces' ) ) {
+        get_logger(__PACKAGE__)->error("cannot write to $idres");
+    }
+
+    ## temporary plain text files
     my $tmpdir = tempdir(
     	'wordalign_XXXXXXXX',
     	DIR     => $ENV{UPLOADDIR},
     	CLEANUP => 1
         );
 
-    $algres->local_dir($tmpdir);
-    $idres->local_dir($tmpdir);
-
-    my ($reader, $xces_writer, $moses_writer);
-    unless ( $reader = new LetsMT::Export::Reader( $algres, 'xces' ) ) {
-        get_logger(__PACKAGE__)->error("cannot read $algres");
-    }
-    unless ( $xces_writer = new LetsMT::Export::Writer( $idres, 'xces' ) ) {
-        get_logger(__PACKAGE__)->error("cannot write to $idres");
-    }
-
     my $mosesres = $idres->clone()->strip_suffix();
     $mosesres->local_path($tmpdir);
 
-
+    ## create Moses file format writer
     unless ( $moses_writer = new LetsMT::Export::Writer( $mosesres, 'moses' ) ) {
         get_logger(__PACKAGE__)->error("cannot write to $mosesres");
     }
 
+    ## open all streams
     $reader->open($algres);
     $moses_writer->open($mosesres);
     $xces_writer->open($idres);
 
+    ## read input and write to XCES and Moses resources
+    my $count = 0;
     while ( my $data = $reader->read() ) {
 	if ($moses_writer->write( $data )){
 	    $xces_writer->write( $data );
+	    $count++;
 	}
     }
 
@@ -143,8 +171,11 @@ sub _prepare{
     $moses_writer->close();
     $xces_writer->close();
 
-    return ($moses_writer->get_source_resource,$moses_writer->get_target_resource);
+    ## need non-empty files
+    return undef unless ($count);
 
+    ## return the temporary aligned text file resources
+    return ($moses_writer->get_source_resource,$moses_writer->get_target_resource);
 }
 
 

@@ -102,7 +102,6 @@ our $IMPORT_PDF_MODE = 'tika';
 # model dir for UDPipe
 our $UDPIPE_MODEL_DIR = $ENV{LETSMTROOT}.'/share/UDPipe';
 
-
 1;
 
 =head1 LICENSE

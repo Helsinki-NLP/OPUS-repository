@@ -3,6 +3,7 @@
 INSTALL = sudo install -c
 INSTALL_BIN = ${INSTALL} -m 755
 INSTALL_DATA = ${INSTALL} -m 644
+COPY = cp -r --preserve=mode,timestamps
 
 APTGET = apt-get
 FORCE  = false
@@ -17,6 +18,7 @@ UBUNTU_BASE_PACKAGES = \
 		automake \
 		build-essential \
 		bzip2 \
+		cmake3 \
 		cpanminus \
 		curl \
 		default-jre \
@@ -150,7 +152,8 @@ CHARED   = chared-1.2
 OPENNLP  = apache-opennlp-1.5.2-incubating
 FUSECOMPRESS = https://github.com/hexxellor/fusecompress.git
 # FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
-EFLOMAL = https://github.com/robertostling/eflomal.git
+EFLOMAL    = https://github.com/robertostling/eflomal.git
+FAST_ALIGN = https://github.com/clab/fast_align.git
 
 # just in case they are installed: remove the old TokyoCabinet packages
 
@@ -247,6 +250,7 @@ server-software: software-base \
 	software-opennlp \
 	software-udpipe \
 	software-eflomal \
+	software-fastalign \
 	software-fusecompress
 
 ## software required by the sge-clients
@@ -257,7 +261,8 @@ sge-client-software: software-base \
 	software-chared \
 	software-opennlp \
 	software-udpipe \
-	software-eflomal
+	software-eflomal \
+	software-fastalign
 
 ## software required on a frontend
 # Tokyo*: Not at all optimal. In the long run it will be better to remove
@@ -433,6 +438,17 @@ software-eflomal:
 	make -C eflomal install
 	cd eflomal && python3 setup.py install
 	${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py
+	mkdir -p ${PREFIX}/share
+	${CP} eflomal ${PREFIX}/share/
+
+.PHONY: software-fastalign
+software-fastalign:
+	git clone ${FAST_ALIGN}
+	mkdir -p fast_align/build
+	cd fast_align/build && cmake ..
+	make -C fast_align/build
+	${INSTALL_BIN} fast_align/build/atools ${PREFIX}/bin/atools
+	${INSTALL_BIN} fast_align/build/fast_align ${PREFIX}/bin/fast_align
 
 
 
