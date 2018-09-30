@@ -87,8 +87,27 @@ sub get_corpus {
 
     # save resource object ...
     push( @{ $self->{RESOURCES} }, $resource );
+    $self->{RESOURCEHASH}->{$lang} =  $resource;
 
     return $self->{CORPUS}->{$lang};
+}
+
+
+sub get_resource {
+    my $self = shift;
+    my $lang = shift;
+    return $self->{RESOURCEHASH}->{$lang} if ( defined $self->{RESOURCEHASH}->{$lang} );
+    return undef;
+}
+
+sub get_source_resource {
+    my $self = shift;
+    return $self->get_resource($self->{-srclang}) if (exists $self->{-srclang});
+}	
+
+sub get_target_resource {
+    my $self = shift;
+    return $self->get_resource($self->{-trglang}) if (exists $self->{-trglang});
 }
 
 

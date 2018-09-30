@@ -711,6 +711,14 @@ sub run_import_resource{
 }
 
 
+## make a safe name by removing all non-ASCII characters, spaces etc
+
+sub _safe_corpus_name{
+    my $name = shift;
+    $name=~tr/[^a-zA-Z0-9.-_+]/_/;
+    return $name;
+}
+
 
 ## set up IDA for a specific corpus file
 
@@ -734,7 +742,10 @@ sub run_setup_ida {
     return 'not in xml-root of your repository' if (shift(@{$path_elements}) ne 'xml');
     my $corpus = join('_',@{$path_elements});
     $corpus-~s/\.xml$//;
-    $corpus=~tr/'"| $@/_____/;
+
+    ## make a name without any special characters (basically ASCII only)
+    ## TODO: save mapping to original name somewhere
+    $corpus=_safe_corpus_name($corpus);
 
     my $CorpusHome = join('/',$IdaHome,$corpus);
     my $langpair   = shift(@{$path_elements});
@@ -826,6 +837,11 @@ sub run_setup_isa {
     my $corpus = join('_',@{$path_elements});
     $corpus-~s/\.xml$//;
 
+    ## make a name without any special characters (basically ASCII only)
+    ## TODO: save mapping to original name somewhere
+    $corpus=_safe_corpus_name($corpus);
+
+
     my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);
     my $langpair   = shift(@{$path_elements});
     my ($src,$trg) = split(/\-/,$langpair);
@@ -876,6 +892,11 @@ sub run_remove_isa {
     my $corpus = join('_',@{$path_elements});
     $corpus=~s/\.xml$//;
 
+    ## make a name without any special characters (basically ASCII only)
+    ## TODO: save mapping to original name somewhere
+    $corpus=_safe_corpus_name($corpus);
+
+
     my $IsaHome    = join('/',$WebRoot,'isa',$user,$slot);
     my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);
     my $CesFile    = $CorpusHome.'.ces';
@@ -922,6 +943,11 @@ sub run_upload_isa {
     unshift( @{$path_elements},$slot );
     my $corpus = join('_',@{$path_elements});
     $corpus=~s/\.xml$//;
+
+    ## make a name without any special characters (basically ASCII only)
+    ## TODO: save mapping to original name somewhere
+    $corpus=_safe_corpus_name($corpus);
+
 
     my $IsaHome    = join('/',$WebRoot,'isa',$user,$slot);
     my $CorpusHome = join('/',$IsaHome,'corpora',$corpus);

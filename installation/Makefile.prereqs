@@ -74,6 +74,7 @@ UBUNTU_BASE_PACKAGES = \
 		perl-doc \
 		php5 \
 		pkg-config \
+		python3 \
 		subversion \
 		tidy \
 		unzip \
@@ -149,7 +150,7 @@ CHARED   = chared-1.2
 OPENNLP  = apache-opennlp-1.5.2-incubating
 FUSECOMPRESS = https://github.com/hexxellor/fusecompress.git
 # FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
-
+EFLOMAL = https://github.com/robertostling/eflomal.git
 
 # just in case they are installed: remove the old TokyoCabinet packages
 
@@ -245,6 +246,7 @@ server-software: software-base \
 	software-chared \
 	software-opennlp \
 	software-udpipe \
+	software-eflomal \
 	software-fusecompress
 
 ## software required by the sge-clients
@@ -254,7 +256,8 @@ sge-client-software: software-base \
 	software-hunalign \
 	software-chared \
 	software-opennlp \
-	software-udpipe
+	software-udpipe \
+	software-eflomal
 
 ## software required on a frontend
 # Tokyo*: Not at all optimal. In the long run it will be better to remove
@@ -421,6 +424,16 @@ software-fusecompress:
 # 	  ./configure; \
 # 	  make install; )
 # 	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
+
+
+
+.PHONY: software-eflomal
+software-eflomal:
+	git clone ${EFLOMAL}
+	make -C eflomal install
+	cd eflomal && python3 setup.py install
+	${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py
+
 
 
 # modules necessary for Grid::Request (not used yet)

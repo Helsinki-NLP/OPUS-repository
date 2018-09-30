@@ -279,7 +279,7 @@ sub _handle_resource_revision{
     if (exists $r_ref->{path_elements}){
         if (ref($r_ref->{path_elements}) eq 'ARRAY'){
             if (@{$r_ref->{path_elements}}){
-                if ($r_ref->{path_elements}->[-1]=~s/\@([0-9]+)$//){
+                if ($r_ref->{path_elements}->[-1]=~s/\@([a-f0-9]+|HEAD)$//){
                     $r_ref->{args}->{rev} = $1;
                     return $r_ref->{args}->{rev};
                 }

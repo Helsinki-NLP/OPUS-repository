@@ -244,7 +244,7 @@ sub revision{
     return $self->{revision} if (exists $self->{revision});
 
     # return revision number attached to the path name
-    return $1 if ( $self->{path} =~ /\@([0-9]+)$/ );
+    return $1 if ( $self->{path} =~ /\@([0-9]+|HEAD)$/ );
 
     # OR try to get the latest revision number from the repository
     my $xml = LetsMT::WebService::get( $self );
@@ -965,7 +965,7 @@ sub local_path {
     my $path = $_[0]->_path( [ 'local_dir', 'path' ] );
 
     # the local path should not include a revision number!
-    $path =~ s/\@([0-9]+)$//;
+    $path =~ s/\@([0-9]+|HEAD)$//;
     return $path;
 
 }

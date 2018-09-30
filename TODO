@@ -20,9 +20,20 @@ High priority:
 
 Medium priority:
 
+* better fuzzy matching of file names (translation detection)
+  --> lowercased file names
+  --> without non-letter characters
+  --> remove/replace language names/IDs from names
+  --> even match translated names? (difficult)
+      (use simple lexical matches with prob's?)
+* find translated documents based on their contents (difficult)
+  --> use external tools for searching parallel documents?
 * more sentence aligners (srtalign, BLEU align, gargantua, yalign?)
 * support moving files (i.e. git mv in backend)
 * allow tagging of releases
+* update language detection (langid.py, cld2)
+  https://github.com/CLD2Owners/cld2
+  https://metacpan.org/pod/Lingua::Identify::CLD2
 * improved pre-processing tools
   - UDpipe									(started)
   - optimized sentence splitters, tokenizers
@@ -30,18 +41,16 @@ Medium priority:
 * slurm job manager (parameters, resource management missing)			(working)
   --> distributed setup
   --> resource configuration and different queues?
+* integrate bicleaner (or similar tools)?
+  https://github.com/bitextor/bicleaner
+  pre-trained models from ParaCrawl
+* integrate other tokenizers for specific languages
+  (mecab for ja ...)
 * code optimization (backends, validation, conversion ...)
 
 
 Low priority:
 
-* better fuzzy matching of file names (translation detection)
-  --> lowercased file names
-  --> without non-letter characters
-  --> remove/replace language names/IDs from names
-  --> even match translated names? (difficult)
-* find translated documents based on their contents (difficult)
-  --> use external tools for searching parallel documents?
 * use poppler bindings for PDF (https://metacpan.org/pod/Poppler)
   --> also in pd2xml!! (check also inline java for pdfxtk)
   --> Poppler may not include text extraction tools in the library?!
