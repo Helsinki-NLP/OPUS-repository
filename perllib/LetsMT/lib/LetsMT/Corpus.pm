@@ -38,7 +38,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT );
 
 ## Default search mode for finding parallel documents
 ## (comment out if you like to use the fuzzy search below)
-# my $DEFAULT_SEARCH = 'identical';
+my $DEFAULT_SEARCH = 'identical';
 
 ## uncomment this one if you want to match similar file names as well
 ## (difference = language ID's + matching thresholds below)
@@ -46,7 +46,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT );
 ## TODO: searching for similar files is less efficient!
 ##  --> need to check time/space complexities
 ##  --> especially for large corpora (= with many files)
-my $DEFAULT_SEARCH = 'similar';
+# my $DEFAULT_SEARCH = 'similar';
 
 ## default thresholds for size ratio and name match
 my $DEFAULT_SIZE_RATIO_THR = 0.7;

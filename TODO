@@ -15,6 +15,7 @@ High priority:
   --> color-coded confidence in ISA
   --> mark corpus that is already done/saved with ISA
   --> keep confidence scores for links that are not changed in ISA
+  --> interactive dependency annotation						(started)
 * user interface (for uploads, OPUS integration)				(started)
 
 

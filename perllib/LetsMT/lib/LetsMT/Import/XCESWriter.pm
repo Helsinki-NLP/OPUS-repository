@@ -222,8 +222,8 @@ sub get_xces_writer {
             }
         };
 
-        $from_doc =~ s/xml\///i;    # Mutilate paths in favor of
-        $to_doc   =~ s/xml\///i;    # future extensions.
+        $from_doc =~ s/^(xml|wordalign)\///i;    # Mutilate paths in favor of
+        $to_doc   =~ s/^(xml|wordalign)\///i;    # future extensions.
 
         $writer->open_document_pair( $from_doc, $to_doc );
 

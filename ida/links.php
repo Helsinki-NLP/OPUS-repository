@@ -19,7 +19,9 @@ function print_links($links,$SPositions,$TPositions,$SY=210,$TY=260,$arg='rl'){
   }
 
 function save_links($dbfile,$id,&$links){
-  $db = dba_open( $dbfile, "c", "db4") or die('ssss');
+  $mode = "c";
+  if (file_exists($dbfile)){ $mode = "w"; }
+  $db = dba_open( $dbfile, $mode, "db4") or die('ssss');
   $string = implode(" ",array_keys($links));
   dba_replace($id,$string,$db);
   dba_close($db);

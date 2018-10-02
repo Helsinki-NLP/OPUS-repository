@@ -15,7 +15,9 @@ function read_sentence($fp,&$lines){
 
 
 function save_deprels($dbfile,$id,&$heads,&$deprels){
-  $db = dba_open( $dbfile, "w", "db4") or die('ssss');
+  $mode = "c";
+  if (file_exists($dbfile)){ $mode = "w"; }
+  $db = dba_open( $dbfile, $mode, "db4") or die('ssss');
   if (dba_exists($id,$db)){
     $string = trim(dba_fetch($id,$db));
   }

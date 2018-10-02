@@ -7,6 +7,10 @@ Sharing of  Training Data and  Building User Tailored MT".  This package holds
 the software contributed  by the  Computational Linguistics  group at  Uppsala
 University, called the Resource Repository.
 
+Lot's of changes since version 0.52 done at the University of
+Helsinki. For more information: Look into CHANGES and the
+documentation in doc/.
+
 
 SYSTEM REQUIREMENTS
 ===================
@@ -14,7 +18,7 @@ SYSTEM REQUIREMENTS
   or (for testing) virtual machines.
   - tested on 64-bit systems, though 32-bit systems should also be possible
 * GNU/Linux operating system
-  - tested on Ubuntu 10.04 LTS and 12.04 LTS
+  - tested on Ubuntu 14.04 LTS
   - the installation installs needed software with the  Debian package manager
     "apt", so a Debian system (Debian, Ubuntu) is at least necessary for
     out-of-the-box installation
@@ -36,10 +40,14 @@ PACKAGE CONTENTS
 admin/ ............. Scripts for administration
 installation/ ...... Scripts & Makefiles for setup & installation
 perllib/ ........... Perl modules and scripts
-perllib/LetsMT/ >... LetsMT package of Perl modules & scripts
+perllib/LetsMT/ .... LetsMT package of Perl modules & scripts
 lib/ ............... Third-party packages/libraries
+doc/ ............... markdown documentation
+isa/ ............... interactive sentence aligner
+ida/ ............... interactive dependency annotation
+marianNMT .......... installation scripts for marianNMT
 
-www/ ............... Extra: web interface
+www/ ............... Extra: web interface (deprecated)
 
 
 Detailed contents for perllib/LetsMT/

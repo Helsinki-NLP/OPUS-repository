@@ -12,6 +12,9 @@ A factory class to return an object instance of a selected alignment module.
 
 use strict;
 
+use DB_File;
+use DBM_Filter;
+
 use LetsMT::Align::Words::Eflomal;
 
 
@@ -25,6 +28,39 @@ sub new {
     my $class = shift;
     return new LetsMT::Align::Words::Eflomal(@_);
 }
+
+
+sub alg2db{
+    my $algfile = shift(@_);
+    my $idx     = shift(@_);
+    my $dbfile  = shift(@_);
+
+    my %links=();
+    my $db = tie %links,"DB_File",$dbfile;
+    $db->Filter_Key_Push('utf8');
+    $db->Filter_Value_Push('utf8');
+
+    open F,"<",$algfile || return 0;
+    my $i=0;
+    while (<F>){
+	chomp;
+	my $key = $$idx[$i]."\n";
+	my @alg = split(/\s/);
+	my @new = ();
+	foreach (@alg){
+	    my ($s,$t) = split(/\-/);
+	    $s++;$t++;
+	    push (@new,"$s-$t");
+	}
+	## NOTE: idx has a final newline to work with IDA
+	$links{$$idx[$i]."\n"} = join(' ',@new);
+	$i++;
+    }
+    close F;
+    untie %links;
+
+}
+
 
 1;
 

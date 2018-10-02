@@ -32,17 +32,21 @@ function print_graph($words,$heads,$deprels,
   // longest distance --> clostest to the middle
   $StartOffset = array();
   for ($i=0;$i<count($words);$i++){
-    ksort($leftdist[$i],SORT_NUMERIC);
-    krsort($rightdist[$i],SORT_NUMERIC);
-    $count = -1;
-    foreach ($leftdist[$i] as $dist => $nr){
-      $StartOffset[$i][$dist] = $count;
-      $count--;
+    if (is_array($leftdist[$i])){
+      ksort($leftdist[$i],SORT_NUMERIC);
+      $count = -1;
+      foreach ($leftdist[$i] as $dist => $nr){
+	$StartOffset[$i][$dist] = $count;
+	$count--;
+      }
     }
-    $count = +1;
-    foreach ($rightdist[$i] as $dist => $nr){
-      $StartOffset[$i][$dist] = $count;
-      $count++;
+    if (is_array($rightdist[$i])){
+      krsort($rightdist[$i],SORT_NUMERIC);
+      $count = +1;
+      foreach ($rightdist[$i] as $dist => $nr){
+	$StartOffset[$i][$dist] = $count;
+	$count++;
+      }
     }
   }
 

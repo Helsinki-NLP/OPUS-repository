@@ -28,6 +28,7 @@ use LetsMT::Tools;
 use LetsMT::Repository::Safesys;
 use LetsMT::Corpus;
 use LetsMT::Align;
+use LetsMT::Align::Words;
 use LetsMT::Tools::UD;
 
 use Cwd;
@@ -262,7 +263,7 @@ sub run_detect_translations {
 
     # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
     # my %parallel = &find_parallel_resources($corpus,\@resources);
-    my %parallel = &find_translations( $corpus, \@ResList );
+    my %parallel = &find_translations( $corpus, \@ResList, %{$args} );
 
     # hash of candidates for each resource
     my %candidates = ();
@@ -372,7 +373,7 @@ sub run_align {
     ## NOTE: this may create lots of align jobs!
     # my %parallel = &find_parallel_resources($corpus,\@resources,%{$args});
     # my %parallel = &find_parallel_resources($corpus,\@resources);
-    my %parallel = &find_translations($corpus,\@resources);
+    my %parallel = &find_translations($corpus,\@resources, %{$args});
 
     my $count = 0;
     my %done  = (); 
@@ -715,7 +716,7 @@ sub run_import_resource{
 
 sub _safe_corpus_name{
     my $name = shift;
-    $name=~tr/[^a-zA-Z0-9.-_+]/_/;
+    $name=~s/[^a-zA-Z0-9.\-_+]/_/g;
     return $name;
 }
 
@@ -759,15 +760,26 @@ sub run_setup_ida {
 
 	my $resource = LetsMT::Resource::make_from_storage_path( $path, $CorpusHome );
 	return "no resource" unless ($resource);
+
+	## check whether a wordalign resource of sent align indeces exists
+	my $algres = $resource->clone();
+	$algres->base_path('wordalign');
+	if (LetsMT::Corpus::resource_exists($algres)){
+	    $resource = $algres;
+	}
+
+	# get all sentence alignments from the bitext
 	&LetsMT::WebService::get_resource($resource, 'archive' => 'no') || return undef;
 	open F,"<",$resource->local_path() || return "cannot read resource";
 	open O,">$CorpusHome/corpus.$src-$trg" || return "cannot write link file";
 	my $srcdoc = undef;
 	my $trgdoc = undef;
+	my @links = ();
 	while (<F>){
 	    chomp;
-	    if (/fromDoc="([^"]+)"/){ $srcdoc = 'ud/'.$1; }
-	    if (/toDoc="([^"]+)"/){ $trgdoc = 'ud/'.$1; }
+	    if (/fromDoc="(wordalign\/)?([^"]+)"/){ $srcdoc = 'ud/'.$2; }
+	    if (/toDoc="(wordalign\/)?([^"]+)"/){ $trgdoc = 'ud/'.$2; }
+	    if (/xtargets="([^"]*)"/){ push(@links,$1); }
 	    if (/xtargets="([^ ][^ ]*;[^ ][^ ]*)"/){ print O $1,"\n"; }
 	}
 	close F;
@@ -780,16 +792,34 @@ sub run_setup_ida {
 
 	my $srcres = LetsMT::Resource::make( $slot, $user, $srcdoc, $CorpusHome );
 	my $trgres = LetsMT::Resource::make( $slot, $user, $trgdoc, $CorpusHome );
-	&LetsMT::WebService::get_resource($srcres, 'archive' => 'no') || return "cannot find source UD";
-	&LetsMT::WebService::get_resource($trgres, 'archive' => 'no') || return "cannot find target UD";
 
-	LetsMT::Tools::UD::deprel2db($srcres->local_path(), "$CorpusHome/corpus.$src.db");
-	LetsMT::Tools::UD::deprel2db($trgres->local_path(), "$CorpusHome/corpus.$trg.db");
+	if (LetsMT::Corpus::resource_exists($srcres)){
+	    &LetsMT::WebService::get_resource($srcres, 'archive' => 'no') || return "cannot get source UD";
+	    &LetsMT::Tools::UD::deprel2db($srcres->local_path(), "$CorpusHome/corpus.$src.db");
+	    unlink($srcres->local_path());
+	}
+	else{
+	    ## TODO: get standard XML, tokenize and convert to DB_File
+	}
+	if (LetsMT::Corpus::resource_exists($trgres)){
+	    &LetsMT::WebService::get_resource($trgres, 'archive' => 'no') || return "cannot find target UD";
+	    &LetsMT::Tools::UD::deprel2db($trgres->local_path(), "$CorpusHome/corpus.$trg.db");
+	    unlink($trgres->local_path());
+	}
+	else{
+	    ## TODO: get standard XML, tokenize and convert to DB_File
+	}
 
-	unlink($srcres->local_path());
-	unlink($trgres->local_path());
+	## word alignment
+	my $wordalgres = $algres->strip_suffix();
+	$wordalgres->base_path('wordalign');
+	if (LetsMT::Corpus::resource_exists($wordalgres)){
+	    &LetsMT::WebService::get_resource($wordalgres, 'archive' => 'no');
+	    &LetsMT::Align::Words::alg2db($wordalgres->local_path(), \@links, "$CorpusHome/corpus.$src-$trg.db");
+	    unlink($wordalgres->local_path());
+	}
 
-	## finally: create the index file
+	## finally: create the index.php file
 	open IN, "<$IdaFileDir/index.in" || return "cannot read index.in";
 	open OUT, ">$CorpusHome/index.php" || return "cannot write index.php";
 	while (<IN>){

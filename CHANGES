@@ -6,11 +6,13 @@
 * integrated pdf2xml from https://bitbucket.org/tiedemann/pdf2xml/
 * updated Apache Tika to v1.18 and added server mode
 * use LibMagic bindings instead of system calls to file
-* added UDPipe support (tokenizer and sentence splitter so far)
+* added UDPipe support (tokenizer, sentence splitter, parsing)
+* added support for word alignment (eflomal)
 * stable srt conversion
 * fuzzy file name matching for detection of parallel texts
 * improvements to job API (import/reimport/detect_translations/detect_unaligned)
 * integration of interactive sentence alignment (prototype)
+* integration of interactive parallel dependency annotation (prototype)
 * bugfixing and fixed unit tests
 
 
