@@ -38,6 +38,8 @@ Medium priority:
 * improved pre-processing tools
   - UDpipe									(started)
   - optimized sentence splitters, tokenizers
+  - boilerplate removal etc (e.g. http://corpus.tools/wiki/Justext)
+    https://metacpan.org/pod/Text::Identify::BoilerPlate
 * stable web interface with configuration support				(started)
 * slurm job manager (parameters, resource management missing)			(working)
   --> distributed setup
