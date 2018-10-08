@@ -92,6 +92,29 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/testslot/testuser?ENDS_WITH_align-c
 Note that there can be multiple candidates for each file. Also note that they are only listed in one direction (language IDs are alphabetically sorted), i.e. the French file is listed as alignment candidate for the English file but not the other way around.
 
 
+## Finding parallel documents
+
+* try to find parallel documents by running the commands `detect_translations` (all potentially parallel documents including the ones that are already aligned) or `detect_unaligned` (potentially parallel documents that are not yet aligned):
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/en?uid=testuser&run=detect_translations"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fi?uid=testuser&run=detect_untranslated"
+```
+
+
+## Align all alignment candidates
+
+
+* align jobs for alignment candidates (the ones detected by import processes or `detect_translations` or `detect_unaligned`) for specific resources or for entire subtrees:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/en/100.xml?uid=user&run=align_candidates"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fr?uid=testuser&run=align_candidates"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml?uid=testuser&run=align_candidates"
+```
+
+
+
 ## Other modes of finding parallel documents
 
 * fuzzy name matching: ... TODO ...
