@@ -26,13 +26,17 @@ use File::Path;
 # eflomal
 our $EFLOMAL = $ENV{LETSMTROOT}.'/share/eflomal/align.py';
 # our $EFLOMAL = `which eflomal.py` || undef;
-# chomp($EFLOMAL);
+chomp($EFLOMAL);
 
 
 ## atools for symmetrisation
 our $ATOOLS = `which atools` || undef;
 chomp($ATOOLS);
 
+
+## priors of eflomal
+our $EFLOMAL_MODEL_DIR = $LetsMT::EFLOMAL_MODEL_DIR || 
+    '/usr/local/share/eflomal/priors';
 
 
 =head1 CONSTRUCTOR
@@ -82,29 +86,59 @@ sub wordalign{
     my $fwdfile = $ForwardWordAlgResource->local_path();
     my $revfile = $ReverseWordAlgResource->local_path();
 
-    my ( $success, $ret, $out, $err ) = &run_cmd(
-        $self->{eflomal},
-        '-s', $srcfile,
+    my $srclang = $source_resource->language();
+    my $trglang = $target_resource->language();
+    my $priors  = $EFLOMAL_MODEL_DIR.'/'.$srclang.'-'.$trglang.'.priors';
+    unless (-e $priors){
+	if (-e $priors.'.gz'){
+	    my ( $fh, $tmpfile ) = tempfile(
+		'eflomal_XXXXXXXX',
+		DIR    => $ENV{UPLOADDIR},
+		UNLINK => 1
+		);
+	    close $fh;
+	    if (&pipe_in_out_cmd($priors.'.gz',$tmpfile,'gzip','-cd')){
+		$priors = $tmpfile;
+	    }
+	    else{
+		$priors = undef;
+	    }
+	}
+	else{
+	    $priors = undef;
+	}
+    }
+
+    ## make eflomal arguments
+    my @para = (
+	'-s', $srcfile,
         '-t', $trgfile,
 	'-f', $fwdfile,
         '-r', $revfile,
 	'--source-prefix', $self->{src_prefix},
-	'--target-prefix', $self->{trg_prefix}
-    );
+	'--target-prefix', $self->{trg_prefix},
+	'--overwrite'
+	);
 
+    ## add parameter about priors if they exist
+    if ($priors){
+	push (@para,'--priors',$priors);
+    }
+
+    ## run eflomal
+    my ( $success, $ret, $out, $err ) = &run_cmd( $self->{eflomal}, @para );
     return undef unless ($success);
 
     ## symmetrisation
-    ## return all new resource (fwd,rev,symm,xces)
-
     my $ForwardWordAlgResource = $WordAlgResource->graft_suffix('.forward');
-
     if (&pipe_out_cmd(
 	     $WordAlgResource->local_path(),
 	     $self->{atools},
 	     '-c', $self->{symmetrization},
 	     '-i', $fwdfile,
 	     '-j', $revfile) ){
+
+	## return all new resource (fwd,rev,symm,xces)
 	return ($WordAlgResource, $WordAlgIDsResource, 
 		$ForwardWordAlgResource, $ReverseWordAlgResource);
     }

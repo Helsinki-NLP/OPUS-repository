@@ -435,6 +435,7 @@ software-fusecompress:
 .PHONY: software-eflomal
 software-eflomal:
 	git clone ${EFLOMAL}
+	cd eflomal && git checkout priors
 	make -C eflomal install
 	cd eflomal && python3 setup.py install
 	${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py

@@ -98,7 +98,7 @@ Note that there can be multiple candidates for each file. Also note that they ar
 
 ```
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/en?uid=testuser&run=detect_translations"
-$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fi?uid=testuser&run=detect_untranslated"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fr?uid=testuser&run=detect_untranslated"
 ```
 
 
