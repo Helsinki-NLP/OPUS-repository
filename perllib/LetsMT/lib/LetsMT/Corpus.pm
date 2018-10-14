@@ -21,6 +21,8 @@ use LetsMT::Tools::Strings;
 use LetsMT::Lang::ISO639;
 use LetsMT::WebService;
 
+use LetsMT::Align::Documents qw/:all/;
+
 
 use Log::Log4perl qw(get_logger :levels);
 
@@ -29,7 +31,7 @@ our @EXPORT = qw(
     is_file resource_exists resource_type
     get_resource_parameter get_user_parameter
     get_align_parameter get_import_parameter
-    find_parallel_resources find_all_parallel find_sentence_aligned
+    find_all_parallel find_sentence_aligned
     find_resources find_corpusfiles find_translations
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
@@ -188,68 +190,72 @@ sub resource_exists {
 }
 
 
-=head2 C<find_parallel_resources>
+# ###############################################
+# ### TODO: this is not used anymore, is it?
+# ###############################################
 
-Returns a list of matching resources.
-NOTE: DEPRECATED FUNCTION!
+# =head2 C<find_parallel_resources>
 
-=cut
+# Returns a list of matching resources.
+# NOTE: DEPRECATED FUNCTION!
 
-sub find_parallel_resources {
-    my $corpus    = shift;
-    my $resources = shift || [];               # list of resources
-    my %args      = @_ ? @_ : %DEFAULT_SEARCH_PARA;
+# =cut
 
-    # make sure we have an array of resources
-    unless ( ref($resources) eq 'ARRAY' ) { $resources = [$resources]; }
+# sub find_parallel_resources {
+#     my $corpus    = shift;
+#     my $resources = shift || [];               # list of resources
+#     my %args      = @_ ? @_ : %DEFAULT_SEARCH_PARA;
 
-    my %parallel = ();
+#     # make sure we have an array of resources
+#     unless ( ref($resources) eq 'ARRAY' ) { $resources = [$resources]; }
 
-    # always include already aligned documents
-    if ( @{$resources} ) {
-        foreach my $res ( @{$resources} ) {
-	    my @aligned = find_aligned_documents($res);
-	    my $file1   = $res->storage_path;
-	    foreach my $file2 (@aligned) {
-		$parallel{$file1}{$file2} =
-		    &LetsMT::Resource::make_from_storage_path($file2);
-	    }
-        }
-    }
+#     my %parallel = ();
 
-    # find documents with identical names
-    if ( @{$resources} && $args{search_parallel} eq 'identical' ) {
-        foreach my $res ( @{$resources} ) {
-	    my @identical = find_parallel_documents( $corpus, $res );
-	    my $file1 = $res->storage_path;
-	    foreach my $file2 (@identical) {
-		$parallel{$file1}{$file2} =
-		    &LetsMT::Resource::make_from_storage_path($file2);
-	    }
-        }
-    }
+#     # always include already aligned documents
+#     if ( @{$resources} ) {
+#         foreach my $res ( @{$resources} ) {
+# 	    my @aligned = find_aligned_documents($res);
+# 	    my $file1   = $res->storage_path;
+# 	    foreach my $file2 (@aligned) {
+# 		$parallel{$file1}{$file2} =
+# 		    &LetsMT::Resource::make_from_storage_path($file2);
+# 	    }
+#         }
+#     }
 
-    # search similar names
-    else {
-        my %possible = find_all_parallel( $corpus, %args );
-        foreach my $file1 ( keys %possible ) {
-            foreach my $lang ( keys %{ $possible{$file1} } ) {
-                ## matching document sorted by match-score
-                my @matches = sort {
-                        $possible{$file1}{$lang}{$b}{match}
-                        <=>
-                        $possible{$file1}{$lang}{$a}{match}
-                    } keys %{ $possible{$file1}{$lang} };
-                if (@matches) {
-                    $parallel{$file1}{ $matches[0] } =
-                      LetsMT::Resource::make_from_storage_path( $matches[0] );
-                }
-            }
-        }
-    }
+#     # find documents with identical names
+#     if ( @{$resources} && $args{search_parallel} eq 'identical' ) {
+#         foreach my $res ( @{$resources} ) {
+# 	    my @identical = find_parallel_documents( $corpus, $res );
+# 	    my $file1 = $res->storage_path;
+# 	    foreach my $file2 (@identical) {
+# 		$parallel{$file1}{$file2} =
+# 		    &LetsMT::Resource::make_from_storage_path($file2);
+# 	    }
+#         }
+#     }
 
-    return %parallel;
-}
+#     # search similar names
+#     else {
+#         my %possible = find_all_parallel( $corpus, %args );
+#         foreach my $file1 ( keys %possible ) {
+#             foreach my $lang ( keys %{ $possible{$file1} } ) {
+#                 ## matching document sorted by match-score
+#                 my @matches = sort {
+#                         $possible{$file1}{$lang}{$b}{match}
+#                         <=>
+#                         $possible{$file1}{$lang}{$a}{match}
+#                     } keys %{ $possible{$file1}{$lang} };
+#                 if (@matches) {
+#                     $parallel{$file1}{ $matches[0] } =
+#                       LetsMT::Resource::make_from_storage_path( $matches[0] );
+#                 }
+#             }
+#         }
+#     }
+
+#     return %parallel;
+# }
 
 
 =head2 C<find_translated_resources>
@@ -278,14 +284,16 @@ sub find_translations {
 	    $basepaths{$base}++;
 	}
 	foreach my $f (keys %basepaths){
-	    _find_matching_corpusfiles($corpus, \%parallel, $f);
+	    &resources_with_identical_names($corpus, \%parallel, $f);
+	    # _find_matching_corpusfiles($corpus, \%parallel, $f);
 	}
     }
 
     ## otherwise: search in the entire corpus
     ## TODO: this can be a big query (retrieve all corpusfiles)
     else{
-	_find_matching_corpusfiles($corpus, \%parallel);
+	&resources_with_identical_names($corpus, \%parallel);
+	# _find_matching_corpusfiles($corpus, \%parallel);
 	my %translations = ();
 	foreach my $base ( keys %parallel ){
 	    my @lang = sort keys %{$parallel{$base}};
@@ -297,17 +305,19 @@ sub find_translations {
 		}
 	    }
 	}
+	## TODO: no fuzzy matching in this case?
 	return %translations;
     }
 
     ## TODO: do we want to do some more fuzzy matching?
     ## --> if there is no translation for a specific file 
     ##     in one of the corpus languages: try to find one?
-    ## --> file names that inlcude language names / IDs?
+    ## --> file names that include language names / IDs?
     ## (How can we do that efficient with TokyoTyrant?)
 
     if ($args{search_parallel}=~/(similar|fuzzy)/){
-	&_add_similar_corpusfiles( $corpus, \%parallel, %args );
+	&resources_with_similar_names( $corpus, \%parallel, %args );
+	# &_add_similar_corpusfiles( $corpus, \%parallel, %args );
     }
 
 
@@ -333,139 +343,142 @@ sub find_translations {
 
 
 
-## try to find corpus files with similar names
-## for languages that do not have a match yet in the given 
-## hash of parallel documents
 
-sub _add_similar_corpusfiles{
-    my $corpus   = shift;
-    my $parallel = shift || {};
-    my %args     = @_;
-
-    return 0 unless (keys %{$parallel});
+## MOVED TO LetsMT::Align::Documents
 
 
-    ## get all registered languages in the corpus
+# ## try to find corpus files with similar names
+# ## for languages that do not have a match yet in the given 
+# ## hash of parallel documents
 
-    my $response  = &LetsMT::WebService::get_meta( $corpus );
-    $response     = decode( 'utf8', $response );
-    my $XmlParser = new XML::LibXML;
-    my $dom       = $XmlParser->parse_string( $response );
-    my @nodes     = $dom->findnodes('//list/entry');
-    my @langs     = split( /,/, $nodes[0]->findvalue('langs') );
+# sub _add_similar_corpusfiles{
+#     my $corpus   = shift;
+#     my $parallel = shift || {};
+#     my %args     = @_;
 
-
-    ## for each file base in parallel: check whether a language is missing
-    ## and collect all those languages
-
-    my %missing = ();
-    foreach my $f (keys %{$parallel}){
-	my $filebase = basename($f);
-	$filebase =~s/\.xml$//;
-	next unless ($filebase=~/\p{L}/);  # skip names without any letters
-	foreach my $l (@langs){
-	    $missing{$l}++ unless (exists $$parallel{$f}{$l});
-	}
-    }
+#     return 0 unless (keys %{$parallel});
 
 
-    ## get all files for all languages with missing documents
+#     ## get all registered languages in the corpus
 
-    my %query = ( 'resource-type'  => 'corpusfile',
-		  type             => 'recursive' );
-
-    my $slot = $corpus->slot;
-    my $branch = $corpus->user;
-    my %corpusfiles = ();
-    foreach my $l (keys %missing){
-
-	## make the language-specific resource
-	my $langres = LetsMT::Resource::make( $slot, $branch, 'xml/'.$l );
-
-	# query the database
-	my $response  = LetsMT::WebService::get_meta( $langres, %query );
-	$response     = decode( 'utf8', $response );
-	my %files     = ();
-	my $XmlParser = new XML::LibXML;
-	my $dom       = $XmlParser->parse_string($response);
-	my @nodes     = $dom->findnodes('//list/entry/@path');
-
-	$corpusfiles{$l} = [];
-	foreach my $n (@nodes) {
-	    my @path = split( /\/+/, $n->to_literal );
-	    shift(@path); # slot
-	    shift(@path); # branch
-	    shift(@path); # xml
-	    shift(@path); # lang
-	    if (@path){
-		$path[-1]=~s/\.xml$//;
-		push(@{$corpusfiles{$l}},join('/',@path));
-	    }
-	}
-    }
-
-    ## run through the document base names again
-    ## and find similar files for the languages that are missing
-    my $count = 0;
-    foreach my $f (keys %{$parallel}){
-
-	# my $filebase = basename($f);
-	# my $filedir  = dirname($f);
-	my $filebase = $f;
-	$filebase =~s/\.xml$//;
-	next unless (basename($filebase)=~/\p{L}/);  # skip file names without any letters
-
-	foreach my $l (@langs){
-	    next if (exists $$parallel{$f}{$l});
-	    next unless (@{$corpusfiles{$l}});
-	    my @matches = amatch( $filebase, @{$corpusfiles{$l}} );
-	    # more than 1? sorting according to distance!
-	    # see https://metacpan.org/pod/String::Approx
-	    if ($#matches){
-		my %dist;
-		@dist{@matches} = map { abs } adistr( $filebase, @matches );
-		@matches = sort { $dist{$a} <=> $dist{$b} } @matches;
-	    }
-	    if (@matches){
-		$matches[0] .= '.xml';
-		$$parallel{$f}{$l} = join( '/',( $slot, $branch, 'xml', $l, $matches[0]) );
-		$count++;
-	    }
-	}
-    }
-    return $count;
-}
+#     my $response  = &LetsMT::WebService::get_meta( $corpus );
+#     $response     = decode( 'utf8', $response );
+#     my $XmlParser = new XML::LibXML;
+#     my $dom       = $XmlParser->parse_string( $response );
+#     my @nodes     = $dom->findnodes('//list/entry');
+#     my @langs     = split( /,/, $nodes[0]->findvalue('langs') );
 
 
-sub _find_matching_corpusfiles{
-    my $corpus   = shift;
-    my $parallel = shift || {};
-    my $filename = shift;
+#     ## for each file base in parallel: check whether a language is missing
+#     ## and collect all those languages
 
-    ## query the meta database
-    my %query = ( 'resource-type'  => 'corpusfile',
-		  type             => 'recursive' );
-    $query{'ENDS_WITH__ID_'} = $filename if ($filename);
-    my $response = LetsMT::WebService::get_meta( $corpus, %query );
-    $response = decode( 'utf8', $response );
+#     my %missing = ();
+#     foreach my $f (keys %{$parallel}){
+# 	my $filebase = basename($f);
+# 	$filebase =~s/\.xml$//;
+# 	next unless ($filebase=~/\p{L}/);  # skip names without any letters
+# 	foreach my $l (@langs){
+# 	    $missing{$l}++ unless (exists $$parallel{$f}{$l});
+# 	}
+#     }
 
-    ## parse the query result (matching files in entry-path)
-    my %files     = ();
-    my $XmlParser = new XML::LibXML;
-    my $dom       = $XmlParser->parse_string($response);
-    my @nodes     = $dom->findnodes('//list/entry/@path');
 
-    foreach my $n (@nodes) {
-        my $file     = $n->to_literal;
-        my $newres   = LetsMT::Resource::make_from_storage_path($file);
-	my $lang     = $newres->language;
-	my $basename = $newres->basename;
-        unless ( $filename && ($basename ne $filename) ) {
-	    $$parallel{$basename}{$lang} = $file;
-        }
-    }
-    return $parallel;
-}
+#     ## get all files for all languages with missing documents
+
+#     my %query = ( 'resource-type'  => 'corpusfile',
+# 		  type             => 'recursive' );
+
+#     my $slot = $corpus->slot;
+#     my $branch = $corpus->user;
+#     my %corpusfiles = ();
+#     foreach my $l (keys %missing){
+
+# 	## make the language-specific resource
+# 	my $langres = LetsMT::Resource::make( $slot, $branch, 'xml/'.$l );
+
+# 	# query the database
+# 	my $response  = LetsMT::WebService::get_meta( $langres, %query );
+# 	$response     = decode( 'utf8', $response );
+# 	my %files     = ();
+# 	my $XmlParser = new XML::LibXML;
+# 	my $dom       = $XmlParser->parse_string($response);
+# 	my @nodes     = $dom->findnodes('//list/entry/@path');
+
+# 	$corpusfiles{$l} = [];
+# 	foreach my $n (@nodes) {
+# 	    my @path = split( /\/+/, $n->to_literal );
+# 	    shift(@path); # slot
+# 	    shift(@path); # branch
+# 	    shift(@path); # xml
+# 	    shift(@path); # lang
+# 	    if (@path){
+# 		$path[-1]=~s/\.xml$//;
+# 		push(@{$corpusfiles{$l}},join('/',@path));
+# 	    }
+# 	}
+#     }
+
+#     ## run through the document base names again
+#     ## and find similar files for the languages that are missing
+#     my $count = 0;
+#     foreach my $f (keys %{$parallel}){
+
+# 	# my $filebase = basename($f);
+# 	# my $filedir  = dirname($f);
+# 	my $filebase = $f;
+# 	$filebase =~s/\.xml$//;
+# 	next unless (basename($filebase)=~/\p{L}/);  # skip file names without any letters
+
+# 	foreach my $l (@langs){
+# 	    next if (exists $$parallel{$f}{$l});
+# 	    next unless (@{$corpusfiles{$l}});
+# 	    my @matches = amatch( $filebase, @{$corpusfiles{$l}} );
+# 	    # more than 1? sorting according to distance!
+# 	    # see https://metacpan.org/pod/String::Approx
+# 	    if ($#matches){
+# 		my %dist;
+# 		@dist{@matches} = map { abs } adistr( $filebase, @matches );
+# 		@matches = sort { $dist{$a} <=> $dist{$b} } @matches;
+# 	    }
+# 	    if (@matches){
+# 		$matches[0] .= '.xml';
+# 		$$parallel{$f}{$l} = join( '/',( $slot, $branch, 'xml', $l, $matches[0]) );
+# 		$count++;
+# 	    }
+# 	}
+#     }
+#     return $count;
+# }
+
+# sub _find_matching_corpusfiles{
+#     my $corpus   = shift;
+#     my $parallel = shift || {};
+#     my $filename = shift;
+
+#     ## query the meta database
+#     my %query = ( 'resource-type'  => 'corpusfile',
+# 		  type             => 'recursive' );
+#     $query{'ENDS_WITH__ID_'} = $filename if ($filename);
+#     my $response = LetsMT::WebService::get_meta( $corpus, %query );
+#     $response = decode( 'utf8', $response );
+
+#     ## parse the query result (matching files in entry-path)
+#     my %files     = ();
+#     my $XmlParser = new XML::LibXML;
+#     my $dom       = $XmlParser->parse_string($response);
+#     my @nodes     = $dom->findnodes('//list/entry/@path');
+
+#     foreach my $n (@nodes) {
+#         my $file     = $n->to_literal;
+#         my $newres   = LetsMT::Resource::make_from_storage_path($file);
+# 	my $lang     = $newres->language;
+# 	my $basename = $newres->basename;
+#         unless ( $filename && ($basename ne $filename) ) {
+# 	    $$parallel{$basename}{$lang} = $file;
+#         }
+#     }
+#     return $parallel;
+# }
 
 
 
@@ -624,6 +637,12 @@ NOTE: THIS MAY CAUSE TROUBLE WITH BIG REPOSITORIES THAT INCLUDE MANY FILES
 ---> PROBABLY DON'T WANT TO USE THIS IN GENERAL ...
 
 =cut
+
+
+###############################################
+## TODO: should we get rid of this function?
+##       it is still used by LetsMT::Admin (and letsmt_admin)
+###############################################
 
 sub find_all_parallel {
     my $corpus = shift;
