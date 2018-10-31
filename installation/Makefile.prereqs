@@ -434,16 +434,18 @@ software-fusecompress:
 
 .PHONY: software-eflomal
 software-eflomal:
+	rm -fr eflomal
 	git clone ${EFLOMAL}
 	cd eflomal && git checkout priors
 	make -C eflomal install
 	cd eflomal && python3 setup.py install
 	${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py
 	mkdir -p ${PREFIX}/share
-	${CP} eflomal ${PREFIX}/share/
+	${COPY} eflomal ${PREFIX}/share/
 
 .PHONY: software-fastalign
 software-fastalign:
+	rm -fr fast_align
 	git clone ${FAST_ALIGN}
 	mkdir -p fast_align/build
 	cd fast_align/build && cmake ..

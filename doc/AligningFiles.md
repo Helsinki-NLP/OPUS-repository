@@ -92,6 +92,15 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/testslot/testuser?ENDS_WITH_align-c
 Note that there can be multiple candidates for each file. Also note that they are only listed in one direction (language IDs are alphabetically sorted), i.e. the French file is listed as alignment candidate for the English file but not the other way around.
 
 
+## Align individual file pairs
+
+* align jobs for selected file pairs: add parameter `trg` to specify target file to be aligned and run align command
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi/2.html.xml?uid=user1&trg=xml/sv/2.html.xml&run=align"
+```
+
+
 ## Finding parallel documents
 
 * try to find parallel documents by running the commands `detect_translations` (all potentially parallel documents including the ones that are already aligned) or `detect_unaligned` (potentially parallel documents that are not yet aligned):
