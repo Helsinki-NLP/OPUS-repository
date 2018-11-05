@@ -21,6 +21,7 @@ UBUNTU_BASE_PACKAGES = \
 		cmake3 \
 		cpanminus \
 		curl \
+		cython3 \
 		default-jre \
 		dos2unix \
 		git \
@@ -47,6 +48,7 @@ UBUNTU_BASE_PACKAGES = \
 		libmagic-dev \
 		libparams-util-perl \
 		libppi-perl \
+		libpython3.4-dev \
 		libssl-dev \
 		libstring-approx-perl \
 		libsub-uplevel-perl \
@@ -77,6 +79,8 @@ UBUNTU_BASE_PACKAGES = \
 		php5 \
 		pkg-config \
 		python3 \
+		python3-numpy \
+		python3-setuptools \
 		subversion \
 		tidy \
 		unzip \
