@@ -93,7 +93,22 @@ print "Try to align $srcres and $trgres ... \n";
 unless ( $algres = $aligner->align_resources( $srcres, $trgres ) ) {
     die "something went wrong ....\n";
 }
+
+## register languages in the corpus
+
+my $corpus = $algres->corpus;
+my @lang   = $algres->language();
+my $pair   = join( '-', @lang );
+
+&LetsMT::WebService::put_meta(
+    $corpus,
+    'parallel-langs' => $pair,
+    'langs'          => join( ',', @lang )
+    );
+
+
 print "Done! ($algres)\n";
+
 
 
 END {
