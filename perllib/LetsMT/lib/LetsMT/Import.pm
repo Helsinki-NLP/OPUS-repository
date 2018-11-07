@@ -358,10 +358,13 @@ sub import_resource {
     # import success if new_resources is a reference to an array!
     if ( ref($new_resources) eq 'ARRAY' ) {
 
-        # update resource status!
-        my $status = @$new_resources
-            ? 'imported'
-            : 'empty resource (imported nothing)';
+        ## update resource status!
+	## NEW: don't add empty resource - just accept
+	##
+        # my $status = @$new_resources
+        #     ? 'imported'
+        #     : 'empty resource (imported nothing)';
+	my $status = 'imported';
 
         &LetsMT::WebService::del_meta(
             $corpus,

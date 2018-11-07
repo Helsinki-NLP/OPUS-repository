@@ -691,11 +691,13 @@ sub run_import_resource{
 		 "import_failed_count"  => 0,
 		 "import_empty_count"   => 0);
 	}
-        # LetsMT::WebService::post_meta(
-        #     $res,
-        #     status => 'waiting in import queue',
-        #     uid    => $args->{uid},
-        # );
+	else{
+	    LetsMT::WebService::post_meta(
+		$res,
+		status => 'waiting in import queue',
+		uid    => $args->{uid},
+		);
+	}
         LetsMT::WebService::del_meta(
             $corpus,
             import_failed => $relative_path,

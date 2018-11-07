@@ -127,22 +127,50 @@ sub put {
     my $message = undef;
 
     if (exists $self->{args}->{run}){
-	## jobs that will be executed immediately (not via batch queues)
-	if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa|setup_ida)$/){
+
+	## NEW: job_maker is only used in some exceptional cases
+	##      run jobs directly otherwise (most of them will submit new jobs)
+	##
+	## WHY? because metadata is updated directly for files that are in import/align queues
+	##
+	## TODO: does that create a big overhead on the server?
+	if ($self->{args}->{run}=~/^(detect_translations|detect_unaligned)$/){
+	    if (my $jobfile = LetsMT::Repository::JobManager::job_maker(
+		    $self->{args}->{run},
+		    $self->{path_elements},
+		    $self->{args})){
+		$message = "job maker submitted ($jobfile)";
+	    }
+	    else{
+		$message = "failed to submit job maker!";
+	    }
+	}
+	else{
 	    $message = LetsMT::Repository::JobManager::run(
 		$self->{args}->{run},
 		$self->{path_elements},
 		$self->{args});
 	}
-	elsif (my $jobfile = LetsMT::Repository::JobManager::job_maker(
-		$self->{args}->{run},
-		$self->{path_elements},
-		$self->{args})){
-	    $message = "job maker submitted ($jobfile)";
-	}
-	else{
-	    $message = "failed to submit job maker!";
-	}
+
+	# ## OLD: run job_maker for most things
+	# ##
+	# ## jobs that will be executed immediately (not via batch queues)
+	# ## (some of these jobs submit additional jobs like import, reimport)
+	# if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa|setup_ida|import|reimport)$/){
+	#     $message = LetsMT::Repository::JobManager::run(
+	# 	$self->{args}->{run},
+	# 	$self->{path_elements},
+	# 	$self->{args});
+	# }
+	# elsif (my $jobfile = LetsMT::Repository::JobManager::job_maker(
+	# 	$self->{args}->{run},
+	# 	$self->{path_elements},
+	# 	$self->{args})){
+	#     $message = "job maker submitted ($jobfile)";
+	# }
+	# else{
+	#     $message = "failed to submit job maker!";
+	# }
     }
     else{
         #delete existing meta?
