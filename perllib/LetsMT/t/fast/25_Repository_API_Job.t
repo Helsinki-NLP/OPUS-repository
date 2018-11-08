@@ -166,7 +166,7 @@ $resource = new LetsMT::Resource(
     user => $uid,
     path => 'uploads/job.xml',
 );
-$result = LetsMT::WebService::put_job( $resource );
+($result,$content) = LetsMT::WebService::put_job( $resource );
 is( $result, 1, "PUT job, resubmit job" );
 
 
@@ -186,7 +186,7 @@ $result = LetsMT::WebService::get_job( $resource );
 my $result_hash = xml_to_hash( $result, 1 );
 my $message = $$result_hash{message};
 my $ok = 0;
-$ok = 1 if ($message=~/(pending|running)/i);
+$ok = 1 if ($message=~/(finished|pending|running)/i);
 is ( $ok, 1, "GET job, check status of resubmitted job, check status");
 
 # is_deeply(
@@ -212,7 +212,7 @@ $resource = new LetsMT::Resource(
 $result = LetsMT::WebService::get_meta( $resource );
 $dom = xml_to_dom( $result );
 $message = $dom->findvalue( '//list/entry/job_status' );
-$message =~s/(pending|running)$//i;
+$message =~s/(finished|pending|running)//i;
 my $status = $1;
 is( $message,
     'submitted to grid engine with status: ',

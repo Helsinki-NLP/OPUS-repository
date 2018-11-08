@@ -126,55 +126,19 @@ sub put {
 
     my $message = undef;
 
+    ## TODO: if a job ID is given instead for a path:
+    ##       find the corresponding job description file from the metadata
+    ##       and re-submit the job!
+
     if (exists $self->{args}->{run}){
-
-	## NEW: job_maker is only used in some exceptional cases
-	##      run jobs directly otherwise (most of them will submit new jobs)
-	##
-	## WHY? because metadata is updated directly for files that are in import/align queues
-	##
-	## TODO: does that create a big overhead on the server?
-	if ($self->{args}->{run}=~/^(detect_translations|detect_unaligned)$/){
-	    if (my $jobfile = LetsMT::Repository::JobManager::job_maker(
-		    $self->{args}->{run},
-		    $self->{path_elements},
-		    $self->{args})){
-		$message = "job maker submitted ($jobfile)";
-	    }
-	    else{
-		$message = "failed to submit job maker!";
-	    }
-	}
-	else{
-	    $message = LetsMT::Repository::JobManager::run(
-		$self->{args}->{run},
-		$self->{path_elements},
-		$self->{args});
-	}
-
-	# ## OLD: run job_maker for most things
-	# ##
-	# ## jobs that will be executed immediately (not via batch queues)
-	# ## (some of these jobs submit additional jobs like import, reimport)
-	# if ($self->{args}->{run}=~/^(setup_isa|upload_isa|remove_isa|setup_ida|import|reimport)$/){
-	#     $message = LetsMT::Repository::JobManager::run(
-	# 	$self->{args}->{run},
-	# 	$self->{path_elements},
-	# 	$self->{args});
-	# }
-	# elsif (my $jobfile = LetsMT::Repository::JobManager::job_maker(
-	# 	$self->{args}->{run},
-	# 	$self->{path_elements},
-	# 	$self->{args})){
-	#     $message = "job maker submitted ($jobfile)";
-	# }
-	# else{
-	#     $message = "failed to submit job maker!";
-	# }
+	$message = LetsMT::Repository::JobManager::submit_job(
+	    $self->{args}->{run},
+	    $self->{path_elements},
+	    $self->{args});
     }
     else{
-        #delete existing meta?
 
+        #delete existing meta?
         #try to delete job in case it exists already
         my $delete_message = undef;
         LetsMT::Repository::JobManager::delete(
@@ -262,10 +226,16 @@ sub delete {
 
     my $message = undef;
 
+    ## TODO: if a job ID is given instead for a path:
+    ##       find the corresponding job description file from the metadata
+    ##       and delete the job!
+
+
     #delete job
     LetsMT::Repository::JobManager::delete(
         message => \$message,
         path    => $self->{path_elements},
+	job_id  => $self->{args}->{job_id}
     );
 
     # Success if we got here, prepare Result object and return it

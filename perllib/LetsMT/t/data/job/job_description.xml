@@ -6,5 +6,6 @@
     <command>date</command>
     <command>env</command>
     <command>cd /asdflkajsdfowiejlksjdflkj</command>
+    <command>sleep 2</command>
   </commands>
 </letsmt-job>

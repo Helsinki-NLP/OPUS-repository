@@ -123,10 +123,10 @@ sub job_maker{
     my $slot = shift(@{$path_elements});
     my $branch = shift(@{$path_elements});
 
-    # create a new alignment job
+    ## create a new job
     my $jobfile = join( '/',
-        'storage', $slot, $branch,
-        'jobs', 'run', @{$path_elements}
+			'storage', $slot, $branch,
+			'jobs', 'run', @{$path_elements}
     );
     $jobfile .= '.'.$command;
 
@@ -141,7 +141,7 @@ sub job_maker{
     }
 
     # create job
-    LetsMT::Repository::JobManager::create_job(
+    create_job(
         path     => $jobfile,
         uid      => $args->{uid},
         walltime => 5,
@@ -158,12 +158,44 @@ sub job_maker{
 
     # and submit job
     my $message;
-    &submit(
+    my $jobID = &submit(
         message => \$message,
         path    => $jobfile,
         uid     => $args->{uid},
-    );
-    return $jobfile;
+	);
+
+    ## save job ID also for the resource
+    my $path = join( '/', $slot, $branch, @{$path_elements} );
+    my $metaDB = new LetsMT::Repository::MetaManager();
+    $metaDB->open();
+    $metaDB->post( $path, { job_id => $jobID } );
+    $metaDB->close();
+
+    return wantarray ? ($jobfile, $jobID) : $jobfile;
+}
+
+
+
+=head2 C<submit_job>
+
+ LetsMT::Repository::JobManager::submit_job (
+    $command,
+    $path_elements,
+    $args
+ )
+
+Submit jobs (running $command) for resources in the given path to the batch job server.
+
+=cut
+
+sub submit_job {
+    if ($_[0]=~/^(detect_translations|detect_unaligned)$/){
+	if (my $jobfile = job_maker(@_) ){
+	    return "job maker submitted ($jobfile)";
+	}
+	return "failed to submit job maker!";
+    }
+    return run(@_);
 }
 
 
@@ -175,7 +207,9 @@ sub job_maker{
     $args
  )
 
-Create jobs (running $command) for resources in the given path and submit them to the SGE.
+Run jobs (running $command) for resources in the given path with given arguments $args.
+Some commands create jobs that will be submitted to the batch job server: align, realign, import, reimport, align_candidates
+Other commands are directly executed on the system.
 
 =cut
 
@@ -572,12 +606,14 @@ sub run_align_resource {
 
     # submit the new job via the JOB API
 
-    if (LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} )) {
+    if (my ($success, $response) = 
+	LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} )) {
         my $resource = LetsMT::Resource::make( $slot, $branch, $sentalign );
         LetsMT::WebService::post_meta(
             $resource,
-            status => 'waiting in alignment queue',
-            uid    => $args->{uid}
+            status           => 'waiting in alignment queue',
+            uid              => $args->{uid},
+	    alignment_job_id => _get_jobid_from_status($response)
         );
         return 1;
     }
@@ -677,13 +713,15 @@ sub run_import_resource{
 
     # submit the new job via the JOB API
 
-    if ( LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} ) ) {
+    if ( my ($success, $response) = 
+	 LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} ) ) {
         my $corpus = LetsMT::Resource::make( $slot, $branch );
         my $res = LetsMT::Resource::make( $slot, $branch, $relative_path );
 	if ($overwrite){
 	    &LetsMT::WebService::post_meta(
 		 $res,
-		 status => 'waiting in import queue',
+		 status                 => 'waiting in import queue',
+		 import_job_id          => _get_jobid_from_status($response),
 		 "import_success"       => '',
 		 "import_failed"        => '',
 		 "import_empty"         => '',
@@ -694,8 +732,9 @@ sub run_import_resource{
 	else{
 	    LetsMT::WebService::post_meta(
 		$res,
-		status => 'waiting in import queue',
-		uid    => $args->{uid},
+		status        => 'waiting in import queue',
+		import_job_id => _get_jobid_from_status($response),
+		uid           => $args->{uid},
 		);
 	}
         LetsMT::WebService::del_meta(
@@ -1080,7 +1119,7 @@ sub submit {
     #write status of submit and job ID back to result reference
     $$message = "submitted job with ID '$jobID'";
 
-    return 1;
+    return $jobID;
 }
 
 
@@ -1106,7 +1145,7 @@ sub check_status {
     my $jobID   = $args{job_id};
 
     #get jobID from meta data via path/url if path is set
-    if ( $args{path} ) {
+    if ( !$jobID && $args{path} ) {
         $jobID = get_ID_from_path( $args{path} );
     }
 
@@ -1124,7 +1163,7 @@ sub check_status {
 	    $$message = $status;
 	    return 1;
 	}
-        $$message = 'could not get status xml from qstat';
+        $$message = 'could not get status xml';
         return 0;
     }
     else {
@@ -1161,7 +1200,7 @@ sub delete {
     my $jobID   = $args{job_id};
 
     #get jobID from meta data via path/url if set
-    if ( $args{path} ) {
+    if ( ! $jobID && $args{path} ) {
         $jobID = get_ID_from_path( $args{path} );
     }
 
@@ -1205,11 +1244,29 @@ sub get_ID_from_path {
     $metaDB->open();
     my $search_result = $metaDB->get( $path, 'job_id' );
     $metaDB->close();
-    unless ($search_result) {
-        raise( 11, 'no jobID found in meta data at this path' );
-    }
+
+## don't fail -- this destroys resubmit calls that try to 
+## delete a job first before resubmitting ....
+## TODO: find some better solution
+#
+#    unless ($search_result) {
+#        raise( 11, 'no jobID found in meta data at this path '.$path );
+#    }
 
     return $search_result;
+}
+
+
+
+
+sub _get_jobid_from_status{
+    my $response = shift;
+    $response     = decode( 'utf8', $response );
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my $jobID     = $dom->findnodes('//status')->to_literal;
+    $jobID =~s/^submitted job with ID '([^']+)'.*$/$1/;
+    return $jobID;
 }
 
 
@@ -1298,8 +1355,16 @@ sub delete_slurm_job{
 	    $status .= $_;
 	}
 	close(STATUS);
+	return $status;
     }
+
     return $status;
+
+## don't fail -- this destroys resubmit calls that try to 
+## delete a job first before resubmitting ....
+## TODO: find some better solution
+#
+#    raise( 8, 'no job with ID '.$jobID.' found!' );
 }
 
 
