@@ -312,6 +312,7 @@ sub run_detect_translations {
 
 	## if skip_aligned: get all aligned files to skip those
 	my @aligned = ();
+	my %alignedLang = ();
 	if ($skip_aligned){
 	    my $response  = LetsMT::WebService::get_meta( $SrcRes );
 	    $response     = decode( 'utf8', $response );
@@ -319,14 +320,25 @@ sub run_detect_translations {
 	    my $dom       = $XmlParser->parse_string( $response );
 	    my @nodes     = $dom->findnodes('//list/entry');
 	    @aligned      = split( /,/, $nodes[0]->findvalue('aligned_with') );
+	    foreach (@aligned){
+		my @parts = split(/\//);
+		shift(@parts);               # shift away 'xml'
+		my $trglang = shift(@parts); # lang of aligned document
+		$alignedLang{$trglang} = $_; # one aligned doc per lang!
+	    }
 	}
 
         foreach my $trg (sort keys %{$parallel{$src}}) {
 	    my $TrgRes = LetsMT::Resource::make_from_storage_path($trg);
 	    my $TrgPath = $TrgRes->path;
 
+	    ## OLD: skip only if the SAME document is aligned already
 	    ## skip if we the files is already in the list of aligned resources
-            next if ( grep ( $TrgPath eq $_, @aligned ) );
+            # next if ( grep ( $TrgPath eq $_, @aligned ) );
+
+	    ## NEW: skip if the language is aligned already!
+	    my @parts = split(/\//,$TrgPath);
+	    next if ( exists($alignedLang{$parts[1]}) );
 
 	    ## skip the other translation direction
             if (exists $parallel{$trg}) {

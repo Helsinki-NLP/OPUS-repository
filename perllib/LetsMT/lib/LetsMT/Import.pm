@@ -376,11 +376,17 @@ sub import_resource {
             'import_runtime' => time() - $start);
 
 	## check import parameters (unless they are given already)
-	unless (defined $skip_align && defined $skip_parsing){
+	unless (defined $skip_align && defined $skip_parsing && defined $skip_wordalign){
 	    my %para = &get_import_parameter($corpus);
-	    $skip_align     = 1 if ($para{autoalign} eq 'off');
-	    $skip_parsing   = 1 if ($para{autoparse} eq 'off');
-	    $skip_wordalign = 1 if ($para{autowordalign} eq 'off');
+	    $skip_align     = $para{autoalign}     eq 'off' ? 1 : 0; # default = on
+	    $skip_parsing   = $para{autoparse}     eq 'on'  ? 0 : 1; # default = off
+	    $skip_wordalign = $para{autowordalign} eq 'on'  ? 0 : 1; # default = off
+
+	    ## OLD: always default=on
+	    ##
+	    # $skip_align     = 1 if ($para{autoalign} eq 'off');
+	    # $skip_parsing   = 0 if ($para{autoparse} eq 'off');
+	    # $skip_wordalign = 0 if ($para{autowordalign} eq 'off');
 	}
 
         #-------------------------------------------------------------------

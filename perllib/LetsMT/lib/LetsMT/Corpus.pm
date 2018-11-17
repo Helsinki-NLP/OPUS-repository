@@ -72,8 +72,8 @@ our %DEFAULT_SEARCH_PARA = (
 
 # default sentence aligner method for all parallel documents
 
-our $DEFAULT_ALIGNER = 'hunalign';
-# our $DEFAULT_ALIGNER = 'bisent';
+# our $DEFAULT_ALIGNER = 'hunalign';
+our $DEFAULT_ALIGNER = 'bisent';
 
 ## default alignment parameters:
 ## - search paramaters for finding parallel documents
@@ -269,7 +269,20 @@ all matching corpusfiles.
 sub find_translations {
     my $corpus    = shift;
     my $resources = shift || [];               # list of resources
-    my %args      = @_ ? @_ : %DEFAULT_SEARCH_PARA;
+
+    ## set parameters (with increasing priority):
+    ## - default parameters
+    ## - resource-specific parameters
+    ## - function-call specific parameters
+
+    my %para = @_;
+    my %args = %DEFAULT_SEARCH_PARA;
+    my %AlignPara = @{$resources} ? 
+	&get_align_parameter( $$resources[0] ) : 
+	&get_align_parameter( $corpus );
+    foreach (keys %AlignPara){ $args{$_} = $AlignPara{$_}; };
+    foreach (keys %para){      $args{$_} = $para{$_};      };
+
 
     ## get parallel corpusfiles
     my %parallel = ();
@@ -293,6 +306,10 @@ sub find_translations {
     ## TODO: this can be a big query (retrieve all corpusfiles)
     else{
 	&resources_with_identical_names($corpus, \%parallel);
+	if ($args{search_parallel}=~/(similar|fuzzy)/){
+	    &resources_with_similar_names( $corpus, \%parallel, %args );
+	}
+
 	# _find_matching_corpusfiles($corpus, \%parallel);
 	my %translations = ();
 	foreach my $base ( keys %parallel ){
@@ -305,7 +322,6 @@ sub find_translations {
 		}
 	    }
 	}
-	## TODO: no fuzzy matching in this case?
 	return %translations;
     }
 
@@ -319,7 +335,6 @@ sub find_translations {
 	&resources_with_similar_names( $corpus, \%parallel, %args );
 	# &_add_similar_corpusfiles( $corpus, \%parallel, %args );
     }
-
 
     my %translations = ();
     foreach my $r (@{$resources}){
