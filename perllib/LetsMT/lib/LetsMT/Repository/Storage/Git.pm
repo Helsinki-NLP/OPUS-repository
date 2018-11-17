@@ -38,6 +38,10 @@ use Cwd;
 our $GITHOME = $ENV{LETSMTDISKROOT} || '/var/lib';
 $GITHOME .= '/.githome';
 
+## remote git server
+our $GITREMOTE = $ENV{GIT_REMOTE};
+# our $GITREMOTE = 'git@version.helsinki.fi:OPUS';
+
 
 =head1 METHODS
 
@@ -113,11 +117,19 @@ sub _clone{
     ( $success, $ret, $out, $err ) = 
 	&run_cmd( 'git', 'checkout', '-b', $user );
 
+    ## add remote server
+    if ($GITREMOTE){
+	my $url = $GITREMOTE.'/'.$slot.'.git';
+	( $success, $ret, $out, $err ) = 
+	    &run_cmd( 'git', 'remote', 'set-url', 'origin', '--push', '--add', $url );
+    }
+
     chdir($pwd);
     unless ($success){
 	# my @err_lines = <$err>;
 	raise( 8, "cannot create branch $user in git-repo $localgit: " . $err );
     }
+
 
     ## create standard dirs xml and uploads (trick to make the git non-empty!)
     # $self->mkdir( $slot, $user, $user, 'xml' );
@@ -266,7 +278,7 @@ sub add {
         my $path  = $dir ? join( '/', $dir, $file ) : $file;
 	get_logger(__PACKAGE__)->info("git: add file $path to $repos/$branch");
 	if ($self->_add_file( $repos, $branch, $path )){
-	    return $self->_commit( $repos, $branch, 'added new file $file to $dir' );
+	    return $self->_commit( $repos, $branch, "added new file $file to $dir" );
 	}
     }
     return 0;

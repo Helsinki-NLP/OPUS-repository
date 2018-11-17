@@ -438,24 +438,26 @@ software-fusecompress:
 
 .PHONY: software-eflomal
 software-eflomal:
-	rm -fr eflomal
-	git clone ${EFLOMAL}
-	cd eflomal && git checkout priors
-	make -C eflomal install
-	cd eflomal && python3 setup.py install
-	${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py
-	mkdir -p ${PREFIX}/share
-	${COPY} eflomal ${PREFIX}/share/
+	! ( ${FORCE} || ! which eflomal ) || \
+	(	rm -fr eflomal; \
+		git clone ${EFLOMAL}; \
+		cd eflomal && git checkout priors; \
+		make -C eflomal install; \
+		cd eflomal && python3 setup.py install; \
+		${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py; \
+		mkdir -p ${PREFIX}/share;\
+		${COPY} eflomal ${PREFIX}/share/; )
 
 .PHONY: software-fastalign
 software-fastalign:
-	rm -fr fast_align
-	git clone ${FAST_ALIGN}
-	mkdir -p fast_align/build
-	cd fast_align/build && cmake ..
-	make -C fast_align/build
-	${INSTALL_BIN} fast_align/build/atools ${PREFIX}/bin/atools
-	${INSTALL_BIN} fast_align/build/fast_align ${PREFIX}/bin/fast_align
+	! ( ${FORCE} || ! which eflomal ) || \
+	(	rm -fr fast_align; \
+		git clone ${FAST_ALIGN}; \
+		mkdir -p fast_align/build; \
+		cd fast_align/build && cmake ..; \
+		make -C fast_align/build; \
+		${INSTALL_BIN} fast_align/build/atools ${PREFIX}/bin/atools; \
+		${INSTALL_BIN} fast_align/build/fast_align ${PREFIX}/bin/fast_align; )
 
 
 

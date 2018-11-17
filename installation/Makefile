@@ -388,7 +388,6 @@ config-apache2:
 	echo "        PerlSetEnv LETSMT_URL ${LETSMT_URL}" >> apache.conf
 	echo "        PerlSetEnv VC_BACKEND ${VC_BACKEND}" >> apache.conf
 	echo "        PerlSetEnv UPLOADDIR ${UPLOADDIR}" >> apache.conf
-	echo "        PerlSetEnv LETSMTDISKROOT ${LETSMTDISKROOT}" >> apache.conf
 	echo "        PerlSetEnv DB_DISKROOT ${DB_DISKROOT}" >> apache.conf
 	echo "        PerlSetEnv LETSMTLOG_DIR ${LETSMTLOG_DIR}" >> apache.conf
 	echo "        PerlSetEnv LETSMT_TMP ${LETSMT_TMP}" >> apache.conf
@@ -398,6 +397,11 @@ config-apache2:
 	echo "        PerlSetEnv LETSMT_USERKEY ${LETSMT_USERKEY}" >> apache.conf
 	echo "        PerlSetEnv SGE_ROOT ${SGE_ROOT}" >> apache.conf
 	echo "        PerlSetEnv SVN_PASSWORD ${SVN_PASSWORD}" >> apache.conf
+	@if [ "${VC_BACKEND}" = "git" ]; then \
+	  if [ "${GIT_REMOTE}" != "" ]; then \
+	    echo "        PerlSetEnv GIT_REMOTE ${GIT_REMOTE}" >> apache.conf; \
+	  fi \
+	fi
 	@if [ "${PERMISSION_DBMS}" = "mysql" ]; then \
 	    echo "        PerlSetEnv DBHOST ${DBHOST}" >> apache.conf; \
 	    echo "        PerlSetEnv DBPORT ${DBPORT}" >> apache.conf; \
@@ -462,6 +466,11 @@ config-conf:
 	@echo "export LETSMT_URL=\"${LETSMT_URL}\"" >> conf.sh
 	@echo "export SSL_TIMEOUT=${SSL_TIMEOUT}" >> conf.sh
 	@echo "export CLASSPATH=\"${CLASSPATH}\"" >> conf.sh
+	@if [ "${VC_BACKEND}" = "git" ]; then \
+	  if [ "${GIT_REMOTE}" != "" ]; then \
+	    echo "export GIT_REMOTE=${GIT_REMOTE}" >> conf.sh; \
+	  fi \
+	fi
 	@if [ "${PERMISSION_DBMS}" = "mysql" ]; then \
 	    echo "export DBHOST=${DBHOST}" >> conf.sh; \
 	    echo "export DBPORT=${DBPORT}" >> conf.sh; \
