@@ -32,6 +32,7 @@ use Data::Dumper;
 
 use LetsMT::Repository::Result;
 use LetsMT::Repository::JobManager;
+use LetsMT::Repository::MetaManager;
 
 
 ### CLASS METHOD ############################################################
@@ -67,7 +68,6 @@ Get a job description.
 
 sub get {
     my $self = shift;
-
     my $message = undef;
 
     get_logger(__PACKAGE__)->debug('job '.$self->{path_elements});
@@ -75,6 +75,27 @@ sub get {
     ## no path? --> list all jobs
     unless (@{$self->{path_elements}}){
 	my $result = LetsMT::Repository::JobManager::get_job_list();
+
+	## check whether the given user name is not admin
+	## if yes: list only jobs for the given user
+	if ( ref($self->{args}) eq 'HASH'){
+	    if ( $self->{args}->{uid} ne 'admin' ){
+		my @myjobs = ();
+		my $msg    = '';
+		my $metaDB = new LetsMT::Repository::MetaManager();
+		$metaDB->open_read();
+		foreach my $job (@{$result->{entry}}){
+		    my $jobfile = $metaDB->search_xml( 
+			0, \$msg, 
+			{ job_id => $job->{name}, 
+			  owner => $self->{args}->{uid} } );
+		    push(@myjobs, $job) if (@{$jobfile->{entry}});
+		}
+		$metaDB->close();
+		$result->{entry} = \@myjobs;
+	    }
+	}
+
 	my $result_obj = LetsMT::Repository::Result->new(
 	    type      => 'ok',
 	    code      => 0,

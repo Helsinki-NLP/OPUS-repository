@@ -14,7 +14,7 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus333/user/uploads/small12.tar.gz?ui
 ```
 
 
-* listing all running jobs
+* listing all running jobs for user `user`
 
 ```
 $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user"
@@ -27,6 +27,8 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user"
   <status code="0" location="job" operation="GET" type="ok" />
 </letsmt-ws>
 ```
+
+If `uid=admin` then all jobs for all users will be listed.
 
 
 * searching for job description files for a given job ID:

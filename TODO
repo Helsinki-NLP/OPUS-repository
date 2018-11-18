@@ -5,6 +5,7 @@ To do as of version 0.56
 High priority:
 
 * import URLs (retrieve from web and convert)
+* jobs for starting word alignment and parsing
 * add dehyphenation module (as normalizer) - see pdf2xml
 * integration of srtalign
 * allow manual corrections (alignments and even other things?)			(started)

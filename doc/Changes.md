@@ -37,7 +37,7 @@ There is quite a lot of changes since the latest release from the original LetsM
 $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 ```
 
-TODO: should we restrict this for admin users only? Is it possible to list only user-specific jobs? Is it easy to find back the actual job description file from the job listing above?
+NEW: this now only lists the jobs of user `user1`. If `uid=admin` then it will list all jobs in the queue for all users.
 
 
 * added: `run=reimport`: The normal import will now only do things to files that have not yet been imported. In order to overwrite existing imports, you now have to use the command `reimport`:
