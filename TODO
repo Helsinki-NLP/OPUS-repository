@@ -4,6 +4,7 @@ To do as of version 0.56
 
 High priority:
 
+* check memory leak in sentence alignment
 * import URLs (retrieve from web and convert)
 * jobs for starting word alignment and parsing
 * add dehyphenation module (as normalizer) - see pdf2xml
@@ -23,6 +24,8 @@ High priority:
 
 Medium priority:
 
+* improve git with remote servers (do not always push! betteru user of commit command?!)
+* allow tags in version-control backends (at least for the git backend)
 * better fuzzy matching of file names (translation detection)
   --> lowercased file names
   --> without non-letter characters

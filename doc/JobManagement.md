@@ -125,7 +125,7 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user/uploads/small.tar.gz?ui
 ```
 
 
-* get a list of all jobs in the queue: Just submit a get-request without a path to job
+* get a list of all user jobs in the queue: Just submit a get-request without a path to job
 
 
 ```
@@ -141,7 +141,7 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 </letsmt-ws>
 ```
 
-TODO: Should we require the `admin` user for that? How do we find the actual job that is queued and the user who submitted the job? Search in metadata for the Job ID?
+
 
 
 
@@ -149,5 +149,4 @@ TODO: Should we require the `admin` user for that? How do we find the actual job
 
 
 * better use of user priveliges
-* list only jobs for the given user (use metadata search?)
 * improve error reporting and status updates
