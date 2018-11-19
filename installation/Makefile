@@ -102,8 +102,8 @@ install-frontend-targets: \
 	config-conf \
 	config-conf-frontend
 
-.PHONY: install-sge-client
-install-sge-client:
+.PHONY: install-sge-client install-client
+install-client install-sge-client:
 	( REMOTE_HOST=$(shell whiptail --title 'Repository server name' \
 		--inputbox \
 		'Should match the name of the SSL server cert on that server' \
@@ -114,8 +114,8 @@ install-sge-client:
 		install-sge-client-targets; )
 
 
-.PHONY: install-sge-client-targets
-install-sge-client-targets: \
+.PHONY: install-sge-client-targets install-client-targets
+install-sge-client-targets install-client-targets: \
 	install-modules \
 	prepare-directories \
 	install-log \
