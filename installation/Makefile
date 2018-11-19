@@ -6,6 +6,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 COPY = cp -r --preserve=mode,timestamps
 
 APACHE_CONF = /etc/apache2
+APACHE_TIKA_VERSION = 1.19.1
 
 LETSMT_SSL_HOME    = /etc/ssl
 LETSMT_SSL_PROJECT = ${LETSMTHOST}
@@ -175,7 +176,6 @@ install-modules:
 .PHONY: install-files
 install-files: ttservctl prepare-directories install-log install-apache-tika
 	${INSTALL_BIN} ../admin/*.sh ../admin/*.pl ${PREFIX}/bin/
-	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
 	${INSTALL_BIN} ../perllib/conf_modperl.pl $(LETSMT_MODPERL_STARTUP)
 	${INSTALL_BIN} ttservctl ${PREFIX}/bin
 	ln -sf ${PREFIX}/bin/ttservctl /etc/init.d/ttservctl_group
@@ -183,9 +183,14 @@ install-files: ttservctl prepare-directories install-log install-apache-tika
 	update-rc.d ttservctl_group defaults
 	update-rc.d ttservctl_meta defaults
 
+## OLD: this is not part of the distribution anymore
+## TODO: check whether this still needs to be supported
+##
+##	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
+
 ## install Apache Tika server (should listen on port 9998)
 .PHONY: install-apache-tika
-install-apache-tika: ${PREFIX}/lib/tika-server-1.18.jar
+install-apache-tika: ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar
 	@echo 'description     "Apache Tika Server"'    > tika-server.conf
 	@echo ''                                       >> tika-server.conf
 	@echo 'start on filesystem or runlevel [2345]' >> tika-server.conf
@@ -194,15 +199,15 @@ install-apache-tika: ${PREFIX}/lib/tika-server-1.18.jar
 	@echo 'respawn'                                >> tika-server.conf
 	@echo 'respawn limit 3 12'                     >> tika-server.conf
 	@echo ''                                       >> tika-server.conf
-	@echo "exec java -jar ${PREFIX}/lib/tika-server-1.18.jar" >> tika-server.conf
+	@echo "exec java -jar ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar" >> tika-server.conf
 	${INSTALL_DATA} -b -S .old tika-server.conf /etc/init/tika-server.conf
 	rm -f tika-server.conf
 	service tika-server start || true
 
-${PREFIX}/lib/tika-server-1.18.jar:
-	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-1.18.jar
-	${INSTALL_BIN} tika-server-1.18.jar ${PREFIX}/lib/
-	rm -f tika-server-1.18.jar
+${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar:
+	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-${APACHE_TIKA_VERSION}.jar
+	${INSTALL_BIN} tika-server-${APACHE_TIKA_VERSION}.jar ${PREFIX}/lib/
+	rm -f tika-server-${APACHE_TIKA_VERSION}.jar
 
 .PHONY: install-doc
 install-doc:
@@ -231,7 +236,10 @@ prepare-directories:
 
 .PHONY: install-frontend-files
 install-frontend-files: prepare-directories install-log
-	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib
+
+## OLD: this is not part of the distribution anymore
+## TODO: check whether this still needs to be supported
+#	${INSTALL_BIN} ../lib/tika-server-${APACHE_TIKA_VERSION}.jar ${PREFIX}/lib
 
 
 .PHONY: install-config

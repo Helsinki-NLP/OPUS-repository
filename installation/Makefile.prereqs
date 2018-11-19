@@ -442,10 +442,10 @@ software-eflomal:
 	(	rm -fr eflomal; \
 		git clone ${EFLOMAL}; \
 		cd eflomal && git checkout priors; \
-		make -C eflomal install; \
-		cd eflomal && python3 setup.py install; \
-		${INSTALL_BIN} eflomal/align.py ${PREFIX}/bin/eflomal.py; \
-		mkdir -p ${PREFIX}/share;\
+		make install; \
+		python3 setup.py install; \
+		${INSTALL_BIN} align.py ${PREFIX}/bin/eflomal.py; \
+		mkdir -p ${PREFIX}/share; cd ..;\
 		${COPY} eflomal ${PREFIX}/share/; )
 
 .PHONY: software-fastalign
