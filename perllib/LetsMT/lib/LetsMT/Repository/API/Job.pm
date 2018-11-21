@@ -76,8 +76,9 @@ sub get {
     unless (@{$self->{path_elements}}){
 	my $result = LetsMT::Repository::JobManager::get_job_list();
 
-	## check whether the given user name is not admin
-	## if yes: list only jobs for the given user
+	## list only jobs for the given user unless it's 'admin'
+	## NOTE: we add extra information to each job
+	## TODO: we don't do it for admin calls!!
 	if ( ref($self->{args}) eq 'HASH'){
 	    if ( $self->{args}->{uid} ne 'admin' ){
 		my @myjobs = ();
@@ -89,7 +90,22 @@ sub get {
 			0, \$msg, 
 			{ job_id => $job->{name}, 
 			  owner => $self->{args}->{uid} } );
-		    push(@myjobs, $job) if (@{$jobfile->{entry}});
+		    if (@{$jobfile->{entry}}){
+			my @files = ();
+			my @jobs = ();
+			foreach my $f (@{$jobfile->{entry}}){
+			    my @dirs = split(/\/+/,$f->{path});
+			    if ($dirs[2] eq 'jobs'){
+				push(@jobs,$f->{path});
+			    }
+			    else{
+				push(@files,$f->{path});
+			    }
+			}
+			$job->{job}  = join(',',@jobs);
+			$job->{file} = join(',',@files);
+			push(@myjobs, $job);
+		    }
 		}
 		$metaDB->close();
 		$result->{entry} = \@myjobs;
@@ -256,7 +272,8 @@ sub delete {
     LetsMT::Repository::JobManager::delete(
         message => \$message,
         path    => $self->{path_elements},
-	job_id  => $self->{args}->{job_id}
+	job_id  => $self->{args}->{job_id},
+	uid     => $self->{args}->{uid}
     );
 
     # Success if we got here, prepare Result object and return it
@@ -265,7 +282,7 @@ sub delete {
         code      => 0,
         operation => 'DELETE',
         location  => $self->{path_info},
-        message   => '',
+        message   => $message,
     );
 
     return $result_obj->get_xml_result();

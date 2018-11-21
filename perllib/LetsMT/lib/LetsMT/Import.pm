@@ -358,23 +358,6 @@ sub import_resource {
     # import success if new_resources is a reference to an array!
     if ( ref($new_resources) eq 'ARRAY' ) {
 
-        ## update resource status!
-	## NEW: don't add empty resource - just accept
-	##
-        # my $status = @$new_resources
-        #     ? 'imported'
-        #     : 'empty resource (imported nothing)';
-	my $status = 'imported';
-
-        &LetsMT::WebService::del_meta(
-            $corpus,
-            'import_queue' => $resource->path,
-            'import_failed' => $resource->path );
-        &LetsMT::WebService::post_meta(
-            $resource,
-            'status'         => $status,
-            'import_runtime' => time() - $start);
-
 	## check import parameters (unless they are given already)
 	unless (defined $skip_align && defined $skip_parsing && defined $skip_wordalign){
 	    my %para = &get_import_parameter($corpus);
@@ -423,6 +406,23 @@ sub import_resource {
 	unless ($skip_wordalign){
 	    push ( @$new_resources, &wordalign_resources( @aligned_resources ) );
 	}
+
+        ## update resource status!
+	## NEW: don't add empty resource - just accept
+	##
+        # my $status = @$new_resources
+        #     ? 'imported'
+        #     : 'empty resource (imported nothing)';
+
+	my $status = 'imported';
+        &LetsMT::WebService::del_meta(
+            $corpus,
+            'import_queue' => $resource->path,
+            'import_failed' => $resource->path );
+        &LetsMT::WebService::post_meta(
+            $resource,
+            'status'         => $status,
+            'import_runtime' => time() - $start);
 
 	return wantarray ? @$new_resources : 1;
     }

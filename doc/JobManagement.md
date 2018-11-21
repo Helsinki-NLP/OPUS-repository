@@ -22,13 +22,13 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user"
 ```xml
 <letsmt-ws version="56">
   <list path="jobs">
-    <entry name="job_1541676088_906142295" id="484" status="RUNNING" />
+    <entry name="job_1542837279_527304382" file="mycorpus/user/uploads/sv.tar.gz" id="761" job="mycorpus/user/jobs/import/uploads/sv.tar.gz.xml" status="RUNNING" />
   </list>
   <status code="0" location="job" operation="GET" type="ok" />
 </letsmt-ws>
 ```
 
-If `uid=admin` then all jobs for all users will be listed.
+If `uid=admin` then all jobs for all users will be listed. NOTE: Currently `file` and `job` attribute will not be set when running with `admin` as user!
 
 
 * searching for job description files for a given job ID:
@@ -77,14 +77,10 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=opus&STARTS_WITH_job_id=job&own
 ```xml
 <letsmt-ws version="56">
   <list path="">
-    <entry path="corpus333/user/uploads/small3.tar.gz.import_job" />
-    <entry path="corpus2/user/uploads/html.tar.gz.import_job" />
-    <entry path="corpus333/user/uploads/small5.tar.gz.import_job" />
-    <entry path="corpus/user/uploads/small.tar.gz.import_job" />
-    <entry path="corpus333/user/jobs/import/uploads/small11.tar.gz" />
-    <entry path="corpus333/user/jobs/import/uploads/small8.tar.gz" />
+    <entry path="corpus333/user/jobs/import/uploads/small11.tar.gz.xml" />
+    <entry path="corpus333/user/jobs/import/uploads/small8.tar.gz.xml" />
   </list>
-  <status code="0" location="/metadata" operation="GET" type="ok">Found 20 matching entries</status>
+  <status code="0" location="/metadata" operation="GET" type="ok">Found 2 matching entries</status>
 </letsmt-ws>
 ```
 
@@ -97,7 +93,7 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata?uid=opus&STARTS_WITH_job_id=job&own
 
 # New in the Job API
 
-* job IDs are added to the metadata when running import (`import_job_id`) and alignment (`alignment_job_id`) jobs:
+* job IDs are added to the metadata when running import and alignment (`job_id`) jobs:
 
 ```
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/uploads/small.tar.gz?uid=user&run=reimport"
@@ -113,9 +109,9 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user/uploads/small.tar.gz?ui
       <import_failed></import_failed>
       <import_failed_count>0</import_failed_count>
       <import_homedir>uploads/small</import_homedir>
-      <import_job_id>job_1541673288_768302220</import_job_id>
       <import_success>en/7.html,en/2.html,en/5.html,en/1.html,en/3.html,en/4.html,en/9.html</import_success>
       <import_success_count>7</import_success_count>
+      <job_id>job_1541673288_768302220</job_id>
       <owner>user</owner>
       <status>importing</status>
     </entry>

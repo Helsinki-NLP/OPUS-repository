@@ -146,7 +146,7 @@ sub _clone{
 ## - path ...... relative path to new file/subdir
 ## - message ... optional commit message
 
-sub _add_file{
+sub add_file{
     my ( $self, $slot, $user, $path ) = @_;
 
     get_logger(__PACKAGE__)->debug("git: add file $path to repo $slot/$user");
@@ -158,34 +158,106 @@ sub _add_file{
     chdir($gitpath);
     my $success = &run_cmd( 'git', 'add', $path );
     chdir($pwd);
-
-    # $self->_commit( $slot, $user, 'add $path to repository' );
     return $success;
 }
 
 
+
+
+=head2 C<commit>
+
+ $storage->commit ($user, $path, $message )
+
+Commit all changes in the given path with message $message.
+
+Returns: $success
+
+ $success = true if successful
+
+=cut
+
 ## commit the latest changes and push to origin
 ## TODO: do we always have to push?
+## NEW: do push separately
 
-sub _commit{
-    my ( $self, $slot, $user, $message ) = @_;
+sub commit{
+    my ( $self, $user, $path, $message ) = @_;
     $message = 'commit all changes' unless ($message);
 
-    get_logger(__PACKAGE__)->debug("git: commit changes in $slot/$user");
+    get_logger(__PACKAGE__)->debug("git: commit changes in $path");
 
     ## path to local copy with user branch
-    my $gitpath = join( '/', ( $self->{partition}, $slot, $user ) );
+    my $gitpath = join( '/', ( $self->{partition}, $path ) );
 
     my $pwd = getcwd();
     chdir($gitpath);
     my $success = &run_cmd( 'git', 'commit', '-am', $message );
-    if ($success){
-	$success = &run_cmd( 'git', 'push', 'origin', $user );
-    }
+    # if ($success){
+    # 	$success = &run_cmd( 'git', 'push', 'origin', $user );
+    # }
     chdir($pwd);
 
     return $success;
 }
+
+
+=head2 C<push>
+
+ $storage->push ($user, $path )
+
+Push branch $user to origin
+
+Returns: $success
+
+ $success = true if successful
+
+=cut
+
+sub push{
+    my ( $self, $user, $path ) = @_;
+
+    get_logger(__PACKAGE__)->debug("git: push changes in $path");
+
+    ## path to local copy with user branch
+    my $gitpath = join( '/', ( $self->{partition}, $path ) );
+
+    my $pwd = getcwd();
+    chdir($gitpath);
+    my $success = &run_cmd( 'git', 'push', 'origin', $user );
+    chdir($pwd);
+
+    return $success;
+}
+
+
+=head2 C<pull>
+
+ $storage->pull ($user, $path )
+
+Pull from remotes
+
+Returns: $success
+
+ $success = true if successful
+
+=cut
+
+sub pull{
+    my ( $self, $user, $path ) = @_;
+
+    get_logger(__PACKAGE__)->debug("git: pull in $path");
+
+    ## path to local copy with user branch
+    my $gitpath = join( '/', ( $self->{partition}, $path ) );
+
+    my $pwd = getcwd();
+    chdir($gitpath);
+    my $success = &run_cmd( 'git', 'pull' );
+    chdir($pwd);
+
+    return $success;
+}
+
 
 
 =head2 C<mkdir>
@@ -216,8 +288,10 @@ sub mkdir {
 	my $repohome = join( '/', $self->{partition}, $repos );
 	my $file = join( '/', $dir, '.gitkeep' );
 	touch( join( '/', $repohome, $branch, $file ) );
-	$self->_add_file($repos, $user, $file);
-	$self->_commit($repos, $user, 'added subdir $dir');
+	$self->add_file($repos, $user, $file);
+	$self->commit($user, join( '/', $repos,$user ), 'added subdir $dir');
+	## no need to push new directories
+	# $self->push($user, join( '/', $repos,$user ) );
 	return 1;
     }
     return 0;
@@ -277,8 +351,12 @@ sub add {
     if ( $self->SUPER::add(@_) ){
         my $path  = $dir ? join( '/', $dir, $file ) : $file;
 	get_logger(__PACKAGE__)->info("git: add file $path to $repos/$branch");
-	if ($self->_add_file( $repos, $branch, $path )){
-	    return $self->_commit( $repos, $branch, "added new file $file to $dir" );
+	if ($self->add_file( $repos, $branch, $path )){
+	    if ( my $success = $self->commit( $user, join( '/', $repos, $branch ), 
+					      "added new file $file to $dir" ) ){
+		$self->push( $user, join( '/', $repos, $branch ) );
+		return $success;
+	    }
 	}
     }
     return 0;
@@ -365,8 +443,9 @@ sub remove {
     ## new syntax in git 1.7: git push origin --delete the_remote_branch
 
     if ( $params{dir} eq $paths[0] ){
-	$self->_commit( $params{repos}, $params{dir}, 
+	$self->commit( $params{user}, join( '/', $params{repos},$params{dir} ), 
 			"final commit before removing local copy" );
+	$self->push( $params{user}, join( '/', $params{repos},$params{dir} ) );
 	return $self->SUPER::remove(@_);
     }
 
@@ -386,36 +465,12 @@ sub remove {
 	raise( 8, "cannot remove: " . $err );
     }
 
-    $self->_commit( $params{repos}, $branch, "remove $path" );
+    $self->commit( $params{user}, join( '/', $params{repos},$branch ), "remove $path" );
+    $self->push( $params{user}, join( '/', $params{repos},$branch ) );;
     return $success;
 }
 
 
-
-
-
-
-
-=head2 C<commit>
-
- $storage->commit ($user, $repos, $path, $message )
-
-Commit all changes in the given path with message $message.
-
-Returns: ( $success, $return_code, $stdout, $stderr )
-
- $success = true if successful
- $return_code = return code of the system call
- $stdout = reference to stdout of the system call
- $stderr = reference to stderr of the system call
-
-=cut
-
-
-sub commit{
-    my ( $self, $user, $repos, $dir, $message) = @_;
-    return $self->( $repos, $user, $message );
-}
 
 
 sub revision{

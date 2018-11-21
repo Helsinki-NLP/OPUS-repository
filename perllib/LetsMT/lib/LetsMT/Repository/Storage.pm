@@ -93,11 +93,13 @@ sub remove  { return 0; }
 
 # additional methods used in VC backends
 
-sub add_file { return 0; }
-sub commit   { return 0; }
-sub checkout { return 0; }
-sub revisions{ return 0; }
-sub revision { return ''; }
+sub add_file { return 1; }
+sub commit   { return 1; }
+sub checkout { return 1; }
+sub revisions{ return 1; }
+sub revision { return 'HEAD'; }
+sub push     { return 1; }
+sub pull     { return 1; }
 
 1;
 

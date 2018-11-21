@@ -184,11 +184,17 @@ sub put {
             my $branch = shift(@$target);
             my $upload = join( '/', @$target );
 
+	    ## path to the job description file
+	    my $jobfile = join('/','storage',$slot,$branch,
+			       'jobs','import',@$target);
+	    $jobfile .= '.xml';
+
             get_logger(__PACKAGE__)->debug( 'upload: ' . $upload );
 
             # create import job
             LetsMT::Repository::JobManager::create_job(
-                path     => "$path.import_job",
+                # path   => "$path.import_job",
+                path     => $jobfile,
                 uid      => $self->{args}->{uid},
                 walltime => 5,
                 queue    => 'letsmt',
@@ -200,13 +206,22 @@ sub put {
                 ) ],
             );
 
+            # submit job
+	    my $jobID = LetsMT::Repository::JobManager::submit(
+		message => \$message_submit,
+		# path    => "$path.import_job",
+		path    => $jobfile,
+		uid     => $self->{args}->{uid},
+            );
+
             # add some information to the meta database
             my $corpus = join( "/", ( $slot, $branch ) );
             my $metaDB = new LetsMT::Repository::MetaManager();
             $metaDB->open() || raise( 8, "open metadata database", 'error' );
             $metaDB->post(
                 $path,
-                { status => 'waiting in import queue' }
+                { status  => 'waiting in import queue',
+		  job_id  => $jobID }
             );
 
             # update queue information on branch level
@@ -216,13 +231,6 @@ sub put {
             }
             $metaDB->put( $corpus, { 'import_queue' => $upload } );
             $metaDB->close();
-
-            # submit job
-            LetsMT::Repository::JobManager::submit(
-                message => \$message_submit,
-                path    => "$path.import_job",
-                uid     => $self->{args}->{uid},
-            );
         }
     }
 

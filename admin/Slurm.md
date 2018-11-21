@@ -11,7 +11,79 @@ The slurm configuration is in `/etc/slurm-llnl/slurm.conf`. More about the SLURM
 NodeName=opus-rr CPUs=2 State=UNKNOWN
 ```
 
+## Adding nodes to SLURM
 
+See also https://bitsanddragons.wordpress.com/2016/09/02/adding-nodes-to-slurm/
+
+* start a new machine (e.g. node110) and install the repository client software; make sure that you enter the correct hostname of the main repository server
+
+```
+ssh node110
+git clone https://github.com/Helsinki-NLP/LetsMT-repository.git
+cd LetsMT-repository
+make install-client
+```
+
+* install slurm and copy the munge and ssl keys from the main repository server
+
+```
+munge -n | ssh node110 unmunge
+scp -r etc/ssl cloud-user@node110:ssl-keys
+ssh node110
+sudo cp -R ssl-keys /etc/ssl
+```
+
+* change slurm configuration on compute node node110 `/etc/slurm-llnl/slurm.conf`; set ControlMachine (main repository server name, e.g. `opus-rr`) and compute nodes:
+
+```
+ControlMachine=opus-rr
+...
+NodeName=opus-rr CPUs=2 State=UNKNOWN
+NodeName=node110 CPUs=1 State=UNKNOWN
+PartitionName=debug Nodes=opus-rr,node110 Default=YES MaxTime=2880 State=UP
+```
+
+* add host information in `/etc/hosts` by adding a line for the main repository server
+
+```
+xxx.xxx.x.xx    opus-rr.domain.org    opus-rr
+```
+
+* restart slurm server (and munge?)
+
+```
+sudo service munge restart
+sudo service slurm-llnl restart
+```
+
+* add the compute node name in the slurm config on the main repository server and also add the host inoformation about the new node in `/etc/hosts` and restart slurm, munge (and possibly even the webserver)
+
+
+
+* TODO
+
+Can we automatize this and can we do that without interrupting the service?
+
+
+## Troubleshooting
+
+If the compute nodes and controller don't find each other: make sure that ssh-agent is running. Try:
+
+```
+eval $(ssh-agent -s)
+```
+
+resume a node that seems to be down but running OK:
+
+```
+sudo scontrol update NodeName=opus-node0 State=RESUME
+```
+
+show status of a node:
+
+```
+scontrol show node opus-node0
+```
 
 
 

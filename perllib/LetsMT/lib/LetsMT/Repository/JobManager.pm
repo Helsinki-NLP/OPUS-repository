@@ -129,6 +129,7 @@ sub job_maker{
 			'jobs', 'run', @{$path_elements}
     );
     $jobfile .= '.'.$command;
+    $jobfile .= '.xml';
 
     my $relative_path = join('/',@{$path_elements});
 
@@ -599,6 +600,7 @@ sub run_align_resource {
     # create a new alignment job
     my $jobfile = join('/','storage',$slot,$branch,
                            'jobs','align',$sentalign);
+    $jobfile .= '.xml';
 
     # create the JOB file and post it
 
@@ -623,9 +625,9 @@ sub run_align_resource {
         my $resource = LetsMT::Resource::make( $slot, $branch, $sentalign );
         LetsMT::WebService::post_meta(
             $resource,
-            status           => 'waiting in alignment queue',
-            uid              => $args->{uid},
-	    alignment_job_id => _get_jobid_from_status($response)
+            status => 'waiting in alignment queue',
+            uid    => $args->{uid},
+	    job_id => _get_jobid_from_status($response)
         );
         return 1;
     }
@@ -702,9 +704,10 @@ sub run_import_resource{
     my $slot = shift(@path_elements);
     my $branch = shift(@path_elements);
 
-    # create a new alignment job
+    # create a new import job
     my $jobfile = join('/','storage',$slot,$branch,
                            'jobs','import',@path_elements);
+    $jobfile .= '.xml';
 
     my $relative_path = join('/',@path_elements);
 
@@ -732,21 +735,22 @@ sub run_import_resource{
 	if ($overwrite){
 	    &LetsMT::WebService::post_meta(
 		 $res,
-		 status                 => 'waiting in import queue',
-		 import_job_id          => _get_jobid_from_status($response),
-		 "import_success"       => '',
-		 "import_failed"        => '',
-		 "import_empty"         => '',
-		 "import_success_count" => 0,
-		 "import_failed_count"  => 0,
-		 "import_empty_count"   => 0);
+		 status               => 'waiting in import queue',
+		 # import_job_id          => _get_jobid_from_status($response),
+		 job_id               => _get_jobid_from_status($response),
+		 import_success       => '',
+		 import_failed        => '',
+		 import_empty         => '',
+		 import_success_count => 0,
+		 import_failed_count  => 0,
+		 import_empty_count   => 0);
 	}
 	else{
 	    LetsMT::WebService::post_meta(
 		$res,
-		status        => 'waiting in import queue',
-		import_job_id => _get_jobid_from_status($response),
-		uid           => $args->{uid},
+		status => 'waiting in import queue',
+		job_id => _get_jobid_from_status($response),
+		uid    => $args->{uid},
 		);
 	}
         LetsMT::WebService::del_meta(
@@ -1227,12 +1231,27 @@ sub delete {
 	    $status = delete_slurm_job($jobID);
 	}
 	
+	my $response  = LetsMT::WebService::search_meta( 'job_id' => $jobID, 
+							 uid => $args{uid} );
+	my $XmlParser = new XML::LibXML;
+	my $dom       = $XmlParser->parse_string( $response );
+	my @nodes     = $dom->findnodes('//list/entry/@path');
+	$$message = "canceled job for" if (@nodes);
+	foreach my $n (@nodes){
+	    my $resource = LetsMT::Resource::make_from_path($n->to_literal);
+	    LetsMT::WebService::post_meta(
+		$resource,
+		status => 'job canceled',
+		uid    => $args{uid} );
+	    $$message .= " ".$n->to_literal;
+	}
+
         #TODO: delete also meta data and old log files!
 
         get_logger(__PACKAGE__)->debug( 'Status:' . $status );
 
         if ($status) {
-            $$message = $status;
+            $$message .= $status;
         }
     }
 }

@@ -50,7 +50,37 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 	@echo "and <user> is a user name to which you have access on that machine."
 	@echo
 
+
+## remote git server for OPUS
+OPUSGIT = git@version.helsinki.fi:OPUS
+
+## install repository for OPUS with connection to remote git server
+.PHONY: install-opus
+install-opus: /var/www/.ssh/config
+	${MAKE} GIT_REMOTE='${OPUSGIT}' install
+	@echo
+	@echo '----------------------------------------------------------';
+	@echo "Installation of the OPUS repository backend finished"
+	@echo "Don't forget to upload the public key /etc/ssh/opusrr.pub"
+	@echo "to the git server at ${OPUSGIT}!"
+	@echo '----------------------------------------------------------';
+	@echo
+
+/var/www/.ssh/config: /etc/ssh/opusrr
+	echo 'Host *' > $@
+	echo '  IdentityFile /etc/ssh/opusrr' >> $@
+	chown -R www-data:www-data $@
+	chmod 700 $@
+	chmod 400 $@
+
+/etc/ssh/opusrr:
+	ssh-keygen -q -t rsa -f $@ -N ""
+	chown www-data:www-data $@
+	chmod 400 $@
+
+
 ## Install the RR Web user interface.
+## OBSOLETE
 .PHONY: install-grenzschnitte www
 install-grenzschnitte www:
 	@which letsmt_rest || { \
