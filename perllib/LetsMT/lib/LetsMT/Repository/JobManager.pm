@@ -239,6 +239,15 @@ sub run {
     if ($command eq 'reimport'){
         return run_import($path_elements, $args, 1);
     }
+    if ($command eq 'download'){
+        return run_import_url($path_elements, $args);
+    }
+    ## TODO: implement web crawling of entire websites
+    ##       (using bitextor?)
+    ## 
+    # if ($command eq 'crawl'){
+    #     return run_crawler($path_elements, $args, 1);
+    # }
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
     }
@@ -684,6 +693,37 @@ sub run_import{
     }
     return $count;
 }
+
+
+
+sub run_import_url{
+    # my ($path_elements, $args) = @_;
+    my $path_elements = ref($_[0]) eq 'ARRAY' ? shift : [];
+    my $args          = ref($_[0]) eq 'HASH'  ? shift : ();
+
+    raise( 12, "slot/branch", 'warn')   unless (@{$path_elements} > 1);
+    raise( 12, "parameter url", 'warn') unless (exists $args->{url});
+    raise( 17, "protocol (supported = http|https|ftp)", 'warn' ) 
+	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
+
+    my $doc    = $2;
+    my $slot   = shift(@{$path_elements});
+    my $branch = shift(@{$path_elements});
+
+    unless (@{$path_elements}){
+	## remove all attributes and special characters
+	$doc=~s/\?.*$$//;
+	$doc=~s/[^a-zA-Z0-9\/_\-\.\s]//g;
+	$doc=~s/\/+$//;
+	push(@{$path_elements},'uploads','url',$doc);
+    }
+
+    ## make the storage request to download the page
+    my $resource = LetsMT::Resource::make($slot,$branch,join('/',@{$path_elements}));
+    delete $args->{run};
+    return LetsMT::WebService::put( $resource, %{$args} );
+}
+
 
 
 =head2 C<run_import_resource>

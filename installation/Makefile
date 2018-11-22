@@ -6,7 +6,10 @@ INSTALL_DATA = ${INSTALL} -m 644
 COPY = cp -r --preserve=mode,timestamps
 
 APACHE_CONF = /etc/apache2
-APACHE_TIKA_VERSION = 1.19.1
+
+APACHE_TIKA_DIST    = https://archive.apache.org/dist/tika/
+APACHE_TIKA_VERSION = 1.18
+
 
 LETSMT_SSL_HOME    = /etc/ssl
 LETSMT_SSL_PROJECT = ${LETSMTHOST}
@@ -205,7 +208,7 @@ install-apache-tika: ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar
 	service tika-server start || true
 
 ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar:
-	wget http://www.nic.funet.fi/pub/mirrors/apache.org/tika/tika-server-${APACHE_TIKA_VERSION}.jar
+	wget ${APACHE_TIKA_DIST}/tika-server-${APACHE_TIKA_VERSION}.jar
 	${INSTALL_BIN} tika-server-${APACHE_TIKA_VERSION}.jar ${PREFIX}/lib/
 	rm -f tika-server-${APACHE_TIKA_VERSION}.jar
 

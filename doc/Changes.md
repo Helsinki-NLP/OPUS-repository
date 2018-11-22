@@ -14,6 +14,11 @@ There is quite a lot of changes since the latest release from the original LetsM
 
 ## Changes to the storage API
 
+* downloading data from URL's: Now it is possible to give a url in the request to download a file directly from the webto store in the repository. For example, to download `http://spiegel.de` to a repository you can run:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/corpus/user/uploads/html/spiegel.de/index.html?uid=user&action=import&url=http://www.spiegel.de"
+```
 
 * listing storages checks now whether there is a readable branch for the selected user (before all slots are always listed); for example, to list all slots that have a readable branch for user `user1` do:
 

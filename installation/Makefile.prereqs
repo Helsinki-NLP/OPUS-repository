@@ -104,6 +104,7 @@ CPAN_MODULES = 	Apache::Tika \
 		File::LibMagic \
 		File::Touch \
 		Lingua::Sentence \
+		LWP::Simple \
 		Module::Install \
 		Net::SSL \
 		Persistent::Base \

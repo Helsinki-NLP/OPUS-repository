@@ -27,6 +27,7 @@ use open qw(:std :utf8);
 use File::Temp qw(tempfile);
 use Apache2::Request;
 use Apache2::Upload;
+use LWP::Simple;
 
 use LetsMT;
 use LetsMT::Tools;
@@ -149,22 +150,31 @@ Upload data and optionally import it.
 sub put {
     my $self = shift;
 
-    my $payload        = undef;
     my $message_create = undef;
     my $message_submit = undef;
 
     # make a copy of the old metadata record (archive revisions!)
     &_archive_meta(join( "/", @{ $self->{path_elements} }));
 
-    # Receive the payload and write it to $payload
-    &_get_payload( $self->{r}, \$payload );
+    ## get a document from an URL or payload
+    system("echo 'download file from url $self->{args}->{url} >>/tmp/tttt.log'");
+    my $file = undef;
+    if ( exists( $self->{args}->{url} ) ){
+	$file = &_download_url( $self->{args}->{url} );
+	system("echo 'download file $file >>/tmp/tttt.log'");
+    }
+    else{
+	my $payload = undef;
+	&_get_payload( $self->{r}, \$payload );
+	$file = $payload->{file} if ($payload);
+    }
 
     LetsMT::Repository::StorageManager::create_storage(
         message => \$message_create,
         path    => $self->{path_elements},
         uid     => $self->{args}->{uid},
         gid     => $self->{args}->{gid},
-        payload => $payload ? $payload->{file} : undef,
+        payload => $file,
         type    => $self->{args}->{type}
     );
 
@@ -175,8 +185,8 @@ sub put {
     # If URL argument action=import is given, import the uploaded resouces
     if ( defined $self->{args}->{action}  &&  $self->{args}->{action} eq "import" ) {
         # create and submit import job if
-        # there is a file in payload && it goes to the uploads dir
-        if ( defined $payload->{file}
+        # there is a file && it goes to the uploads dir
+        if ( defined $file
             && ( $self->{path_elements}[2] eq $LetsMT::REPOSITORY_UPLOAD_DIR )
         ) {
             my $target = [ @{ $self->{path_elements} } ];
@@ -250,7 +260,7 @@ sub put {
     );
 
     # don't wait for cleaning up and remove payload immediately
-    unlink($payload->{file}) if (-f $payload->{file});
+    unlink($file) if (-f $file);
 
     return $result_obj->get_xml_result();
 }
@@ -308,19 +318,27 @@ sub post {
         $metaDB->close();
     }
     else {
-        my $payload = undef;
 
         # make a copy of the old metadata record (archive revisions)
         &_archive_meta(join( "/", @{ $self->{path_elements} }));
 
-        &_get_payload( $self->{r}, \$payload );
+	## get a document from an URL or payload
+	my $file = undef;
+	if ( exists( $self->{args}->{url} ) ){
+	    $file = &_download_url( $self->{args}->{url} );
+	}
+	else{
+	    my $payload = undef;
+	    &_get_payload( $self->{r}, \$payload );
+	    $file = $payload->{file} if ($payload);
+	}
 
         LetsMT::Repository::StorageManager::create_storage(
             message => \$message,
             path    => $self->{path_elements},
             uid     => $self->{args}->{uid},
             gid     => $self->{args}->{gid},
-            payload => $payload ? $payload->{file} : undef,
+            payload => $file,
             type    => $self->{args}->{type},
         );
 
@@ -328,7 +346,7 @@ sub post {
             status => 'created' );
 
         # don't wait for cleaning up and remove payload immediately
-        unlink($payload->{file}) if (-f $payload->{file});
+        unlink($file) if (-f $file);
     }
 
     # Success if we got here, prepare Result object and return it
@@ -461,6 +479,23 @@ sub _get_payload() {
                 ->info( 'Received file via PUT: ' . Dumper($$payload) );
         }
     }
+}
+
+
+sub _download_url {
+    my $url = shift;
+    my ($content_type, $document_length, $modified_time, $expires, $server) = 
+	head($url);
+    head($url) || raise( 8, "cannot download $url", 'error' );
+    my ( $fh, $file ) = tempfile(
+	'url_download_XXXXXXXX',
+	DIR    => $ENV{UPLOADDIR},
+	UNLINK => 1
+        );
+    close $fh;
+    # my $response_code = mirror($url, $file);
+    my $response_code = getstore($url, $file);
+    return $file;
 }
 
 

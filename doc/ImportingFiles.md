@@ -204,6 +204,27 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot1/user1/uploads/pdf/D2.1.pdf?uid
 </letsmt-ws>
 ```
 
+* download websites from URLs: We can now specify a URL to download files directly from the web:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/mycorpus10/user/uploads/url/spiegel.de/index.html?uid=user&action=import&url=http://www.spiegel.de"
+```
+
+This can also be done via the job API to run a job in the backend (using slurm - no overhead of downloading directly during the storage request): use the additional command `run=download`:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/uploads/url/de/spiegel.de/index.html?uid=user&action=import&url=http://www.spiegel.de&run=download"
+```
+
+You can also leave out the relative path to the upload dir and then the system will create a path from the URL that is relative to `uploads/url`
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user&action=import&url=http://www.spiegel.de&run=download"
+```
+
+It removes special characters and the protocol of the URI. In the example above it creates a resource in `corpus/user/uploads/url/de/www.spiegel.de`.
+
+
 
 * import queue
 

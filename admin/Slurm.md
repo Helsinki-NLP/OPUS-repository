@@ -58,7 +58,12 @@ sudo service slurm-llnl restart
 
 * add the compute node name in the slurm config on the main repository server and also add the host inoformation about the new node in `/etc/hosts` and restart slurm, munge (and possibly even the webserver)
 
+* modify the state with scontrol, specifying the node and the new state. You must provide a reason when disabling a node.
 
+```
+Disable: scontrol update NodeName=node[02-04] State=DRAIN Reason=”Cloning”
+Enable: scontrol update NodeName=node[02-04] State=RESUME
+```
 
 * TODO
 
