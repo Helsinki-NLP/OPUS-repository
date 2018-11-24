@@ -24,6 +24,7 @@ UBUNTU_BASE_PACKAGES = \
 		cython3 \
 		default-jre \
 		dos2unix \
+		g++ \
 		git \
 		graphviz \
 		gzip \
@@ -169,17 +170,17 @@ OLD_TOKYO_PACKAGES = libtokyocabinet-dbg libtokyocabinet-dev libtokyocabinet9 \
 # prerequesites on a server machine (do the same for storage-server & rr-server)
 .PHONY: install-storage-server install-rr-server install-client install
 install-storage-server install-rr-server install: \
-    update-apt-repository server-software install-perlmodules
+    update-apt-repository install-swap server-software install-perlmodules
 
 # prerequesites on a frontend machine
 # TODO: do we need all this on a frontend machine?
 .PHONY: install-frontend
-install-frontend: install-perlmodules frontend-software
+install-frontend: install-swap frontend-software install-perlmodules 
 
 
 # prerequesites on a sge exec host
 .PHONY: install-sge-client install-client
-install-client install-sge-client: install-perlmodules sge-client-software
+install-client install-sge-client: install-swap client-software install-perlmodules
 
 
 # modules for mojolicious webinterface
@@ -245,7 +246,8 @@ prepare-cpan:
 ## (add LETSMTHOST as alias for localhost in /etc/hosts/ --> for SGE setup!)
 
 .PHONY: server-software
-server-software: software-base \
+server-software: \
+	software-base \
 	software-mysql \
 	${BATCHQUEUE_SERVER_TARGETS} \
 	software-tokyocabinet \
@@ -308,6 +310,24 @@ software-sge-client:
 .PHONY: software-sge-exec
 software-sge-exec:
 	$(APTGET) -qq install gridengine-exec
+
+
+
+#########################################################################
+# add a swapfile for more flexibility in memory allocation
+# (https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04)
+
+.PHONY: install-swap
+install-swap: /swapfile
+/swapfile:
+	fallocate -l 8G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile
+	swapon /swapfile
+	grep -v '/swapfile' /etc/fstab > fstab.tmp
+	echo '/swapfile   none    swap    sw    0   0' >> fstab.tmp
+	${INSTALL_DATA} -b -S .old fstab.tmp /etc/fstab
+	rm -f fstab.tmp
 
 
 

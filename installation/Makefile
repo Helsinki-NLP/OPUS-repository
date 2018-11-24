@@ -80,7 +80,6 @@ install-targets: \
 	install-files \
 	install-config \
 	install-svnserver \
-	install-swap \
 	install-isa \
 	restart-apache
 
@@ -120,7 +119,7 @@ install-client install-sge-client:
 	  make LETSMTHOST=$${REMOTE_HOST} \
 		META_DB_HOST=$${REMOTE_HOST} \
 		GROUP_DB_HOST=$${REMOTE_HOST} \
-		install-sge-client-targets; )
+		install-client-targets; )
 
 
 .PHONY: install-sge-client-targets install-client-targets
@@ -129,7 +128,11 @@ install-sge-client-targets install-client-targets: \
 	prepare-directories \
 	install-log \
 	config-conf \
+	config-slurm \
 	install-diskroot
+
+# 	/etc/ssl/${LETSMTHOST}
+
 
 #.PHONY: install-sge-client
 #install-sge-client: install-frontend
@@ -567,6 +570,11 @@ ${LETSMT_SSL_DIR}:
 		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
 		--site $(LETSMTHOST)
 
+WHOAMI = ${shell whoami}
+/etc/ssl/${LETSMTHOST}:
+	scp -r ${WHOAMI}@${LETSMTHOST}:/etc/ssl/${LETSMTHOST} $@
+	chmod -R og+rX $@
+
 
 .PHONY: config-slurm
 config-slurm: 	/etc/slurm-llnl/slurm.conf \
@@ -597,21 +605,21 @@ config-gridengine:
 
 
 
-#########################################################################
-# add a swapfile for more flexibility in memory allocation
-# (https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04)
+# #########################################################################
+# # add a swapfile for more flexibility in memory allocation
+# # (https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04)
 
-.PHONY: install-swap
-install-swap: /swapfile
-/swapfile:
-	fallocate -l 8G /swapfile
-	chmod 600 /swapfile
-	mkswap /swapfile
-	swapon /swapfile
-	grep -v '/swapfile' /etc/fstab > fstab.tmp
-	echo '/swapfile   none    swap    sw    0   0' >> fstab.tmp
-	${INSTALL_DATA} -b -S .old fstab.tmp /etc/fstab
-	rm -f fstab.tmp
+# .PHONY: install-swap
+# install-swap: /swapfile
+# /swapfile:
+# 	fallocate -l 8G /swapfile
+# 	chmod 600 /swapfile
+# 	mkswap /swapfile
+# 	swapon /swapfile
+# 	grep -v '/swapfile' /etc/fstab > fstab.tmp
+# 	echo '/swapfile   none    swap    sw    0   0' >> fstab.tmp
+# 	${INSTALL_DATA} -b -S .old fstab.tmp /etc/fstab
+# 	rm -f fstab.tmp
 
 
 #########################################################################

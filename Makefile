@@ -77,9 +77,6 @@ install-opus: /var/www/.ssh/config /etc/ssl/${HOSTNAME}
 	@echo '----------------------------------------------------------';
 	@echo
 
-install-%-opus: /etc/ssl/${HOSTNAME}
-	${MAKE} GIT_REMOTE='${OPUSGIT}' $(@:-opus=)
-
 /var/www/.ssh/config: /etc/ssh/opusrr
 	echo 'Host *' > $@
 	echo '  IdentityFile /etc/ssh/opusrr' >> $@
