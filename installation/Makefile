@@ -28,6 +28,11 @@ LETSMT_USERCERT = ${LETSMT_SSL_DIR}/user/certificates/developers@localhost.crt
 LETSMT_USERKEY  = ${LETSMT_SSL_DIR}/user/keys/developers@localhost.key
 LETSMT_USERCERTPASS = letsmt
 
+## server and compute nodes for SLURM
+SLURM_SERVER = ${LETSMTHOST}
+SLURM_NODES  = ${NODENAME}
+
+
 ### Java classpath
 empty:=
 space:= $(empty) $(empty)
@@ -248,6 +253,7 @@ install-frontend-files: prepare-directories install-log
 .PHONY: install-config
 install-config: \
 	config-conf \
+	config-slurm \
 	config-gridengine \
 	config-apache2 \
 	config-mysql \
@@ -560,6 +566,24 @@ ${LETSMT_SSL_DIR}:
 		--username "$(LETSMT_SSL_USERNAME)" \
 		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
 		--site $(LETSMTHOST)
+
+
+.PHONY: config-slurm
+config-slurm: 	/etc/slurm-llnl/slurm.conf \
+		/etc/slurm-llnl/cgroup.conf
+	service slurm-llnl start
+
+/etc/slurm-llnl/cgroup.conf: cgroup.conf
+	mkdir -p ${dir $@}
+	${INSTALL_DATA} $< $@
+
+/etc/slurm-llnl/slurm.conf: slurm.conf
+	mkdir -p ${dir $@}
+	sed -e "s#REPLACE_SLURM_SERVER#${SLURM_SERVER}#" \
+	    -e "s#REPLACE_SLURM_NODES#${SLURM_NODES}#" \
+	< $< > $@
+
+
 
 
 .PHONY: config-gridengine

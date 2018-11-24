@@ -51,12 +51,23 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 	@echo
 
 
+
+###########################################################################
+## OPUS specific installation (remote git & OPUS-specific ssl keys)
+##
+##   sudo make install-opus .......... install repository server
+##   sudo make install-client-opus ... install slurm compute node
+##
+###########################################################################
+
 ## remote git server for OPUS
 OPUSGIT = git@version.helsinki.fi:OPUS
+ADMIN   = tiedeman
+KEYHOME = taito.csc.fi:/proj/OPUS/admin/repository
 
 ## install repository for OPUS with connection to remote git server
 .PHONY: install-opus
-install-opus: /var/www/.ssh/config
+install-opus: /var/www/.ssh/config /etc/ssl/${HOSTNAME}
 	${MAKE} GIT_REMOTE='${OPUSGIT}' install
 	@echo
 	@echo '----------------------------------------------------------';
@@ -66,6 +77,9 @@ install-opus: /var/www/.ssh/config
 	@echo '----------------------------------------------------------';
 	@echo
 
+install-%-opus: /etc/ssl/${HOSTNAME}
+	${MAKE} GIT_REMOTE='${OPUSGIT}' $(@:-opus=)
+
 /var/www/.ssh/config: /etc/ssh/opusrr
 	echo 'Host *' > $@
 	echo '  IdentityFile /etc/ssh/opusrr' >> $@
@@ -73,10 +87,31 @@ install-opus: /var/www/.ssh/config
 	chmod 700 $@
 	chmod 400 $@
 
+## copy ssh and ssl keys from KEYHOME
+
 /etc/ssh/opusrr:
-	ssh-keygen -q -t rsa -f $@ -N ""
-	chown www-data:www-data $@
+	rsync -zav ${ADMIN}@${KEYHOME}/ssh/opusrr* ${dir $@}
+	chown www-data:www-data $@ $@.pub
 	chmod 400 $@
+	chmod 444 $@.pub
+
+/etc/ssl/${HOSTNAME}:
+	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${HOSTNAME} ${dir $@}
+	chmod -R og+rX $@
+
+## generate a new ssh key for remote git access
+#
+#/etc/ssh/opusrr:
+#	ssh-keygen -q -t rsa -f $@ -N ""
+#	chown www-data:www-data $@
+#	chmod 400 $@
+
+
+###########################################################################
+## end of OPUS specific installation
+###########################################################################
+
+
 
 
 ## Install the RR Web user interface.
