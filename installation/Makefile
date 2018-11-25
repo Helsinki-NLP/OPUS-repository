@@ -29,8 +29,14 @@ LETSMT_USERKEY  = ${LETSMT_SSL_DIR}/user/keys/developers@localhost.key
 LETSMT_USERCERTPASS = letsmt
 
 ## server and compute nodes for SLURM
-SLURM_SERVER = ${LETSMTHOST}
 SLURM_NODES  = ${NODENAME}
+ifndef SLURM_SERVER
+ifeq "${LETSMTHOST}" ""
+    SLURM_SERVER = ${NODENAME}
+else
+    SLURM_SERVER = ${LETSMTHOST}
+endif
+endif
 
 
 ### Java classpath

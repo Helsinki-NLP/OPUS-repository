@@ -56,7 +56,7 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 ## OPUS specific installation (remote git & OPUS-specific ssl keys)
 ##
 ##   sudo make install-opus .......... install repository server
-##   sudo make install-client-opus ... install slurm compute node
+##   sudo make install-opus-client ... install slurm compute node
 ##
 ###########################################################################
 
@@ -64,10 +64,12 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 OPUSGIT = git@version.helsinki.fi:OPUS
 ADMIN   = tiedeman
 KEYHOME = taito.csc.fi:/proj/OPUS/admin/repository
+OPUSRR  = vm0081.kaj.pouta.csc.fi
+OPUSIP  = 192.168.1.10
 
 ## install repository for OPUS with connection to remote git server
 .PHONY: install-opus
-install-opus: /var/www/.ssh/config /etc/ssl/${HOSTNAME}
+install-opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
 	${MAKE} GIT_REMOTE='${OPUSGIT}' install
 	@echo
 	@echo '----------------------------------------------------------';
@@ -76,6 +78,10 @@ install-opus: /var/www/.ssh/config /etc/ssl/${HOSTNAME}
 	@echo "to the git server at ${OPUSGIT}!"
 	@echo '----------------------------------------------------------';
 	@echo
+
+.PHONY: install-opus-client opus-client /etc/munge/munge.key
+install-opus-client opus-client: /etc/ssl/${OPUSRR}
+	${MAKE} SLURM_SERVER=${OPUSIP} LETSMTHOST=${OPUSRR} install-client
 
 /var/www/.ssh/config: /etc/ssh/opusrr
 	echo 'Host *' > $@
@@ -91,6 +97,15 @@ install-opus: /var/www/.ssh/config /etc/ssl/${HOSTNAME}
 	chown www-data:www-data $@ $@.pub
 	chmod 400 $@
 	chmod 444 $@.pub
+
+/etc/munge/munge.key:
+	mkdir -p ${dir $@}
+	rsync -zav ${ADMIN}@${KEYHOME}/munge/munge.key $@
+	chmod 400 $@
+	chmod 700 ${dir $@}
+	chown munge:munge ${dir $@} $@
+
+
 
 /etc/ssl/${HOSTNAME}:
 	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${HOSTNAME} ${dir $@}
