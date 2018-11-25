@@ -56,7 +56,7 @@ PartitionName=debug Nodes=opus-rr,node110 Default=YES MaxTime=2880 State=UP
 xxx.xxx.x.xx    opus-rr.domain.org    opus-rr
 ```
 
-* restart slurm server (and munge?)
+* restart slurm server (and munge?), first on controler than on compute nodes (?)
 
 ```
 sudo service munge restart

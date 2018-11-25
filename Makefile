@@ -79,8 +79,8 @@ install-opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
 	@echo '----------------------------------------------------------';
 	@echo
 
-.PHONY: install-opus-client opus-client /etc/munge/munge.key
-install-opus-client opus-client: /etc/ssl/${OPUSRR}
+.PHONY: install-opus-client opus-client
+install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
 	${MAKE} SLURM_SERVER=${OPUSIP} LETSMTHOST=${OPUSRR} install-client
 
 /var/www/.ssh/config: /etc/ssh/opusrr
