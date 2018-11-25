@@ -133,6 +133,7 @@ install-sge-client-targets install-client-targets: \
 	install-modules \
 	prepare-directories \
 	install-log \
+	install-apache-tika \
 	config-conf \
 	config-slurm \
 	install-diskroot

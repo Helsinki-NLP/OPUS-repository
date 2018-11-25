@@ -107,8 +107,8 @@ install-opus-client opus-client: /etc/ssl/${OPUSRR}
 
 
 
-/etc/ssl/${HOSTNAME}:
-	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${HOSTNAME} ${dir $@}
+/etc/ssl/${OPUSRR}:
+	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${OPUSRR} ${dir $@}
 	chmod -R og+rX $@
 
 ## generate a new ssh key for remote git access

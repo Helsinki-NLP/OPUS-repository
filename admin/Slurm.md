@@ -24,13 +24,20 @@ cd LetsMT-repository
 make install-client
 ```
 
-* install slurm and copy the munge and ssl keys from the main repository server
+* install slurm and copy ssl keys from the main repository server
 
 ```
-munge -n | ssh node110 unmunge
 scp -r etc/ssl cloud-user@node110:ssl-keys
 ssh node110
 sudo cp -R ssl-keys /etc/ssl
+```
+
+* make sure that slurm/munge users are the same and that you can munge/remunge from login node
+
+```
+id munge
+id slurm
+munge -n | ssh node110 unmunge
 ```
 
 * change slurm configuration on compute node node110 `/etc/slurm-llnl/slurm.conf`; set ControlMachine (main repository server name, e.g. `opus-rr`) and compute nodes:

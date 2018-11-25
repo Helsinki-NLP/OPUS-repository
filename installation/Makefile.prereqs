@@ -180,7 +180,8 @@ install-frontend: install-swap frontend-software install-perlmodules
 
 # prerequesites on a sge exec host
 .PHONY: install-sge-client install-client
-install-client install-sge-client: install-swap client-software install-perlmodules
+install-client install-sge-client: \
+	update-apt-repository install-swap client-software install-perlmodules
 
 
 # modules for mojolicious webinterface
@@ -262,8 +263,11 @@ server-software: \
 
 ## software required by the sge-clients
 .PHONY: sge-client-software client-software
-client-software sge-client-software: software-base \
+client-software sge-client-software: \
+	software-base \
 	${BATCHQUEUE_CLIENT_TARGETS} \
+	software-tokyocabinet \
+	software-tokyotyrant \
 	software-hunalign \
 	software-chared \
 	software-opennlp \
