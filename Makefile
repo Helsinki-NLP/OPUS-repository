@@ -67,10 +67,27 @@ KEYHOME = taito.csc.fi:/proj/OPUS/admin/repository
 OPUSRR  = vm0081.kaj.pouta.csc.fi
 OPUSIP  = 192.168.1.10
 
+## install stable versions
+opus-stable opus-client-stable:
+	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
+		OPUSRR=vm0024.kaj.pouta.csc.fi \
+		OPUSIP=192.168.1.17 \
+	${@:-stable=}
+
+## install development versions
+opus-dev opus-client-dev:
+	${MAKE} OPUSGIT= \
+		OPUSRR=vm0081.kaj.pouta.csc.fi \
+		OPUSIP=192.168.1.10 \
+	${@:-dev=}
+
+
 ## install repository for OPUS with connection to remote git server
-.PHONY: install-opus
-install-opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
-	${MAKE} GIT_REMOTE='${OPUSGIT}' install
+.PHONY: install-opus opus
+install-opus opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
+	${MAKE} GIT_REMOTE='${OPUSGIT}' HOSTNAME=${OPUSRR} install
+	service munge restart
+	service slurm-llnl restart
 	@echo
 	@echo '----------------------------------------------------------';
 	@echo "Installation of the OPUS repository backend finished"
@@ -82,17 +99,21 @@ install-opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
 .PHONY: install-opus-client opus-client
 install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
 	${MAKE} SLURM_SERVER=${OPUSIP} LETSMTHOST=${OPUSRR} install-client
+	service munge restart
+	service slurm-llnl restart
 
 /var/www/.ssh/config: /etc/ssh/opusrr
+	mkdir -p ${dir $@}
 	echo 'Host *' > $@
 	echo '  IdentityFile /etc/ssh/opusrr' >> $@
 	chown -R www-data:www-data $@
 	chmod 700 $@
 	chmod 400 $@
 
-## copy ssh and ssl keys from KEYHOME
+## copy ssh, ssl and munge keys from KEYHOME
 
 /etc/ssh/opusrr:
+	mkdir -p ${dir $@}
 	rsync -zav ${ADMIN}@${KEYHOME}/ssh/opusrr* ${dir $@}
 	chown www-data:www-data $@ $@.pub
 	chmod 400 $@
@@ -100,14 +121,14 @@ install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
 
 /etc/munge/munge.key:
 	mkdir -p ${dir $@}
+	apt-get -qq install munge
 	rsync -zav ${ADMIN}@${KEYHOME}/munge/munge.key $@
 	chmod 400 $@
 	chmod 700 ${dir $@}
 	chown munge:munge ${dir $@} $@
 
-
-
 /etc/ssl/${OPUSRR}:
+	mkdir -p ${dir $@}
 	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${OPUSRR} ${dir $@}
 	chmod -R og+rX $@
 
