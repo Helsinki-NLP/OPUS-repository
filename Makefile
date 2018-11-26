@@ -64,21 +64,28 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 OPUSGIT = git@version.helsinki.fi:OPUS
 ADMIN   = tiedeman
 KEYHOME = taito.csc.fi:/proj/OPUS/admin/repository
-OPUSRR  = vm0081.kaj.pouta.csc.fi
-OPUSIP  = 192.168.1.10
+
+## stable version
+OPUS_STABLE    = vm1637.kaj.pouta.csc.fi
+OPUS_STABLE_IP = 192.168.1.19
+
+## development version
+OPUS_DEV       = vm0081.kaj.pouta.csc.fi
+OPUS_DEV_IP    = 192.168.1.10
+
 
 ## install stable versions
 opus-stable opus-client-stable:
 	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
-		OPUSRR=vm0024.kaj.pouta.csc.fi \
-		OPUSIP=192.168.1.17 \
+		OPUSRR=${OPUS_STABLE} \
+		OPUSIP=${OPUS_STABLE_IP} \
 	${@:-stable=}
 
 ## install development versions
 opus-dev opus-client-dev:
 	${MAKE} OPUSGIT= \
-		OPUSRR=vm0081.kaj.pouta.csc.fi \
-		OPUSIP=192.168.1.10 \
+		OPUSRR=${OPUS_DEV} \
+		OPUSIP=${OPUS_DEV_IP} \
 	${@:-dev=}
 
 

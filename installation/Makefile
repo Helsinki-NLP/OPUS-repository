@@ -577,11 +577,6 @@ ${LETSMT_SSL_DIR}:
 		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
 		--site $(LETSMTHOST)
 
-WHOAMI = ${shell whoami}
-/etc/ssl/${LETSMTHOST}:
-	scp -r ${WHOAMI}@${LETSMTHOST}:/etc/ssl/${LETSMTHOST} $@
-	chmod -R og+rX $@
-
 
 .PHONY: config-slurm
 config-slurm: 	/etc/slurm-llnl/slurm.conf \
