@@ -61,9 +61,10 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 ###########################################################################
 
 ## remote git server for OPUS
-OPUSGIT = git@version.helsinki.fi:OPUS
-ADMIN   = tiedeman
-KEYHOME = taito.csc.fi:/proj/OPUS/admin/repository
+GITSEVER = version.helsinki.fi
+OPUSGIT  = git@${OPUSGIT}:OPUS
+ADMIN    = tiedeman
+KEYHOME  = taito.csc.fi:/proj/OPUS/admin/repository
 
 ## stable version
 OPUS_STABLE    = vm1637.kaj.pouta.csc.fi
@@ -116,6 +117,9 @@ install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
 	chown -R www-data:www-data $@
 	chmod 700 $@
 	chmod 400 $@
+	ssh-keyscan -H ${GITSERVER} > ${dir $@}/known_hosts
+	chown -R www-data:www-data ${dir $@}/known_hosts
+
 
 ## copy ssh, ssl and munge keys from KEYHOME
 
