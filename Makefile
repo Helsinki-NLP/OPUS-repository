@@ -88,6 +88,10 @@ opus-dev opus-client-dev:
 		OPUSIP=${OPUS_DEV_IP} \
 	${@:-dev=}
 
+ifndef OPUSRR
+  OPUSRR = ${OPUS_STABLE}
+  OPUSIP = ${OPUS_STABLE_IP}
+endif
 
 ## install repository for OPUS with connection to remote git server
 .PHONY: install-opus opus
