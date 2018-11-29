@@ -62,12 +62,11 @@ my $DEFAULT_NAME_MATCH_WEIGHT = 1 - $DEFAULT_SIZE_RATIO_WEIGHT;
 
 our %DEFAULT_SEARCH_PARA = (
     search_parallel                   => $DEFAULT_SEARCH,
-
 ## old parameters - not used anymore!
-    search_parallel_min_size_ratio    => $DEFAULT_SIZE_RATIO_THR,
-    search_parallel_min_name_match    => $DEFAULT_NAME_MATCH_THR,
-    search_parallel_weight_size_ratio => $DEFAULT_SIZE_RATIO_WEIGHT,
-    search_parallel_weight_name_match => $DEFAULT_NAME_MATCH_WEIGHT
+#    search_parallel_min_size_ratio    => $DEFAULT_SIZE_RATIO_THR,
+#    search_parallel_min_name_match    => $DEFAULT_NAME_MATCH_THR,
+#    search_parallel_weight_size_ratio => $DEFAULT_SIZE_RATIO_WEIGHT,
+#    search_parallel_weight_name_match => $DEFAULT_NAME_MATCH_WEIGHT
 );
 
 # default sentence aligner method for all parallel documents

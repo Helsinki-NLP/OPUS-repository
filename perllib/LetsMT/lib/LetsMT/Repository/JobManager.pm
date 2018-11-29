@@ -239,6 +239,13 @@ sub run {
     if ($command eq 'reimport'){
         return run_import($path_elements, $args, 1);
     }
+    ## TODO: to be implemented
+    # if ($command eq 'wordalign'){
+    #     return run_wordalign($path_elements, $args);
+    # }
+    # if ($command eq 'parse'){
+    #     return run_parse($path_elements, $args);
+    # }
     if ($command eq 'download'){
         return run_import_url($path_elements, $args);
     }
@@ -642,6 +649,39 @@ sub run_align_resource {
     }
     return 0;
 }
+
+
+
+# sub run_wordalign {
+#     my ($path_elements,$args) = @_;
+
+#     my @sentalign = ();
+#     my $path      = join('/',@{$path_elements});
+
+#     my $resource = LetsMT::Resource::make_from_storage_path( $path );
+#     my $files = &find_sentence_aligned( $resource, $args );
+
+#     my $count = 0;
+#     my %done = ();
+#     foreach my $s (keys %{$files}){
+#         my $SrcRes = LetsMT::Resource::make_from_storage_path($s);
+
+#         foreach my $t (keys %{$$files{$s}}){
+
+#             next if ($done{$$files{$s}{$t}});
+#             my $TrgRes = LetsMT::Resource::make_from_storage_path($t);
+#             my $AlgRes = 
+#                 LetsMT::Resource::make_from_storage_path($$files{$s}{$t});
+
+#             &run_wordalign_resource( $SrcRes->slot, $SrcRes->user,
+# 				     $SrcRes->path, $TrgRes->path, 
+# 				     $AlgRes->path, $args );
+#             $done{ $$files{$s}{$t} } = 1;
+#             $count++;
+#         }
+#     }
+#     return $count;
+# }
 
 
 

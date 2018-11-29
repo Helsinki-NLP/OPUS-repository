@@ -397,12 +397,14 @@ sub import_resource {
 	}
         #-------------------------------------------------------------------
 
+	my @parsed_resources = ();
 	unless ($skip_parsing){
-	    my @parsed_resources = &parse_resources( $corpus, @$new_resources );
+	    @parsed_resources = &parse_resources( $corpus, @$new_resources );
 	    push ( @$new_resources, @parsed_resources);
 	}
 
 	## now even run word alignment!
+	## TODO: this only works for parsed or tokenized data!
 	unless ($skip_wordalign){
 	    push ( @$new_resources, &wordalign_resources( @aligned_resources ) );
 	}

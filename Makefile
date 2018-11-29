@@ -62,7 +62,7 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 
 ## remote git server for OPUS
 GITSEVER = version.helsinki.fi
-OPUSGIT  = git@${OPUSGIT}:OPUS
+OPUSGIT  = git@${GITSERVER}:OPUS
 ADMIN    = tiedeman
 KEYHOME  = taito.csc.fi:/proj/OPUS/admin/repository
 

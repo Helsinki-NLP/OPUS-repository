@@ -179,7 +179,8 @@ sub read {
 
                 # print "look for $srcidstr .. $trgidstr\n";
 
-                if ( !$self->GetSentences( $data, \@srcids, \@trgids ) ) {
+                if ( !$self->GetSentencesFromCache( $data, \@srcids, \@trgids ) ) {
+                # if ( !$self->GetSentences( $data, \@srcids, \@trgids ) ) {
                     warn
                         "Warning! Cannot find source sentences $srcidstr and/or target sentences $trgidstr!\n";
                     %{$data} = %OldData;
@@ -236,6 +237,89 @@ sub GetSentences {
     }
     return 1;
 }
+
+
+
+
+## get sentences from a cache
+## where we have all sentences of the document stored
+
+sub GetSentencesFromCache {
+    my $self = shift;
+    my ( $data, $srcids, $trgids ) = @_;
+    my $srclang = $self->{SRCLANG};
+    my $trglang = $self->{TRGLANG};
+
+    unless (ref($self->{SRC_CACHE}) eq 'HASH'){
+	$self->{SRC_CACHE} = ();
+	$self->GetAllSentences($self->{SRC},$self->{SRC_CACHE});
+    }
+    unless (ref($self->{TRG_CACHE}) eq 'HASH'){
+	$self->{TRG_CACHE} = ();
+	$self->GetAllSentences($self->{TRG},$self->{TRG_CACHE});
+    }
+
+    foreach my $id ( @{$srcids} ) {
+	if (exists $self->{SRC_CACHE}->{$id}){
+	    $$data{$srclang}{$id} = $self->{SRC_CACHE}->{$id};
+	}
+	else{
+	    warn "cannot find source sentence $id";
+	}
+    }
+    foreach my $id ( @{$trgids} ) {
+	if (exists $self->{TRG_CACHE}->{$id}){
+	    $$data{$trglang}{$id} = $self->{TRG_CACHE}->{$id};
+	}
+	else{
+	    warn "cannot find target sentence $id";
+	}
+    }
+
+    ## TODO: always return 1?
+    return 1;
+}
+
+
+sub GetAllSentences {
+    my $self = shift;
+    my ( $reader, $cache ) = @_;
+
+    my $count=0;
+    while (my $new = $reader->read()){
+        my ($lang) = keys %{$new};
+        foreach my $id ( keys %{$$new{$lang}} ) {
+	    $$cache{$id} = $$new{$lang}{$id};
+	    $count++;
+        }
+    }
+    return $count;
+}
+
+
+
+
+
+# sub ParseAllSentences{
+#     my ($handle,$fh,$container,$wordcounter)=@_;
+
+#     while (<$fh>){
+#         eval { $handle->parse_more($_); };
+#         if ($@){
+#             warn $@;
+#             print STDERR $_;
+#         }
+#         if (exists $handle->{CLOSEDSID}){
+#             $$container{$handle->{CLOSEDSID}} = $handle->{OUTSTR};
+#             $$wordcounter{$handle->{CLOSEDSID}} = $handle->{NRWORDS};
+#             $handle->{OUTSTR} = '';
+#             $handle->{NRWORDS} = 0;
+#             delete $handle->{CLOSEDSID};
+# 	}
+#     }
+#     print '';
+# }
+
 
 
 =head1 INTERNAL METHODS
