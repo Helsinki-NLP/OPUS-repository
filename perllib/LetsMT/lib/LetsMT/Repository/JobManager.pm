@@ -15,7 +15,7 @@ use strict;
 use open qw(:std :utf8);
 
 use XML::LibXML;
-use File::Basename 'basename';
+use File::Basename;
 use File::Temp 'tempfile';
 use File::Path;
 use Encode qw(decode decode_utf8 is_utf8);
@@ -190,7 +190,7 @@ Submit jobs (running $command) for resources in the given path to the batch job 
 =cut
 
 sub submit_job {
-    if ($_[0]=~/^(detect_translations|detect_unaligned)$/){
+    if ($_[0]=~/^(detect_translations|detect_unaligned|parse|wordalign)$/){
 	if (my $jobfile = job_maker(@_) ){
 	    return "job maker submitted ($jobfile)";
 	}
@@ -239,13 +239,12 @@ sub run {
     if ($command eq 'reimport'){
         return run_import($path_elements, $args, 1);
     }
-    ## TODO: to be implemented
-    # if ($command eq 'wordalign'){
-    #     return run_wordalign($path_elements, $args);
-    # }
-    # if ($command eq 'parse'){
-    #     return run_parse($path_elements, $args);
-    # }
+    if ($command eq 'wordalign'){
+        return run_wordalign($path_elements, $args);
+    }
+    if ($command eq 'parse'){
+        return run_parse($path_elements, $args);
+    }
     if ($command eq 'download'){
         return run_import_url($path_elements, $args);
     }
@@ -652,37 +651,85 @@ sub run_align_resource {
 
 
 
-# sub run_wordalign {
-#     my ($path_elements,$args) = @_;
+sub run_parse {
+    my ($path_elements,$args) = @_;
 
-#     my @sentalign = ();
-#     my $path      = join('/',@{$path_elements});
+    my @sentalign = ();
+    my $path      = join('/',@{$path_elements});
+    my $resource  = LetsMT::Resource::make_from_storage_path( $path );
 
-#     my $resource = LetsMT::Resource::make_from_storage_path( $path );
-#     my $files = &find_sentence_aligned( $resource, $args );
+    ## run word alignment if the file is a sentence alignment file
+    if ($resource->type eq 'xml') {
+	my $udpipe = new LetsMT::DataProcessing::UDPipe;
+	my $lang = $resource->language();
+	if ($udpipe->load_model($lang)){
+	    my $pr = $resource->clone();
+	    $pr->base_path('ud');
 
-#     my $count = 0;
-#     my %done = ();
-#     foreach my $s (keys %{$files}){
-#         my $SrcRes = LetsMT::Resource::make_from_storage_path($s);
+	    my $input  = $resource->local_path;
+	    my $output = $pr->local_path;
+	    my $outdir = dirname($output);
 
-#         foreach my $t (keys %{$$files{$s}}){
+	    print "parsing: ".$resource->path."\n";
+	    &run_cmd( 'mkdir', '-p', $outdir );
+	    $udpipe->parse_xml_file($input,$output);
+	    if ( &LetsMT::WebService::put_resource( $pr ) ){
+		&LetsMT::WebService::put_meta( $resource,'parsed' => $pr->path );
+		return $pr;
+	    }
+	}
+	return 0;
+    }
 
-#             next if ($done{$$files{$s}{$t}});
-#             my $TrgRes = LetsMT::Resource::make_from_storage_path($t);
-#             my $AlgRes = 
-#                 LetsMT::Resource::make_from_storage_path($$files{$s}{$t});
+    ## search for all sentence alignment files and submit wordalign jobs
+    my @resources = &find_corpusfiles( $resource );
+    foreach my $res (@resources){
+	my @path_elements = split(/\/+/,$res->storage_path);
+	&job_maker( 'wordalign', \@path_elements, $args );
+    }
+    return scalar @resources;
+}
 
-#             &run_wordalign_resource( $SrcRes->slot, $SrcRes->user,
-# 				     $SrcRes->path, $TrgRes->path, 
-# 				     $AlgRes->path, $args );
-#             $done{ $$files{$s}{$t} } = 1;
-#             $count++;
-#         }
-#     }
-#     return $count;
-# }
 
+sub run_wordalign {
+    my ($path_elements,$args) = @_;
+
+    my @sentalign = ();
+    my $path      = join('/',@{$path_elements});
+    my $resource  = LetsMT::Resource::make_from_storage_path( $path );
+
+    ## run word alignment if the file is a sentence alignment file
+    if ($resource->type eq 'xces') {
+	print "word-align: ".$resource->path."\n";
+	my $aligner = new LetsMT::Align::Words;
+	my @newres = $aligner->wordalign($resource);
+	foreach my $n (@newres){
+	    &LetsMT::WebService::put_resource( $n )
+	}
+	if (@newres){
+	    &LetsMT::WebService::put_meta( $resource,
+					   'wordaligned'     => $newres[0]->path,
+					   'wordaligned_ids' => $newres[1]->path );
+	}
+	return @newres;
+    }
+
+    ## search for all sentence alignment files and submit wordalign jobs
+    my $files = &find_sentence_aligned( $resource, $args );
+
+    my $count = 0;
+    my %done = ();
+    foreach my $s (keys %{$files}){
+        foreach my $t (keys %{$$files{$s}}){
+            next if ($done{$$files{$s}{$t}});
+	    my @path_elements = split(/\/+/,$$files{$s}{$t});
+	    &job_maker( 'wordalign', \@path_elements, $args );
+            $done{ $$files{$s}{$t} } = 1;
+            $count++;
+        }
+    }
+    return $count;
+}
 
 
 

@@ -251,11 +251,11 @@ sub GetSentencesFromCache {
     my $trglang = $self->{TRGLANG};
 
     unless (ref($self->{SRC_CACHE}) eq 'HASH'){
-	$self->{SRC_CACHE} = ();
+	$self->{SRC_CACHE} = {};
 	$self->GetAllSentences($self->{SRC},$self->{SRC_CACHE});
     }
     unless (ref($self->{TRG_CACHE}) eq 'HASH'){
-	$self->{TRG_CACHE} = ();
+	$self->{TRG_CACHE} = {};
 	$self->GetAllSentences($self->{TRG},$self->{TRG_CACHE});
     }
 
