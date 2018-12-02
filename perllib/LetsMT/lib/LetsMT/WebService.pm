@@ -305,13 +305,13 @@ sub get_resource_request {
     my $resource     = shift;
     my %params       = @_;
 
-    # Determin whether we are downloading an archive or not.
+    # Determine whether we are downloading an archive or not.
     my $download_archive = ! (
            defined $params{archive}
         && $params{archive} =~ /^no$/i
     );
 
-    # Determin the actual name of the downloaded file.
+    # Determine the actual name of the downloaded file.
     my $target_file = $resource->local_path;
     my $target_dir = dirname($target_file);
     $target_file .= $archive_suffix  if ( $download_archive );

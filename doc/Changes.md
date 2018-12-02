@@ -44,6 +44,20 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 
 NEW: this now only lists the jobs of user `user1`. If `uid=admin` then it will list all jobs in the queue for all users.
 
+* new commands: parse and wordalign; for specific files:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en/4.xml?uid=user&run=parse"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv/4.xml?uid=user&run=wordalign"
+```
+
+* for all files in a subtree:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/opustest2/user/xml?uid=user&run=parse"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv?uid=user&run=wordalign"
+```
+
 
 * added: `run=reimport`: The normal import will now only do things to files that have not yet been imported. In order to overwrite existing imports, you now have to use the command `reimport`:
 

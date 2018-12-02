@@ -129,7 +129,8 @@ sub tokenize {
 
     #ensure final line break
     $text .= "\n" unless $text =~ /\n$/;
-    return split( /\s+/, $text );
+    # return split( /\s+/, $text );
+    return wantarray ? split( /\s+/, $text ) : join( ' ', split( /\s+/, $text ) );
 }
 
 

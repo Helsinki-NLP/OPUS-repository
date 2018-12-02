@@ -30,6 +30,9 @@ use LetsMT::Corpus;
 use LetsMT::Align;
 use LetsMT::Align::Words;
 use LetsMT::Tools::UD;
+use LetsMT::Export::Reader::XML;
+use LetsMT::Export::Writer::XML;
+use LetsMT::DataProcessing::Tokenizer;
 
 use Cwd;
 use Data::Dumper;
@@ -238,6 +241,9 @@ sub run {
     ## activate overwriting 
     if ($command eq 'reimport'){
         return run_import($path_elements, $args, 1);
+    }
+    if ($command eq 'tokenize'){
+        return run_tokenize($path_elements, $args);
     }
     if ($command eq 'wordalign'){
         return run_wordalign($path_elements, $args);
@@ -651,6 +657,60 @@ sub run_align_resource {
 
 
 
+## tokenize a resource or submit jobs to tokenize all resources in a subtree
+
+sub run_tokenize {
+    my ($path_elements,$args) = @_;
+
+    my @sentalign = ();
+    my $path      = join('/',@{$path_elements});
+    my $resource  = LetsMT::Resource::make_from_storage_path( $path );
+
+    ## run word alignment if the file is a sentence alignment file
+    if ($resource->type eq 'xml') {
+	$$args{method} = 'europarl' unless (exists $$args{method});
+
+	my $lang      = $resource->language;
+	my $tokenizer = new LetsMT::DataProcessing::Tokenizer(
+	    method => $$args{method},
+	    lang   => $resource->language );
+	my $reader = new LetsMT::Export::Reader::XML( tokenizer  => $tokenizer );
+	my $writer = new LetsMT::Export::Writer::XML;
+
+	my $outres = $resource->clone;
+	$outres->base_path('tok');
+
+	$reader->open($resource);
+	$writer->open($outres);
+
+	my $before = {};
+	my $after  = {};
+	while ( my $data = $reader->read($before,$after) ) {
+	    $writer->write($data,$before,$after);
+	}
+	$reader->close;
+	$writer->close;
+
+	if ( &LetsMT::WebService::put_resource( $outres ) ){
+	    &LetsMT::WebService::put_meta( $resource,
+					   'tokenized' => $outres->path );
+	    return $outres;
+	}
+    }
+
+    ## search for all sentence alignment files and submit wordalign jobs
+    my @resources = &find_corpusfiles( $resource );
+    foreach my $res (@resources){
+	my @path_elements = split(/\/+/,$res->storage_path);
+	&job_maker( 'tokenize', \@path_elements, $args );
+    }
+    return scalar @resources;
+}
+
+
+
+## parse a resource or submit jobs to parse all resources in a subtree
+
 sub run_parse {
     my ($path_elements,$args) = @_;
 
@@ -710,6 +770,36 @@ sub run_wordalign {
 
     ## run word alignment if the file is a sentence alignment file
     if ($resource->type eq 'xces') {
+
+	## check whether the source and target files exist as 
+	## UD parsed or tokenized versions
+	## if not? Try to parse or tokenize it ...
+	my $files = LetsMT::Corpus::find_sentence_aligned($resource);
+	return unless (ref($files) eq 'HASH');
+	return unless (keys %{$files});
+	my ($srcdoc) = keys %{$files};
+	my ($trgdoc) = keys %{$$files{$srcdoc}};
+
+	my $srcres = LetsMT::Resource::make_from_storage_path($srcdoc);
+	my $trgres = LetsMT::Resource::make_from_storage_path($trgdoc);
+
+	foreach my $res ($srcres, $trgres){
+	    $res->base_path('ud');
+	    unless (LetsMT::Corpus::resource_exists($res)){
+		$srcres->base_path('tok');
+		unless (LetsMT::Corpus::resource_exists($res)){
+		    $res->base_path('xml');
+		    my @path = split(/\/+/,$res->storage_path);
+		    print "pre-process: ".$res->path."\n";
+		    unless (run_parse(\@path)){
+			unless (run_tokenize(\@path)){
+			    return 0;
+			}
+		    }
+		}
+	    }
+	}
+
 	print "word-align: ".$resource->path."\n";
 	my $aligner = new LetsMT::Align::Words;
 	my @newres = $aligner->wordalign($resource);

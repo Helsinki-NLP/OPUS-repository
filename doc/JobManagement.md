@@ -139,6 +139,22 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/job?uid=user1"
 
 
 
+* `tokenize`, `parse`, `wordalign`  for specific files:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en/4.xml?uid=user&run=tokenize"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en/4.xml?uid=user&run=parse"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv/4.xml?uid=user&run=wordalign"
+```
+
+* `tokenize`, `parse`, `wordalign` for all files in a subtree:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/opustest2/user/xml?uid=user&run=tokenize"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/opustest2/user/xml?uid=user&run=parse"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv?uid=user&run=wordalign"
+```
+
 
 
 # TODO

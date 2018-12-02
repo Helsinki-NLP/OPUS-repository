@@ -131,6 +131,7 @@ sub _tail {
 sub _sentence_start {
     my ( $self, $id ) = @_;
     $id = $self->{SID} unless ($id);
+    return '' if ($self->{no_new_sentences});
     return "<s id=\"$id\">";
 }
 
@@ -141,6 +142,7 @@ sub _sentence_start {
 
 sub _sentence_end {
     my ( $self, $id ) = @_;
+    return '' if ($self->{no_new_sentences});
     return "</s>";
 }
 

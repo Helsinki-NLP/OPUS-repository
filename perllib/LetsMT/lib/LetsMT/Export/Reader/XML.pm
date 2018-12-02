@@ -15,6 +15,7 @@ use LetsMT::Resource;
 use LetsMT::WebService;
 use LetsMT::Tools;
 use LetsMT::Tools::XML qw/:all/;
+use LetsMT::Import;
 
 =head1 CONSTRUCTOR
 
@@ -23,6 +24,9 @@ use LetsMT::Tools::XML qw/:all/;
 sub new {
     my $class = shift;
     my %self = ( SID => 0, -encoding => 'utf8', @_ );
+
+    $self{normalizer} = $LetsMT::Import::DEFAULT_NORMALIZER  unless ( defined $self{normalizer} );
+    $self{tokenizer}  = $LetsMT::Import::DEFAULT_TOKENIZER   unless ( defined $self{tokenizer} );
 
     $self{PARSEROBJECT} = new XML::Parser(
         Handlers => {
@@ -115,7 +119,10 @@ sub read {
             = $self->{XMLPARSER}->{CLOSED_S}
             ? $self->{XMLPARSER}->{CLOSED_S}
             : $self->{SID};
-        $data->{ $self->{language} }->{$id} = $self->{XMLPARSER}->{SENT};
+
+	$self->{normalizer}->normalize_no_copy( $self->{XMLPARSER}->{SENT} );
+        $data->{ $self->{language} }->{$id} = 
+	    $self->{tokenizer}->tokenize( $self->{XMLPARSER}->{SENT} );
 
         # data from before the sentences
         if ( ref($before) eq 'HASH' ) {
@@ -153,10 +160,9 @@ sub __XmlTagStart {
         if ( $p->{INSIDE_BODY} ) {
             push( @{ $p->{BEFORE} }, [ $e, \%a ] );
         }
-        elsif ( $e eq 'body' ) {
+        elsif ( $e=~/^(body|text|letsmt)$/) {
             $p->{INSIDE_BODY} = 1;
         }
-
     }
 }
 

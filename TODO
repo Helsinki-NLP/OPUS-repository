@@ -4,7 +4,12 @@ To do as of version 0.56
 
 High priority:
 
-* jobs for starting word alignment and parsing
+* sentence alignment also produces TMX files
+  - integration of TMX files in interface (parallel data to be shown)
+  - need to copy some metadata from sentalign files
+* proper handling of revisions in GIT backend!
+* allow tags in version-control backends (at least for the git backend)
+* jobs for starting word alignment and parsing					(done)
 * check memory leak in sentence alignment?!
 * import URLs (retrieve from web and convert)					(done)
 * add dehyphenation module (as normalizer) - see pdf2xml
@@ -19,14 +24,17 @@ High priority:
   --> mark corpus that is already done/saved with ISA
   --> keep confidence scores for links that are not changed in ISA
   --> interactive dependency annotation						(started)
-* user interface (for uploads, OPUS integration)				(started)
-
+* user interface								(on-going)
+  - OPUS integration
+  - admin interface
 
 Medium priority:
 
+* support of e-book formats (epub), 
+  converter from Calibre (ebook-convert) or Apache-Tika				(done with Tika?)
 * jobs for web-crawling (using bitextor, e.g. bitextor integration)
-* improve git with remote servers (do not always push! betteru user of commit command?!)
-* allow tags in version-control backends (at least for the git backend)
+* interactive dependency aligner (IDA), integrated in interface			(started)
+* improve git with remote servers (do not always push!)
 * better fuzzy matching of file names (translation detection)
   --> lowercased file names
   --> without non-letter characters
@@ -46,9 +54,9 @@ Medium priority:
   - optimized sentence splitters, tokenizers
   - boilerplate removal etc (e.g. http://corpus.tools/wiki/Justext)
     https://metacpan.org/pod/Text::Identify::BoilerPlate
-* stable web interface with configuration support				(started)
-* slurm job manager (parameters, resource management missing)			(working)
-  --> distributed setup
+    boilerpipe (see bitextor)
+* slurm job manager (parameters, resource management missing)			(basic mode done)
+  --> distributed setup		 	  	     				(started)
   --> resource configuration and different queues?
 * integrate bicleaner (or similar tools)?
   https://github.com/bitextor/bicleaner

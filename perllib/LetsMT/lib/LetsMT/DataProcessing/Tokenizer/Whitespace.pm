@@ -17,7 +17,7 @@ use parent 'LetsMT::DataProcessing::Tokenizer';
 
 
 sub tokenize {
-    return split( /\s+/, $_[1] );
+    return wantarray ? split( /\s+/, $_[1] ) : join( ' ', split( /\s+/, $_[1] ) );
 }
 
 
