@@ -16,7 +16,7 @@ use open qw(:std :utf8);
 
 use XML::LibXML;
 use File::Basename;
-use File::Temp 'tempfile';
+use File::Temp qw/tempfile tempdir/;
 use File::Path;
 use Encode qw(decode decode_utf8 is_utf8);
 
@@ -663,6 +663,16 @@ sub run_parse {
 	my $udpipe = new LetsMT::DataProcessing::UDPipe;
 	my $lang = $resource->language();
 	if ($udpipe->load_model($lang)){
+	    unless (-e $resource->local_path){
+		my $tmpdir = $ENV{LETSMT_TMP} || '/tmp';
+		my $local_root = tempdir( 'parse_XXXXXXXX',
+					  DIR     => $tmpdir,
+					  CLEANUP => 1 );
+		$resource->local_dir($local_root);
+		unless ( &LetsMT::WebService::get_resource($resource) ) {
+		    get_logger(__PACKAGE__)->error("Unable to fetch resource: $resource");
+		}
+	    }
 	    my $pr = $resource->clone();
 	    $pr->base_path('ud');
 
@@ -685,7 +695,7 @@ sub run_parse {
     my @resources = &find_corpusfiles( $resource );
     foreach my $res (@resources){
 	my @path_elements = split(/\/+/,$res->storage_path);
-	&job_maker( 'wordalign', \@path_elements, $args );
+	&job_maker( 'parse', \@path_elements, $args );
     }
     return scalar @resources;
 }

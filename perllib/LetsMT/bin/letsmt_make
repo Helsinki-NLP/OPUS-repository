@@ -79,13 +79,13 @@ if ($opt_s) {
 $args{uid} = $user;
 my @path_elements = split( /\/+/, $path );
 
-my $nr_of_jobs = LetsMT::Repository::JobManager::run(
+my $response = LetsMT::Repository::JobManager::run(
     $command,
     \@path_elements,
     \%args
 );
 
-print "number of jobs submitted: $nr_of_jobs";
+print "response from job maker: $response";
 
 
 END {
