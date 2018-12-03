@@ -157,11 +157,11 @@ sub put {
     &_archive_meta(join( "/", @{ $self->{path_elements} }));
 
     ## get a document from an URL or payload
-    system("echo 'download file from url $self->{args}->{url} >>/tmp/tttt.log'");
+    # system("echo 'download file from url $self->{args}->{url} >>/tmp/tttt.log'");
     my $file = undef;
     if ( exists( $self->{args}->{url} ) ){
 	$file = &_download_url( $self->{args}->{url} );
-	system("echo 'download file $file >>/tmp/tttt.log'");
+	# system("echo 'download file $file >>/tmp/tttt.log'");
     }
     else{
 	my $payload = undef;
@@ -484,18 +484,30 @@ sub _get_payload() {
 
 sub _download_url {
     my $url = shift;
-    my ($content_type, $document_length, $modified_time, $expires, $server) = 
-	head($url);
-    head($url) || raise( 8, "cannot download $url", 'error' );
+
+    ## temp file for storing the downloaded file
     my ( $fh, $file ) = tempfile(
 	'url_download_XXXXXXXX',
 	DIR    => $ENV{UPLOADDIR},
 	UNLINK => 1
         );
     close $fh;
-    # my $response_code = mirror($url, $file);
-    my $response_code = getstore($url, $file);
-    return $file;
+
+    ## TODO: do something useful with the detectable content_type
+    # my ($content_type, $document_length, $modified_time, $expires, $server) = head($url);
+    # head($url) || raise( 8, "cannot download $url ($?)", 'error' );
+    if  (head($url)){
+	# my $response_code = mirror($url, $file);
+	my $response_code = getstore($url, $file);
+	return $file;
+    }
+    ## try wget if LWP::Simple fails
+    elsif (&run_cmd('wget','-O',$file,$url)){
+	return $file;
+    }
+    else{
+	raise( 8, "cannot download $url ($?)", 'error' );
+    }
 }
 
 

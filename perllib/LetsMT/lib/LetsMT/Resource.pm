@@ -311,8 +311,16 @@ sub language {
         }
     }
 
-    # try to find the first path element that looks like a language (pair)
-    foreach my $p (@path) {
+    ## relevant subdirs to check
+    my @dir2check = ();
+    push (@dir2check,$path[1]) if (@path>0);
+    push (@dir2check,$path[2]) if ($path[0] eq 'uploads' && @path>1);
+
+    ## OLD: try to find the first path element that looks like a language (pair)
+    # foreach my $p (@path) {
+
+    ## NEW: only check selected subdirs
+    foreach my $p (@dir2check) {
         my @langs = split( /\-/, $p );
         my $valid = 1;
         foreach (@langs) {

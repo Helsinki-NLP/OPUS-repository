@@ -223,7 +223,7 @@ sub tokenize_conllu{
 
 
 
-## TODO: other things like parsing and tagging
+## TODO: other things like tagging
 
 sub parse_xml_file{
     my $self      = shift;

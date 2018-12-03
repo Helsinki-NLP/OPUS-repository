@@ -14,6 +14,7 @@ use strict;
 
 use LetsMT::Export::Writer::Text;
 use LetsMT::Export::Writer::XML;
+use LetsMT::Export::Writer::TMX;
 use LetsMT::Export::Writer::Moses;
 
 use LetsMT::Import::XCESWriter;
@@ -49,6 +50,7 @@ use LetsMT::Import::XCESWriter;
 our %WRITER = (
     txt   => 'LetsMT::Export::Writer::Text',
     xml   => 'LetsMT::Export::Writer::XML',
+    tmx   => 'LetsMT::Export::Writer::TMX',
     moses => 'LetsMT::Export::Writer::Moses',
     align => 'LetsMT::Export::Writer::XCES',
     xces  => 'LetsMT::Import::XCESWriter'

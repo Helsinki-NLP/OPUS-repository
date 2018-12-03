@@ -13,6 +13,7 @@
 * improvements to job API (import/reimport/detect_translations/detect_unaligned)
 * integration of interactive sentence alignment (prototype)
 * integration of interactive parallel dependency annotation (prototype)
+* TMX output support added
 * bugfixing and fixed unit tests
 
 

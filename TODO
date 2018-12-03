@@ -5,6 +5,7 @@ To do as of version 0.56
 High priority:
 
 * sentence alignment also produces TMX files
+  - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)
   - need to copy some metadata from sentalign files
 * proper handling of revisions in GIT backend!
