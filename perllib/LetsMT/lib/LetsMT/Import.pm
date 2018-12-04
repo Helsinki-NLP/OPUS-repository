@@ -56,6 +56,7 @@ use LetsMT::Align;
 use LetsMT::Align::Words;
 
 use LetsMT::Repository::GroupManager;
+use LetsMT::Repository::JobManager;
 
 
 =head1 VARIABLES
@@ -364,12 +365,6 @@ sub import_resource {
 	    $skip_align     = $para{autoalign}     eq 'off' ? 1 : 0; # default = on
 	    $skip_parsing   = $para{autoparse}     eq 'on'  ? 0 : 1; # default = off
 	    $skip_wordalign = $para{autowordalign} eq 'on'  ? 0 : 1; # default = off
-
-	    ## OLD: always default=on
-	    ##
-	    # $skip_align     = 1 if ($para{autoalign} eq 'off');
-	    # $skip_parsing   = 0 if ($para{autoparse} eq 'off');
-	    # $skip_wordalign = 0 if ($para{autowordalign} eq 'off');
 	}
 
         #-------------------------------------------------------------------
@@ -395,27 +390,42 @@ sub import_resource {
 		}
 	    }
 	}
-        #-------------------------------------------------------------------
 
-	my @parsed_resources = ();
+	## this should be done by align_resources now .....
+        # #-------------------------------------------------------------------
+	# ## convert to TMX
+	# foreach my $r (@aligned_resources){
+	#     my @path_elements = split(/\/+/,$r->storage_path);
+	#     LetsMT::Repository::JobManager::run_make_tmx(\@path_elements);
+	# }
+
+        #-------------------------------------------------------------------
+	## parse all monolingual resources using UDPipe
 	unless ($skip_parsing){
-	    @parsed_resources = &parse_resources( $corpus, @$new_resources );
-	    push ( @$new_resources, @parsed_resources);
+	    my @resources = &get_monolingual_resources(@$new_resources);
+	    my $udpipe = new LetsMT::DataProcessing::UDPipe;
+	    foreach my $r (@resources) {
+		my @path_elements = split(/\/+/,$r->storage_path);
+		if (my $newres = LetsMT::Repository::JobManager::run_parse(\@path_elements)){
+		    push (@$new_resources,$newres);
+		}
+	    }
 	}
 
-	## now even run word alignment!
-	## TODO: this only works for parsed or tokenized data!
+        #-------------------------------------------------------------------
+	## now even run word alignment for sentence aligned documents!
 	unless ($skip_wordalign){
-	    push ( @$new_resources, &wordalign_resources( @aligned_resources ) );
+	    foreach my $res (@aligned_resources){
+		my @path_elements = split(/\/+/,$res->storage_path);
+		my @newres = 
+		    LetsMT::Repository::JobManager::run_wordalign(\@path_elements);
+		foreach my $n (@newres){
+		    push (@$new_resources,$n);
+		}
+	    }
 	}
 
         ## update resource status!
-	## NEW: don't add empty resource - just accept
-	##
-        # my $status = @$new_resources
-        #     ? 'imported'
-        #     : 'empty resource (imported nothing)';
-
 	my $status = 'imported';
         &LetsMT::WebService::del_meta(
             $corpus,
@@ -616,70 +626,6 @@ sub find_translations {
     }
     return $AlignResources;
 }
-
-
-=head2 C<parse_resources>
-
-=cut
-
-sub parse_resources {
-    my $corpus    = shift;
-    my @resources = &get_monolingual_resources(@_);
-    my @parsed    = ();
-
-    my $udpipe = new LetsMT::DataProcessing::UDPipe;
-    foreach my $r (@resources) {
-	my $lang = $r->language();
-	if ($udpipe->load_model($lang)){
-
-	    my $pr = $r->clone();
-	    $pr->base_path('ud');
-
-	    my $input  = $r->local_path;
-	    my $output = $pr->local_path;
-	    my $outdir = dirname($output);
-
-	    print "parsing: ".$r->path."\n";
-	    &run_cmd( 'mkdir', '-p', $outdir );
-	    $udpipe->parse_xml_file($input,$output);
-	    if ( &LetsMT::WebService::put_resource( $pr ) ){
-		&LetsMT::WebService::put_meta( $r,'parsed' => $pr->path );
-		push (@parsed,$pr);
-	    }
-	}
-    }
-    return @parsed;
-}
-
-
-
-=head2 C<wordalign_resources>
-
-=cut
-
-sub wordalign_resources {
-    my @resources = @_;
-    my @aligned   = ();
-
-    my $aligner = new LetsMT::Align::Words;
-    foreach my $res (@resources){
-	print "word-align: ".$res->path."\n";
-	my @newres = $aligner->wordalign($res);
-	foreach my $n (@newres){
-	    if ( &LetsMT::WebService::put_resource( $n ) ){
-		push (@aligned,$n);
-	    }
-	}
-	if (@newres){
-	    &LetsMT::WebService::put_meta( $res,
-					   'wordaligned'     => $newres[0]->path,
-					   'wordaligned_ids' => $newres[1]->path );
-	}
-    }
-    return @aligned;
-}
-
-
 
 
 

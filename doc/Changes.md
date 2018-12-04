@@ -10,6 +10,8 @@ There is quite a lot of changes since the latest release from the original LetsM
 * UDPipe is integrated for sentence splitting (and more in the future)
 * pdf2xml is integrated as pdf import method `combined` (but this is VERY slow!)
 * experimental sentence alignment interface (ISA)
+* support of additional commands via the job API and run: tokenize, parse, wordalign, make_tmx
+* import now automatically creates TMX files as well
 
 
 ## Changes to the storage API

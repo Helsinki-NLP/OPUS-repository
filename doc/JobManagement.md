@@ -155,6 +155,12 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/opustest2/user/xml?uid=user&run=parse"
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv?uid=user&run=wordalign"
 ```
 
+* convert to TMX: `make_tmx`
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv/4.xml?uid=user&run=make_tmx"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv?uid=user&run=make_tmx"
+```
 
 
 # TODO

@@ -4,6 +4,9 @@ To do as of version 0.56
 
 High priority:
 
+* option to send import result by e-mail
+  (see email server setup here: 
+   https://www.tecmint.com/setup-postfix-mail-server-in-ubuntu-debian/)
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)
@@ -28,6 +31,7 @@ High priority:
 * user interface								(on-going)
   - OPUS integration
   - admin interface
+
 
 Medium priority:
 

@@ -182,11 +182,15 @@ sub align_resources {
                 'aligner-arguments'    => $args,
                 'nr-source-sents'      => $self->nr_source_sentences(),
                 'nr-target-sents'      => $self->nr_target_sentences(),
-                'alignment-cost'       => $self->align_cost(),
-                'average-link-cost'    => $self->average_align_cost(),
-                'alignment-confidence' => $self->align_confidence(),
+                # 'alignment-cost'       => $self->align_cost(),
+                # 'average-link-cost'    => $self->average_align_cost(),
+                # 'alignment-confidence' => $self->align_confidence(),
                 'running-time'         => time() - $start
             );
+
+            $meta{'alignment-cost'} = $self->align_cost() if ($self->align_cost());
+            $meta{'alignment-confidence'} = $self->align_confidence() if ($self->align_confidence());
+            $meta{'average-link-cost'} = $self->average_align_cost() if ($self->average_align_cost());
 
             # statistics of alignment types
             my $LinkTypes = $self->link_types;
@@ -224,6 +228,10 @@ sub align_resources {
                 $SrcResource,
                 'align-candidates' => $TrgResource->path
             );
+
+	    ## NEW: also create a TMX file out of the bitext
+	    my @path_elements = split(/\/+/,$AlgResource->storage_path);
+	    LetsMT::Repository::JobManager::run_make_tmx(\@path_elements);
 
             return $AlgResource;
         }

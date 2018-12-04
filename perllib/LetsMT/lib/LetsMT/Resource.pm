@@ -584,7 +584,7 @@ sub convert_type {
 
 =head2 C<base_path>
 
- $newbasepath = $resource->base_path
+ $basepath    = $resource->base_path
  $oldbasepath = $resource->base_path($new)
 
 Return or set first element in resource path

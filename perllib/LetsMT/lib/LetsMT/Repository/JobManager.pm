@@ -30,6 +30,8 @@ use LetsMT::Corpus;
 use LetsMT::Align;
 use LetsMT::Align::Words;
 use LetsMT::Tools::UD;
+use LetsMT::Export::Reader;
+use LetsMT::Export::Writer;
 use LetsMT::Export::Reader::XML;
 use LetsMT::Export::Writer::XML;
 use LetsMT::DataProcessing::Tokenizer;
@@ -193,7 +195,7 @@ Submit jobs (running $command) for resources in the given path to the batch job 
 =cut
 
 sub submit_job {
-    if ($_[0]=~/^(detect_translations|detect_unaligned|parse|wordalign)$/){
+    if ($_[0]=~/^(detect_translations|detect_unaligned|parse|wordalign|make_tmx)$/){
 	if (my $jobfile = job_maker(@_) ){
 	    return "job maker submitted ($jobfile)";
 	}
@@ -250,6 +252,9 @@ sub run {
     }
     if ($command eq 'parse'){
         return run_parse($path_elements, $args);
+    }
+    if ($command eq 'make_tmx'){
+        return run_make_tmx($path_elements, $args);
     }
     if ($command eq 'download'){
         return run_import_url($path_elements, $args);
@@ -414,6 +419,9 @@ sub run_align {
         )
         : $corpus;
 
+    ## conversion magic if the file is a TMX resource
+    $resource->base_path('xml') if ($resource->base_path eq 'tmx');
+
     ## if trg argument is given: assume that we have two 
     ## given resources to be aligned (in the same slot/branch)
 
@@ -567,7 +575,10 @@ sub run_realign {
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
 
+    ## make the resource and turn it into the xces files in case it is TMX
+    ## TODO: is it good to introduce this kind of conversion magic?
     my $resource = LetsMT::Resource::make_from_storage_path( $path );
+    $resource->base_path('xml') if ($resource->base_path eq 'tmx');
     my $files = &find_sentence_aligned( $resource, $args );
 
     my $count = 0;
@@ -748,7 +759,7 @@ sub run_parse {
 		return $pr;
 	    }
 	}
-	return 0;
+	return undef;
     }
 
     ## search for all sentence alignment files and submit wordalign jobs
@@ -767,6 +778,9 @@ sub run_wordalign {
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
     my $resource  = LetsMT::Resource::make_from_storage_path( $path );
+
+    ## conversion magic if the file is a TMX resource
+    $resource->base_path('xml') if ($resource->base_path eq 'tmx');
 
     ## run word alignment if the file is a sentence alignment file
     if ($resource->type eq 'xces') {
@@ -830,6 +844,75 @@ sub run_wordalign {
     }
     return $count;
 }
+
+
+## convert bitexts to TMX
+
+sub run_make_tmx {
+    my ($path_elements,$args) = @_;
+
+    my @sentalign = ();
+    my $path      = join('/',@{$path_elements});
+    my $resource  = LetsMT::Resource::make_from_storage_path( $path );
+
+    if ($resource->type eq 'xces') {
+
+	print "convert to TMX: ".$resource->path."\n";
+
+	## fetch resource if necessary
+	unless (-e $resource->local_path){
+	    my $tmpdir = $ENV{LETSMT_TMP} || '/tmp';
+	    my $local_root = tempdir( 'make_tmx_XXXXXXXX',
+				      DIR     => $tmpdir,
+				      CLEANUP => 1 );
+	    $resource->local_dir($local_root);
+	    unless ( &LetsMT::WebService::get_resource($resource) ) {
+		get_logger(__PACKAGE__)->error("Unable to fetch resource: $resource");
+	    }
+	}
+
+	## output resource
+	my $outres = $resource->clone;
+	$outres->base_path('tmx');
+
+	## readers and writers
+	my $input = new LetsMT::Export::Reader( $resource, 'xces' );
+	my $output = new LetsMT::Export::Writer( $outres, 'tmx' );
+
+	## convert the data
+	$input->open($resource);
+	$output->open($outres);
+	my ($before, $after) = ({}, {});
+	while ( my $data = $input->read( $before, $after ) ) {
+	    $output->write( $data, $before, $after );
+	}
+	$input->close();
+	$output->close();
+
+	if ( &LetsMT::WebService::put_resource( $outres ) ){
+	    &LetsMT::WebService::put_meta( $resource,'tmx' => $outres->path );
+		return $outres;
+	}
+	return undef;
+    }
+
+    ## search for all sentence alignment files and submit conversion jobs
+    my $files = &find_sentence_aligned( $resource, $args );
+
+    my $count = 0;
+    my %done = ();
+    foreach my $s (keys %{$files}){
+        foreach my $t (keys %{$$files{$s}}){
+            next if ($done{$$files{$s}{$t}});
+	    my @path_elements = split(/\/+/,$$files{$s}{$t});
+	    &job_maker( 'make_tmx', \@path_elements, $args );
+            $done{ $$files{$s}{$t} } = 1;
+            $count++;
+        }
+    }
+    return $count;
+}
+
 
 
 
@@ -1023,6 +1106,9 @@ sub run_setup_ida {
 
     my $IdaHome = join('/',$WebRoot,'ida',$user,$slot);
 
+    ## conversion magic if the file is a TMX resource
+    $$path_elements[0]='xml' if ($$path_elements[0] eq 'tmx');
+
     ## path should start with xml
     return 'not in xml-root of your repository' if (shift(@{$path_elements}) ne 'xml');
     my $corpus = join('_',@{$path_elements});
@@ -1146,6 +1232,9 @@ sub run_setup_isa {
 	system("cp -R $IsaFileDir/* $IsaHome/");
     }
 
+    ## conversion magic if the file is a TMX resource
+    $$path_elements[0]='xml' if ($$path_elements[0] eq 'tmx');
+
     ## path should start with xml
     return undef if (shift(@{$path_elements}) ne 'xml');
     my $corpus = join('_',@{$path_elements});
@@ -1197,6 +1286,10 @@ sub run_remove_isa {
 
     my $slot = shift(@{$path_elements});
     my $user = shift(@{$path_elements});
+
+    ## conversion magic if the file is a TMX resource
+    $$path_elements[0]='xml' if ($$path_elements[0] eq 'tmx');
+
     my $path = join('/',@{$path_elements});
     $path    =~s/\.xml$/.isa.xml/;
 
@@ -1250,6 +1343,10 @@ sub run_upload_isa {
 
     my $slot = shift(@{$path_elements});
     my $user = shift(@{$path_elements});
+
+    ## conversion magic if the file is a TMX resource
+    $$path_elements[0]='xml' if ($$path_elements[0] eq 'tmx');
+
     my $path = join('/',@{$path_elements});
 
     return undef if (shift(@{$path_elements}) ne 'xml');

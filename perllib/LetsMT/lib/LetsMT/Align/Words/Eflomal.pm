@@ -21,6 +21,7 @@ use File::Temp qw/tempfile tempdir/;
 use File::Basename;
 use File::Copy;
 use File::Path;
+use LWP::Simple;
 
 
 # eflomal
@@ -36,7 +37,7 @@ chomp($ATOOLS);
 
 ## priors of eflomal
 our $EFLOMAL_MODEL_DIR = $LetsMT::EFLOMAL_MODEL_DIR || 
-    '/usr/local/share/eflomal/priors';
+    '/usr/local/share/eflomal/priors2';
 
 
 =head1 CONSTRUCTOR
@@ -88,26 +89,7 @@ sub wordalign{
 
     my $srclang = $source_resource->language();
     my $trglang = $target_resource->language();
-    my $priors  = $EFLOMAL_MODEL_DIR.'/'.$srclang.'-'.$trglang.'.priors';
-    unless (-e $priors){
-	if (-e $priors.'.gz'){
-	    my ( $fh, $tmpfile ) = tempfile(
-		'eflomal_XXXXXXXX',
-		DIR    => $ENV{UPLOADDIR},
-		UNLINK => 1
-		);
-	    close $fh;
-	    if (&pipe_in_out_cmd($priors.'.gz',$tmpfile,'gzip','-cd')){
-		$priors = $tmpfile;
-	    }
-	    else{
-		$priors = undef;
-	    }
-	}
-	else{
-	    $priors = undef;
-	}
-    }
+    my $priors  = _get_priors($srclang, $trglang);
 
     ## make eflomal arguments
     my @para = (
@@ -146,6 +128,44 @@ sub wordalign{
 }
 
 
+## find priors for the given language pair
+
+sub _get_priors{
+    my ($srclang, $trglang) = @_;
+
+    my $priors  = $EFLOMAL_MODEL_DIR.'/'.$srclang.'-'.$trglang.'.priors';
+    return $priors if (-e $priors);
+
+    # download from OPUS if necessary
+    unless (-e $priors.'.gz'){
+	my $dir = $ENV{LETSMT_TMP} ? $ENV{LETSMT_TMP} : '/tmp';
+	$dir .= '/eflomal';
+	mkdir $dir unless ( -e $dir );
+	$priors = $dir.'/'.$srclang.'-'.$trglang.'.priors';
+	unless (-e $priors.'.gz'){
+	    my $opus_eflomal = 'https://object.pouta.csc.fi/OPUS-eflomal/priors/';
+	    my $url = $opus_eflomal.$srclang.'-'.$trglang.'.priors.gz';
+	    if  (head($url)){
+		unless (getstore($url, $priors.'.gz')){
+		    $priors = undef;
+		}
+	    }
+	}
+    }
+
+    if (-e $priors.'.gz'){
+	my ( $fh, $tmpfile ) = tempfile(
+	    'eflomal_XXXXXXXX',
+	    DIR    => $ENV{UPLOADDIR},
+	    UNLINK => 1
+	    );
+	close $fh;
+	if (&pipe_in_out_cmd($priors.'.gz',$tmpfile,'gzip','-cd')){
+	    return $tmpfile;
+	}
+    }
+    return undef;
+}
 
 ## convert to temporary Moses format for running eflomal
 ## NOTE! don't forget tokenization! (if not tokenized already)
