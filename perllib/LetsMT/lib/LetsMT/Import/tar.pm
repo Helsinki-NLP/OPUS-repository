@@ -9,7 +9,7 @@ LetsMT::Import::tar - import handler for C<tar> archives
 use strict;
 use parent 'LetsMT::Import::Generic';
 
-use File::Basename qw/basename/;
+use File::Basename qw/basename dirname/;
 use Data::Dumper;
 use XML::LibXML;
 use Encode qw(decode decode_utf8 is_utf8);
@@ -132,8 +132,8 @@ sub initialize_import{
     my $self=shift;
     my ($resource,$meta_resource) = @_;
 
-    my $resource_path = $resource->path;
-    $resource_path =~s/\.[^.]+(\.gz)?$// or $resource_path .= '.extracted';
+    my $resource_path = dirname($resource->path);
+    # $resource_path =~s/\.[^.]+(\.gz)?$// or $resource_path .= '.extracted';
     my $homedir_resource = $resource->clone;
     $homedir_resource->path( $resource_path );
 
