@@ -34,6 +34,13 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/corpus/user/uploads/html/spiegel.de/
  $LETSMT_CONNECT -X GET "$LETSMT_URL/storage?uid=admin"
 ```
 
+* send resources by e-mail (zip archives or plain files):
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/corpus/user/xml/en/test.html?uid=user&action=download&email=name@domain.org"
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/corpus/user/xml/en/test.html?uid=user&action=download&archive=no&email=name@domain.org"
+```
+
 
 
 ## Changes to the job API

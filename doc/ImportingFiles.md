@@ -283,3 +283,11 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/metadata/corpus/user?uid=user1"
 </letsmt-ws>
 ```
 
+
+* e-mail TMX files of all bitexts that come ot of an import
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/corpus/user/uploads/archive.tar.gz?uid=user&action=import&email=name@domain.com" --form payload=@archive.tar.gz
+```
+
+NOTE: This sends one e-mail per document pair! This may become many e-mails if the arhive contains a lot of parallel documents!

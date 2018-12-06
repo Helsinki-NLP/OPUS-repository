@@ -28,6 +28,7 @@ use File::Temp qw(tempfile);
 use Apache2::Request;
 use Apache2::Upload;
 use LWP::Simple;
+use MIME::Lite;
 
 use LetsMT;
 use LetsMT::Tools;
@@ -87,6 +88,29 @@ sub get {
         );
 
         get_logger(__PACKAGE__)->debug( 'got target: ' . $target );
+
+	## send the resource by e-mail instead of downloading
+	if ( $self->{args}->{email}=~/\S+\@\S+/ ){
+	    my $msg = MIME::Lite->new(
+		From    => 'admin@opus.nlpl.org',
+		To      => $self->{args}->{email},
+		Subject => 'resource from the OPUS repository',
+		Data    => "The resource $self->{path_info} is attached.\n\nOPUS repository\n\n"
+		);
+	    $msg->attach(
+		Path    => $target,
+		Type    =>'AUTO'
+		);
+	    $msg->send;
+	    my $result_obj = LetsMT::Repository::Result->new(
+		type      => 'ok',
+		code      => 0,
+		operation => 'GET',
+		location  => $self->{path_info},
+		message   => 'resource sent to '.$self->{args}->{email},
+		);
+	    return $result_obj->get_xml_result();
+	}
 
         return \$target;  # Return the temp location of the download target as string ref
     }
@@ -201,6 +225,13 @@ sub put {
 
             get_logger(__PACKAGE__)->debug( 'upload: ' . $upload );
 
+	    my $command = join( ' ',
+				'letsmt_import',
+				'-u' => safe_path($branch),
+				'-s' => safe_path($slot),
+				'-p' => safe_path($upload) );
+	    $command .= ' -E ' . $self->{args}->{email} if (defined $self->{args}->{email});
+
             # create import job
             LetsMT::Repository::JobManager::create_job(
                 # path   => "$path.import_job",
@@ -208,12 +239,7 @@ sub put {
                 uid      => $self->{args}->{uid},
                 walltime => 5,
                 queue    => 'letsmt',
-                commands => [ join( ' ',
-                    'letsmt_import',
-                    '-u' => safe_path($branch),
-                    '-s' => safe_path($slot),
-                    '-p' => safe_path($upload),
-                ) ],
+                commands => [ $command ],
             );
 
             # submit job

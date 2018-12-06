@@ -267,7 +267,7 @@ sub import_file {
 
 =head2 C<import_resource>
 
- $importer->import_resource ($resource[,skip_align[,skip_find_align]])
+ $importer->import_resource ($resource, %args)
 
 Fetches a resource from the repository (should be from the C<uploads> directory)
 and attempts to run all possible import handlers to get a new set of resources
@@ -279,10 +279,12 @@ successful and false otherwise.
 sub import_resource {
     my $self            = shift;
     my $resource        = shift;
-    my $skip_align      = shift;
-    my $skip_find_align = shift;
-    my $skip_parsing    = shift;
-    my $skip_wordalign  = shift;
+    my %args            = @_;
+
+    my $skip_align      = $args{skip_align} ? $args{skip_align} : undef;
+    my $skip_find_align = $args{skip_find_align} ? $args{skip_find_align} : undef;
+    my $skip_parsing    = $args{skip_parsing} ? $args{skip_parsing} : undef;
+    my $skip_wordalign  = $args{skip_wordalign} ? $args{skip_wordalign} : undef;
 
     $self->{new_resources} = [];
     $resource->local_dir( $self->{local_root} )
@@ -387,6 +389,9 @@ sub import_resource {
 		else {
 		    @aligned_resources = &align_documents( $corpus, @$new_resources );
 		    # push ( @$new_resources, @aligned_resources);
+		    if ($args{email}=~/\S+\@\S+/){
+			&send_bitexts_as_tmx( $args{email}, \@aligned_resources );
+		    }
 		}
 	    }
 	}
@@ -451,6 +456,32 @@ sub import_resource {
     }
     return wantarray ? () : 0;
 }
+
+
+## send a bitext as TMX via email
+## TODO: should we create one global TMX for multiple aligned documents?
+
+sub send_bitexts_as_tmx{
+    my $email  = shift;
+    my $algres = shift;
+
+    return unless (ref($algres) eq 'ARRAY');
+    foreach my $tmxres (@$algres){
+	$tmxres->base_path('tmx');
+	if (resource_exists($tmxres)){
+	    LetsMT::WebService::get( $tmxres, 
+				     email => $email,
+				     action => 'download',
+				     archive => 'no' );
+	}
+	else{
+	    my @path_elements = split(/\/+/,$tmxres->storage_path);
+	    LetsMT::Repository::JobManager::run_make_tmx( \@path_elements,
+							  email => $email );
+	}
+    }
+}
+
 
 
 =head2 C<align_documents>

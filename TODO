@@ -5,8 +5,14 @@ To do as of version 0.56
 High priority:
 
 * option to send import result by e-mail
-  (see email server setup here: 
-   https://www.tecmint.com/setup-postfix-mail-server-in-ubuntu-debian/)
+  simple setup of mail utilities: https://tecadmin.net/bash-mail-command-not-found/
+  sudo apt-get install mailutils
+  echo "Message Body" | mail -s "Message Subject" receiver@example.com
+  or using sendmail
+  sudo apt-get install sendmail
+  sudo apt-get install libemail-sender-perl 
+  for perl: https://metacpan.org/pod/Mail::Sendmail
+  or better libmime-lite-perl (Mime::Lite)
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)
