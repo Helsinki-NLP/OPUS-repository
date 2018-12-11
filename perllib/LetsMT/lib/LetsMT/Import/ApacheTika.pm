@@ -35,11 +35,6 @@ sub new {
     my $class = shift;
     my %self  = @_;
 
-    # pattern for matching expected tika output in validation
-    # accept as long as there is a type detected
-    $self{content_type_pattern} = '\S' unless $self{content_type_pattern};
-    $self{content_type_pattern}=~s/Content-Type:\s*//;
-
     ## could also have rawxml here (use rmeta function to get XML output from TIKA)
     $self{intermediate_format} = 'txt' unless ($self{intermediate_format});
 
@@ -71,18 +66,18 @@ sub validate {
     my $content  = $self->_read_raw_file($resource->local_path);
     my $detected = $TIKA->detect_stream($content);
 
-    ## TODO: should we do more than warn if type is not matched?
     if ($detected){
-#	if ($detected=~/$type/i){
-        if ($detected=~/$$self{content_type_pattern}/i){
-            return [];
-	}
+	## a bit of ad-hoc changes to mime-types
+	$detected-~s/text\/plain/txt/;
+	$detected=~s/^[^\/]+\///;
+	$resource->type($detected);
+	return ( [] , [[$resource,'detected_stream' => $detected]] );
     }
 
-    ## fail if nothing detected
-    $logger->warn("failed to validate as $type (detected = $detected)!");
+    ## something went wrong
+    $logger->warn("failed to detect stream type!");
     return [
-        [ $resource, import_log => "failed to validate as $type" ]
+        [ $resource, import_log => "failed to delect stream type" ]
     ];
 }
 

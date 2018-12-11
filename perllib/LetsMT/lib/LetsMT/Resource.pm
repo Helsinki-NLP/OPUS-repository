@@ -412,6 +412,11 @@ Return the resource type (guessing from the path if necessary).
 
 sub type {
     my $self = shift;
+
+    ## set type if given as argument
+    ## (TODO: is that OK to make that possible?)
+    $self->{type} = $_[0] if defined( $_[0] );
+
     return $self->{type} if ( exists $self->{type} );
 
     # repository resources:
@@ -568,6 +573,10 @@ sub convert_type {
         }
     }
 
+    ## NEW: delete special directories "original" and "translation"
+    ##      (coming from uploads with unspecified languages)
+    $new_self->{path}=~s/^(uploads\/$new_type\/)(original|translation)\//$1/;
+
     # set the file extension according to the new type
     # or add an extension
     unless ( $new_self->{path} =~ s/\.$old_type$/\.$new_type/i ) {
@@ -577,6 +586,7 @@ sub convert_type {
         # }
     }
 
+    $new_self->type($new_type);
     return $new_self;
 }
 
