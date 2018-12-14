@@ -55,7 +55,7 @@ PartitionName=debug Nodes=opus-rr,opus-node0 Default=YES MaxTime=2880 State=UP
 
 ## Install stable version
 
-Add `-stable` to the make targets:
+Add `-stable` to the make targets (this is also the default for `make install-opus` and `make install-opus-client`):
 
 ```
 make opus-stable
@@ -71,3 +71,10 @@ Add `-dev` to the make targets:
 make opus-dev
 make opus-client-dev
 ```
+
+
+## Updating the system
+
+* pull latest source from git on all servers (including compute nodes)
+* run the make commands as above on all nodes
+* make sure that slurm is running corectly with connections to all nodes (`sinfo`)

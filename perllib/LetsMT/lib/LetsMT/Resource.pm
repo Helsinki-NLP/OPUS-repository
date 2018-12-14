@@ -564,13 +564,21 @@ sub convert_type {
 
     # set the sub-directory according to the new type
     # - allow (and ignore) a leading 'uploads' dir
-    # - replace the first non-'uploads' dir with new-type
-    # - or simply add a new-type sub-dir
+    # - replace the first non-'uploads' dir with new-type (if it is not the language ID)
+    # - or simply add a new-type sub-dir in all other cases
     # (this looks much too complicated but seems to work fine ...)
     unless ( $new_self->{path} =~ s/^(uploads\/)?$old_type\//$1$new_type\//i ) {
-        unless ( $new_self->{path} =~ s/^(uploads\/)?[^\/]+\//$1$new_type\//i ) {
-            $new_self->{path} =~ s/^(uploads\/)?/$1$new_type\//i;
-        }
+        if ( $new_self->{path} =~ /^(uploads\/)?([^\/]+)\//i ) {
+	    ## check whether the first non-'uploads' dir is not the language ID
+	    ## if not --> replace with new type
+	    if ($2 ne $self->language){
+		$new_self->{path} =~ s/^(uploads\/)?[^\/]+\//$1$new_type\//i;
+	    }
+	}
+	## if replacement didn't work --> just add the subdir of the new type
+	unless ($new_self->{path} =~ /^(uploads\/)?$new_type\//i){
+	    $new_self->{path} =~ s/^(uploads\/)?/$1$new_type\//i;
+	}
     }
 
     ## NEW: delete special directories "original" and "translation"
