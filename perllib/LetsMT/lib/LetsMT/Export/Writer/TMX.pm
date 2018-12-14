@@ -129,8 +129,7 @@ sub _sentence_end {
 
 sub _encode {
     my ( $self, $string ) = @_;
-    $string=~s/^\s+/ /;
-    $string=~s/\s+$/ /;
+    $string=~s/\s\s+/ /;
     $self->{WRITER}->characters( $string );
     return '';
 }
