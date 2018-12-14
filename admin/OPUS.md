@@ -55,7 +55,7 @@ PartitionName=debug Nodes=opus-rr,opus-node0 Default=YES MaxTime=2880 State=UP
 
 ## Install stable version
 
-Add `-stable` to the make targets (this is also the default for `make install-opus` and `make install-opus-client`):
+Add `-stable` to the make targets (this should also be the default of `make install-opus` and `make install-opus-client`):
 
 ```
 make opus-stable
