@@ -104,7 +104,7 @@ sub resources_with_similar_names{
 	    my @matches = amatch( $filebase, @{$corpusfiles{$l}} );
 	    # more than 1? sorting according to distance!
 	    # see https://metacpan.org/pod/String::Approx
-	    if ($#matches){
+	    if (@matches>1){
 		my %dist;
 		@dist{@matches} = map { abs } adistr( $filebase, @matches );
 		@matches = sort { $dist{$a} <=> $dist{$b} } @matches;

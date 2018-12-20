@@ -42,6 +42,20 @@ use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
 
 
+## wget parameters
+##
+## WgetReject: file types to reject
+## WgetQuota:  overall download quota (0=unlimited)
+##
+## TODO: make it possible to adjust parameters from API calls
+##       other kind of checks to make sure we only download files we want
+
+my $WgetReject = 'zip,mp3,mp4,tar,gz,jpg,tiff,gif,png,mov,m4v,css,rar,js,pl,sh,rb,ico';
+my $WgetQuota = '0';
+# my $WgetQuota = '4000m';
+
+
+
 =head1 FUNCTIONS
 
 =head2 C<create_job>
@@ -194,15 +208,33 @@ Submit jobs (running $command) for resources in the given path to the batch job 
 
 =cut
 
+## align|align_candidates|realign|import|reimport|.*_ida|.*_isa
+
 sub submit_job {
-    if ($_[0]=~/^(detect_translations|detect_unaligned|parse|wordalign|make_tmx)$/){
-	if (my $jobfile = job_maker(@_) ){
-	    return "job maker submitted ($jobfile)";
-	}
-	return "failed to submit job maker!";
+
+    if ($_[0]=~/^(align|align_candidates|realign|import|reimport|.*_ida|.*_isa)$/){
+	return run(@_);
     }
-    return run(@_);
+    if (my $jobfile = job_maker(@_) ){
+	return "job maker submitted ($jobfile)";
+    }
+    return "failed to submit job maker!";
 }
+
+
+## OLD: job_maker only in selected cases
+## NEW: job_maker is default and selected cases run directly (see above)
+##
+#     if ($_[0]=~/^(detect_translations|detect_unaligned|parse|wordalign|make_tmx|download|crawl)$/){
+# 	if (my $jobfile = job_maker(@_) ){
+# 	    return "job maker submitted ($jobfile)";
+# 	}
+# 	return "failed to submit job maker!";
+#     }
+#     return run(@_);
+# }
+
+
 
 
 =head2 C<run>
@@ -262,9 +294,9 @@ sub run {
     ## TODO: implement web crawling of entire websites
     ##       (using bitextor?)
     ## 
-    # if ($command eq 'crawl'){
-    #     return run_crawler($path_elements, $args, 1);
-    # }
+    if ($command eq 'crawl'){
+        return run_crawler($path_elements, $args);
+    }
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
     }
@@ -1008,6 +1040,86 @@ sub run_import_url{
     delete $args->{run};
     return LetsMT::WebService::put( $resource, %{$args} );
 }
+
+
+
+## recursively download a whole website ...
+## TODO: make sure that this does not crash the system and overloads another server
+sub run_crawler{
+    # my ($path_elements, $args) = @_;
+    my $path_elements = ref($_[0]) eq 'ARRAY' ? shift : [];
+    my $args          = ref($_[0]) eq 'HASH'  ? shift : ();
+
+    ## NEW: ignore all path elements
+    # raise( 12, "slot/branch", 'warn')   unless (@{$path_elements} > 1);
+    raise( 12, "parameter uid", 'warn') unless (exists $args->{uid});
+    raise( 12, "parameter url", 'warn') unless (exists $args->{url});
+    raise( 17, "protocol (supported = http|https|ftp)", 'warn' ) 
+	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
+
+    my $doc    = $2;
+    my $slot   = shift(@{$path_elements});
+    my $branch = shift(@{$path_elements});
+
+    ## make the upload location if not given
+    unless (@{$path_elements}){
+	## remove all attributes and special characters
+	$doc=~s/\?.*$$//;
+	$doc=~s/[^a-zA-Z0-9\/_\-\.\s]//g;
+	$doc=~s/\/+$//;
+	push(@{$path_elements},'uploads','url',$doc);
+    }
+
+    ## temporary download space
+    my $tmphome = $ENV{LETSMT_TMP} || '/tmp';
+    my $tmpdir  = tempdir( 'crawl_XXXXXXXX',
+			   DIR     => $tmphome,
+			   CLEANUP => 1 );
+
+    ## wget parameters
+    my @para = ('-r','--no-parent',
+		'--convert-links',
+		'--adjust-extension',
+		'--reject',$WgetReject,
+		# '--accept','xml,html,doc,pdf,docx,epub,rtf,srt,txt,php',
+		'--ignore-case',
+		'-Q'.$WgetQuota,
+		'--wait','0.1','--random-wait');
+    my @docdir = split(/\/+/,$doc);
+    if (@docdir > 1){
+	my @subdir = @docdir;
+	shift(@subdir);
+	push(@para,'-I',join('/',@subdir));
+    }
+
+
+    my $tarfile = join( '/', $tmpdir, $docdir[-1].'.tar.gz' );
+    my $slot    = shift(@docdir);
+    my $branch  = $args->{uid};
+
+    @{$path_elements} = ('uploads','website',@docdir);
+    $$path_elements[-1]=~s/(.tar.gz)?$/.tar.gz/;
+
+    ## download, pack into tar archive and upload to repository
+    my $pwd = getcwd();
+    chdir($tmpdir);
+    # if (&run_cmd('wget',@para,$args->{url})){
+    &run_cmd('wget',@para,$args->{url});
+	if (&run_cmd('tar','-czf',$tarfile,'-C',$slot,'./')){
+	    ## make the storage request to download the page
+	    my $resource = LetsMT::Resource::make($slot,$branch,join('/',@{$path_elements}));
+	    delete $args->{run};
+	    delete $args->{url};
+	    chdir($pwd);
+	    return LetsMT::WebService::put_file( $resource, $tarfile, %{$args} );
+	}
+	chdir($pwd);
+	raise( 8, "cannot make tar file from $args->{url} ($?)", 'error' );
+    # }
+    chdir($pwd);
+    raise( 8, "cannot download $args->{url} ($?)", 'error' );
+}
+
 
 
 

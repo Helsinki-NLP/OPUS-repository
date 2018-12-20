@@ -181,11 +181,9 @@ sub put {
     &_archive_meta(join( "/", @{ $self->{path_elements} }));
 
     ## get a document from an URL or payload
-    # system("echo 'download file from url $self->{args}->{url} >>/tmp/tttt.log'");
     my $file = undef;
     if ( exists( $self->{args}->{url} ) ){
 	$file = &_download_url( $self->{args}->{url} );
-	# system("echo 'download file $file >>/tmp/tttt.log'");
     }
     else{
 	my $payload = undef;

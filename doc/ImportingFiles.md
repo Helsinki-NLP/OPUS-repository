@@ -62,6 +62,8 @@ The import can be triggered directly when uploading the file or started later us
 
 Importing files and the automatic alignment can be configured in various ways. There is a separate page about [configurations of import and alignment](ImportConfiguration.md).
 
+Examples for importing files via the backend APIs are given further down.
+
 
 # Supported upload formats
 
@@ -90,6 +92,23 @@ Other data formats:
 * iWorks
 * WordPerfect
 * EPUB
+
+
+# Web crawling
+
+The latest version of the repository backend also supports (expermental) web crawling from given websites. The system downloads all files and stores them in the repository as a tar-archive. A crawling job can be submitted via the job API and the `run=crawl` command:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/crawl?uid=user&action=import&url=https://www.helsinki.fi&run=crawl"
+```
+
+Note that the command will put the crawled data in a repository with the name of the web domain (`www.helsinki.fi` in the example above) and not in the repository that is specified in the call to the job API (`corpus/user` in the example). The reason for this is to avoid repeated downloads of the same websites in different repositories. The additional command in `action` above tiggers the automatic import of the tar-file after web crawling is done (this is optional).
+
+It may be useful to set the search for translated documents to `similar-names` (instead of `identical-names`, which is the default). This would improve the matching of potentially translated documents:
+
+```
+$LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/www.helsinki.fi/user?uid=user&AlignPara_search_parallel=similar-names"
+``` 
 
 
 
@@ -291,3 +310,5 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/corpus/user/uploads/archive.tar.gz?u
 ```
 
 NOTE: This sends one e-mail per document pair! This may become many e-mails if the arhive contains a lot of parallel documents!
+
+

@@ -127,9 +127,10 @@ sub _sentence_end {
     return '';
 }
 
+## also normalise space characters before writing!
 sub _encode {
     my ( $self, $string ) = @_;
-    $string=~s/\s\s+/ /g;
+    $string=~s/\s+/ /g;
     $self->{WRITER}->characters( $string );
     return '';
 }

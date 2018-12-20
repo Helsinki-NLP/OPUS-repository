@@ -594,6 +594,10 @@ sub convert_type {
         # }
     }
 
+    ## normalize path (only basic ascii characters are allowed)
+    ## TODO: this is a lot of magic - does that break anything?
+    $new_self->{path}=~s/[^a-zA-Z0-9\_\-\.\/]/_/g;
+
     $new_self->type($new_type);
     return $new_self;
 }

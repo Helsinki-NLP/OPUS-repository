@@ -4,26 +4,22 @@ To do as of version 0.56
 
 High priority:
 
-* option to send import result by e-mail
-  simple setup of mail utilities: https://tecadmin.net/bash-mail-command-not-found/
-  sudo apt-get install mailutils
-  echo "Message Body" | mail -s "Message Subject" receiver@example.com
-  or using sendmail
-  sudo apt-get install sendmail
-  sudo apt-get install libemail-sender-perl 
-  for perl: https://metacpan.org/pod/Mail::Sendmail
-  or better libmime-lite-perl (Mime::Lite)
+* TMX options
+  - option for removing duplicates 
+    (temp storage in hashed database before writing TMX)
+  - large imports (tar-files) etc - send only one de-duplicated TMX
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)
-  - need to copy some metadata from sentalign files
 * proper handling of revisions in GIT backend!
 * allow tags in version-control backends (at least for the git backend)
-* jobs for starting word alignment and parsing					(done)
 * check memory leak in sentence alignment?!
-* import URLs (retrieve from web and convert)					(done)
 * add dehyphenation module (as normalizer) - see pdf2xml
-* integration of srtalign
+* integration of srtalign (automatically for srt files?)
+  (via external tools and backoff to hunalign if no time-info is found?)
+* update language detection (langid.py, cld2)
+  https://github.com/CLD2Owners/cld2
+  https://metacpan.org/pod/Lingua::Identify::CLD2
 * allow manual corrections (alignments and even other things?)			(started)
   --> ISA integration	   	       	   	      				(prototype)
   --> limit the number of sentalign files that can be open for edit
@@ -37,13 +33,22 @@ High priority:
 * user interface								(on-going)
   - OPUS integration
   - admin interface
+  - show logos of sponsors, link to research group, university, OPUS (footer)
 
 
 Medium priority:
 
+* use scrapy for web crawling?
+  https://docs.scrapy.org/en/latest/intro/overview.html
 * support of e-book formats (epub), 
   converter from Calibre (ebook-convert) or Apache-Tika				(done with Tika?)
 * jobs for web-crawling (using bitextor, e.g. bitextor integration)
+  - wget based crawling								(started)
+  - wget2: mime-type based filtering!
+    https://unix.stackexchange.com/questions/53397/wget-how-to-download-recursively-and-only-specific-mime-types-extensions-i-e/56895
+    https://gitlab.com/gnuwget/wget2
+  - patch for wget for mime-type based accept:
+    https://savannah.gnu.org/bugs/?20378
 * interactive dependency aligner (IDA), integrated in interface			(started)
 * improve git with remote servers (do not always push!)
 * better fuzzy matching of file names (translation detection)
@@ -56,10 +61,6 @@ Medium priority:
   --> use external tools for searching parallel documents?
 * more sentence aligners (srtalign, BLEU align, gargantua, yalign?)
 * support moving files (i.e. git mv in backend)
-* allow tagging of releases
-* update language detection (langid.py, cld2)
-  https://github.com/CLD2Owners/cld2
-  https://metacpan.org/pod/Lingua::Identify::CLD2
 * improved pre-processing tools
   - UDpipe									(started)
   - optimized sentence splitters, tokenizers
@@ -105,6 +106,17 @@ Low priority:
 
 Done:
 
+* import URLs (retrieve from web and convert)					(done)
+* jobs for starting word alignment and parsing					(done)
+* option to send import result by e-mail
+  simple setup of mail utilities: https://tecadmin.net/bash-mail-command-not-found/
+  sudo apt-get install mailutils
+  echo "Message Body" | mail -s "Message Subject" receiver@example.com
+  or using sendmail
+  sudo apt-get install sendmail
+  sudo apt-get install libemail-sender-perl 
+  for perl: https://metacpan.org/pod/Mail::Sendmail
+  or better libmime-lite-perl (Mime::Lite)
 * integrate pdf2xml								(done)
   (need to improve pdf2xml! too slow! use Tika server!)
 * install and setup Apache Tika as a server and call it from Apache::Tika 	(done!)
