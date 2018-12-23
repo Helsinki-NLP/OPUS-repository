@@ -113,8 +113,16 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fr?uid=testuser&ru
 * default search method is to find documents with identical names and paths (except the language-specific subdir); there is also a mode for fuzzy matching of names: `similar-names`: set the parameter `AlignPara_search_parallel` to `similar-names`
 
 ```
-$LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/testslot/testuser?uid=testuser&AlignPara_search_parallel=similar-names"
+$LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/testslot/testuser/uploads?uid=testuser&AlignPara_search_parallel=similar-names"
 ``` 
+
+* the fuzzy matching mode now also includes a test whether file names (and paths) only differ in a language name or identifier. This can also be used without fuzzy matching mode by adding `_with_lang` to the seatch mode:
+
+```
+$LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/testslot/testuser/uploads?uid=testuser&AlignPara_search_parallel=identical-names_with_lang"
+``` 
+
+
 
 * TODO: matching of translated document names (difficult), content-based matching of documents (expensive and difficult); could we use existing external tools such as bitextor?
 

@@ -305,8 +305,12 @@ sub find_translations {
     ## TODO: this can be a big query (retrieve all corpusfiles)
     else{
 	&resources_with_identical_names($corpus, \%parallel);
-	if ($args{search_parallel}=~/(similar|fuzzy)/){
-	    &resources_with_similar_names( $corpus, \%parallel, %args );
+	#if ($args{search_parallel}=~/with_lang/){
+	#    &resources_with_langids( $corpus, \%parallel, %args );
+	#}
+	if ($args{search_parallel}=~/(similar|fuzzy|with_lang)/){
+	    &resources_match_no_lang( $corpus, \%parallel, %args );
+	    # &resources_with_similar_names( $corpus, \%parallel, %args );
 	}
 
 	# _find_matching_corpusfiles($corpus, \%parallel);
@@ -330,8 +334,9 @@ sub find_translations {
     ## --> file names that include language names / IDs?
     ## (How can we do that efficient with TokyoTyrant?)
 
-    if ($args{search_parallel}=~/(similar|fuzzy)/){
-	&resources_with_similar_names( $corpus, \%parallel, %args );
+    if ($args{search_parallel}=~/(similar|fuzzy|with_lang)/){
+	&resources_match_no_lang( $corpus, \%parallel, %args );
+	# &resources_with_similar_names( $corpus, \%parallel, %args );
 	# &_add_similar_corpusfiles( $corpus, \%parallel, %args );
     }
 
@@ -932,6 +937,10 @@ sub get_import_parameter {
 
     my $user    = $resource->user;
     my $doctype = $resource->type();
+    my $corpus = LetsMT::Resource::make(
+        $resource->slot,
+        $resource->user,
+    );
     my $uploads = LetsMT::Resource::make(
         $resource->slot,
         $resource->user,
@@ -945,6 +954,7 @@ sub get_import_parameter {
     # 3) resource-specifc
 
     &get_user_parameter( $user, $prefix, $para, $doctype );
+    &get_resource_parameter( $corpus,   $prefix, $para, $doctype );
     &get_resource_parameter( $uploads,  $prefix, $para, $doctype );
     &get_resource_parameter( $resource, $prefix, $para, $doctype );
     return %{$para};
@@ -999,6 +1009,11 @@ sub get_align_parameter {
 
     my $prefix  = 'AlignPara_';
     my $user    = $resource->user;
+
+    my $corpus = LetsMT::Resource::make(
+        $resource->slot,
+        $resource->user
+    );
     my $uploads = LetsMT::Resource::make(
         $resource->slot,
         $resource->user,
@@ -1007,6 +1022,7 @@ sub get_align_parameter {
 
     # overwrite them with user/corpus/resource-specific settings
     &get_user_parameter( $user, $prefix, \%para );
+    &get_resource_parameter( $corpus,   $prefix, \%para );
     &get_resource_parameter( $uploads,  $prefix, \%para );
     &get_resource_parameter( $resource, $prefix, \%para );
 

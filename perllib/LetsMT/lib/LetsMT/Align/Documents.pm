@@ -28,6 +28,7 @@ use Exporter 'import';
 our @EXPORT = qw(
     resources_with_identical_names
     resources_with_similar_names
+    resources_match_no_lang
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -119,6 +120,108 @@ sub resources_with_similar_names{
     return $count;
 }
 
+
+
+## try to find corpus files that only differ in a language name or langids
+
+sub resources_match_no_lang{
+    my $corpus   = shift;
+    my $parallel = shift || {};
+    my %args     = @_;
+
+    return 0 unless (keys %{$parallel});
+
+    ## get languages that we need to look for
+    my @langs = &_get_missing_languages( $corpus, $parallel, %args );
+
+    my $slot        = $corpus->slot;
+    my $branch      = $corpus->user;
+    my %corpusfiles = ();
+    foreach my $l (@langs){
+	@{$corpusfiles{$l}} = &_get_language_documents( $slot, $branch, $l );
+    }
+
+    ## delete lang names and IDs of all files
+    ## and store map back to the full name
+    my %map_name = ();
+    foreach my $l (keys %corpusfiles){
+	foreach my $f (@{$corpusfiles{$l}}){
+	    my $name = _delete_language($f,$l);
+	    $map_name{$l}{$name} = $f;
+	}
+    }
+
+    ## save all existing languages for the files in %$parallel
+    my %existing_langs = ();
+    foreach my $f (keys %{$parallel}){
+	$existing_langs{$f} = [];
+	foreach my $l (keys %{$$parallel{$f}}){
+	    push(@{$existing_langs{$f}},$l);
+	}
+    }
+
+    ## now find parallel documents
+    my $count=0;
+    foreach my $f (keys %{$parallel}){
+
+	## try to remove all existing languages from the file
+	my $filebase = $f;
+	$filebase =~s/\.xml$//;
+	foreach my $l (@{$existing_langs{$f}}){
+	    $filebase = _delete_language($filebase,$l);
+	}
+
+	foreach my $l (@langs){
+	    next if (exists $$parallel{$f}{$l});
+	    next unless (@{$corpusfiles{$l}});
+	    my @matches = grep { $filebase eq $_ } keys %{$map_name{$l}};
+
+	    ## try fuzzy matching if specified
+	    unless (@matches){
+		if ($args{search_parallel}=~/(similar|fuzzy)/){
+		    @matches = amatch( $filebase, keys %{$map_name{$l}} );
+		    if (@matches>1){
+			my %dist;
+			@dist{@matches} = map { abs } adistr( $filebase, @matches );
+			@matches = sort { $dist{$a} <=> $dist{$b} } @matches;
+		    }
+		}
+	    }
+	    if (@matches){
+		$$parallel{$f}{$l} = join( '/',( $slot, $branch, 'xml', $l, $map_name{$l}{$matches[0]}) );
+		$$parallel{$f}{$l} .= '.xml';
+		$count++;
+	    }
+	}
+    }
+    return $count;
+}
+
+
+
+sub _delete_language{
+    my ($str,$langid2) = @_;
+
+    ## remove all occurrences of the langiD in the string
+    ## - case-insensitive
+    ## - delimitered by non alphanumeric characters
+    $str=~s/(\A|\P{Alnum})$langid2(\Z|\P{Alnum})/$1$2/ig;
+
+    ## the same with 3-letter codes
+    my $langid3 = iso639_TwoToThree($langid2);
+    $str=~s/(\A|\P{Alnum})$langid3(\Z|\P{Alnum})/$1$2/ig;
+
+    ## and finally also the plain name
+    ## TODO: also local language names!
+    my $lang = iso639_ThreeToName($langid3);
+    $str=~s/(\A|\P{Alnum})$langid3(\Z|\P{Alnum})/$1$2/ig;
+
+    ## also delete all non-alphanumeric characters
+    ## TODO: is this good to do in general?
+    $str=~s/\P{Alnum}+/ /g;
+
+    return $str;
+}
 
 
 ## try to find corpus files with translated names
