@@ -205,16 +205,23 @@ sub _delete_language{
     ## remove all occurrences of the langiD in the string
     ## - case-insensitive
     ## - delimitered by non alphanumeric characters
+    ## - or at beginning or at the end of the file name
     $str=~s/(\A|\P{Alnum})$langid2(\Z|\P{Alnum})/$1$2/ig;
+    $str=~s/(\A|\/)$langid2([^\/]+)/$1$2/ig;
+    $str=~s/$langid2(\.[a-z]{2,4}|\Z)/$1/ig;
 
     ## the same with 3-letter codes
     my $langid3 = iso639_TwoToThree($langid2);
     $str=~s/(\A|\P{Alnum})$langid3(\Z|\P{Alnum})/$1$2/ig;
+    $str=~s/(\A|\/)$langid3([^\/]+)/$1$2/ig;
+    $str=~s/$langid3(\.[a-z]{2,4}|\Z)/$1/ig;
 
     ## and finally also the plain name
     ## TODO: also local language names!
     my $lang = iso639_ThreeToName($langid3);
-    $str=~s/(\A|\P{Alnum})$langid3(\Z|\P{Alnum})/$1$2/ig;
+    $str=~s/(\A|\P{Alnum})$lang(\Z|\P{Alnum})/$1$2/ig;
+    $str=~s/(\A|\/)$lang([^\/]+)/$1$2/ig;
+    $str=~s/$lang(\.[a-z]{2,4}|\Z)/$1/ig;
 
     ## also delete all non-alphanumeric characters
     ## TODO: is this good to do in general?

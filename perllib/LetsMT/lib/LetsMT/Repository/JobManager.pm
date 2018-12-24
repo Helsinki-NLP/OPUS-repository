@@ -1067,14 +1067,23 @@ sub run_crawler{
 	$doc=~s/\?.*$$//;
 	$doc=~s/[^a-zA-Z0-9\/_\-\.\s]//g;
 	$doc=~s/\/+$//;
-	push(@{$path_elements},'uploads','url',$doc);
+	push(@{$path_elements},'uploads',$doc);	
     }
+    unshift(@{$path_elements},'uploads');
 
     ## temporary download space
     my $tmphome = $ENV{LETSMT_TMP} || '/tmp';
     my $tmpdir  = tempdir( 'crawl_XXXXXXXX',
 			   DIR     => $tmphome,
 			   CLEANUP => 1 );
+
+    ## add rejected file formats (file extensions)
+    if (exists $$args{reject}){
+	$WgetReject .= ','.$$args{reject};
+    }
+
+    ## download quota
+    my $quota = exists $$args{quota} ? $$args{quota} : $WgetQuota;
 
     ## wget parameters
     my @para = ('-r','--no-parent',
@@ -1083,8 +1092,14 @@ sub run_crawler{
 		'--reject',$WgetReject,
 		# '--accept','xml,html,doc,pdf,docx,epub,rtf,srt,txt,php',
 		'--ignore-case',
-		'-Q'.$WgetQuota,
+		'-Q'.$quota,
 		'--wait','0.1','--random-wait');
+
+    ## add ccepted file formats (file extensions)
+    if (exists $$args{accept}){
+	push (@para,'--accept',$$args{accept});
+    }
+
     my @docdir = split(/\/+/,$doc);
     if (@docdir > 1){
 	my @subdir = @docdir;
@@ -1092,30 +1107,45 @@ sub run_crawler{
 	push(@para,'-I',join('/',@subdir));
     }
 
-
-    my $tarfile = join( '/', $tmpdir, $docdir[-1].'.tar.gz' );
+    ## we always us the URL domain as the slot
+    ## and the user as branch!
+    ## TODO: is this strange?
     my $slot    = shift(@docdir);
     my $branch  = $args->{uid};
 
-    @{$path_elements} = ('uploads','website',@docdir);
+
+## TODO: give file a time stamp?
+#
+#    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+#	localtime(time);
+#    $year+=1900;
+#    $mon++;
+#    my $filebase = "$year$mon$mday\_$hour$min$sec.tar.gz";
+
+    ## Why would we need this?
+    # @{$path_elements} = ('uploads','website',@docdir);
+
+
+    ## make sure that the file exitension is a tar.gz file
     $$path_elements[-1]=~s/(.tar.gz)?$/.tar.gz/;
+    my $tarfile = join( '/', $tmpdir, $$path_elements[-1] );
 
     ## download, pack into tar archive and upload to repository
     my $pwd = getcwd();
     chdir($tmpdir);
+
+    ## TODO: break if the command returns an error?
+    ##       but this seems to happen all the time ...
     # if (&run_cmd('wget',@para,$args->{url})){
     &run_cmd('wget',@para,$args->{url});
-	if (&run_cmd('tar','-czf',$tarfile,'-C',$slot,'./')){
-	    ## make the storage request to download the page
-	    my $resource = LetsMT::Resource::make($slot,$branch,join('/',@{$path_elements}));
-	    delete $args->{run};
-	    delete $args->{url};
-	    chdir($pwd);
-	    return LetsMT::WebService::put_file( $resource, $tarfile, %{$args} );
-	}
+    if (&run_cmd('tar','-czf',$tarfile,'-C',$slot,'./')){
+	## make the storage request to download the page
+	my $resource = LetsMT::Resource::make($slot,$branch,join('/',@{$path_elements}));
+	delete $args->{run};
+	delete $args->{url};
 	chdir($pwd);
-	raise( 8, "cannot make tar file from $args->{url} ($?)", 'error' );
-    # }
+	return LetsMT::WebService::put_file( $resource, $tarfile, %{$args} );
+    }
     chdir($pwd);
     raise( 8, "cannot download $args->{url} ($?)", 'error' );
 }

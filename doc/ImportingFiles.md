@@ -110,6 +110,18 @@ It may be useful to set the search for translated documents to `similar-names` (
 $LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/www.helsinki.fi/user?uid=user&AlignPara_search_parallel=similar-names"
 ``` 
 
+There are also two useful parameters that change the behaviour of the crawler: `accept` and `reject`: Both of them can be used to restrict the file types that are kept when doenloading from the website. You can specify an arbitrary number of comma-separated file extensions to either reject certain file types (there is already a number of file types that are rejected by default and the parameter only adds additional types) or to ONLY accept certain file types. For example, to reject all PDF and DOC documents, add the parameter `reject=pdf,doc`
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/crawl?uid=user&action=import&url=https://www.helsinki.fi&run=crawl&reject=pdf,doc"
+```
+
+To download only pdf and doc files you can do:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/crawl?uid=user&action=import&url=https://www.helsinki.fi&run=crawl&accept=pdf,doc"
+```
+
 
 
 
