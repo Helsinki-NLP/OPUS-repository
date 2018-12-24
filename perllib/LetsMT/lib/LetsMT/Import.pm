@@ -813,9 +813,10 @@ sub upload_new_resource{
     # don't import again if already imported before
     return 1 if ($new_res->{status} eq 'imported');
 
-    get_logger(__PACKAGE__)->info( 'New resource: ', $new_res->{resource} );
-    push @{ $self->{new_resources} }, $new_res->{resource};
-    &LetsMT::WebService::put_resource( $new_res->{resource} );
+    ## NEW: don't upload before language check!
+    # get_logger(__PACKAGE__)->info( 'New resource: ', $new_res->{resource} );
+    # push @{ $self->{new_resources} }, $new_res->{resource};
+    # &LetsMT::WebService::put_resource( $new_res->{resource} );
 
     ## old call to post_meta with empty metadata hash ... why?
     # &LetsMT::WebService::post_meta( $new_res->{resource} );
@@ -837,7 +838,12 @@ sub upload_new_resource{
                             'likely language mismatch';
                     }
                     else{
-                        $new_res->{meta}->{warning} = 'language mismatch';
+			## NEW: overwrite old language!
+			##      (this is especially necessary for user-contributed
+			##       data and webcrawled data!)
+			$new_res->{resource}->set_language($detected[0]);
+                        $new_res->{meta}->{warning} = 'language mismatch! old language = ';
+			$new_res->{meta}->{warning}.= $lang[0];
                     }
                     $new_res->{meta}->{detected_languages} = 
                         join( ',', @detected );
@@ -845,6 +851,11 @@ sub upload_new_resource{
             }
         }
     }
+
+    ## NEW: upload resource AFTER language check
+    get_logger(__PACKAGE__)->info( 'New resource: ', $new_res->{resource} );
+    push @{ $self->{new_resources} }, $new_res->{resource};
+    &LetsMT::WebService::put_resource( $new_res->{resource} );
 
     ## update meta data
     $new_res->{meta}->{'imported_from'} => &utf8_to_perl( $from_res->path );
