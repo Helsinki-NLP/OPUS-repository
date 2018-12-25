@@ -5,8 +5,8 @@ backupdir=REPLACE_DBDIR/backup/monthly
 
 mkdir -p $backupdir
 
-tcrmgr copy -port REPLACE_META_DB_PORT localhost $backupdir/meta.$month
-tcrmgr copy -port REPLACE_GROUP_DB_PORT localhost $backupdir/group.$month
+REPLACE_TCMGR copy -port REPLACE_META_DB_PORT localhost $backupdir/meta.$month
+REPLACE_TCMGR copy -port REPLACE_GROUP_DB_PORT localhost $backupdir/group.$month
 
  
 # Deletes all but the newest 5 files to keep Tokyo Tyrant ulogs 

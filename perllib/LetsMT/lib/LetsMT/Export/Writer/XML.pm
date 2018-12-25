@@ -133,9 +133,19 @@ sub _tail {
 #  - or a tree structure (Tiger format - not implemented yet)
 #  - or a plain text sentence
 
+## TODO: this should be better done with XML::Writer
+##       --> completely remanufacture this?!
+
 sub _sentence_start {
-    my ( $self, $id ) = @_;
+    my ( $self, $id, $attr ) = @_;
     $id = $self->{SID} unless ($id);
+    if (ref($attr) eq 'HASH'){
+	my $str = "<s id=\"$id\"";
+	foreach my $k (sort keys %{$attr}){
+	    $str .= ' '.$k.'="'.$self->_encode($$attr{$k}).'"';
+	}
+	return $str.'>';
+    }
     return "<s id=\"$id\">";
 }
 

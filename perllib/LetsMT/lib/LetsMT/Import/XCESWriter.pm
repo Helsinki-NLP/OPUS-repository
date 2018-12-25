@@ -11,6 +11,7 @@ use strict;
 use Data::Dumper;
 use File::Path;
 use File::Basename;
+use Lingua::Identify::Blacklists qw/:all/;
 
 use LetsMT::DataProcessing::Tokenizer::No;
 use LetsMT::DataProcessing::Normalizer::Chain;
@@ -112,15 +113,28 @@ sub write {
 
         # normalize data
         my %data = ();
+	my %attr = ();   # sentence attributes
+
         foreach my $sid ( keys %{ $sent_pair->{$lang} } ) {
             $data{$lang}{$sid}
                 = $self->{tokenizer}->detokenize( $sent_pair->{$lang}{$sid} );
             $self->{normalizer}->normalize_no_copy( $data{$lang}{$sid} );
             $self->{resources}{$lang}{meta}{size}++;
+
+	    ## TODO: add language identifier for each sentence (optional?)
+	    ## PROBLEM: SRT converts directly to XML and does not go via
+	    ##          LetsMT::Export::Writer::XML
+	    #
+	    # should this only be optional?
+	    my $detected = &identify( $data{$lang}{$sid} );
+	    if ($detected ne $lang){
+		$attr{$lang}{$sid}{lang} = $detected;
+	    }
         }
 
         # finally print them!
-        $writer->write( \%data, $before, $after );
+        # $writer->write( \%data, $before, $after );
+        $writer->write( \%data, $before, $after, \%attr );
 
     }
 

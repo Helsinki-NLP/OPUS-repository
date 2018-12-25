@@ -84,12 +84,13 @@ sub write {
 
     my $before = shift || {};
     my $after  = shift || {};
+    my $attr   = shift || {};  # optional sentence attributes
 
     my $fh = $self->{FH};
     if ( ref($data) eq 'HASH' ) {
         foreach my $l ( keys %{$data} ) {
             print $fh $self->markup_to_string( $$before{$l} );
-            print $fh $self->to_string( $$data{$l} );
+            print $fh $self->to_string( $$data{$l}, $$attr{$l} );
             print $fh $self->markup_to_string( $$after{$l} );
         }
     }
@@ -116,25 +117,30 @@ sub write_string {
 sub to_string {
     my $self = shift;
     my $data = shift;
+    my $attr = shift;   # optional sentence attributes
 
     my $str = '';
 
     my @ids = ();
     if ( ref($data) eq 'ARRAY' ) {    # array of sentences!
-        foreach my $s (@{$data}) {
+	$attr = [] unless ( ref($attr) eq 'ARRAY' );
+        foreach my $s (0..$#{$data}) {
             $self->{SID}++;
             $self->{INFO}->{'size'}++;
             push( @ids, $self->{SID} );
-            $str .= $self->_sentence( $s, $self->{SID} ) . ' ';
+            $str .= $self->_sentence( $$data[$s], $self->{SID}, $$attr[$s] ) . ' ';
         }
         $str =~ s/ $//;    # delete final space again
     }
     elsif ( ref($data) eq 'HASH' ) {    # hash of sentences (key = ID)
-        foreach my $id ( sort keys %{$data} ) {
+	$attr = {} unless ( ref($attr) eq 'HASH' );
+	## TODO: is sort the best way to do here?
+	##       does this always give the correct order?
+        foreach my $id ( sort {$a <=> $b } keys %{$data} ) {
             $self->{SID}++;             # count anyway
             $self->{INFO}->{'size'}++;
             push( @ids, $id );
-            $str .= $self->_sentence( $data->{$id}, $id ) . ' ';
+            $str .= $self->_sentence( $data->{$id}, $id, $attr->{$id} ) . ' ';
         }
         $str =~ s/ $//;    # delete final space again
     }
@@ -142,7 +148,7 @@ sub to_string {
         $self->{SID}++;
         $self->{INFO}->{'size'}++;
         push( @ids, $self->{SID} );
-        $str = $self->_sentence( $data, $self->{SID} );
+        $str = $self->_sentence( $data, $self->{SID}, $attr );
     }
     return $str . "\n";
 }
@@ -211,14 +217,14 @@ sub _encode {
 # sub _encode { return $_[1]; }
 
 sub _sentence {
-    my ( $self, $data, $id ) = @_;
+    my ( $self, $data, $id, $attr ) = @_;
     if ( ref($data) eq 'ARRAY' ) {    # this is an array of tokens
         return $self->_tokenized($data);
     }
     elsif ( ref($data) eq 'HASH' ) {    # this is a tree
         return $self->_tree($data);
     }
-    my $str = $self->_sentence_start($id);
+    my $str = $self->_sentence_start($id, $attr);
     $str .= $self->_encode($data);
     $str .= $self->_sentence_end($id);
     return $str;

@@ -319,11 +319,13 @@ update-cron: tt_daily.sh tt_monthly.sh
 
 tt_daily.sh: tt_daily.in
 	sed 	-e "s#REPLACE_DBDIR#${DB_DISKROOT}#" \
+		-e "s#REPLACE_TCMGR#${shell which tcrmgr | tr \"\\\n\" ' '}#" \
 		-e "s#REPLACE_GROUP_DB_PORT#${GROUP_DB_PORT}#" \
 		-e "s#REPLACE_META_DB_PORT#${META_DB_PORT}#" < $< > $@
 
 tt_monthly.sh: tt_monthly.in
 	sed 	-e "s#REPLACE_DBDIR#${DB_DISKROOT}#" \
+		-e "s#REPLACE_TCMGR#${shell which tcrmgr | tr \"\\\n\" ' '}#" \
 		-e "s#REPLACE_GROUP_DB_PORT#${GROUP_DB_PORT}#" \
 		-e "s#REPLACE_META_DB_PORT#${META_DB_PORT}#" < $< > $@
 
