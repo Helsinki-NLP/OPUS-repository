@@ -128,7 +128,7 @@ sub write {
 	    ##
 	    ## should this only be optional?
 	    # my $detected = &identify( $data{$lang}{$sid} );
-	    my $detected = &detect_language_string( $data{$lang}{$sid}, $lang );
+	    my $detected = &LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, $lang );
 	    if ($detected ne $lang){
 		$attr{$lang}{$sid}{lang} = $detected;
 	    }

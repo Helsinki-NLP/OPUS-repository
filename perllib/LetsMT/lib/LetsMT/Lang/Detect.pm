@@ -19,7 +19,11 @@ use Benchmark;
 use File::Temp qw(tempfile tempdir);
 use File::ShareDir 'dist_dir';
 use Lingua::Identify::Blacklists qw/:all/;
-use Inline::Python;                         # for CLD2 bindings!
+
+## CLD2 module does not build correcly!
+# use Lingua::Identify::CLD2;
+use Lingua::Identify::CLD;
+use Lingua::Identify qw(:language_identification);
 
 use LetsMT::Lang::ISO639 qw / :all /;
 use LetsMT::Tools qw /:all/;
@@ -28,6 +32,13 @@ use LetsMT::Export::Reader;
 use LetsMT::Export::Writer;
 
 
+#################################################################
+## Inline Python does not seem to work with apache and mod_perl
+## at least when importing other libraries
+#################################################################
+#
+# use Inline::Python;                         # for CLD2 bindings!
+#
 ## call cld2 language identifier
 ## input arguments: textstring, assumed_language
 ##          output: langid, isReliable, details
@@ -37,23 +48,27 @@ use LetsMT::Export::Writer;
 ##
 ## other options:
 ##   bestEffort=True
-use Inline Python => <<'END_OF_PYTHON_CODE';
+#
+# use Inline Python => <<'END_OF_PYTHON_CODE';
+#
+# import pycld2 as cld2
+# import langid
+# from langid.langid import LanguageIdentifier, model
+# identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 
-import pycld2 as cld2
-import langid
-from langid.langid import LanguageIdentifier, model
-identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
-
-def detect_with_cld2(s,l=""):
-    if (l != ""):
-       isReliable, textBytesFound, details = cld2.detect(s, hintLanguage=l)
-    else:
-       isReliable, textBytesFound, details = cld2.detect(s)
-    return (details[0][1],isReliable,details)
-def detect_with_langid(s):
-    return identifier.classify(s)
-END_OF_PYTHON_CODE
-
+## import sys
+## sys.path.append('/usr/local/lib/python3.4/dist-packages')
+# def detect_with_cld2(s,l=""):
+#      return 'en'
+#     if (l != ""):
+#        isReliable, textBytesFound, details = cld2.detect(s, hintLanguage=l)
+#     else:
+#        isReliable, textBytesFound, details = cld2.detect(s)
+#     return (details[0][1],isReliable,details)
+# def detect_with_langid(s):
+#     return identifier.classify(s)
+# END_OF_PYTHON_CODE
+#################################################################
 
 
 our $LM_HOMEDIR = &dist_dir('LetsMT') . '/lang/textcat';
@@ -64,9 +79,12 @@ our $BOILER_PLATE_SIZE = 8148; # estimated max size of a boiler plate
 
 # our $LANGUAGE_IDENTIFIER = 'textcat';
 # our $LANGUAGE_IDENTIFIER = 'blacklists';
+# our $LANGUAGE_IDENTIFIER = 'cld';
 # our $LANGUAGE_IDENTIFIER = 'cld2';
 our $LANGUAGE_IDENTIFIER = 'default';
 
+## the compact language identifier from Google Chrome
+my $CLD = new Lingua::Identify::CLD;
 
 # this is mainly copied from textcat ......
 
@@ -186,28 +204,58 @@ sub classify_text {
 }
 
 sub detect_language_string {
-    if ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
-	return &detect_language_with_cld2(@_);
+    if ( $LANGUAGE_IDENTIFIER eq 'cld' ){
+	return &detect_language_with_cld(@_);
     }
+#    elsif ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
+#	return &detect_language_with_cld2(@_);
+#    }
     elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
 	return &identify(@_);
     }
-    return &detect_language__with_langid(@_);
+    return &detect_language_with_langid(@_);
 }
 
-sub detect_language_with_cld2 {
+sub detect_language_with_cld {
     my $string = shift;
-    my $langhint = shift || "";
-    my ($lang, $isReliable, $details) = detect_with_cld2($string,$langhint);
-    return wantarray ? ($lang, $isReliable, $details) : $lang;
+    my $hint = shift || undef;
+
+    my %para = ();
+    if ($hint){ $para{'tld'} = $hint; }
+    my ($lang, $id, $conf, $isReliable) = $CLD->identify( $string, %para );
+
+    # strangely enough CLD is not really reliable for English
+    # (all kinds of garbish input is recognized as English)
+    # --> check with Lingua::Identify
+    if ($id eq 'en'){
+        ($id,$conf) = $id = langof( $string ) ? $id : 'unknown';
+    }
+    return wantarray ? ($id, $conf, $isReliable) : $id;
 }
 
-sub detect_language_string_with_langid {
-    my $string = shift;
-    my $langhint = shift || "";
-    my ($lang, $isReliable, $details) = detect_with_cld2($string,$langhint);
-    return wantarray ? ($lang, $isReliable, $details) : $lang;
+
+## TODO: use langid via langid server!
+
+sub detect_language_with_langid {
+    return &detect_language_with_cld(@_);
 }
+
+
+## Python bindings do not work!
+
+# sub detect_language_with_cld2 {
+#     my $string = shift;
+#     my $langhint = shift || "";
+#     my ($lang, $isReliable, $details) = detect_with_cld2($string,$langhint);
+#     return wantarray ? ($lang, $isReliable, $details) : $lang;
+# }
+
+# sub detect_language_string_with_langid {
+#     my $string = shift;
+#     my $langhint = shift || "";
+#     my ($lang, $conf) = detect_with_langid($string,$langhint);
+#     return wantarray ? ($lang, $conf) : $lang;
+# }
 
 
 
@@ -229,7 +277,7 @@ sub classify_with_langid{
     if ( length($input)-2*$BOILER_PLATE_SIZE > $TEXT_SIZE/2 ){
 	$input = substr( $input, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
     }
-    return &detect_language_string_with_langid($input);
+    return &detect_language_with_langid($input);
 }
 
 
