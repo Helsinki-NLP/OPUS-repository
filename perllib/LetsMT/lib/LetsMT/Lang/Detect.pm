@@ -11,7 +11,7 @@ LetsMT::Lang::Detect
 use strict;
 
 use Exporter 'import';
-our @EXPORT = qw( detect_language create_lm );
+our @EXPORT = qw( detect_language detect_language_string create_lm );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 use Benchmark;
@@ -19,6 +19,7 @@ use Benchmark;
 use File::Temp qw(tempfile tempdir);
 use File::ShareDir 'dist_dir';
 use Lingua::Identify::Blacklists qw/:all/;
+use Inline::Python;                         # for CLD2 bindings!
 
 use LetsMT::Lang::ISO639 qw / :all /;
 use LetsMT::Tools qw /:all/;
@@ -26,13 +27,44 @@ use LetsMT::Tools qw /:all/;
 use LetsMT::Export::Reader;
 use LetsMT::Export::Writer;
 
+
+## call cld2 language identifier
+## input arguments: textstring, assumed_language
+##          output: langid, isReliable, details
+##
+## help on pycld2:
+##    python -c "import pycld2 as cld2; help(cld2.detect)"
+##
+## other options:
+##   bestEffort=True
+use Inline Python => <<'END_OF_PYTHON_CODE';
+
+import pycld2 as cld2
+import langid
+from langid.langid import LanguageIdentifier, model
+identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
+
+def detect_with_cld2(s,l=""):
+    if (l != ""):
+       isReliable, textBytesFound, details = cld2.detect(s, hintLanguage=l)
+    else:
+       isReliable, textBytesFound, details = cld2.detect(s)
+    return (details[0][1],isReliable,details)
+def detect_with_langid(s):
+    return identifier.classify(s)
+END_OF_PYTHON_CODE
+
+
+
 our $LM_HOMEDIR = &dist_dir('LetsMT') . '/lang/textcat';
 
-our $TEXT_SIZE = 65536;    # text size used for detection (in bytes)
-our $MAX_DATA  = 100;      # max number of data records to be read
+our $TEXT_SIZE = 65536;        # text size used for detection (in bytes)
+our $MAX_DATA  = 100;          # max number of data records to be read
+our $BOILER_PLATE_SIZE = 8148; # estimated max size of a boiler plate
 
 # our $LANGUAGE_IDENTIFIER = 'textcat';
 # our $LANGUAGE_IDENTIFIER = 'blacklists';
+# our $LANGUAGE_IDENTIFIER = 'cld2';
 our $LANGUAGE_IDENTIFIER = 'default';
 
 
@@ -138,18 +170,66 @@ sub classify_text {
 	return &classify_with_textcat(@_);
     }
 
-    # Lingua::Identify::Blacklists mode
+    # Lingua::Identify::Blacklists with textcat as fallback
     elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
-	return &classify_with_blacklists(@_);
+	my $lang = &classify_with_blacklists(@_);
+	if ((not defined $lang) || 
+	    ($lang eq 'unknown') || ($lang eq 'un') || ($lang eq 'ut')){
+	    return &classify_with_textcat(@_);
+	}
+	return wantarray ? ($lang) : $lang;
     }
 
-    # Lingua::Identify::Blacklists with textcat as fallback
-    my $lang = &classify_with_blacklists(@_);
-    if ((not defined $lang) || 
-	($lang eq 'unknown') || ($lang eq 'un') || ($lang eq 'ut')){
-	return &classify_with_textcat(@_);
-    }
+    ## NEW: default = langid!
+    my $lang = &classify_with_langid(@_);
     return wantarray ? ($lang) : $lang;
+}
+
+sub detect_language_string {
+    if ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
+	return &detect_language_with_cld2(@_);
+    }
+    elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
+	return &identify(@_);
+    }
+    return &detect_language__with_langid(@_);
+}
+
+sub detect_language_with_cld2 {
+    my $string = shift;
+    my $langhint = shift || "";
+    my ($lang, $isReliable, $details) = detect_with_cld2($string,$langhint);
+    return wantarray ? ($lang, $isReliable, $details) : $lang;
+}
+
+sub detect_language_string_with_langid {
+    my $string = shift;
+    my $langhint = shift || "";
+    my ($lang, $isReliable, $details) = detect_with_cld2($string,$langhint);
+    return wantarray ? ($lang, $isReliable, $details) : $lang;
+}
+
+
+
+
+# classify with langid (require utf8 encoded text!)
+# (TODO: or should it rather be in bytes?)
+
+sub classify_with_langid{
+    my $file   = shift;
+    # read input
+    if   ( $file =~ /\.gz/ ) { open F, "gzip -cd <$file |"; }
+    else                     { open F, "<$file"; }
+    # binmode(F);
+    binmode(F, ":utf8");
+    my $input;
+    read( *F, $input, $TEXT_SIZE );
+    close F;
+    ## if there is enough text: remove some data that might be a boiler plate
+    if ( length($input)-2*$BOILER_PLATE_SIZE > $TEXT_SIZE/2 ){
+	$input = substr( $input, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
+    }
+    return &detect_language_string_with_langid($input);
 }
 
 
@@ -232,11 +312,14 @@ sub classify_with_textcat {
 
 # alias of classify_text
 sub detect_language {
-    my $resource = shift;
-    if (ref($resource)){
-        return classify_resource($resource,@_);
+    my $data = shift;
+    if (ref($data)){
+        return classify_resource($data,@_);
     }
-    return classify_text($resource,@_);
+    if (-e $data){
+	return classify_text($data,@_);
+    }
+    return detect_language_string($data,@_);
 }
 
 

@@ -6,6 +6,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 COPY = cp -r --preserve=mode,timestamps
 
 APTGET = apt-get
+PIP    = pip3
 FORCE  = false
 ## if you want to force-install all packages:
 ## uncomment the following lines instead of the ones above
@@ -80,8 +81,11 @@ UBUNTU_BASE_PACKAGES = \
 		perl-doc \
 		php5 \
 		pkg-config \
+		python \
+		python-pip \
 		python3 \
 		python3-numpy \
+		python3-pip \
 		python3-setuptools \
 		sendmail \
 		subversion \
@@ -106,6 +110,7 @@ CPAN_MODULES = 	Apache::Tika \
 		File::GetLineMaxLength \
 		File::LibMagic \
 		File::Touch \
+		Inline::Python \
 		Lingua::Sentence \
 		LWP::Simple \
 		Module::Install \
@@ -202,7 +207,6 @@ install-perlmodules: prepare-cpan
 			perl -e "use $$cpanmod" 2>/dev/null ) || \
 			{ echo "*** cpan $$cpanmod" >&2 ; exit 1 ; } ) \
 	done
-
 	for cpanmod in ${FORCECPAN_MODULES}; do \
 		! ( ${FORCE} || ! perl -e "use $$cpanmod" 2>/dev/null ) || \
 		( (	cpanm -f $$cpanmod && \
@@ -236,6 +240,13 @@ install-perlmodules: prepare-cpan
 	$(APTGET) -qq install openjdk-7-jdk
 	cpanm Inline
 	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
+
+## install Inline::Python with support for python3 and not python2.7
+
+	update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+	cpanm Inline::Python
+	update-alternatives --install /usr/bin/python python /usr/bin/python2.7 20
+
 
 
 
@@ -293,11 +304,10 @@ update-apt-repository:
 #	add-apt-repository "deb http://archive.canonical.com/ lucid partner"
 	$(APTGET) update
 
-
 .PHONY: software-base
 software-base:
 	$(APTGET) -qq install ${UBUNTU_BASE_PACKAGES}
-
+	${PIP} install pycld2
 
 .PHONY: software-mysql
 software-mysql:

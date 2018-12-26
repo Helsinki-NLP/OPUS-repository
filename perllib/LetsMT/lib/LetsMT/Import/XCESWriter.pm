@@ -11,12 +11,13 @@ use strict;
 use Data::Dumper;
 use File::Path;
 use File::Basename;
-use Lingua::Identify::Blacklists qw/:all/;
+# use Lingua::Identify::Blacklists qw/:all/;
 
 use LetsMT::DataProcessing::Tokenizer::No;
 use LetsMT::DataProcessing::Normalizer::Chain;
 use LetsMT::DataProcessing::Normalizer::Moses;
 use LetsMT::DataProcessing::Normalizer::Whitespace;
+use LetsMT::Lang::Detect;
 use LetsMT::Tools;
 
 use LetsMT::Export::Writer::XCES;
@@ -124,9 +125,10 @@ sub write {
 	    ## TODO: add language identifier for each sentence (optional?)
 	    ## PROBLEM: SRT converts directly to XML and does not go via
 	    ##          LetsMT::Export::Writer::XML
-	    #
-	    # should this only be optional?
-	    my $detected = &identify( $data{$lang}{$sid} );
+	    ##
+	    ## should this only be optional?
+	    # my $detected = &identify( $data{$lang}{$sid} );
+	    my $detected = &detect_language_string( $data{$lang}{$sid}, $lang );
 	    if ($detected ne $lang){
 		$attr{$lang}{$sid}{lang} = $detected;
 	    }
