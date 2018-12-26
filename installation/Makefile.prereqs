@@ -110,7 +110,6 @@ CPAN_MODULES = 	Apache::Tika \
 		File::GetLineMaxLength \
 		File::LibMagic \
 		File::Touch \
-		Inline::Python \
 		Lingua::Sentence \
 		LWP::Simple \
 		Module::Install \
@@ -122,6 +121,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Switch \
 		Ufal::UDPipe
 
+#		Inline::Python    # not needed anymore (does not work with mod_perl)
 #		String::Approx    # installed via libstring-approx-perl
 
 
@@ -241,11 +241,13 @@ install-perlmodules: prepare-cpan
 	cpanm Inline
 	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
 
-## install Inline::Python with support for python3 and not python2.7
 
-	update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-	cpanm Inline::Python
-	update-alternatives --install /usr/bin/python python /usr/bin/python2.7 20
+## ......... doesn't work with mod_perl ..........
+## install Inline::Python with support for python3 and not python2.7
+#
+#	update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+#	cpanm Inline::Python
+#	update-alternatives --install /usr/bin/python python /usr/bin/python2.7 20
 
 
 
@@ -307,7 +309,7 @@ update-apt-repository:
 .PHONY: software-base
 software-base:
 	$(APTGET) -qq install ${UBUNTU_BASE_PACKAGES}
-	${PIP} install pycld2
+#	${PIP} install pycld2
 
 .PHONY: software-mysql
 software-mysql:
