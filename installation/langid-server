@@ -14,6 +14,13 @@ import pycld2 as cld2
 from langid.langid import LanguageIdentifier, model
 identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-v", "--verbose", help="increase output verbosity",
+                    action="store_true")
+args = parser.parse_args()
+
+
 # adapted from
 # https://stackoverflow.com/questions/48506460/python-simple-socket-client-server-using-asyncio
 # with changes from
@@ -48,19 +55,23 @@ def handle_client(reader, writer):
             text += l + ' '
 
     if text:
-        # print("classify "+text)
+        if args.verbose:
+            print("classify with " + classifier + ': ' + text)
         if (classifier == 'cld2'):
             ## add best guess for short strings by adding option 'bestEffort=True' below
             if (langhint):
                 isReliable, textBytesFound, details = cld2.detect(text, bestEffort=True, hintLanguage=langhint)
             else:
                 isReliable, textBytesFound, details = cld2.detect(text, bestEffort=True)
-            # print(str(details))
+            if args.verbose:
+                print(str(details))
             response = str((details[0][1],details[0][2],isReliable,details[0][3]))
             # response = str((details[0][1],isReliable,details))
         else:
             response = str(identifier.classify(text))
         writer.write(response.encode('utf8'))
+        if args.verbose:
+            print(response)
 
 
 loop = asyncio.get_event_loop()

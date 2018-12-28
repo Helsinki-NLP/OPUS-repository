@@ -128,9 +128,17 @@ sub write {
 	    ##
 	    ## should this only be optional?
 	    # my $detected = &identify( $data{$lang}{$sid} );
-	    my $detected = &LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, $lang );
+
+	    my ($detected,$conf) = 
+		&LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, 
+							       $lang, 'langid' );
+
+	    ## TODO: should we always add the lang identification scores 
+	    ##       even if the language matches?
+
 	    if ($detected ne $lang){
 		$attr{$lang}{$sid}{lang} = $detected;
+		$attr{$lang}{$sid}{conf} = $conf;
 	    }
         }
 

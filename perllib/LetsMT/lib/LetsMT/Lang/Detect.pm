@@ -28,13 +28,15 @@ use Lingua::Identify qw(:language_identification);
 
 ## for the langid server that served clds and langid.py
 use IO::Socket::INET;
-
+use IO::Select;
 
 use LetsMT::Lang::ISO639 qw / :all /;
 use LetsMT::Tools qw /:all/;
 
 use LetsMT::Export::Reader;
 use LetsMT::Export::Writer;
+
+use Log::Log4perl qw(get_logger :levels);
 
 
 #################################################################
@@ -209,16 +211,17 @@ sub classify_text {
 }
 
 sub detect_language_string {
-    if ( $LANGUAGE_IDENTIFIER eq 'cld' ){
+    my $method = $_[2] || $LANGUAGE_IDENTIFIER;
+    if ( $method eq 'cld' ){
 	return &detect_language_with_cld(@_);
     }
-    elsif ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
+    elsif ( $method eq 'cld2' ){
 	return &detect_language_with_cld2(@_);
     }
-    elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
+    elsif ( $method eq 'blacklist' ){
 	return &identify(@_);
     }
-    elsif ( $LANGUAGE_IDENTIFIER eq 'lingua' ){
+    elsif ( $method eq 'lingua' ){
 	return &detect_language_with_lingua(@_);
     }
     return &detect_language_with_langid(@_);
@@ -231,13 +234,14 @@ sub detect_language_with_cld {
     my %para = ();
     if ($hint){ $para{'tld'} = $hint; }
     my ($lang, $id, $conf, $isReliable) = $CLD->identify( $string, %para );
+    $conf /= 100;
 
     # strangely enough CLD is not really reliable for English
     # (all kinds of garbish input is recognized as English)
     # --> check with Lingua::Identify
-    if ($id eq 'en'){
-        ($id,$conf) = langof( $string );
-    }
+    # if ($id eq 'en'){
+    #     ($id,$conf) = langof( $string );
+    # }
     return wantarray ? ($id, $conf, $isReliable) : $id;
 }
 
@@ -266,22 +270,30 @@ sub detect_language_with_langid {
     ## fallback to cld classifier
     return &detect_language_with_cld(@_) unless $socket;
 
+    ## TODO: is that what we want?
     $socket->blocking(0);
 
-    # $PerlIO::encoding::fallback = Encode::FB_PERLQQ;
     my $size = $socket->send(encode('utf8',$_[0], sub{ return  ' ' }));
-    # my $size = $socket->send(encode('utf8',$_[0], sub{ sprintf "<U+%04X>", shift }));
-    # my $size = $socket->send(encode($_[0],'utf8'));
     # print "sent data of length $size\n";
     $socket->send("\nCLASSIFIER=langid\n");
     $socket->send('<<<CLASSIFY>>>');
     shutdown($socket, 1);
- 
+
     # receive a response of up to 1024 characters from server
     my $response = "";
-    $socket->recv($response, 1024);
-    # print "received response: $response\n";
+    my $sel = new IO::Select ($socket);
+    my $timeout = 5;
+    if (my @socks = $sel->can_read($timeout)) {
+	# $socket = shift(@socks);
+	$socket->recv($response, 1024);
+    }
+    else{
+	my $logger = get_logger(__PACKAGE__);
+        $logger->warn("langid server timeout - try CLD instead");
+	return &detect_language_with_cld(@_);
+    }
     $socket->close();
+    # print "received response: $response\n";
 
     if ($response){
 	my @ret = eval($response);
@@ -318,7 +330,17 @@ sub detect_language_with_cld2 {
  
     # receive a response of up to 1024 characters from server
     my $response = "";
-    $socket->recv($response, 1024);
+    my $sel = new IO::Select ($socket);
+    my $timeout = 5;
+    if (my @socks = $sel->can_read($timeout)) {
+	# $socket = shift(@socks);
+	$socket->recv($response, 1024);
+    }
+    else{
+	my $logger = get_logger(__PACKAGE__);
+        $logger->warn("langid server timeout - try CLD instead");
+	return &detect_language_with_cld(@_);
+    }
     # print "received response: $response\n";
     $socket->close();
 
@@ -326,6 +348,7 @@ sub detect_language_with_cld2 {
 	# $response=~tr/\(\)/\[\]/;
 	$response=~s/(true|false)/'$1'/i;
 	my @ret = eval($response);
+	$ret[1] /= 100;
 	return wantarray ? @ret : $ret[0];
     }
 
