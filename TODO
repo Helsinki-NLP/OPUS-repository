@@ -8,6 +8,8 @@ High priority:
   - option for removing duplicates 
     (temp storage in hashed database before writing TMX)
   - large imports (tar-files) etc - send only one de-duplicated TMX
+  - exclude incorrect languages (lang attribute in XML)
+    ---> also for xces align files in general!
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)
@@ -18,12 +20,17 @@ High priority:
 * integration of srtalign (automatically for srt files?)
   (via external tools and backoff to hunalign if no time-info is found?)
 * update language detection (langid.py, cld2)					(done)
+  - do we need to check that langhints is among supported languages?
+    (see https://github.com/aboSamoor/pycld2)
   https://metacpan.org/pod/Lingua::Identify::CLD2				(does not build)
   - check supported languages before selecting classifier
     https://github.com/CLD2Owners/cld2/issues/58
+    https://github.com/aboSamoor/pycld2 (cld2.DETECTED_LANGUAGES)
     https://github.com/saffsd/langid.py
     https://metacpan.org/pod/Lingua::Identify
   - voting for language by several classifiers?
+  - also use cld3? (https://github.com/google/cld3)
+    python bindings: https://github.com/Elizafox/cld3
 * allow manual corrections (alignments and even other things?)			(started)
   --> ISA integration	   	       	   	      				(prototype)
   --> limit the number of sentalign files that can be open for edit

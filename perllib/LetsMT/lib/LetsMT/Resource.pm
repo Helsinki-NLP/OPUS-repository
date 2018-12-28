@@ -360,6 +360,9 @@ sub set_language {
     my $new_lang = shift;
     my $old_lang = $self->language();
 
+    my $oldPath = $self->local_path;
+    my $oldDir  = File::Basename::dirname($oldPath);
+
     my @path = $self->path_elements();
     my $file = pop(@path);    # don't touch the last part!
 
@@ -394,8 +397,21 @@ sub set_language {
     }
 
     push( @path, $file ) if ($file);    # put the file back again!
-
     $self->path( join( '/', @path ) );
+
+    ## move the old file in case it physically exists
+    ## TODO: should we handle cases where the new location
+    ##       is already occupied?
+    if (-e $oldPath){
+	my $newPath = $self->local_path;
+	if ($oldPath ne $newPath){
+	    my $newDir  = File::Basename::dirname($newPath);
+	    File::Path::make_path( $newDir );
+	    move( $oldPath,$newPath );
+	}
+    }
+    $self->{lang} = $new_lang;
+
     return wantarray
         ? split( /\-/, $new_lang )
         : $new_lang;
