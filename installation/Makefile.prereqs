@@ -274,7 +274,9 @@ server-software: \
 	software-udpipe \
 	software-eflomal \
 	software-fastalign \
+	software-langid \
 	software-fusecompress
+
 
 ## software required by the sge-clients
 .PHONY: sge-client-software client-software
@@ -288,7 +290,9 @@ client-software sge-client-software: \
 	software-opennlp \
 	software-udpipe \
 	software-eflomal \
-	software-fastalign
+	software-fastalign \
+	software-langid
+
 
 ## software required on a frontend
 # Tokyo*: Not at all optimal. In the long run it will be better to remove
@@ -309,7 +313,6 @@ update-apt-repository:
 .PHONY: software-base
 software-base:
 	$(APTGET) -qq install ${UBUNTU_BASE_PACKAGES}
-#	${PIP} install pycld2
 
 .PHONY: software-mysql
 software-mysql:
@@ -502,6 +505,10 @@ software-fastalign:
 		${INSTALL_BIN} fast_align/build/atools ${PREFIX}/bin/atools; \
 		${INSTALL_BIN} fast_align/build/fast_align ${PREFIX}/bin/fast_align; )
 
+.PHONY: software-langid
+software-langid:
+	${PIP} install langid
+	${PIP} install pycld2
 
 
 # modules necessary for Grid::Request (not used yet)

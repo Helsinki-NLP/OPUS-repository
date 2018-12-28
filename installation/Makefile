@@ -130,9 +130,11 @@ install-sge-client-targets install-client-targets: \
 	prepare-directories \
 	install-log \
 	install-apache-tika \
+	install-langid-server \
 	config-conf \
 	config-slurm \
 	install-diskroot
+
 
 # 	/etc/ssl/${LETSMTHOST}
 
@@ -188,7 +190,7 @@ install-modules:
 ## handy to have as a separate target,
 ## we can call it from frontend installations too (frontend only, no repos)
 .PHONY: install-files
-install-files: ttservctl prepare-directories install-log install-apache-tika
+install-files: ttservctl prepare-directories install-log install-apache-tika install-langid-server
 	${INSTALL_BIN} ../admin/*.sh ../admin/*.pl ${PREFIX}/bin/
 	${INSTALL_BIN} ../perllib/conf_modperl.pl $(LETSMT_MODPERL_STARTUP)
 	${INSTALL_BIN} ttservctl ${PREFIX}/bin
@@ -222,6 +224,27 @@ ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar:
 	wget ${APACHE_TIKA_DIST}/tika-server-${APACHE_TIKA_VERSION}.jar
 	${INSTALL_BIN} tika-server-${APACHE_TIKA_VERSION}.jar ${PREFIX}/lib/
 	rm -f tika-server-${APACHE_TIKA_VERSION}.jar
+
+## install Apache Tika server (should listen on port 9998)
+.PHONY: install-langid-server
+install-langid-server:  ${PREFIX}/bin/langid-server
+	@echo 'description     "langid Server"'        > langid-server.conf
+	@echo ''                                       >> langid-server.conf
+	@echo 'start on filesystem or runlevel [2345]' >> langid-server.conf
+	@echo 'stop on shutdown'                       >> langid-server.conf
+	@echo ''                                       >> langid-server.conf
+	@echo 'respawn'                                >> langid-server.conf
+	@echo 'respawn limit 3 12'                     >> langid-server.conf
+	@echo ''                                       >> langid-server.conf
+	@echo "exec python3 ${PREFIX}/bin/langid-server"    >> langid-server.conf
+	${INSTALL_DATA} -b -S .old langid-server.conf /etc/init/langid-server.conf
+	rm -f langid-server.conf
+	service langid-server start || true
+
+${PREFIX}/bin/langid-server: langid-server
+	${INSTALL_BIN} $< $@
+
+
 
 .PHONY: install-doc
 install-doc:

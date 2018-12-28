@@ -16,6 +16,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT );
 
 use Benchmark;
 
+use Encode qw(encode);
 use File::Temp qw(tempfile tempdir);
 use File::ShareDir 'dist_dir';
 use Lingua::Identify::Blacklists qw/:all/;
@@ -24,6 +25,10 @@ use Lingua::Identify::Blacklists qw/:all/;
 # use Lingua::Identify::CLD2;
 use Lingua::Identify::CLD;
 use Lingua::Identify qw(:language_identification);
+
+## for the langid server that served clds and langid.py
+use IO::Socket::INET;
+
 
 use LetsMT::Lang::ISO639 qw / :all /;
 use LetsMT::Tools qw /:all/;
@@ -207,11 +212,14 @@ sub detect_language_string {
     if ( $LANGUAGE_IDENTIFIER eq 'cld' ){
 	return &detect_language_with_cld(@_);
     }
-#    elsif ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
-#	return &detect_language_with_cld2(@_);
-#    }
+    elsif ( $LANGUAGE_IDENTIFIER eq 'cld2' ){
+	return &detect_language_with_cld2(@_);
+    }
     elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
 	return &identify(@_);
+    }
+    elsif ( $LANGUAGE_IDENTIFIER eq 'lingua' ){
+	return &detect_language_with_lingua(@_);
     }
     return &detect_language_with_langid(@_);
 }
@@ -228,17 +236,102 @@ sub detect_language_with_cld {
     # (all kinds of garbish input is recognized as English)
     # --> check with Lingua::Identify
     if ($id eq 'en'){
-        ($id,$conf) = $id = langof( $string ) ? $id : 'unknown';
+        ($id,$conf) = langof( $string );
     }
     return wantarray ? ($id, $conf, $isReliable) : $id;
 }
 
+sub detect_language_with_lingua {
+    my $string = shift;
+    # my @all_languages = get_all_languages();
+    my ($id,$conf) = langof( $string );
+    return wantarray ? ($id, $conf) : $id;
+}
 
-## TODO: use langid via langid server!
 
+# get langid classifications from langid server
+# from http://xmodulo.com/how-to-write-simple-tcp-server-and-client-in-perl.html 
 sub detect_language_with_langid {
+    # auto-flush on socket
+    $| = 1;
+ 
+    # create a connecting socket
+    my $socket = new IO::Socket::INET (
+	PeerHost => 'localhost',
+	PeerPort => '15555',
+	Proto => 'tcp',
+	Timeout => 5,
+	);
+
+    ## fallback to cld classifier
+    return &detect_language_with_cld(@_) unless $socket;
+
+    $socket->blocking(0);
+
+    # $PerlIO::encoding::fallback = Encode::FB_PERLQQ;
+    my $size = $socket->send(encode('utf8',$_[0], sub{ return  ' ' }));
+    # my $size = $socket->send(encode('utf8',$_[0], sub{ sprintf "<U+%04X>", shift }));
+    # my $size = $socket->send(encode($_[0],'utf8'));
+    # print "sent data of length $size\n";
+    $socket->send("\nCLASSIFIER=langid\n");
+    $socket->send('<<<CLASSIFY>>>');
+    shutdown($socket, 1);
+ 
+    # receive a response of up to 1024 characters from server
+    my $response = "";
+    $socket->recv($response, 1024);
+    # print "received response: $response\n";
+    $socket->close();
+
+    if ($response){
+	my @ret = eval($response);
+	return wantarray ? @ret : $ret[0];
+    }
+
     return &detect_language_with_cld(@_);
 }
+
+
+# get cld2 classifications from langid server
+sub detect_language_with_cld2 {
+    # auto-flush on socket
+    $| = 1;
+ 
+    # create a connecting socket
+    my $socket = new IO::Socket::INET (
+	PeerHost => 'localhost',
+	PeerPort => '15555',
+	Proto => 'tcp',
+	Timeout => 5,
+	);
+
+    ## fallback to cld classifier
+    return &detect_language_with_cld(@_) unless $socket;
+
+    # $PerlIO::encoding::fallback = Encode::FB_PERLQQ;
+    my $size = $socket->send(encode('utf8',$_[0], sub{ return  ' ' }));
+    # print "sent data of length $size\n";
+    $socket->send("\nCLASSIFIER=cld2\n");
+    $socket->send("LANGHINT=$_[1]\n") if ($_[1]);
+    $socket->send('<<<CLASSIFY>>>');
+    shutdown($socket, 1);
+ 
+    # receive a response of up to 1024 characters from server
+    my $response = "";
+    $socket->recv($response, 1024);
+    # print "received response: $response\n";
+    $socket->close();
+
+    if ($response){
+	# $response=~tr/\(\)/\[\]/;
+	$response=~s/(true|false)/'$1'/i;
+	my @ret = eval($response);
+	return wantarray ? @ret : $ret[0];
+    }
+
+    return &detect_language_with_cld(@_);
+}
+
 
 
 ## Python bindings do not work!

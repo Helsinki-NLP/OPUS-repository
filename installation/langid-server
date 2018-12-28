@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+#-*-python-*-
+#
+# a simple server for langid and cld2
+# listens on port 15555 (hardcoded)
+#
+
+
+import time
+import asyncio, socket
+import langid
+import pycld2 as cld2
+
+from langid.langid import LanguageIdentifier, model
+identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
+
+# adapted from
+# https://stackoverflow.com/questions/48506460/python-simple-socket-client-server-using-asyncio
+# with changes from
+# https://stackoverflow.com/questions/43948454/python-invalid-syntax-with-async-def
+
+@asyncio.coroutine
+def handle_client(reader, writer):
+    request = None
+    classifier = 'langid'
+    langhint = None
+    received = '';
+
+    timeout = time.time() + 5  # 10 seconds max
+    while not '<<CLASSIFY>>' in received:
+        request = (yield from reader.read(255)).decode('utf8', 'replace')
+        if (request):
+            # print("received "+request)
+            received += request
+        if time.time() > timeout:
+            break
+
+    response = None
+    text = '';
+    received = received.replace('<<CLASSIFY>>','')
+    lines = received.split("\n")
+    for l in lines:
+        if ('CLASSIFIER=' in l):
+            classifier = l.split('=')[1]
+        elif ('LANGHINT=' in l):
+            langhint = l.split('=')[1]
+        else:
+            text += l + ' '
+
+    if text:
+        # print("classify "+text)
+        if (classifier == 'cld2'):
+            ## add best guess for short strings by adding option 'bestEffort=True' below
+            if (langhint):
+                isReliable, textBytesFound, details = cld2.detect(text, bestEffort=True, hintLanguage=langhint)
+            else:
+                isReliable, textBytesFound, details = cld2.detect(text, bestEffort=True)
+            # print(str(details))
+            response = str((details[0][1],details[0][2],isReliable,details[0][3]))
+            # response = str((details[0][1],isReliable,details))
+        else:
+            response = str(identifier.classify(text))
+        writer.write(response.encode('utf8'))
+
+
+loop = asyncio.get_event_loop()
+loop.create_task(asyncio.start_server(handle_client, 'localhost', 15555))
+loop.run_forever()
