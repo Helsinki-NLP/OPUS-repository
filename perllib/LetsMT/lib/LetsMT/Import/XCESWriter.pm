@@ -129,12 +129,14 @@ sub write {
 	    ## should this only be optional?
 	    # my $detected = &identify( $data{$lang}{$sid} );
 
+	    ## NEW: use cld2 with language hint instead of langid ...
 	    my ($detected,$conf) = 
 		&LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, 
-							       $lang, 'langid' );
+							       $lang, 'cld2' );
 
+	    ## add attribute to sentence tag if the language does not match
 	    ## TODO: should we always add the lang identification scores 
-	    ##       even if the language matches?
+	    ##       even if the language matches? 
 
 	    if ($detected ne $lang){
 		$attr{$lang}{$sid}{lang} = $detected;

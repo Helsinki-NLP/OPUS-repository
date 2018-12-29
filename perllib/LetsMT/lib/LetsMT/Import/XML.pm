@@ -126,21 +126,31 @@ sub convert {
 	# $new_resource->{path}=~s/\.xml$/_converted\.xml/;
     }
 
-    my $lang = $importer->{lang} || $resource->language();
-
     # shift the 'uploads' path to local_dir
     $new_resource->shift_path_to_local();
+
+    ## NEW: always run language detection
+    my $lang = $importer->{lang} || $resource->language();
+    my @detected = &detect_language($resource);
+    if ( @detected && $detected[0] ne 'unknown' ){
+	$lang = $detected[0] unless (grep($_ eq $lang,@detected));
+    }
+    $lang = 'xx' unless ($lang);
+
+    # make sure the subdir is set correctly
+    $new_resource->language($lang);
+
 
     ## ugly hack to avoid overwriting the same file
     if ($new_resource->local_path eq $resource->local_path ){
 	$new_resource->{path}=~s/\.xml$/_converted\.xml/;
     }
 
-    # try to detect the language if it is not specified or 'xx'
-    if ((!$lang) || ($lang eq 'xx')){
-        my @detected = &detect_language($resource);
-        $lang = shift(@detected) || 'xx';
-    }
+    # # try to detect the language if it is not specified or 'xx'
+    # if ((!$lang) || ($lang eq 'xx')){
+    #     my @detected = &detect_language($resource);
+    #     $lang = shift(@detected) || 'xx';
+    # }
 
     my $splitter = $importer->{splitter} || new LetsMT::DataProcessing::Splitter(
         method => $LetsMT::IMPORT_SPLITTER,

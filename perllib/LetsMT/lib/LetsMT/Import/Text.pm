@@ -105,22 +105,28 @@ sub validate {
     # extra call to unlink: linked files do not disappear otherwise
     unlink($valid_file) if (-e $valid_file); 
 
-    # no language known ---> don't need to check!
-    return [] unless ($lang);
+    return [];
 
-    # check language
-    my @detected = &detect_language($file);
-    return [] if ( $detected[0] eq 'unknown' );   # unknown --> let's trust it
-    return [] if ( grep( $_ eq $lang, @detected ) );   # one of the detected? -> OK!
+    ## NEW: skip language check during validation
+    ##      Why? because we check the language later in conversion
+    # 
+    # # no language known ---> don't need to check!
+    # return [] unless ($lang);
 
-    # if the language does not match --> return a warn-resource
-    # (but do not fail!)
-    my $LangName = &iso639_ThreeToName( &iso639_TwoToThree($lang) );
-    return (
-        [],
-        [ [ $resource, detected_languages => join( ',', @detected ) ] ],
-        "Failed to validate as $LangName text"
-    );
+    # # check language
+    # my @detected = &detect_language($file);
+    # return [] if ( $detected[0] eq 'unknown' );   # unknown --> let's trust it
+    # return [] if ( grep( $_ eq $lang, @detected ) );   # one of the detected? -> OK!
+
+    # # if the language does not match --> return a warn-resource
+    # # (but do not fail!)
+    # my $LangName = &iso639_ThreeToName( &iso639_TwoToThree($lang) );
+    # return (
+    #     [],
+    #     [ [ $resource, detected_languages => join( ',', @detected ) ] ],
+    #     "Failed to validate as $LangName text"
+    # );
+
 }
 
 

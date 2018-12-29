@@ -821,36 +821,44 @@ sub upload_new_resource{
     ## old call to post_meta with empty metadata hash ... why?
     # &LetsMT::WebService::post_meta( $new_res->{resource} );
 
-    # for all monolingual corpus files: do language detection!!!
-    if ($new_res->{resource}->type eq 'xml'){
-        my @lang = $new_res->{resource}->language();
-        if ($#lang == 0){
-            my @detected = &detect_language($new_res->{resource});
-            if ( $detected[0] ne 'unknown' ){
-                # unless ( grep( $_ eq $lang[0], @detected ) ){
-                unless ( $#detected == 0 && $detected[0] eq $lang[0] ){
-                    if ($detected[0] eq $lang[0]){
-                        $new_res->{meta}->{warning} = 
-                            'possible language mismatch';
-                    }
-                    elsif (grep($_ eq $lang[0],@detected)){
-                        $new_res->{meta}->{warning} = 
-                            'likely language mismatch';
-                    }
-                    else{
-			## NEW: overwrite old language!
-			##      (this is especially necessary for user-contributed
-			##       data and webcrawled data!)
-			$new_res->{resource}->set_language($detected[0]);
-                        $new_res->{meta}->{warning} = 'language mismatch! old language = ';
-			$new_res->{meta}->{warning}.= $lang[0];
-                    }
-                    $new_res->{meta}->{detected_languages} = 
-                        join( ',', @detected );
-                }
-            }
-        }
-    }
+    ########################################
+    ## NEW: skip language checks here
+    ## ---> this should be done earlier
+    ##      when converting files
+    ## ---> TODO: we don't get meta data for mismatches!
+    ########################################
+
+    # # for all monolingual corpus files: do language detection!!!
+    # # TODO: should this be done earlier?
+    # if ($new_res->{resource}->type eq 'xml'){
+    #     my @lang = $new_res->{resource}->language();
+    #     if ($#lang == 0){
+    #         my @detected = &detect_language($new_res->{resource});
+    #         if ( $detected[0] ne 'unknown' ){
+    #             # unless ( grep( $_ eq $lang[0], @detected ) ){
+    #             unless ( $#detected == 0 && $detected[0] eq $lang[0] ){
+    #                 if ($detected[0] eq $lang[0]){
+    #                     $new_res->{meta}->{warning} = 
+    #                         'possible language mismatch';
+    #                 }
+    #                 elsif (grep($_ eq $lang[0],@detected)){
+    #                     $new_res->{meta}->{warning} = 
+    #                         'likely language mismatch';
+    #                 }
+    #                 else{
+    # 			## NEW: overwrite old language!
+    # 			##      (this is especially necessary for user-contributed
+    # 			##       data and webcrawled data!)
+    # 			$new_res->{resource}->set_language($detected[0]);
+    #                     $new_res->{meta}->{warning} = 'language mismatch! old language = ';
+    # 			$new_res->{meta}->{warning}.= $lang[0];
+    #                 }
+    #                 $new_res->{meta}->{detected_languages} = 
+    #                     join( ',', @detected );
+    #             }
+    #         }
+    #     }
+    # }
 
     ## NEW: upload resource AFTER language check
     get_logger(__PACKAGE__)->info( 'New resource: ', $new_res->{resource} );

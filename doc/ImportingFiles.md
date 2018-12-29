@@ -102,9 +102,9 @@ The latest version of the repository backend also supports (expermental) web cra
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/crawl?uid=user&action=import&url=https://www.helsinki.fi&run=crawl"
 ```
 
-Note that the command will put the crawled data in a repository with the name of the web domain (`www.helsinki.fi` in the example above) and not in the repository that is specified in the call to the job API (`corpus/user` in the example). The reason for this is to avoid repeated downloads of the same websites in different repositories. The additional command in `action` above tiggers the automatic import of the tar-file after web crawling is done (this is optional).
+ The additional command in `action` above tiggers the automatic import of the tar-file after web crawling is done (this is optional).
 
-It may be useful to set the search for translated documents to `similar-names` (instead of `identical-names`, which is the default). This would improve the matching of potentially translated documents:
+It may be useful to set the search for translated documents to `similar-names` (instead of `identical-names`, which is the default). This would improve the matching of potentially translated documents (but it can also cause a lot of trouble):
 
 ```
 $LETSMT_CONNECT -X POST "$LETSMT_URL/metadata/www.helsinki.fi/user?uid=user&AlignPara_search_parallel=similar-names"

@@ -1067,7 +1067,7 @@ sub run_crawler{
 	$doc=~s/\?.*$$//;
 	$doc=~s/[^a-zA-Z0-9\/_\-\.\s]//g;
 	$doc=~s/\/+$//;
-	push(@{$path_elements},'uploads',$doc);	
+	push(@{$path_elements},$doc);	
     }
     unshift(@{$path_elements},'uploads');
 
@@ -1107,24 +1107,10 @@ sub run_crawler{
 	push(@para,'-I',join('/',@subdir));
     }
 
-    ## we always us the URL domain as the slot
-    ## and the user as branch!
-    ## TODO: is this strange?
-    my $slot    = shift(@docdir);
-    my $branch  = $args->{uid};
-
-
-## TODO: give file a time stamp?
-#
-#    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
-#	localtime(time);
-#    $year+=1900;
-#    $mon++;
-#    my $filebase = "$year$mon$mday\_$hour$min$sec.tar.gz";
-
-    ## Why would we need this?
-    # @{$path_elements} = ('uploads','website',@docdir);
-
+    ## use URL domain as the slot if no slot is set
+    ## use user as branch if not set
+    $slot    = shift(@docdir) unless ($slot);
+    $branch  = $args->{uid}   unless ($branch);
 
     ## make sure that the file exitension is a tar.gz file
     $$path_elements[-1]=~s/(.tar.gz)?$/.tar.gz/;
