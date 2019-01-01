@@ -63,7 +63,13 @@ sub new {
     if ( $self{method} =~ /(length|gale|church)/i ) {
         return new LetsMT::Align::GaleChurch(@_);
     }
-    if ( $self{method} =~ /(bisent|cautious)/i ) {
+    if ( $self{method} =~ /bisent-?cautious/i ) {
+        return new LetsMT::Align::Hunalign::Bisent::Cautious(@_);
+    }
+    if ( $self{method} =~ /cautious/i ) {
+        return new LetsMT::Align::Hunalign::Cautious(@_);
+    }
+    if ( $self{method} =~ /bisent/i ) {
         return new LetsMT::Align::Hunalign::Bisent(@_);
     }
     if ( $self{method} =~ /hun/i ) {
@@ -283,6 +289,90 @@ sub make_align_resource {
 
     return $resource;
 }
+
+
+=head2 write_links
+
+write links to an xces resource
+
+=cut
+
+
+sub write_links{
+    my $self = shift;
+    my ($AlgResource, $links, $langs) = @_;
+
+    my $writer = new LetsMT::Export::Writer::XCES();
+    $writer->open($AlgResource);
+    $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
+
+    my ($SrcLang,$TrgLang) = $AlgResource->language;
+
+    %{ $self->{LinkTypes} } = ();
+    $self->{NrLinks}        = 0;
+    $self->{NrSrcSents}     = 0;
+    $self->{NrTrgSents}     = 0;
+
+    # $self->{NrSkippedLinks}        = 0;
+    # $self->{NrSkippedSrcSents}     = 0;
+    # $self->{NrSkippedTrgSents}     = 0;
+
+
+    $self->{SIZE} = 0;
+    foreach my $l (@$links) {
+        $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
+        $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
+	my $ok = 1;
+	foreach my $s (@{$l->{src}}){
+	    next unless (exists($$langs{$SrcLang}) && ref($$langs{$SrcLang}) eq 'HASH' );
+	    next unless (exists($$langs{$SrcLang}{$s}) && ref($$langs{$SrcLang}{$s}) eq 'HASH' );
+	    $ok = 0 if ($$langs{$SrcLang}{$s}{lang} && 
+			$$langs{$SrcLang}{$s}{lang} ne $SrcLang);
+	}
+	foreach my $t (@{$l->{trg}}){
+	    next unless (exists($$langs{$TrgLang}) && ref($$langs{$TrgLang}) eq 'HASH' );
+	    next unless (exists($$langs{$TrgLang}{$t}) && ref($$langs{$TrgLang}{$t}) eq 'HASH' );
+	    $ok = 0 if ($$langs{$TrgLang}{$t}{lang} && 
+			$$langs{$TrgLang}{$t}{lang} ne $TrgLang);
+	}
+	my $nrSrc = scalar @{ $l->{src} };
+	my $nrTrg = scalar @{ $l->{trg} };
+	unless ($nrSrc || $nrTrg){
+	    print '';
+	}
+	if ($ok){
+	    my %para = exists $l->{score} ? ('certainty' => $l->{score}) : ();
+	    $writer->write( $l->{src}, $l->{trg}, %para );
+	    $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
+	    $self->{NrSrcSents} += $nrSrc;
+	    $self->{NrTrgSents} += $nrTrg;
+	    $self->{NrLinks}++;
+	}
+	elsif ($self->{verbose}){
+	    $self->{NrSkippedSrcSents} += $nrSrc;
+	    $self->{NrSkippedTrgSents} += $nrTrg;
+	    $self->{NrSkippedLinks}++;
+	}
+    }
+    $writer->close();
+
+    if ( $self->{verbose} ) {
+        foreach ( keys %{ $self->{LinkTypes} } ) {
+            print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
+        }
+        print STDERR "$self->{NrLinks} links\n";
+        print STDERR "$self->{NrSrcSents} source sentences\n";
+        print STDERR "$self->{NrTrgSents} target sentences\n";
+
+        print STDERR "skipped $self->{NrSkippedLinks} links\n" if ($self->{NrSkippedLinks});
+        print STDERR "$self->{NrSkippedSrcSents} source sentences\n" if ($self->{NrSkippedSrcSents});
+        print STDERR "$self->{NrSkippedTrgSents} target sentences\n" if ($self->{NrSkippedTrgSents});
+
+    }
+
+    return $self->{NrLinks};
+}
+
 
 
 =head2 nr_links

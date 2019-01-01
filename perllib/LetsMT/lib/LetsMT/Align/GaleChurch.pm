@@ -133,46 +133,59 @@ sub align {
 
     my ( @SrcIDs, @SrcLen );
     my ( @TrgIDs, @TrgLen );
+    my %DetectedLang = ();
 
-    get_sentence_lengths( $SrcResource, \@SrcIDs, \@SrcLen );
-    get_sentence_lengths( $TrgResource, \@TrgIDs, \@TrgLen );
+    get_sentence_lengths( $SrcResource, \@SrcIDs, \@SrcLen, \%DetectedLang );
+    get_sentence_lengths( $TrgResource, \@TrgIDs, \@TrgLen, \%DetectedLang );
     my @links = $self->length_align( \@SrcLen, \@TrgLen, \@SrcIDs, \@TrgIDs );
 
-    my $writer = new LetsMT::Export::Writer::XCES();
-    $writer->open($AlgResource);
-    $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
+    $self->write_links($AlgResource, \@links, \%DetectedLang);
 
-    %{ $self->{LinkTypes} } = ();
-    $self->{NrLinks} = 0;
+    # my $writer = new LetsMT::Export::Writer::XCES();
+    # $writer->open($AlgResource);
+    # $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
 
-    $self->{SIZE} = 0;
-    foreach my $l (@links) {
-        $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
-        $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
-        my $nrSrc = scalar @{ $l->{src} };
-        my $nrTrg = scalar @{ $l->{trg} };
-        $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
-        $writer->write( $l->{src}, $l->{trg} );
-        $self->{NrLinks}++;
-    }
-    $writer->close();
+    # my ($SrcLang,$TrgLang) = $AlgResource->language;
+    # %{ $self->{LinkTypes} } = ();
+    # $self->{NrLinks} = 0;
 
-    $self->{NrSrcSents} = scalar @SrcIDs;
-    $self->{NrTrgSents} = scalar @TrgIDs;
+    # $self->{SIZE} = 0;
+    # foreach my $l (@links) {
+    #     $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
+    #     $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
+    #     my $nrSrc = scalar @{ $l->{src} };
+    #     my $nrTrg = scalar @{ $l->{trg} };
+    #     $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
+    # 	my $ok = 1;
+    # 	foreach $s (@{$l->{src}}){
+    # 	    $ok = 0 if ($DetectedLang{$SrcLang}{$s}{lang} && 
+    # 			$DetectedLang{$SrcLang}{$s}{lang} ne $SrcLang);
+    # 	}
+    # 	foreach $t (@{$l->{trg}}){
+    # 	    $ok = 0 if ($DetectedLang{$TrgLang}{$t}{lang} && 
+    # 			$DetectedLang{$TrgLang}{$t}{lang} ne $TrgLang);
+    # 	}
+    #     $writer->write( $l->{src}, $l->{trg} ) if ($ok);
+    #     $self->{NrLinks}++;
+    # }
+    # $writer->close();
 
-    if ( $self->{verbose} ) {
-        foreach ( keys %{ $self->{LinkTypes} } ) {
-            print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
-        }
-        print STDERR "$self->{NrLinks} links\n";
-        print STDERR "$self->{NrSrcSents} source sentences\n";
-        print STDERR "$self->{NrTrgSents} target sentences\n";
-        print STDERR "final alignment cost: $self->{AlignCost}\n";
-        if ( $self->{NrLinks} ) {
-            printf STDERR "average cost = %5.2f\n",
-                $self->{AlignCost} / $self->{NrLinks};
-        }
-    }
+    # $self->{NrSrcSents} = scalar @SrcIDs;
+    # $self->{NrTrgSents} = scalar @TrgIDs;
+
+    # if ( $self->{verbose} ) {
+    #     foreach ( keys %{ $self->{LinkTypes} } ) {
+    #         print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
+    #     }
+    #     print STDERR "$self->{NrLinks} links\n";
+    #     print STDERR "$self->{NrSrcSents} source sentences\n";
+    #     print STDERR "$self->{NrTrgSents} target sentences\n";
+    #     print STDERR "final alignment cost: $self->{AlignCost}\n";
+    #     if ( $self->{NrLinks} ) {
+    #         printf STDERR "average cost = %5.2f\n",
+    #             $self->{AlignCost} / $self->{NrLinks};
+    #     }
+    # }
 
     return $AlgResource;
 }
@@ -186,7 +199,7 @@ Read all sentences from the resource and return sentence IDs and lengths.
 
 sub get_sentence_lengths {
     my $resource = shift;
-    my ( $ids, $len ) = @_;
+    my ( $ids, $len, $lang ) = @_;
 
     my $reader;
     unless ( $reader = new LetsMT::Export::Reader( $resource, 'xml' ) ) {
@@ -194,7 +207,7 @@ sub get_sentence_lengths {
     }
 
     $reader->open($resource);
-    while ( my $data = $reader->read() ) {
+    while ( my $data = $reader->read( undef, undef, $lang ) ) {
         foreach my $l ( keys %{$data} ) {   # this should be only one language
             foreach my $i ( keys %{ $$data{$l} } ) {
                 push( @{$ids}, $i );

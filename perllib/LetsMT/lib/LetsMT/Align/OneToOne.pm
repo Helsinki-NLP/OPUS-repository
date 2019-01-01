@@ -69,56 +69,61 @@ sub align {
     $SrcReader->open($SrcResource);
     $TrgReader->open($TrgResource);
 
-    my $writer = new LetsMT::Export::Writer::XCES();
-    $writer->open($AlgResource);
-    $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
+    # my $writer = new LetsMT::Export::Writer::XCES();
+    # $writer->open($AlgResource);
+    # $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
 
-    $self->{SIZE} = 0;
-    while ( my $data = $SrcReader->read() ) {
+    $self->{SIZE}    = 0;
+    my @links        = ();
+    my %DetectedLang = ();
+
+    while ( my $data = $SrcReader->read(undef, undef, \%DetectedLang) ) {
         my @sids = ();
         foreach my $l ( keys %{$data} ) {
             push( @sids, keys %{ $$data{$l} } );
         }
         my @tids = ();
-        if ( my $data = $TrgReader->read() ) {
+        if ( my $data = $TrgReader->read(undef, undef, \%DetectedLang) ) {
             foreach my $l ( keys %{$data} ) {
                 push( @tids, keys %{ $$data{$l} } );
             }
         }
-        $writer->write( \@sids, \@tids );
-        $self->{NrLinks}++;
-        my $nrSrc = scalar @sids;
-        my $nrTrg = scalar @tids;
-        $self->{NrSrcSents} += $nrSrc;
-        $self->{NrTrgSents} += $nrTrg;
-        $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
+	my $idx = @links;
+	@{$links[$idx]{src}} = @sids;
+	@{$links[$idx]{trg}} = @tids;
+
+        # $writer->write( \@sids, \@tids );
+        # $self->{NrLinks}++;
+        # my $nrSrc = scalar @sids;
+        # my $nrTrg = scalar @tids;
+        # $self->{NrSrcSents} += $nrSrc;
+        # $self->{NrTrgSents} += $nrTrg;
+        # $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
     }
+
 
     # remaining target sentences will be aligned to nothing .....
     my @tids = ();
-    while ( my $data = $TrgReader->read() ) {
+    while ( my $data = $TrgReader->read(undef, undef, \%DetectedLang) ) {
         foreach my $l ( keys %{$data} ) {
             push( @tids, keys %{ $$data{$l} } );
         }
-        $writer->write( [], \@tids );
-        $self->{NrLinks}++;
-        my $nrTrg = scalar @tids;
-        $self->{NrTrgSents} += $nrTrg;
-        $self->{LinkTypes}->{"0:$nrTrg"}++;
+	my $idx = @links;
+	@{$links[$idx]{src}} = ();
+	@{$links[$idx]{trg}} = @tids;
+
+        # $writer->write( [], \@tids );
+        # $self->{NrLinks}++;
+        # my $nrTrg = scalar @tids;
+        # $self->{NrTrgSents} += $nrTrg;
+        # $self->{LinkTypes}->{"0:$nrTrg"}++;
     }
 
     $SrcReader->close();
     $TrgReader->close();
-    $writer->close();
+    # $writer->close();
 
-    if ( $self->{verbose} ) {
-        foreach ( keys %{ $self->{LinkTypes} } ) {
-            print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
-        }
-        print STDERR "$self->{NrLinks} links\n";
-        print STDERR "$self->{NrSrcSents} source sentences\n";
-        print STDERR "$self->{NrTrgSents} target sentences\n";
-    }
+    $self->write_links($AlgResource, \@links, \%DetectedLang);
 
     return $AlgResource;
 }

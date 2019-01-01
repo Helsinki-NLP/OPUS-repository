@@ -94,7 +94,7 @@ sub close {
 
 sub read {
     my $self   = shift;
-    my $before = shift;
+    my ($before,$after,$sattr) = @_;
 
     my $data = {};
     my $fh   = $self->{FH};
@@ -128,6 +128,11 @@ sub read {
         if ( ref($before) eq 'HASH' ) {
             $before->{ $self->{language} } = $self->{XMLPARSER}->{BEFORE};
         }
+        if ( ref($sattr) eq 'HASH' ) {
+	    if ( ref($self->{XMLPARSER}->{SATTR}) eq 'HASH' ){
+		%{$$sattr{ $self->{language} }{ $id }} = %{$self->{XMLPARSER}->{SATTR}};
+	    }
+	}
         return $data;
     }
 
@@ -154,6 +159,7 @@ sub __XmlTagStart {
         $p->{OPEN_S} = $a{id};
         delete $p->{CLOSED_S};
         $p->{SENT} = '';
+	%{$p->{SATTR}} = %a;
         return 1;
     }
     elsif ( ref( $p->{BEFORE} ) eq 'ARRAY' ) {

@@ -16,7 +16,7 @@ extracts the links in a slightly different way.
 use strict;
 use parent 'LetsMT::Align::Hunalign';
 
-our $HUNPARA = '-realign -cautious';
+# our $HUNPARA = '-realign -bisent';
 
 
 =head1 CONSTRUCTOR
@@ -25,16 +25,25 @@ our $HUNPARA = '-realign -cautious';
 
 =cut
 
+
 sub new {
-    my $class = shift;
-    my %args  = @_;
-
-    $args{para}    = $args{para} || $HUNPARA;
-    my $self       = $class->SUPER::new(%args);
-    $self->{para} .= ' -bisent';
-
-    return bless $self, $class;
+    my ($class, %args) = @_;
+    my $this = $class->SUPER::new(%args);
+    $$this{para} .= ' -bisent';
+    return bless($this, $class);
 }
+
+
+# sub new {
+#     my $class = shift;
+#     my %args  = @_;
+
+#     $args{para}    = $args{para} || $HUNPARA;
+#     my $self       = $class->SUPER::new(%args);
+#     # $self->{para} .= ' -bisent';
+
+#     return bless $self, $class;
+# }
 
 
 =head2 C<_hunalign2links>
@@ -61,11 +70,6 @@ sub _hunalign2links {
         ## split the line
         my ( $sid, $tid, $score ) = split(/\s+/);
 
-        ## add links
-        my $idx = @{$links};
-        $links->[$idx]->{src} = [];
-        $links->[$idx]->{trg} = [];
-
         # TODO: why can this happen ....?
         next if ($sid > $#{$srcids});
         next if ($tid > $#{$trgids});
@@ -74,11 +78,21 @@ sub _hunalign2links {
         next if ( $$srcids[$sid] eq 'p' );
         next if ( $$trgids[$tid] eq 'p' );
 
-        push( @{ $links->[$idx]->{src} }, $$srcids[$sid] );
-        push( @{ $links->[$idx]->{trg} }, $$trgids[$tid] );
+	next unless ($$srcids[$sid] || $$trgids[$tid]);
 
-        $links->[$idx]->{score} = $score;
-        $totalScore += $score;
+	if ($score < $self->{scorethr} ){
+	    $self->{NrSkippedLinks}++;
+	    $self->{NrSkippedSrcSents}++;   # this does not work
+	    $self->{NrSkippedTrgSents}++;   # only counts this sentence
+	}
+	else{
+	    ## add links
+	    my $idx = @{$links};
+	    @{ $links->[$idx]->{src} } = ( $$srcids[$sid] );
+	    @{ $links->[$idx]->{trg} } = ( $$trgids[$tid] );
+	    $links->[$idx]->{score} = $score;
+	    $totalScore += $score;
+	}
     }
 
     if ($#{$output}){
@@ -86,6 +100,22 @@ sub _hunalign2links {
     }
     return 0;
 }
+
+
+
+
+package LetsMT::Align::Hunalign::Bisent::Cautious;
+
+use parent 'LetsMT::Align::Hunalign::Bisent';
+my $HUNPARA = '-realign -bisent -cautious';
+
+sub new {
+    my ($class, %args) = @_;
+    my $this = $class->SUPER::new(%args);
+    $$this{para} .= ' -cautious';
+    return bless($this, $class);
+}
+
 
 
 1;

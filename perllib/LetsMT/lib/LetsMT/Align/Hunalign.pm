@@ -31,8 +31,9 @@ our $HUNALIGN = `which hunalign` || undef;
 chomp($HUNALIGN);
 
 our $HUNDIC      =  dist_dir('LetsMT').'/hunalign/null.dic';
-our @BASE_PARAMS = ('-utf');                   # required parameter
-our $HUNPARA     = '-realign';                 # additional hunalign parameters
+our @BASE_PARAMS = ('-utf');                                                   # required parameter
+our $HUNPARA     = '-realign';                                                 # additional hunalign parameters
+# our $HUNPARA     = '-realign -ppthresh=30 -headerthresh=100 -topothresh=30';   # additional hunalign parameters
 
 
 ###-------------------------------------------------------------------------
@@ -73,6 +74,32 @@ our $HUNPARA     = '-realign';                 # additional hunalign parameters
 #     Filter rungs with less than n percent of one-to-one segments
 #     in their vicinity.
 #
+#  All these 'thresh' values default to zero (i.e., no postfiltering). Typical sensible values are 
+#      -ppthresh=30 -headerthresh=100 -topothresh=30 
+#  and *are* recommended over the default. Of course the optimal parameter values depend on the 
+#  nature of the bitext, and also depend on the coverage of the dictionary somewhat.
+#
+# - Ladder format of alignments. Alignments are described by a newline-separated
+#   list of pairs of integers represented by the first two columns of the ladder
+#   file. Such a pair is called a rung. The first coordinate denotes a position in
+#   the source language, the second coordinate denotes a position in the target
+#   language. A rung (n,m) means the following: The first n sentences of the
+#   source text correspond to the first m sentences of the target text. The rungs
+#   cannot intersect (e.g., (10,12) (11,10) is not allowed), which means that the
+#   order of sentences are preserved by the alignment. The first rung is always
+#   (0,0), the last one is always
+#   (sentenceNumber(sourceText),sentenceNumber(targetText)). The third column of
+#   the ladder format is a confidence value for the segment starting with the
+#   given rung. The columns of the ladder file are separated by a tab.
+#
+# -Dictionary:
+#
+# The dictionary consists of newline-separated dictionary items. An item
+# consists of a target languge phrase and a source language phrase, separated by
+# the " @ " sequence. Multiword phrases are allowed. The words of a phrase are
+# space-separated as usual. IMPORTANT NOTE: In the current version, for
+# historical reasons, the target language phrases come first. So the ordering is
+# the opposite of the ordering of the command-line arguments or the results.
 ###-------------------------------------------------------------------------
 
 
@@ -102,6 +129,13 @@ sub new {
     $self{hunalign} = $self{hunalign} || $HUNALIGN;
     $self{dic}      = $self{dic}      || $HUNDIC;
     $self{para}     = $self{para}     || $HUNPARA;
+
+    ## filter alignments with scores below scorethr
+    $self{scorethr} = 0 unless $self{scorethr};
+
+    ## maximum number of sentences in alignments
+    $self{maxsrc} = 2 unless $self{maxsrc};
+    $self{maxtrg} = 2 unless $self{maxtrg};
 
     return bless \%self, $class;
 }
@@ -136,9 +170,10 @@ sub align {
 
     my $srcids = [];
     my $trgids = [];
+    my %DetectedLang = ();
 
-    my $srcfile = $self->_resource2hunalign( $SrcResource, $srcids );
-    my $trgfile = $self->_resource2hunalign( $TrgResource, $trgids );
+    my $srcfile = $self->_resource2hunalign( $SrcResource, $srcids, \%DetectedLang );
+    my $trgfile = $self->_resource2hunalign( $TrgResource, $trgids, \%DetectedLang );
 
     # TODO: it's stupid to always require splitting of parameters
     my @para = split(/\s+/,$self->{para});
@@ -153,6 +188,9 @@ sub align {
         $srcfile,
         $trgfile
     );
+    # if ($err=~/\nQuality\s+([0-9\.]+)(\Z|\s)/){
+    #      $self->{AlignConfidence} = $1;
+    # }
 
     ## not successfull? --> try to fall-back to Gale & Church alignment
 
@@ -172,43 +210,44 @@ sub align {
     }
 
     # create the sentence alignment file
+    $self->write_links($AlgResource, \@links, \%DetectedLang);
 
-    my $writer = new LetsMT::Export::Writer::XCES();
-    $writer->open($AlgResource);
-    $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
+    # my $writer = new LetsMT::Export::Writer::XCES();
+    # $writer->open($AlgResource);
+    # $writer->open_document_pair( $AlgResource->fromDoc, $AlgResource->toDoc );
 
-    %{ $self->{LinkTypes} } = ();
-    $self->{NrLinks} = 0;
+    # %{ $self->{LinkTypes} } = ();
+    # $self->{NrLinks} = 0;
 
-    my ( $totalSrc, $totalTrg ) = ( 0, 0 );
+    # my ( $totalSrc, $totalTrg ) = ( 0, 0 );
 
-    $self->{SIZE} = 0;
-    foreach my $l (@links) {
-        $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
-        $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
-        my $nrSrc = scalar @{ $l->{src} };
-        my $nrTrg = scalar @{ $l->{trg} };
-        next unless ( $nrSrc || $nrTrg );
-        $totalSrc += $nrSrc;
-        $totalTrg += $nrTrg;
-        $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
-        $writer->write( $l->{src}, $l->{trg}, 'certainty' => $l->{score} );
-        $self->{NrLinks}++;
-    }
-    $writer->close();
+    # $self->{SIZE} = 0;
+    # foreach my $l (@links) {
+    #     $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
+    #     $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
+    #     my $nrSrc = scalar @{ $l->{src} };
+    #     my $nrTrg = scalar @{ $l->{trg} };
+    #     next unless ( $nrSrc || $nrTrg );
+    #     $totalSrc += $nrSrc;
+    #     $totalTrg += $nrTrg;
+    #     $self->{LinkTypes}->{"$nrSrc:$nrTrg"}++;
+    #     $writer->write( $l->{src}, $l->{trg}, 'certainty' => $l->{score} );
+    #     $self->{NrLinks}++;
+    # }
+    # $writer->close();
 
-    $self->{NrSrcSents} = $totalSrc;
-    $self->{NrTrgSents} = $totalTrg;
+    # $self->{NrSrcSents} = $totalSrc;
+    # $self->{NrTrgSents} = $totalTrg;
 
-    if ( $self->{verbose} ) {
-        foreach ( keys %{ $self->{LinkTypes} } ) {
-            print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
-        }
-        print STDERR "$self->{NrLinks} links\n";
-        print STDERR "$self->{NrSrcSents} source sentences\n";
-        print STDERR "$self->{NrTrgSents} target sentences\n";
-        printf STDERR "align confidence = %5.2f\n", $self->{AlignConfidence};
-    }
+    # if ( $self->{verbose} ) {
+    #     foreach ( keys %{ $self->{LinkTypes} } ) {
+    #         print STDERR "type = $_: $self->{LinkTypes}->{$_} times\n";
+    #     }
+    #     print STDERR "$self->{NrLinks} links\n";
+    #     print STDERR "$self->{NrSrcSents} source sentences\n";
+    #     print STDERR "$self->{NrTrgSents} target sentences\n";
+    #     printf STDERR "align confidence = %5.2f\n", $self->{AlignConfidence};
+    # }
 
     return $AlgResource;
 }
@@ -226,10 +265,11 @@ sub _hunalign2links {
 
     my ( $prevSrc, $prevTrg, $totalScore, $prevScore ) = ( 0, 0, 0, 0 );
 
-    # add the final point of bitext space
-    my $lastSrc = $#{$srcids};
-    my $lastTrg = $#{$trgids};
-    push( @$output, join(' ',$lastSrc,$lastTrg,0) );
+    ## TODO: why should we do this?
+    ## add the final point of bitext space
+    # my $lastSrc = $#{$srcids}+1;
+    # my $lastTrg = $#{$trgids}+1;
+    # push( @$output, join(' ',$lastSrc,$lastTrg,0) );
 
     foreach (@$output) {
         chomp;
@@ -245,18 +285,42 @@ sub _hunalign2links {
         $links->[$idx]->{src} = [];
         $links->[$idx]->{trg} = [];
 
-        if ($sid > $prevSrc){
-            foreach ( $prevSrc .. $sid - 1 ) {
-                next if ( $$srcids[$_] eq 'p' );
-                push( @{ $links->[$idx]->{src} }, $$srcids[$_] );
-            }
-        }
-        if ($tid > $prevTrg){
-            foreach ( $prevTrg .. $tid - 1 ) {
-                next if ( $$trgids[$_] eq 'p' );
-                push( @{ $links->[$idx]->{trg} }, $$trgids[$_] );
-            }
-        }
+	if ($prevScore < $self->{scorethr} ){
+	    $self->{NrSkippedLinks}++;
+	    $self->{NrSkippedSrcSents}+=$sid-$prevSrc+1;
+	    $self->{NrSkippedTrgSents}+=$tid-$prevTrg+1;
+	}
+	else{
+	    my @srcids = ();
+	    if ($sid > $prevSrc){
+		foreach ( $prevSrc .. $sid - 1 ) {
+		    next if ( $$srcids[$_] eq 'p' );
+		    push( @srcids, $$srcids[$_] );
+		    # push( @{ $links->[$idx]->{src} }, $$srcids[$_] );
+		}
+	    }
+	    my @trgids = ();
+	    if ($tid > $prevTrg){
+		foreach ( $prevTrg .. $tid - 1 ) {
+		    next if ( $$trgids[$_] eq 'p' );
+		    push( @trgids, $$srcids[$_] );
+		    # push( @{ $links->[$idx]->{trg} }, $$trgids[$_] );
+		}
+	    }
+	    unless (@srcids || @trgids){
+		print '';
+	    }
+	    if ( (! $self->{maxsrc} || @srcids <= $self->{maxsrc}) &&
+		 (! $self->{maxtrg} || @trgids <= $self->{maxtrg}) ){
+		push( @{ $links->[$idx]->{src} }, @srcids );
+		push( @{ $links->[$idx]->{trg} }, @trgids );
+	    }
+	    else{
+		$self->{NrSkippedLinks}++;
+		$self->{NrSkippedSrcSents}+=scalar @srcids;
+		$self->{NrSkippedTrgSents}+=scalar @trgids;
+	    }
+	}
 
         # no sentences linked? --> pop it again
         # (could be a linked paragraph boundary)
@@ -279,7 +343,8 @@ sub _hunalign2links {
         return $totalScore/$#{$output};
     }
 
-    return $prevScore;
+    return 0;
+    # return $prevScore;
 }
 
 
@@ -291,7 +356,7 @@ Create temporary files for running the aligner.
 
 sub _resource2hunalign {
     my $self = shift;
-    my ( $resource, $ids ) = @_;
+    my ( $resource, $ids, $langs ) = @_;
 
     my ( $fh, $tmpfile ) = tempfile(
         'align_XXXXXXXX',
@@ -307,7 +372,7 @@ sub _resource2hunalign {
 
     my $before = {};
     $reader->open($resource);
-    while ( my $data = $reader->read($before) ) {
+    while ( my $data = $reader->read($before, undef, $langs) ) {
         foreach my $l ( keys %{$data} ) {   # this should be only one language
 
             ## check if there is a paragraph break before the first sent
@@ -326,6 +391,18 @@ sub _resource2hunalign {
     }
     close $fh;
     return $tmpfile;
+}
+
+
+package LetsMT::Align::Hunalign::Cautious;
+
+use parent 'LetsMT::Align::Hunalign';
+
+sub new {
+    my ($class, %args) = @_;
+    my $this = $class->SUPER::new(%args);
+    $$this{para} .= ' -cautious';
+    return bless($this, $class);
 }
 
 
