@@ -50,7 +50,8 @@ use LetsMT::Import::XCESWriter;
 our %WRITER = (
     txt   => 'LetsMT::Export::Writer::Text',
     xml   => 'LetsMT::Export::Writer::XML',
-    tmx   => 'LetsMT::Export::Writer::TMX',
+    # tmx   => 'LetsMT::Export::Writer::TMX',
+    tmx   => 'LetsMT::Export::Writer::TMX::Unique',
     moses => 'LetsMT::Export::Writer::Moses',
     align => 'LetsMT::Export::Writer::XCES',
     xces  => 'LetsMT::Import::XCESWriter'

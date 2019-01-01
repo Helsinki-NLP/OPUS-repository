@@ -103,8 +103,9 @@ sub write {
 
     my $fh = $self->{FH};
     if ( ref($data) eq 'HASH' ) {
+	return 0 unless (keys %{$data} > 1);
 	$self->{WRITER}->startTag('tu');
-        foreach my $l ( keys %{$data} ) {
+        foreach my $l ( sort keys %{$data} ) {
 	    $self->{WRITER}->startTag('tuv', 'xml::lang' => $l);
             $self->to_string( $$data{$l} );
 	    $self->{WRITER}->endTag('tuv');
@@ -140,6 +141,64 @@ sub _token {
     my ( $self, $token ) = @_;
     $self->_encode( $$token{word} );
     return '';
+}
+
+
+
+
+#########################################
+# TMX with unique entries
+#########################################
+
+package LetsMT::Export::Writer::TMX::Unique;
+
+use parent 'LetsMT::Export::Writer::TMX';
+use File::Temp qw(tempfile tempdir);
+use Data::Dumper;
+
+$Data::Dumper::Terse = 1;
+
+sub open{
+    my $self = shift;
+
+    my ( $fh, $tmpfile ) = tempfile(
+	'srt2xml_XXXXXXXX',
+	DIR    => $ENV{UPLOADDIR},
+	SUFFIX => '.xml',
+	UNLINK => 1
+	);
+    close($fh);
+
+    $self->{tmpdb}  = {};
+    my $db = tie %{$self->{tmpdb}},"DB_File",$tmpfile;
+
+    $db->Filter_Key_Push('utf8');
+    $db->Filter_Value_Push('utf8');
+
+    return $self->SUPER::open(@_);
+}
+
+sub write{
+    my $self = shift;
+    my $data = shift;
+    my $key = Dumper($data);
+    $self->{tmpdb}->{$key}++;
+}
+
+sub close{
+    my $self = shift;
+
+    while (my ($key,$value) = each %{$self->{tmpdb}}) {
+	my $data = eval($key);
+	$self->SUPER::write($data);
+	if ($value > 1){
+	    print '';
+	}
+    }
+
+    untie %{$self->{tmpdb}};
+    return $self->SUPER::close(@_);
+
 }
 
 

@@ -30,6 +30,11 @@ use File::ShareDir qw(dist_dir);
 our $HUNALIGN = `which hunalign` || undef;
 chomp($HUNALIGN);
 
+## the recommended options for post-filtering do not seem to worl well
+## (-ppthresh=30 -headerthresh=100 -topothresh=30)
+## TODO: integrate language-specific dictionaries
+##       (and timeout like in uplug-hunalign)
+
 our $HUNDIC      =  dist_dir('LetsMT').'/hunalign/null.dic';
 our @BASE_PARAMS = ('-utf');                                                   # required parameter
 our $HUNPARA     = '-realign';                                                 # additional hunalign parameters
@@ -382,6 +387,12 @@ sub _resource2hunalign {
                     print $fh "<p>\n";
                 }
             }
+            if ( ref( $$before{$l} ) eq 'ARRAY' ) {
+		if ( grep( $$_[0] eq 'p' ,@{$$before{$l}}) ){
+                    push( @{$ids}, 'p' );
+                    print $fh "<p>\n";
+		}
+	    }
 
             foreach my $i ( keys %{ $$data{$l} } ) {
                 push( @{$ids}, $i );

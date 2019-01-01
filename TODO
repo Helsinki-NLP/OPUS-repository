@@ -5,14 +5,15 @@ To do as of version 0.56
 High priority:
 
 * TMX options
-  - option for removing duplicates 
+  - option for removing duplicates						(done = default)
     (temp storage in hashed database before writing TMX)
-  - large imports (tar-files) etc - send only one de-duplicated TMX
-  - exclude incorrect languages (lang attribute in XML)
-    ---> also for xces align files in general!
+  - large imports (tar-files) etc - send only one de-duplicated TMX		(skip this?)
+  - generate one TMX file for one compete subdir tree				(done)
+  - exclude incorrect languages (lang attribute in XML)				(done in xces)
+    ---> also for xces align files in general!	   				(done)
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
-  - integration of TMX files in interface (parallel data to be shown)
+  - integration of TMX files in interface (parallel data to be shown)		(started)
 * proper handling of revisions in GIT backend!
 * allow tags in version-control backends (at least for the git backend)
 * check memory leak in sentence alignment?!

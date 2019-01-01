@@ -197,6 +197,8 @@ sub __XmlTagEnd {
     my ( $p, $e, %a ) = @_;
 
     if ( $e eq 's' ) {
+	$p->{SENT} =~s/^\s*//s;
+	$p->{SENT} =~s/\s*$//s;
         $p->{CLOSED_S} = $p->{OPEN_S};
         delete $p->{OPEN_S};
     }

@@ -7,6 +7,7 @@ LetsMT::Export::Reader::Corpus - reader for corpus data
 =cut
 
 use strict;
+use File::Temp 'tempdir';
 
 use Log::Log4perl qw(get_logger :levels);
 
@@ -38,6 +39,13 @@ sub fetch{
     my $self = shift;
     my $resource = shift;
     if ( (! -e $resource->local_path) || $self->{-always_fetch}){
+	my $tmphome = $ENV{LETSMT_TMP} || '/tmp';
+	my $tmpdir = tempdir(
+	    'fetch_XXXXXXXX',
+	    DIR     => $tmphome,
+	    CLEANUP => 1,
+	    );
+	$resource->local_dir($tmpdir);
         unless ( &LetsMT::WebService::get_resource($resource) ) {
             get_logger(__PACKAGE__)->error("Unable to fetch '$resource'");
             return 0;
