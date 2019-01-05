@@ -162,9 +162,9 @@ sub open{
     my $self = shift;
 
     my ( $fh, $tmpfile ) = tempfile(
-	'srt2xml_XXXXXXXX',
+	'tmx_XXXXXXXX',
 	DIR    => $ENV{UPLOADDIR},
-	SUFFIX => '.xml',
+	SUFFIX => '.db',
 	UNLINK => 1
 	);
     close($fh);
@@ -181,7 +181,23 @@ sub open{
 sub write{
     my $self = shift;
     my $data = shift;
-    my $key = Dumper($data);
+
+    ## reset the sentence IDs
+    my $DataSameId = {};
+    for my $l (keys %{$data}){
+	if ( ref($$data{$l}) eq 'HASH'){
+	    my $count = 1;
+	    for my $i (sort { $a <=> $b } keys %{$$data{$l}}){
+		$$DataSameId{$l}{$count} = $$data{$l}{$i};
+		$count++;
+	    }
+	}
+	else{
+	    $$DataSameId{$l} = $$data{$l};
+	}
+    }
+
+    my $key = Dumper($DataSameId);
     $self->{tmpdb}->{$key}++;
 }
 
@@ -191,9 +207,6 @@ sub close{
     while (my ($key,$value) = each %{$self->{tmpdb}}) {
 	my $data = eval($key);
 	$self->SUPER::write($data);
-	if ($value > 1){
-	    print '';
-	}
     }
 
     untie %{$self->{tmpdb}};
