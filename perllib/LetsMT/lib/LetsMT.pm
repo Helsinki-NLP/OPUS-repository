@@ -95,7 +95,8 @@ our $IMPORT_REPORT_PROGRESS = 0;
 our $IMPORT_SPLITTER = 'udpipe';
 
 # default PDF conversion mode
-our $IMPORT_PDF_MODE = 'tika';
+our $IMPORT_PDF_MODE = 'pdf2xml';
+# our $IMPORT_PDF_MODE = 'tika';
 # our $IMPORT_PDF_MODE = 'combined';
 
 

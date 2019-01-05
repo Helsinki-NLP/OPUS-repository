@@ -44,7 +44,8 @@ sub markup_to_string {
                     $string .= ' ' . $self->_key_encode($_);
                     $string .= '="' . $self->_encode( $$attr{$_} ) . '"';
                 }
-                $string .= ">\n";
+                $string .= ">";
+                # $string .= ">\n";
             }
             else {
                 if ( @{ $$self{OPENTAGS} }
@@ -60,6 +61,10 @@ sub markup_to_string {
         else {
             $string .= $self->_encode($e);
         }
+    }
+    if ($string){
+	chomp $string;
+	$string .= "\n";
     }
     return $string;
 }

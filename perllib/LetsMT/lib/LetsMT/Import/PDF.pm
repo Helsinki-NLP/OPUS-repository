@@ -24,9 +24,8 @@ use LetsMT::Import::ApacheTika;
 
 # needed for the layout-mode conversion
 use IPC::Run qw(run);
-
 use File::Path;
-
+use Text::PDF2XML;
 use Data::Dumper;
 use Log::Log4perl qw(get_logger :levels);
 
@@ -63,7 +62,9 @@ my $MODE_TO_CMD = {
     'standard' => \&convert_standard_cmd,
     'raw'      => \&convert_raw_cmd,
     'layout'   => \&convert_layout_cmd,
-    'combined' => \&convert_pdf2xml_cmd,
+    # 'combined' => \&convert_pdf2xml_cmd,
+    'combined' => \&convert_pdf2xml,
+    'pdf2xml'  => \&convert_pdf2xml,
 };
 
 ## intermediate format used for conversion in each mode
@@ -72,7 +73,8 @@ my %MODE_TMP_FORMAT = (
     'standard' => 'txt',
     'raw'      => 'txt',
     'layout'   => 'txt',
-    'combined' => 'rawxml'
+    'combined' => 'rawxml',
+    'pdf2xml'  => 'rawxml'
 );
 
 
@@ -310,22 +312,39 @@ sub convert_layout_cmd {
 }
 
 
-=head2 C<convert_layout_cmd>
+=head2 C<convert_pdf2xml_cmd>
 
- $data = LetsMT::Import::PDF::convert_layout_cmd ($resourcce, $text_resource)
+ $data = LetsMT::Import::PDF::convert_pdf2xml_cmd ($resourcce, $text_resource)
 
-Convert a pdf to text in C<layout> mode,
-detecting columns with the help of a column-detection script.
+Convert a pdf to xml using pdf2xml.
 
 =cut
 
 sub convert_pdf2xml_cmd {
     my ( $resource, $xml_resource ) = @_;
 
-    ## use IPC::Run to pipe the PDF through pdftotext and letsmt_convert_column
+    ## use IPC::Run to pipe the PDF through pdf2xml
     return run 
         [ 'pdf2xml',$resource->local_path ],
 	'>', $xml_resource->local_path;
+}
+
+
+=head2 C<convert_pdf2xml_cmd>
+
+ $data = LetsMT::Import::PDF::convert_pdf2xml ($resourcce, $text_resource)
+
+Convert a pdf to xml using the pdf2xml library.
+
+=cut
+
+sub convert_pdf2xml {
+    my ( $resource, $xml_resource ) = @_;
+
+    ## use IPC::Run to pipe the PDF through pdf2xml
+    pdf2xml( $resource->local_path, 
+	     output => $xml_resource->local_path );
+    return 1;
 }
 
 
