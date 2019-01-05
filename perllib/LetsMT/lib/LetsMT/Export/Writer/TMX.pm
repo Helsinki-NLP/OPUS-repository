@@ -157,6 +157,7 @@ use File::Temp qw(tempfile tempdir);
 use Data::Dumper;
 
 $Data::Dumper::Terse = 1;
+$Data::Dumper::Sortkeys = 1;
 
 sub open{
     my $self = shift;
@@ -183,21 +184,22 @@ sub write{
     my $data = shift;
 
     ## reset the sentence IDs
-    my $DataSameId = {};
+    my $DataNoId = {};
     for my $l (keys %{$data}){
-	if ( ref($$data{$l}) eq 'HASH'){
-	    my $count = 1;
-	    for my $i (sort { $a <=> $b } keys %{$$data{$l}}){
-		$$DataSameId{$l}{$count} = $$data{$l}{$i};
-		$count++;
-	    }
-	}
-	else{
-	    $$DataSameId{$l} = $$data{$l};
-	}
+    	if ( ref($$data{$l}) eq 'HASH'){
+    	    $$DataNoId{$l} = [];
+    	    my $count = 0;
+    	    for my $i (sort { $a <=> $b } keys %{$$data{$l}}){
+    		$$DataNoId{$l}[$count] = $$data{$l}{$i};
+    		$count++;
+    	    }
+    	}
+    	else{
+    	    $$DataNoId{$l} = $$data{$l};
+    	}
     }
-
-    my $key = Dumper($DataSameId);
+   
+    my $key = Dumper($DataNoId);
     $self->{tmpdb}->{$key}++;
 }
 
