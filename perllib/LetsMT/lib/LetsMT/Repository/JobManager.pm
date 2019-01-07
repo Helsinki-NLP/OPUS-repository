@@ -1131,6 +1131,9 @@ sub run_crawler{
     my $pwd = getcwd();
     chdir($tmpdir);
 
+    ## set the run_cmd timout to 3 days
+    local $LetsMT::Tools::TIMEOUT = 3*24*60*60;
+
     ## TODO: break if the command returns an error?
     ##       but this seems to happen all the time ...
     # if (&run_cmd('wget',@para,$args->{url})){

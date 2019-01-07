@@ -62,6 +62,16 @@ sub validate {
     # document type
     my $type = $self->{type} || $resource->type();
 
+    ## don't redo validation
+    if (exists $resource->{apache_tika_validated}){
+	if ($resource->{apache_tika_validated}){
+	    return ( [] , [[$resource,'detected_stream' => $type]] );
+	}
+	else{
+	    return [ [ $resource, import_log => "failed to delect stream type" ] ];
+	}
+    }
+
     # read content and detect type with TIKA
     my $content  = $self->_read_raw_file($resource->local_path);
     my $detected = $TIKA->detect_stream($content);
@@ -71,11 +81,13 @@ sub validate {
 	$detected-~s/text\/plain/txt/;
 	$detected=~s/^[^\/]+\///;
 	$resource->type($detected);
+	$resource->{apache_tika_validated} = 1;
 	return ( [] , [[$resource,'detected_stream' => $detected]] );
     }
 
     ## something went wrong
     $logger->warn("failed to detect stream type!");
+    $resource->{apache_tika_validated} = 0;
     return [
         [ $resource, import_log => "failed to delect stream type" ]
     ];

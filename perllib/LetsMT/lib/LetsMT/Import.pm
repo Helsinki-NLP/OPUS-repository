@@ -1005,12 +1005,24 @@ sub get_resource_handlers {
     }
 
     ## otherwise: suffix-patterns are first
-    push( @handlers, $$TYPES{$suffix_type} ) if (defined $suffix_type);
+    push( @handlers, $$TYPES{$suffix_type} ) 
+	if (defined $suffix_type && exists $$TYPES{$suffix_type});
 
     ## path-types are second
     if ($path_type && $path_type ne 'moses'){
 	if ($path_type ne $suffix_type){
-	    push( @handlers, $$TYPES{$path_type} );
+	    push( @handlers, $$TYPES{$path_type} ) if (exists $$TYPES{$path_type});
+	}
+    }
+
+    ## check resource type and try to detect with Apache Tika if necessary
+    if (my $type = $resource->type()){
+	push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});
+    }
+    else{
+	$TYPES->{unknown}->validate($resource);
+	if (my $type = $resource->type()){
+	    push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});
 	}
     }
 

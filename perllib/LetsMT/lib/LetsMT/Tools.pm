@@ -69,7 +69,7 @@ Timeout for system calls (see run_cmd). Default = 60 seconds.
 =cut
 
 our $DEFAULT_INPUT_ENCODING = 'utf8';
-our $TIMEOUT = 60;
+our $TIMEOUT = 300;
 
 =head2 C<$DEFAULT_OUTPUT_ENCODING>
 

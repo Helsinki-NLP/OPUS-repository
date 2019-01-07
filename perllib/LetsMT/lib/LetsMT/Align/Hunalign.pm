@@ -308,12 +308,9 @@ sub _hunalign2links {
 	    if ($tid > $prevTrg){
 		foreach ( $prevTrg .. $tid - 1 ) {
 		    next if ( $$trgids[$_] eq 'p' );
-		    push( @trgids, $$srcids[$_] );
+		    push( @trgids, $$trgids[$_] );
 		    # push( @{ $links->[$idx]->{trg} }, $$trgids[$_] );
 		}
-	    }
-	    unless (@srcids || @trgids){
-		print '';
 	    }
 	    if ( (! $self->{maxsrc} || @srcids <= $self->{maxsrc}) &&
 		 (! $self->{maxtrg} || @trgids <= $self->{maxtrg}) ){

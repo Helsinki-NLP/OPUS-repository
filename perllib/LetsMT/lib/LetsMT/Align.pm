@@ -76,8 +76,8 @@ sub new {
         return new LetsMT::Align::Hunalign(@_);
     }
 
-    # default aligner = hunalign in bisent mode
-    return new LetsMT::Align::Hunalign::Bisent(@_);
+    # default aligner = hunalign in bisent cautious mode
+    return new LetsMT::Align::Hunalign::Bisent::Cautious(@_);
 }
 
 
