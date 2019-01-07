@@ -10,7 +10,8 @@ use strict;
 use parent 'LetsMT::Repository::DB';
 
 use open qw(:std :utf8);
-use Encode qw(decode);
+use Encode qw(decode encode);
+use utf8;
 
 use LetsMT::Tools;
 use TokyoCabinet;
@@ -344,6 +345,10 @@ sub post {
 	    next;
 	}
         $data->{$_} = $newData->{$_};
+	## TODO: crazy decoding / encoding to make sure that
+	##       we get the string in correct internal format
+	utf8::decode($data->{$_});
+	utf8::encode($data->{$_});
     }
 
     # set gid (should always be the same as branch-level gid!)
@@ -407,6 +412,7 @@ sub get_strict {
     # TODO: this decoding business is quite annoying
     # is this really necessary?!?
     map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
+    # map( utf8::decode( $$data{$_} ), keys %{$data} );
 
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         delete $data->{_ID_};        # (only for internal use!)
@@ -438,6 +444,7 @@ sub get {
         # TODO: this decoding business is quite annoying
         # is this really necessary?!?
 	map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
+	# map( utf8::decode( $$data{$_} ), keys %{$data} );
 
         # a key is given: return only that value!
         # (as an array if necessary)

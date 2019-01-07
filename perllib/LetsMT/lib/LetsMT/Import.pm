@@ -11,6 +11,7 @@ Import resources into the repository.
 =cut
 
 use strict;
+# use utf8;
 
 use Cwd;
 use Data::Dumper;
@@ -294,6 +295,9 @@ sub import_resource {
     my $response = LetsMT::WebService::get_meta( $resource );
     # eval{ $response = decode( 'utf8', $response ) };
     $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response, sub{ return ' ' } );
+    # $response = decode( 'utf8', $response, Encode::FB_PERLQQ );
+    # utf8::decode($response);
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string($response);
     my @nodes     = $dom->findnodes('//list/entry');
@@ -1019,7 +1023,7 @@ sub get_resource_handlers {
     if (my $type = $resource->type()){
 	push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});
     }
-    else{
+    elsif (! @handlers){
 	$TYPES->{unknown}->validate($resource);
 	if (my $type = $resource->type()){
 	    push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});

@@ -9,6 +9,7 @@ LetsMT::Import::tar - import handler for C<tar> archives
 use strict;
 use parent 'LetsMT::Import::Generic';
 
+# use utf8;
 use File::Basename qw/basename dirname/;
 use Data::Dumper;
 use XML::LibXML;

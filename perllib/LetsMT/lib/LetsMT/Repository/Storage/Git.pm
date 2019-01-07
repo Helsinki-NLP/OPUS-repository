@@ -692,6 +692,7 @@ sub _export_subtree {
     # git archive --format=zip --prefix=... -o output.zip rev:path 
     my $prefix = basename($path);
     $path = ':'.$path if ($path);
+    $revision = 'HEAD' unless ($revision);
     get_logger(__PACKAGE__)->info("git archive --format=zip --prefix=$prefix -o $target $revision$path");
     my $success = &run_cmd( 'git',
 			    'archive',
@@ -717,7 +718,7 @@ sub _export_file {
 
     my $pwd = getcwd();
     chdir( $repohome );
-    if ( $revision eq 'HEAD' ){
+    if ( ! $revision || $revision eq 'HEAD' ){
 	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
 	my $success = &run_cmd( 'git',
 				'checkout-index',

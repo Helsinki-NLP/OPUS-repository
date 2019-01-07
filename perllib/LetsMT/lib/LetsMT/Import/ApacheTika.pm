@@ -72,8 +72,8 @@ sub validate {
 	}
     }
 
-    # read content and detect type with TIKA
-    my $content  = $self->_read_raw_file($resource->local_path);
+    # read content and detect type with Apache Tika (max 1MB)
+    my $content  = $self->_read_raw_file($resource->local_path, 1048576);
     my $detected = $TIKA->detect_stream($content);
 
     if ($detected){
@@ -165,10 +165,19 @@ sub convert {
 sub _read_raw_file{
     my $self =shift;
     my $file = shift;
-    open my $fh, '<:raw', $file;
-    my $content = do { local $/; <$fh> };
-    close $fh;
+    my $maxsize = shift;
+    open F, '<:raw', $file;
+    my $content = undef;
+    if ($maxsize){
+	sysread(F, $content, $maxsize );
+    }
+    my $content = do { local $/; <F> };
+    close F;
     return $content;
+
+    # open my $fh, '<:raw', $file;
+    # my $content = do { local $/; <$fh> };
+    # close $fh;
 }
 
 

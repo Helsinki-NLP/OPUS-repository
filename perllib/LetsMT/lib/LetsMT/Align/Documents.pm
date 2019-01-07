@@ -12,6 +12,7 @@ use XML::LibXML;
 use XML::Simple;
 
 use open qw(:std :utf8);
+# use utf8;
 use Encode qw(decode decode_utf8 is_utf8);
 
 use String::Approx qw/amatch adistr/;

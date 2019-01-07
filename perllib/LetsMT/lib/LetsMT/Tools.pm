@@ -18,6 +18,7 @@ use File::Basename;
 use File::Find;
 use File::ShareDir;
 
+# use utf8;
 use Encode qw(decode decode_utf8 encode);
 
 use IPC::Open3;
@@ -164,10 +165,12 @@ The C<_no_copy> version performs destructive conversion by changing the original
 sub utf8_to_perl {
     my $string = shift;
     $string = decode_utf8($string);
+    # utf8::decode($string);
     return $string;
 }
 
 sub utf8_to_perl_no_copy {
+    # utf8::decode($_[0]);
     $_[0] = decode_utf8($_[0]);
 }
 

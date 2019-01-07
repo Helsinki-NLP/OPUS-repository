@@ -13,6 +13,7 @@ Interacts with the Oracle (Sun) Grid Engine.
 use strict;
 
 use open qw(:std :utf8);
+# use utf8;
 
 use XML::LibXML;
 use File::Basename;

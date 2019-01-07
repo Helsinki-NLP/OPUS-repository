@@ -214,7 +214,7 @@ sub put {
             my $target = [ @{ $self->{path_elements} } ];
             my $slot   = shift(@$target);
             my $branch = shift(@$target);
-            my $upload = join( '/', @$target );
+            my $upload = join( '/', @$target );	  
 
 	    ## path to the job description file
 	    my $jobfile = join('/','storage',$slot,$branch,
