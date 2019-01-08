@@ -1014,7 +1014,7 @@ sub local_path {
     my $path = $_[0]->_path( [ 'local_dir', 'path' ] );
 
     # the local path should not include a revision number!
-    $path =~ s/\@([0-9]+|HEAD)$//;
+    $path =~ s/\@([0-9a-f]+|HEAD)$//;
     return $path;
 
 }

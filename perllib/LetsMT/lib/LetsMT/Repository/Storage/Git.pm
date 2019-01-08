@@ -472,16 +472,19 @@ sub remove {
 
 
 
+## strangely enough this function receives the global path (dir) and the user name
+## (see FileSystem.pm)
 
 sub revision{
-    my ( $self, $user, $dir ) = @_;
+    my ( $self, $user, $dir) = @_;
 
-    my $pwd = getcwd();
+    my $pwd  = getcwd();
     chdir( dirname($dir) );
-    my ($success,$ret,$out,$err) = &run_cmd( 'git',
-					     'rev-parse',
-					     '--short',
-					     'HEAD' );
+    my ($success,$ret,$out,$err) = &run_cmd( 'git', 
+					     'log', 
+					     '-n', '1', 
+					     '--pretty=format:%h', 
+					     '--', basename($dir) );
     chdir($pwd);
 
     if ($success){
@@ -489,6 +492,22 @@ sub revision{
 	return $out;
     }
     return '';
+
+    # ## OLD: always return last revision of entire repo
+    #
+    # my $pwd = getcwd();
+    # chdir( dirname($dir) );
+    # my ($success,$ret,$out,$err) = &run_cmd( 'git',
+    # 					     'rev-parse',
+    # 					     '--short',
+    # 					     'HEAD' );
+    # chdir($pwd);
+    #
+    # if ($success){
+    # 	chomp($out);
+    # 	return $out;
+    # }
+    # return '';
 }
 
 
@@ -552,7 +571,13 @@ sub list {
 
     my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
     my $path_to_display = join( '/', $params{repos}, $params{dir} );
-    my $revision = $params{revision} || 'HEAD';
+
+    ## revision of the root dir is set for all files
+    ## TODO: should we get commit hash's for all individual files?
+    my $revision = $self->revision( $user, join( '/', $self->{partition}, 
+						      $params{repos}, 
+						      $params{dir} ) ) || 'HEAD';
+    # my $revision = $params{revision} || 'HEAD';
 
     if ($path){
 	unless ( $self->_is_file( $repohome, $revision, $path )){
@@ -654,7 +679,8 @@ sub export {
     my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
     if ( $path && $self->_is_file( $repohome, $params{rev}, $path ) ){
 	${ $params{trg} } = 
-	    $self->_export_file($repohome, 
+	    $self->_export_file($user,
+				$repohome, 
 				$path,
 				$params{rev}, 
 				$params{archive} );
@@ -663,7 +689,7 @@ sub export {
     }
     elsif ( $params{archive} ){
 	${ $params{trg} } = 
-	    $self->_export_subtree($repohome, $path, $params{rev});
+	    $self->_export_subtree($user, $repohome, $path, $params{rev});
 	get_logger(__PACKAGE__)->debug("git: download dir $params{src} to ${ $params{trg} }");
 	return 1;
     }
@@ -676,7 +702,7 @@ sub export {
 
 sub _export_subtree {
     my $self  = shift;
-    my ($repohome, $path, $revision ) = @_;
+    my ($user, $repohome, $path, $revision ) = @_;
 
     # Create temp file to store archive in
     my ( $fh, $target ) = tempfile(
@@ -707,7 +733,7 @@ sub _export_subtree {
 
 sub _export_file {
     my $self  = shift;
-    my ($repohome, $path, $revision, $archive) = @_;
+    my ($user, $repohome, $path, $revision, $archive) = @_;
 
     # Create temp dir for svn export
     my $tmp_dir = tempdir(
@@ -716,9 +742,14 @@ sub _export_file {
 	CLEANUP => 1
 	);
 
+    my $head = undef;
+    if ($revision && $revision ne 'HEAD'){
+	$head = $self->revision( $user, join('/', ($repohome, $path) ));
+    }
+
     my $pwd = getcwd();
     chdir( $repohome );
-    if ( ! $revision || $revision eq 'HEAD' ){
+    if ( ! $revision || $revision eq 'HEAD' || $revision eq $head ){
 	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
 	my $success = &run_cmd( 'git',
 				'checkout-index',
