@@ -42,6 +42,9 @@ $GITHOME .= '/.githome';
 our $GITREMOTE = $ENV{GIT_REMOTE};
 # our $GITREMOTE = 'git@version.helsinki.fi:OPUS';
 
+## always push to origin
+our $AUTO_PUSH = 1;
+
 
 =head1 METHODS
 
@@ -354,7 +357,7 @@ sub add {
 	if ($self->add_file( $repos, $branch, $path )){
 	    if ( my $success = $self->commit( $user, join( '/', $repos, $branch ), 
 					      "added new file $file to $dir" ) ){
-		$self->push( $user, join( '/', $repos, $branch ) );
+		$self->push( $user, join( '/', $repos, $branch ) ) if ($AUTO_PUSH);
 		return $success;
 	    }
 	}
@@ -466,7 +469,7 @@ sub remove {
     }
 
     $self->commit( $params{user}, join( '/', $params{repos},$branch ), "remove $path" );
-    $self->push( $params{user}, join( '/', $params{repos},$branch ) );;
+    $self->push( $params{user}, join( '/', $params{repos},$branch ) ) if ($AUTO_PUSH);
     return $success;
 }
 

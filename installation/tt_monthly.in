@@ -8,23 +8,24 @@ mkdir -p $backupdir
 REPLACE_TCMGR copy -port REPLACE_META_DB_PORT localhost $backupdir/meta.$month
 REPLACE_TCMGR copy -port REPLACE_GROUP_DB_PORT localhost $backupdir/group.$month
 
- 
-# Deletes all but the newest 5 files to keep Tokyo Tyrant ulogs 
-# from killing the disk.
+# DONE WEEKLY NOW
+# 
+# # Deletes all but the newest 5 files to keep Tokyo Tyrant ulogs 
+# # from killing the disk.
 
-for db in metadata group
-do
-    logdir="REPLACE_DBDIR/$db.tct.ulog/"
-    mydir=`ls -t $logdir` 
-    it=1
+# for db in metadata group
+# do
+#     logdir="REPLACE_DBDIR/$db.tct.ulog/"
+#     mydir=`ls -t $logdir` 
+#     it=1
  
-    for file in $mydir
-    do
-	if [ $it -gt 5 ]
-	then
-	    echo "delete tt-ulog file $logdir$file"
-            rm -f $logdir$file
-	fi
-	it=$((it+1))
-    done
-done
+#     for file in $mydir
+#     do
+# 	if [ $it -gt 5 ]
+# 	then
+# 	    echo "delete tt-ulog file $logdir$file"
+#             rm -f $logdir$file
+# 	fi
+# 	it=$((it+1))
+#     done
+# done
