@@ -491,7 +491,7 @@ sub revision{
 	chomp($out);
 	return $out;
     }
-    return '';
+    return 'HEAD';
 
     # ## OLD: always return last revision of entire repo
     #
@@ -527,7 +527,8 @@ sub revisions{
     chdir( dirname($path) );
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'log',
-					     '--pretty=format:"%h|%cd"' );
+					     '--pretty=format:"%h|%cd"',
+					     '--', basename($path) );
     chdir($pwd);
 
     my %revisions = ();
@@ -574,10 +575,10 @@ sub list {
 
     ## revision of the root dir is set for all files
     ## TODO: should we get commit hash's for all individual files?
-    my $revision = $self->revision( $user, join( '/', $self->{partition}, 
-						      $params{repos}, 
-						      $params{dir} ) ) || 'HEAD';
-    # my $revision = $params{revision} || 'HEAD';
+    my $revision = $params{revision} || 
+	$self->revision( $user, join( '/', $self->{partition}, 
+				      $params{repos}, 
+				      $params{dir} ) ) || 'HEAD';
 
     if ($path){
 	unless ( $self->_is_file( $repohome, $revision, $path )){
@@ -765,8 +766,11 @@ sub _export_file {
 	}
     }
     else{
+	my $output = $tmp_dir.'/'.basename($path);
+	&pipe_out_cmd( $output, 'git', 'show', $revision.':'.$path ) || 
+	    raise( 8, "Cannot get $path\@$revision" );
 	## TODO: implement checking out old revisions of single files
-	raise( 8, 'checking out old revisions of files is not implemented in Storage::Git', 'warn' );
+	# raise( 8, 'checking out old revisions of files is not implemented in Storage::Git', 'warn' );
     }
     chdir($pwd);
 
