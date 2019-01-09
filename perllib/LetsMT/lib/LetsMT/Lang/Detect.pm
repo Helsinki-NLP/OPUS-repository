@@ -483,7 +483,9 @@ sub detect_language {
     if (-e $data){
 	return classify_text($data,@_);
     }
-    return detect_language_string($data,@_);
+    my $lang = detect_language_string($data,@_);
+    return wantarray ? ($lang) : $lang;
+    # return detect_language_string($data,@_);
 }
 
 
@@ -493,41 +495,74 @@ sub classify_resource {
     my $resource = shift or die("Missing resource!\n");
     my $max_data = shift || $MAX_DATA;
 
-    print STDERR "unknown format" unless ($resource->type);
-
-    my $input = new LetsMT::Export::Reader($resource);
-    $input->open($resource);
-
-    my ($fh, $outfile) = tempfile();
-    close $fh;
-    my $text = new LetsMT::Resource(path => $outfile);
-
-    # convert input to text and store in the local text resource
-    # (TODO: should we skip converting text resource?)
-
-    my $reader = new LetsMT::Export::Reader($resource);
-    my $writer = new LetsMT::Export::Writer($text,'text');
-
-    $reader->open();
-    $writer->open();
-
-    my $count=0;
-    while (my $data = $reader->read){
-        $writer->write($data);
-        $count++;
-        last if ($count>=$max_data);
+    ## if the resource is a plain text: just send it to the classifier
+    my $type = $resource->type;
+    if ($type=~/(txt|text)/){
+	return classify_text($resource->local_path,@_);
     }
 
+    ## otherwise: try to read from the resource
+    print STDERR "unknown format" unless ($type);
+    my $input = new LetsMT::Export::Reader( $resource, $type );
+    $input->open($resource);
+
+    # NEW: don't actually create a text but just get the string
+    my $string = '';
+
+    my $reader = new LetsMT::Export::Reader($resource);
+    my $writer = new LetsMT::Export::Writer(undef,'text');
+
+    $reader->open();
+    my $count=0;
+    while (my $data = $reader->read ){
+	if ( ref($data) eq 'HASH' ) {
+	    my $str = '';
+	    foreach my $l ( keys %{$data} ) {
+		$str .= $writer->to_string( $$data{$l} )."\n";
+	    }
+	    if ( $str=~/\S/ ){
+		$string .= $str;
+		$count++;
+		last if ($count>=$max_data && length($string)>$TEXT_SIZE );
+	    }
+	}
+    }
     $reader->close();
-    $writer->close();
+    my $lang = detect_language_string($string,@_);
+    return wantarray ? ($lang) : $lang;
 
 
-    # finally: detect the language of that local text resource
-    # (and remove the temporary file)
+    # my ($fh, $outfile) = tempfile();
+    # close $fh;
+    # my $text = new LetsMT::Resource(path => $outfile);
+    # my $string = '';
 
-    my @langs = &detect_language($text->local_path);
-    unlink($text->local_path);
-    return @langs;
+    # # convert input to text and store in the local text resource
+    # # (TODO: should we skip converting text resource?)
+
+    # my $reader = new LetsMT::Export::Reader($resource);
+    # my $writer = new LetsMT::Export::Writer($text,'text');
+
+    # $reader->open();
+    # $writer->open();
+
+    # my $count=0;
+    # while (my $data = $reader->read){
+    #     $writer->write($data);
+    #     $count++;
+    #     last if ($count>=$max_data);
+    # }
+
+    # $reader->close();
+    # $writer->close();
+
+
+    # # finally: detect the language of that local text resource
+    # # (and remove the temporary file)
+
+    # my @langs = &detect_language($text->local_path);
+    # unlink($text->local_path);
+    # return @langs;
 }
 
 
