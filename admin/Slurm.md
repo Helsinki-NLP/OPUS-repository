@@ -63,6 +63,13 @@ sudo service munge restart
 sudo service slurm-llnl restart
 ```
 
+Without restarting the SLURM server you can also run on the server:
+
+```
+sudo scontrol reconfigure
+```
+
+
 * add the compute node name in the slurm config on the main repository server and also add the host inoformation about the new node in `/etc/hosts` and restart slurm, munge (and possibly even the webserver)
 
 * modify the state with scontrol, specifying the node and the new state. You must provide a reason when disabling a node.

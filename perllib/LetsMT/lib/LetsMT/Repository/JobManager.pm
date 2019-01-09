@@ -1200,6 +1200,7 @@ sub run_import_resource{
 
     if ( my ($success, $response) = 
 	 LetsMT::WebService::post_job( $job_resource, 'uid' => $args->{uid} ) ) {
+
         my $corpus = LetsMT::Resource::make( $slot, $branch );
         my $res = LetsMT::Resource::make( $slot, $branch, $relative_path );
 	if ($overwrite){
