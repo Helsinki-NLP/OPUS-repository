@@ -197,6 +197,11 @@ sub update_import_meta{
     my $MarkedAsFailed = grep($_ eq $filename, @{$self->{failed}} ) ? 1 : 0;
     my $MarkedAsEmpty = grep($_ eq $filename, @{$self->{empty}} ) ? 1 : 0;
 
+
+    ## TODO: those lists can become VERY big
+    ##       for some tar files
+    ## --> do we need to be careful in registrering every single document?
+
     if ($imported){
         if (scalar @$imported){
 	    if ($MarkedAsFailed || $MarkedAsEmpty){

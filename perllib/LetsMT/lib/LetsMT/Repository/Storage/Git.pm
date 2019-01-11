@@ -42,9 +42,6 @@ $GITHOME .= '/.githome';
 our $GITREMOTE = $ENV{GIT_REMOTE};
 # our $GITREMOTE = 'git@version.helsinki.fi:OPUS';
 
-## always push to origin
-our $AUTO_PUSH = 1;
-
 
 =head1 METHODS
 
@@ -78,7 +75,6 @@ sub init {
 	    $gitpath
 	    );
 	unless ($success){
-	    # my @err_lines = <$err>;
 	    raise( 8, "cannot create git-repo $gitpath: " . $err );
 	}
     }
@@ -129,14 +125,8 @@ sub _clone{
 
     chdir($pwd);
     unless ($success){
-	# my @err_lines = <$err>;
 	raise( 8, "cannot create branch $user in git-repo $localgit: " . $err );
     }
-
-
-    ## create standard dirs xml and uploads (trick to make the git non-empty!)
-    # $self->mkdir( $slot, $user, $user, 'xml' );
-    # $self->mkdir( $slot, $user, $user, 'uploads' );
 
     return $success;
 }
@@ -165,6 +155,15 @@ sub add_file{
 }
 
 
+sub auto_commit { 
+    $_[0]->{auto_commit} = $_[1] if (defined $_[1]);
+    return (defined $_[0]->{auto_commit}) ? $_[0]->{auto_commit} : 1;
+}
+
+sub auto_push { 
+    $_[0]->{auto_push} = $_[1] if (defined $_[1]);
+    return (defined $_[0]->{auto_push}) ? $_[0]->{auto_push} : 1;
+}
 
 
 =head2 C<commit>
@@ -292,9 +291,11 @@ sub mkdir {
 	my $file = join( '/', $dir, '.gitkeep' );
 	touch( join( '/', $repohome, $branch, $file ) );
 	$self->add_file($repos, $user, $file);
-	$self->commit($user, join( '/', $repos,$user ), 'added subdir $dir');
-	## no need to push new directories
-	# $self->push($user, join( '/', $repos,$user ) );
+	if ($self->auto_commit()){
+	    $self->commit($user, join( '/', $repos,$user ), 'added subdir $dir');
+	    ## no need to push new directories
+	    # $self->push($user, join( '/', $repos,$user ) );
+	}
 	return 1;
     }
     return 0;
@@ -320,6 +321,13 @@ sub copy {
     raise( 8, "copy is only implemented for a branch (src)" ) if ($#srcpaths);
     raise( 8, "copy is only implemented for a branch (dest)" ) if ($#trgpaths);
 
+    ## check whether we need to commit anything
+    if ($self->auto_commit()){
+	if ( $self->commit( $user, $src, 'last commit before cloning') ){
+	    $self->push( $user, $src);
+	}
+    }
+
     ## make a new sub branch for the user $trg cloned from $src
     ## TODO: do we need to allow other types of copies?
     return $self->init( $slot, $trg, $src );
@@ -340,25 +348,16 @@ sub add {
     my $self = shift;
     my ( $user, $repos, $branch, $dir, $file, $source ) = @_;
 
-
-    # if ( $self->mkdir( $repos, $branch, $user, $dir ) ) {
-    #     my $homedir  = join( '/', $self->{partition}, $repos );
-    #     my $fullpath = join( '/', $self->{partition}, $repos, $branch, $dir, $file );
-    #     my $relpath  = join( '/', $branch, $dir, $file );
-
-    # 	get_logger(__PACKAGE__)->error("git: $source not found") unless (-e $source);
-    # 	get_logger(__PACKAGE__)->info("git: move $source to $fullpath");
-    #     move( $source, $fullpath ) || raise( 8, $! );
-
-
     if ( $self->SUPER::add(@_) ){
         my $path  = $dir ? join( '/', $dir, $file ) : $file;
 	get_logger(__PACKAGE__)->info("git: add file $path to $repos/$branch");
 	if ($self->add_file( $repos, $branch, $path )){
-	    if ( my $success = $self->commit( $user, join( '/', $repos, $branch ), 
-					      "added new file $file to $dir" ) ){
-		$self->push( $user, join( '/', $repos, $branch ) ) if ($AUTO_PUSH);
-		return $success;
+	    if ($self->auto_commit()){
+		if ( my $success = $self->commit( $user, join( '/', $repos, $branch ), 
+						  "added new file $file to $dir" ) ){
+		    $self->push( $user, join( '/', $repos, $branch ) ) if ($self->auto_push());
+		    return $success;
+		}
 	    }
 	}
     }
@@ -394,8 +393,8 @@ sub remove {
     unless ( $params{dir} ){
 
 	## path to master git
-	my $mastergit = join( '/', ( $GITHOME, $params{repos} ) );
-	my $localgit  = join( '/', ( $self->{partition}, $params{repos} ) );
+	my $mastergit  = join( '/', ( $GITHOME, $params{repos} ) );
+	my $localgit   = join( '/', ( $self->{partition}, $params{repos} ) );
 
 	## THIS LOOKS QUITE DANGEROUS
 	## TODO: MAKE SURE THAT NOTHING CAN GO WRONG HERE
@@ -436,7 +435,8 @@ sub remove {
 	return 1;
     }
 
-    my @paths = split(/\//,$params{dir});
+    my @paths   = split(/\//,$params{dir});
+    my $relpath = join( '/', $params{repos}, $params{dir} );
 
     ## (2) remove entire branch
     ## TODO: do we need to check whether the user is allowed to do that? (but how?)
@@ -446,15 +446,15 @@ sub remove {
     ## new syntax in git 1.7: git push origin --delete the_remote_branch
 
     if ( $params{dir} eq $paths[0] ){
-	$self->commit( $params{user}, join( '/', $params{repos},$params{dir} ), 
-			"final commit before removing local copy" );
-	$self->push( $params{user}, join( '/', $params{repos},$params{dir} ) );
+	$self->commit( $params{user}, $relpath, "final commit before removing local copy" );
+	$self->push( $params{user}, $relpath );
 	return $self->SUPER::remove(@_);
     }
 
 
     ## (3) finally: remove subtree or file
 
+    $self->commit( $params{user}, $relpath, "final commit before removing files in $relpath" );
     my $repohome = join( '/', $self->{partition}, $params{repos}, $params{user} );
     my $pwd = getcwd();
     chdir( $repohome );
@@ -468,21 +468,35 @@ sub remove {
 	raise( 8, "cannot remove: " . $err );
     }
 
-    $self->commit( $params{user}, join( '/', $params{repos},$branch ), "remove $path" );
-    $self->push( $params{user}, join( '/', $params{repos},$branch ) ) if ($AUTO_PUSH);
+    if ($self->auto_commit()){
+	$self->commit( $params{user}, join( '/', $params{repos},$branch ), "remove $path" );
+	$self->push( $params{user}, join( '/', $params{repos},$branch ) ) if ($self->auto_push());
+    }
     return $success;
 }
 
 
 
-## strangely enough this function receives the global path (dir) and the user name
-## (see FileSystem.pm)
+# get revision of a resource
 
 sub revision{
-    my ( $self, $user, $dir) = @_;
+    my ( $self, $user, $path, $commit_changes ) = @_;
 
+    my $dir = join( '/', $self->{partition}, $path );
     my $pwd  = getcwd();
     chdir( dirname($dir) );
+    ## TODO: this seems to slow down the whole thing quite a lot!
+    ## --> should we store the last revision in metadata instead?
+    ## 
+    ## if we don't commit changes automatically: does this become inconsistent?
+    ## (what happens with new files that are not yet commited?)
+    ## but if we always commit before listing (see below) then this becomes
+    ## inefficient again
+    ##
+    if (! $self->auto_commit() && $commit_changes){
+      &run_cmd( 'git', 'commit', '-am', 'commit before finding revision' );
+    }
+
     my ($success,$ret,$out,$err) = &run_cmd( 'git', 
 					     'log', 
 					     '-n', '1', 
@@ -528,6 +542,10 @@ sub revisions{
 
     my $pwd = getcwd();
     chdir( dirname($path) );
+    ## TODO: do we need this?
+    if ( ! $self->auto_commit() ){
+	&run_cmd( 'git', 'commit', '-am', 'commit before finding revisions' );
+    }
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'log',
 					     '--pretty=format:"%h|%cd"',
@@ -576,13 +594,14 @@ sub list {
     my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
     my $path_to_display = join( '/', $params{repos}, $params{dir} );
 
+    ## check whether we need to commit anything
+    ## TODO: does this become inefficient?
+    ## - only list committed files!
+    # $self->commit( $user, $path, 'last commit before listing') unless ($self->auto_commit());
+
     ## revision of the root dir is set for all files
     ## TODO: should we get commit hash's for all individual files?
-    my $revision = $params{revision} || 
-	$self->revision( $user, join( '/', $self->{partition}, 
-				      $params{repos}, 
-				      $params{dir} ) ) || 'HEAD';
-
+    my $revision = $params{revision} || $self->revision( $user, $path_to_display ) || 'HEAD';
     if ($path){
 	unless ( $self->_is_file( $repohome, $revision, $path )){
 	    $path .= '/';
@@ -680,11 +699,16 @@ sub export {
     my $user = shift(@paths);
     my $path = join( '/', @paths );
 
+    ## check whether we need to commit anything
+    ## TODO: does this become inefficient?
+    # - only export committed files
+    # $self->commit( $user, $path, 'last commit before listing') unless ($self->auto_commit());
+
     my $repohome = join( '/', $self->{partition}, $params{repos}, $user );
     if ( $path && $self->_is_file( $repohome, $params{rev}, $path ) ){
 	${ $params{trg} } = 
-	    $self->_export_file($user,
-				$repohome, 
+	    $self->_export_file($params{repos}, 
+				$user,
 				$path,
 				$params{rev}, 
 				$params{archive} );
@@ -693,7 +717,7 @@ sub export {
     }
     elsif ( $params{archive} ){
 	${ $params{trg} } = 
-	    $self->_export_subtree($user, $repohome, $path, $params{rev});
+	    $self->_export_subtree($params{repos}, $user, $path, $params{rev});
 	get_logger(__PACKAGE__)->debug("git: download dir $params{src} to ${ $params{trg} }");
 	return 1;
     }
@@ -706,7 +730,7 @@ sub export {
 
 sub _export_subtree {
     my $self  = shift;
-    my ($user, $repohome, $path, $revision ) = @_;
+    my ($slot, $user, $repohome, $path, $revision ) = @_;
 
     # Create temp file to store archive in
     my ( $fh, $target ) = tempfile(
@@ -716,6 +740,13 @@ sub _export_subtree {
 	UNLINK => 1
 	);
     close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
+
+    my $repohome = join( '/', $self->{partition}, $slot, $user );
+    my $head = undef;
+    if ($revision && $revision ne 'HEAD'){
+	my @parts = split(/\//,$repohome);
+	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
+    }
 
     my $pwd = getcwd();
     chdir( $repohome );
@@ -737,7 +768,14 @@ sub _export_subtree {
 
 sub _export_file {
     my $self  = shift;
-    my ($user, $repohome, $path, $revision, $archive) = @_;
+    my ($slot, $user, $path, $revision, $archive) = @_;
+
+    my $repohome = join( '/', $self->{partition}, $slot, $user );
+    my $head = undef;
+    if ($revision && $revision ne 'HEAD'){
+	my @parts = split(/\//,$repohome);
+	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
+    }
 
     # Create temp dir for svn export
     my $tmp_dir = tempdir(
@@ -745,11 +783,6 @@ sub _export_file {
 	DIR     => $ENV{UPLOADDIR},
 	CLEANUP => 1
 	);
-
-    my $head = undef;
-    if ($revision && $revision ne 'HEAD'){
-	$head = $self->revision( $user, join('/', ($repohome, $path) ));
-    }
 
     my $pwd = getcwd();
     chdir( $repohome );

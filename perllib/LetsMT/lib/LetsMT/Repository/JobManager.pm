@@ -705,6 +705,7 @@ sub run_align_resource {
 
 sub run_tokenize {
     my ($path_elements,$args) = @_;
+    $args = {} unless $args;
 
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
@@ -735,7 +736,9 @@ sub run_tokenize {
 	$reader->close;
 	$writer->close;
 
-	if ( &LetsMT::WebService::put_resource( $outres ) ){
+	my %para = ();
+	$para{auto_commit} = $$args{auto_commit} if (defined $$args{auto_commit});
+	if ( &LetsMT::WebService::put_resource( $outres, %para ) ){
 	    &LetsMT::WebService::put_meta( $resource,
 					   'tokenized' => $outres->path );
 	    return $outres;
@@ -757,6 +760,7 @@ sub run_tokenize {
 
 sub run_parse {
     my ($path_elements,$args) = @_;
+    $args = {} unless $args;
 
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
@@ -787,7 +791,9 @@ sub run_parse {
 	    print "parsing: ".$resource->path."\n";
 	    &run_cmd( 'mkdir', '-p', $outdir );
 	    $udpipe->parse_xml_file($input,$output);
-	    if ( &LetsMT::WebService::put_resource( $pr ) ){
+	    my %para = ();
+	    $para{auto_commit} = $$args{auto_commit} if (defined $$args{auto_commit});
+	    if ( &LetsMT::WebService::put_resource( $pr, %para ) ){
 		&LetsMT::WebService::put_meta( $resource,'parsed' => $pr->path );
 		return $pr;
 	    }
@@ -807,6 +813,7 @@ sub run_parse {
 
 sub run_wordalign {
     my ($path_elements,$args) = @_;
+    $args = {} unless $args;
 
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
@@ -850,8 +857,10 @@ sub run_wordalign {
 	print "word-align: ".$resource->path."\n";
 	my $aligner = new LetsMT::Align::Words;
 	my @newres = $aligner->wordalign($resource);
+	my %para = ();
+	$para{auto_commit} = $$args{auto_commit} if (defined $$args{auto_commit});
 	foreach my $n (@newres){
-	    &LetsMT::WebService::put_resource( $n )
+	    &LetsMT::WebService::put_resource( $n, %para )
 	}
 	if (@newres){
 	    &LetsMT::WebService::put_meta( $resource,
@@ -883,6 +892,7 @@ sub run_wordalign {
 
 sub run_make_tmx {
     my ($path_elements,$args) = @_;
+    $args = {} unless $args;
 
     my @sentalign = ();
     my $path      = join('/',@{$path_elements});
@@ -943,7 +953,9 @@ sub run_make_tmx {
 	$msg->send;
     }
 
-    if ( &LetsMT::WebService::put_resource( $outres ) ){
+    my %para = ();
+    $para{auto_commit} = $$args{auto_commit} if (defined $$args{auto_commit});
+    if ( &LetsMT::WebService::put_resource( $outres, %para ) ){
 	&LetsMT::WebService::put_meta( $resource,'tmx' => $outres->path );
 	return $outres;
     }

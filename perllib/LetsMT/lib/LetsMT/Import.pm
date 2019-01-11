@@ -362,8 +362,17 @@ sub import_resource {
         'import_queue' => $resource->path
     );
 
+
     # import success if new_resources is a reference to an array!
     if ( ref($new_resources) eq 'ARRAY' ) {
+
+	## commit all changes so far
+	&LetsMT::WebService::post(
+	     $corpus,
+	     'action'         => 'commit',
+	     'commit_message' =>  'imported '.$resource->path,
+	     'uid'            => $branch
+	    );
 
 	## check import parameters (unless they are given already)
 	unless (defined $skip_align && defined $skip_parsing && defined $skip_wordalign){
@@ -380,6 +389,7 @@ sub import_resource {
         ## this is only done for non-pre-aligned data
         ## (need to skip pre-aligned data by adding them 
         ##  to the SKIP_AUTO_ALIGN list)
+        #-------------------------------------------------------------------
 
 	my @aligned_resources = ();
 	unless ($skip_find_align){
@@ -400,39 +410,72 @@ sub import_resource {
 	    }
 	}
 
+	## commit sentence alignments
+	&LetsMT::WebService::post(
+	     $corpus,
+	     'action'         => 'commit',
+	     'commit_message' =>  'bitexts from '.$resource->path,
+	     'uid'            => $branch
+	    );
+
+        ##-------------------------------------------------------------------
 	## this should be done by align_resources now .....
-        # #-------------------------------------------------------------------
+        ##-------------------------------------------------------------------
 	# ## convert to TMX
 	# foreach my $r (@aligned_resources){
 	#     my @path_elements = split(/\/+/,$r->storage_path);
-	#     LetsMT::Repository::JobManager::run_make_tmx(\@path_elements);
+	#     LetsMT::Repository::JobManager::run_make_tmx(\@path_elements, 
+	#                                                  { auto_commit => 'off' });
 	# }
 
         #-------------------------------------------------------------------
 	## parse all monolingual resources using UDPipe
+        #-------------------------------------------------------------------
 	unless ($skip_parsing){
 	    my @resources = &get_monolingual_resources(@$new_resources);
 	    my $udpipe = new LetsMT::DataProcessing::UDPipe;
 	    foreach my $r (@resources) {
 		my @path_elements = split(/\/+/,$r->storage_path);
-		if (my $newres = LetsMT::Repository::JobManager::run_parse(\@path_elements)){
+		if (my $newres = LetsMT::Repository::JobManager::run_parse(\@path_elements,
+									   { auto_commit => 'off' })){
 		    push (@$new_resources,$newres);
 		}
+	    }
+	    if (@resources){
+		## commit parsed data
+		&LetsMT::WebService::post(
+		     $corpus,
+		     'action'         => 'commit',
+		     'commit_message' =>  'parsed data from '.$resource->path,
+		     'uid'            => $branch
+		    );
 	    }
 	}
 
         #-------------------------------------------------------------------
 	## now even run word alignment for sentence aligned documents!
+        #-------------------------------------------------------------------
 	unless ($skip_wordalign){
 	    foreach my $res (@aligned_resources){
 		my @path_elements = split(/\/+/,$res->storage_path);
 		my @newres = 
-		    LetsMT::Repository::JobManager::run_wordalign(\@path_elements);
+		    LetsMT::Repository::JobManager::run_wordalign(\@path_elements,
+								  { auto_commit => 'off' });
 		foreach my $n (@newres){
 		    push (@$new_resources,$n);
 		}
 	    }
+	    if (@aligned_resources){
+		## commit parsed data
+		&LetsMT::WebService::post(
+		     $corpus,
+		     'action'         => 'commit',
+		     'commit_message' =>  'word alignments from '.$resource->path,
+		     'uid'            => $branch
+		    );
+	    }
 	}
+        #-------------------------------------------------------------------
 
         ## update resource status!
 	my $status = 'imported';
@@ -481,7 +524,7 @@ sub send_bitexts_as_tmx{
 	else{
 	    my @path_elements = split(/\/+/,$tmxres->storage_path);
 	    LetsMT::Repository::JobManager::run_make_tmx( \@path_elements,
-							  email => $email );
+							  { email => $email } );
 	}
     }
 }
@@ -520,7 +563,7 @@ sub align_documents {
 
 	my $aligner = new LetsMT::Align( %AlignPara );
 	print "aligning: ".$FromRes->path." and ".$ToRes->path."\n";
-	if ( $aligner->align_resources( $FromRes, $ToRes, $AlgRes ) ) {
+	if ( $aligner->align_resources( $FromRes, $ToRes, $AlgRes, auto_commit => 'off' ) ) {
 	    $logger->info("done!");
 	    ## save language info for meta data (see below)
 	    my @lang = $AlgRes->language();
@@ -864,10 +907,10 @@ sub upload_new_resource{
     #     }
     # }
 
-    ## NEW: upload resource AFTER language check
+ 
     get_logger(__PACKAGE__)->info( 'New resource: ', $new_res->{resource} );
     push @{ $self->{new_resources} }, $new_res->{resource};
-    &LetsMT::WebService::put_resource( $new_res->{resource} );
+    &LetsMT::WebService::put_resource( $new_res->{resource}, auto_commit => 'off' );
 
     ## update meta data
     $new_res->{meta}->{'imported_from'} => &utf8_to_perl( $from_res->path );
@@ -952,7 +995,7 @@ sub _upload_errors {
             # as the original resource that we try to import
             # + save the name in @logfiles
             if ( $res->path ne $original_resource->path ) {
-                &LetsMT::WebService::put_resource($res);
+                &LetsMT::WebService::put_resource($res, auto_commit => 'off');
                 push( @resource_names, $res->path );
             }
 

@@ -80,8 +80,9 @@ use Log::Log4perl qw(get_logger :levels);
 
 our $LM_HOMEDIR = &dist_dir('LetsMT') . '/lang/textcat';
 
-our $TEXT_SIZE = 65536;        # text size used for detection (in bytes)
-our $MAX_DATA  = 100;          # max number of data records to be read
+our $MAX_TEXT_SIZE = 65536;    # max text size read for detection (in bytes)
+our $MIN_TEXT_SIZE = 512;      # min text size used for detection
+our $MAX_DATA      = 100;      # max number of data records to be read
 our $BOILER_PLATE_SIZE = 8148; # estimated max size of a boiler plate
 
 # our $LANGUAGE_IDENTIFIER = 'textcat';
@@ -387,10 +388,10 @@ sub classify_with_langid{
     # binmode(F);
     binmode(F, ":utf8");
     my $input;
-    read( *F, $input, $TEXT_SIZE );
+    read( *F, $input, $MAX_TEXT_SIZE );
     close F;
     ## if there is enough text: remove some data that might be a boiler plate
-    if ( length($input)-2*$BOILER_PLATE_SIZE > $TEXT_SIZE/2 ){
+    if ( length($input)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
 	$input = substr( $input, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
     }
     return &detect_language_with_langid($input);
@@ -417,7 +418,7 @@ sub classify_with_textcat {
     else                     { open F, "<$file"; }
     binmode(F);
     my $input;
-    read( *F, $input, $TEXT_SIZE );
+    read( *F, $input, $MAX_TEXT_SIZE );
     close F;
 
     my %results = ();
@@ -523,46 +524,22 @@ sub classify_resource {
 	    if ( $str=~/\S/ ){
 		$string .= $str;
 		$count++;
-		last if ($count>=$max_data && length($string)>$TEXT_SIZE );
+		last if (length($string) >= $MAX_TEXT_SIZE );
+		last if ($count >= $max_data && 
+			 length($string) >= $MIN_TEXT_SIZE );
 	    }
 	}
     }
     $reader->close();
+    
+    ## if we have enough data - remove some part in the beginning
+    ## (possible boile plate)
+    if ( length($string)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
+	$string = substr( $string, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
+    }
+
     my $lang = detect_language_string($string,@_);
     return wantarray ? ($lang) : $lang;
-
-
-    # my ($fh, $outfile) = tempfile();
-    # close $fh;
-    # my $text = new LetsMT::Resource(path => $outfile);
-    # my $string = '';
-
-    # # convert input to text and store in the local text resource
-    # # (TODO: should we skip converting text resource?)
-
-    # my $reader = new LetsMT::Export::Reader($resource);
-    # my $writer = new LetsMT::Export::Writer($text,'text');
-
-    # $reader->open();
-    # $writer->open();
-
-    # my $count=0;
-    # while (my $data = $reader->read){
-    #     $writer->write($data);
-    #     $count++;
-    #     last if ($count>=$max_data);
-    # }
-
-    # $reader->close();
-    # $writer->close();
-
-
-    # # finally: detect the language of that local text resource
-    # # (and remove the temporary file)
-
-    # my @langs = &detect_language($text->local_path);
-    # unlink($text->local_path);
-    # return @langs;
 }
 
 

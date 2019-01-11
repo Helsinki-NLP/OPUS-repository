@@ -59,6 +59,7 @@ $BACKENDS{VCxml}              = $BACKENDS{vc_xml};
 $BACKENDS{xml_vc}             = $BACKENDS{vc_xml};
 $BACKENDS{xmlVC}              = $BACKENDS{vc_xml};
 
+
 =head1 CONSTRUCTOR / FACTORY METHOD
 
  $storage = new LetsMT::Repository::Storage ($type, $resource [, $format])
@@ -100,6 +101,13 @@ sub revisions{ return 1; }
 sub revision { return 'HEAD'; }
 sub push     { return 1; }
 sub pull     { return 1; }
+sub tag      { return 1; }
+
+# return or switch on/off AUTO_COMMIT and AUTO_PUSH
+# (mainly useful for the git backend)
+
+sub auto_commit { return 1; }
+sub auto_push   { return 1; }
 
 1;
 

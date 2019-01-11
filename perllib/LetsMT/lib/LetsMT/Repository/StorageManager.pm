@@ -59,7 +59,9 @@ sub drop_tables {
      groupwrite => $groupwrite,
      otherread  => $otherread,
      otherwrite => $otherwrite,
-     payload    => $payload
+     payload    => $payload,
+     auto_commit => on|off,
+     auto_push   => on|off
  )
 
 Create data, either only a slot and a branch, or a file with contents in a branch's directory.
@@ -97,6 +99,7 @@ sub create_storage {
     raise( 12, "slot parameter", 'warn' )  unless ( defined($slot) );
 
     ### Find/create slot
+    $logger->debug("get slot $slot") if ( $logger->is_debug );
     my $slotobj = &_get_slot( name => $slot );
 
     ### slot not found --> try to create
@@ -113,6 +116,7 @@ sub create_storage {
 
     #### Find/create branch
     my $branchobj;
+    $logger->debug("get branch $slot/$branch") if ( $logger->is_debug );
     $branchobj = &_get_branch(
         name => $branch,
         user => $uid,
@@ -122,7 +126,8 @@ sub create_storage {
         $did_action .= "Created branch $branch ";
     };
 
-    #### We're done unless there's also a targetfile or targetdir involved or some more dirs need to be created
+    #### We're done unless there's also a targetfile or targetdir involved or 
+    #### some more dirs need to be created
     unless (
         ( defined($targetfile) && length $targetfile )
         || scalar @{$pathref}
@@ -132,6 +137,7 @@ sub create_storage {
     };
 
     #### Check for create conflict
+    $logger->debug("check groups") if ( $logger->is_debug );
     raise( 14, "$uid has no write permission on $slot/$branch", 'warn' )
         unless ( $branchobj->may_write(
             $uid,
@@ -142,50 +148,57 @@ sub create_storage {
         $slotobj->type
     ) or raise( 9, "Storage Backend", 'error' );
 
+    ## switch off AUTO_COMMIT and AUTO_PUSH if necessary
+    ## (on is the default)
+    $vc->auto_commit(0) if ($args{auto_commit} eq 'off');
+    $vc->auto_push(0)   if ($args{auto_push}   eq 'off');
+
     #### Create directory if pathref is set and it does not point to a dir that already exists
+    my $path = join( '/', @{$pathref} );
+    $logger->debug("check path $path") if ( $logger->is_debug );
     if (
         ( scalar @{$pathref} > 0 )
         && ! $vc->is_path(
             repos  => $slot,
             branch => $branch,
-            dir    => join( '/', @{$pathref} ),
+            dir    => $path,
             user   => $uid,
         )
     ) {
-        $vc->mkdir( $slot, $branch, $uid, join( '/', @{$pathref} ) );
+        $vc->mkdir( $slot, $branch, $uid, $path );
         $did_action .= "mkdir ";
     }
 
     #### Store file (create or update)
     if ( defined($targetfile) && $targetfile ) {
         ## If file exists, update, otherwise add
+	$logger->debug("check path $path/$targetfile") if ( $logger->is_debug );
         if ( $vc->is_path(
-                repos  => $slot,
-                branch => $branch,
-                dir    => join( '/', @{$pathref} ),
-                file   => $targetfile,
-                user   => $uid,
-            )
-        ) {
+		 repos  => $slot,
+		 branch => $branch,
+		 dir    => $path,
+		 file   => $targetfile,
+		 user   => $uid,
+	     )
+	    ) {
+	    $logger->debug("update $path/$targetfile") if ( $logger->is_debug );
             $vc->update(
-                $uid, $slot, $branch,
-                join( '/', @{$pathref} ),
+                $uid, $slot, $branch, $path,
                 $targetfile, $payload
             );
             $did_action .= "update ";
         }
         else {
+	    $logger->debug("add $path/$targetfile") if ( $logger->is_debug );
             $vc->add(
-                $uid, $slot, $branch,
-                join( '/', @{$pathref} ),
+                $uid, $slot, $branch, $path,
                 $targetfile, $payload
             );
             $did_action .= "add ";
         }
     }
 
-    $$message = "${did_action}ok /$slot/$branch/"
-        . join( '/', @{$pathref}, $targetfile );
+    $$message = "${did_action}ok /" . join( '/', $slot, $branch, $path, $targetfile );
     return 1;
 }
 
@@ -572,6 +585,122 @@ sub list_storage_branch_filelist {
 
     return $result;
 }
+
+
+
+
+=head2 C<commit_changes>
+
+ &LetsMT::Repository::StorageManager::commit_changes (
+    message         => $message_ref, 
+    path            => $pathref, 
+    commmit_message => $message,
+    uid             => $user )
+
+Commit all changes made to the repository.
+
+Returns: true if successful, false otherwise
+
+=cut
+
+sub commit_changes {
+    my %args        = @_;
+
+    my $pathref     = $args{path}
+        or raise( 12, "parameter path in commit_changes", 'warn' );
+
+    my $message_ref = $args{message};
+    my $message     = $args{commit_message} || 'commit all changes';
+
+
+    unless (ref($pathref) eq 'ARRAY'){
+	raise( 12, "parameter path in commit_changes", 'warn' );
+    }
+
+    my $slot   = $$pathref[0];
+    my $branch = $$pathref[1];
+
+    # Check if uid is set correctly
+    raise( 12, 'uid', 'warn' ) unless ($args{uid} eq $branch);
+
+    # If slot name is given, check if it exists
+    my $slotobj = &_get_slot(
+        name => $slot
+    ) or raise( 6, "slot '$slot'", 'warn' );
+
+    # get backend handler
+    my $vc = new LetsMT::Repository::Storage(
+        $slotobj->type
+    ) or raise( 9, "Storage Backend", 'error' );
+
+    # run commit command and also push
+    my $path = join( '/', @$pathref );
+    if ($vc->commit($args{uid}, $path, $message)){
+	$$message_ref = "successfully committed all changes";
+	return $vc->push($args{uid}, $path);
+    }
+    $$message_ref = "failed to commit or no changes detected";
+    return 0;
+}
+
+
+=head2 C<create_release>
+
+ &LetsMT::Repository::StorageManager::create_release (
+    message => $message_ref, 
+    path    => $pathref, 
+    tag     => $tag, 
+    uid     => $user )
+
+Create a release by tagging the current revision.
+
+Returns: true if successful, false otherwise
+
+=cut
+
+sub create_release {
+    my %args        = @_;
+
+    my $pathref     = $args{path}
+        or raise( 12, "parameter path in commit_changes", 'warn' );
+
+    my $message_ref = $args{message};
+    my $tag         = $args{tag};
+
+    ## TODO: create an incremental tag if nothing is given
+
+    unless (ref($pathref) eq 'ARRAY'){
+	raise( 12, "parameter path in commit_changes", 'warn' );
+    }
+
+    my $slot   = $$pathref[0];
+    my $branch = $$pathref[1];
+
+    # Check if uid is set correctly
+    raise( 12, 'uid', 'warn' ) unless ($args{uid} eq $branch);
+
+    # If slot name is given, check if it exists
+    my $slotobj = &_get_slot(
+        name => $slot
+    ) or raise( 6, "slot '$slot'", 'warn' );
+
+    # get backend handler
+    my $vc = new LetsMT::Repository::Storage(
+        $slotobj->type
+    ) or raise( 9, "Storage Backend", 'error' );
+
+    # run commit command
+    my $path = join( '/', @$pathref );
+    if (($vc->tag($args{uid}, $path, $tag))){
+	$$message_ref = "successfully created release with tag $tag";
+	return 1;
+    }
+    $$message_ref = "failed to create release";
+    return 0;
+}
+
+
+
 
 
 =head2 C<_filelist>

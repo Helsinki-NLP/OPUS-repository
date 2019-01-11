@@ -13,7 +13,7 @@ High priority:
 * sentence alignment also produces TMX files
   - add TMX as export format							(done)
   - integration of TMX files in interface (parallel data to be shown)		(started)
-* proper handling of revisions in GIT backend!	    	       			(started)
+* proper handling of revisions in GIT backend!	    	       			(done)
 * allow tags in version-control backends (at least for the git backend)
 * check memory leak in sentence alignment?!					(no issue?)
 * add dehyphenation module (as normalizer) - see pdf2xml			(done for PDF - enough?)
@@ -49,15 +49,24 @@ High priority:
 
 Medium priority:
 
+* nicer look and feel for the repository interface using bootstrap?
+  https://getbootstrap.com
 * support polyglot python library?
   https://github.com/aboSamoor/polyglot
 * use scrapy for web crawling?
   https://docs.scrapy.org/en/latest/intro/overview.html
+* corpus tools from http://corpus.tools/wiki
+  - newer chared
+  - JustText
+  - text web crawler spiderling
+  - unitok - universal tokenizer
+  - de-duplication
+  - wiki2corpus (can tika convert wikimedia and other markup langs?)
 * support of e-book formats (epub), 
   converter from Calibre (ebook-convert) or Apache-Tika				(done with Tika?)
 * jobs for web-crawling (using bitextor, e.g. bitextor integration)
-  - wget based crawling								(started)
-  - wget2: mime-type based filtering!
+  - wget based crawling								(done)
+  - wget2: mime-type based filtering!						(do we need this?)
     https://unix.stackexchange.com/questions/53397/wget-how-to-download-recursively-and-only-specific-mime-types-extensions-i-e/56895
     https://gitlab.com/gnuwget/wget2
   - patch for wget for mime-type based accept:

@@ -215,7 +215,7 @@ sub build_server_address {
 
 =head2 C<put_file_request>
 
- $success = put_file_request ($make_url_ref, $resource, $file)
+ $success = put_file_request ($make_url_ref, $resource, $file [, %args])
 
 Upload C<$file> to the repository location corresponding to C<$resource>.
 C<$make_url_ref> is a code reference for making an appropriate URL for the HTTP request.
@@ -425,7 +425,7 @@ sub put_resource {
 
 =head2 C<put_file>
 
- $success = put_file ($resource, $file)
+ $success = put_file ($resource, $file [, %args ])
 
 Upload C<$file> to the repository location corresponding to C<$resource>.
 

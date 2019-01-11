@@ -42,6 +42,7 @@ use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
 use Data::Dumper;
 
+
 ### CLASS METHOD ############################################################
 # Usage      : LetsMT::Repository::API::Storage->new($r);
 # Purpose    : Constructor, creates an instance of API::Storage class
@@ -177,30 +178,35 @@ sub put {
     my $message_create = undef;
     my $message_submit = undef;
 
+    my $path = join( "/", @{ $self->{path_elements} } );
+
     # make a copy of the old metadata record (archive revisions!)
-    &_archive_meta(join( "/", @{ $self->{path_elements} }));
+    get_logger(__PACKAGE__)->debug( "archive metadata of $path" );
+    &_archive_meta( $self->{args}->{uid}, $path );
+    get_logger(__PACKAGE__)->debug( "done with archive metadata of $path" );
 
     ## get a document from an URL or payload
     my $file = undef;
     if ( exists( $self->{args}->{url} ) ){
+	get_logger(__PACKAGE__)->debug( "download $self->{args}->{url}" );
 	$file = &_download_url( $self->{args}->{url} );
     }
     else{
+	get_logger(__PACKAGE__)->debug( "get payload" );
 	my $payload = undef;
 	&_get_payload( $self->{r}, \$payload );
 	$file = $payload->{file} if ($payload);
     }
 
     LetsMT::Repository::StorageManager::create_storage(
-        message => \$message_create,
-        path    => $self->{path_elements},
-        uid     => $self->{args}->{uid},
-        gid     => $self->{args}->{gid},
-        payload => $file,
-        type    => $self->{args}->{type}
+        message     => \$message_create,
+        path        => $self->{path_elements},
+        uid         => $self->{args}->{uid},
+        gid         => $self->{args}->{gid},
+        payload     => $file,
+        type        => $self->{args}->{type},
+        auto_commit => $self->{args}->{auto_commit}
     );
-
-    my $path = join( "/", @{ $self->{path_elements} } );
 
     &_post_meta( $path, status => 'updated' );
 
@@ -311,9 +317,23 @@ sub post {
 
     my $logger = get_logger(__PACKAGE__);
 
-    if ( exists( $self->{args}->{action} )
-        && ( $self->{args}->{action} eq 'copy' ) )
-    {
+    if (exists($self->{args}->{action}) && ($self->{args}->{action} eq 'commit')){
+        &LetsMT::Repository::StorageManager::commit_changes(
+	     message        => \$message,
+	     path           => $self->{path_elements},
+	     commit_message => $self->{args}->{message},
+	     uid            => $self->{args}->{uid},
+	    );
+    }
+    elsif (exists($self->{args}->{action}) && ($self->{args}->{action} eq 'tag')){
+        &LetsMT::Repository::StorageManager::create_release(
+	     message => \$message,
+	     path    => $self->{path_elements},
+	     tag     => $self->{args}->{tag},
+	     uid     => $self->{args}->{uid},
+	    );
+    }
+    elsif (exists($self->{args}->{action}) && ($self->{args}->{action} eq 'copy')){
         &LetsMT::Repository::StorageManager::copy_branch(
             message => \$message,
             path    => $self->{path_elements},
@@ -344,7 +364,7 @@ sub post {
     else {
 
         # make a copy of the old metadata record (archive revisions)
-        &_archive_meta(join( "/", @{ $self->{path_elements} }));
+        &_archive_meta($self->{args}->{uid}, join( "/", @{ $self->{path_elements} }));
 
 	## get a document from an URL or payload
 	my $file = undef;
@@ -573,10 +593,11 @@ sub _put_meta {
 # --> save metadata history!
 
 sub _archive_meta {
+    my $user = shift;
     my $path = shift;
 
     my $resource = &LetsMT::Resource::make_from_storage_path($path);
-    my $revision = $resource->revision();
+    my $revision = $resource->revision( $user, $path );
 
     if ($revision){
         my $metaDB = new LetsMT::Repository::MetaManager();

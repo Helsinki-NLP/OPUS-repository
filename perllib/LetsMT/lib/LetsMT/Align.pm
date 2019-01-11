@@ -98,10 +98,11 @@ by the language pair (language of $SrcRes + language of $TrgRes, sorted alphabet
 =cut
 
 sub align_resources {
-    my $self        = shift;
-    my $SrcResource = shift;
-    my $TrgResource = shift;
-    my $AlgResource = shift;
+    my $self         = shift;
+    my $SrcResource  = shift;
+    my $TrgResource  = shift;
+    my $AlgResource  = shift;
+    my %UploadParams = @_;
 
     my $logger = get_logger(__PACKAGE__);
 
@@ -128,24 +129,29 @@ sub align_resources {
     );
 
     #
-    # Get resources
+    # Get resources (if necessary)
+    # (TODO: is it OK to rely on local copies if they exist?)
     #
-    unless ( LetsMT::WebService::get_resource($SrcResource) ) {
-        $logger->warn("Unable to fetch $SrcResource");
-        LetsMT::WebService::post_meta(
-            $SrcResource,
-            status => 'failed to fetch'
-        );
-        return 0;
+    unless(-e $SrcResource->local_path()){
+	unless ( LetsMT::WebService::get_resource($SrcResource) ) {
+	    $logger->warn("Unable to fetch $SrcResource");
+	    LetsMT::WebService::post_meta(
+		$SrcResource,
+		status => 'failed to fetch'
+		);
+	    return 0;
+	}
     }
     my $SrcRevision = $SrcResource->revision();
-    unless ( LetsMT::WebService::get_resource($TrgResource) ) {
-        $logger->warn("Unable to fetch $TrgResource");
-        LetsMT::WebService::post_meta(
-            $TrgResource,
-            status => 'failed to fetch'
-        );
-        return 0;
+    unless(-e $TrgResource->local_path()){
+	unless ( LetsMT::WebService::get_resource($TrgResource) ) {
+	    $logger->warn("Unable to fetch $TrgResource");
+	    LetsMT::WebService::post_meta(
+		$TrgResource,
+		status => 'failed to fetch'
+		);
+	    return 0;
+	}
     }
     my $TrgRevision = $TrgResource->revision();
 
@@ -164,7 +170,7 @@ sub align_resources {
     my $start = time();
     if ( $AlgResource = $self->align( $SrcResource, $TrgResource, $AlgResource, @_ ) )
     {
-        if ( LetsMT::WebService::put_resource($AlgResource) ) {
+        if ( LetsMT::WebService::put_resource($AlgResource, %UploadParams) ) {
             ## put aligner arguments into a string
             my $args = defined $self->{args} ? Dumper( $self->{args} ) : '';
             $args =~ s/^\{//;
@@ -237,7 +243,7 @@ sub align_resources {
 
 	    ## NEW: also create a TMX file out of the bitext
 	    my @path_elements = split(/\/+/,$AlgResource->storage_path);
-	    LetsMT::Repository::JobManager::run_make_tmx(\@path_elements);
+	    LetsMT::Repository::JobManager::run_make_tmx(\@path_elements, \%UploadParams);
 
             return $AlgResource;
         }
