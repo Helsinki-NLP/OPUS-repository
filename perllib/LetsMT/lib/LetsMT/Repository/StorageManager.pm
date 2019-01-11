@@ -1061,7 +1061,7 @@ sub delete_storage_slot {
     my %user_visible_branches = ();
     my @other_branches        = ();
     my $groups = &LetsMT::Repository::GroupManager::get_groups_for_user($uid);
-    my $slotobj = &_get_slot( name => $slot );
+    my $slotobj = &_get_slot( name => $slot ) or raise( 6, "slot $slot", 'warn' );
 
     my $vc = new LetsMT::Repository::Storage( $slotobj->type )
         or raise( 9, "Storage Backend", 'error' );
