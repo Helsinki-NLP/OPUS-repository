@@ -1225,10 +1225,12 @@ sub run_import_resource{
 	if ($overwrite){
 	    &LetsMT::WebService::post_meta(
 		 $res,
-		 status               => 'waiting in import queue',
-		 # import_job_id          => _get_jobid_from_status($response),
+		 uid                  => $args->{uid},
+		 status               => 'waiting in re-import queue',
+		 # import_job_id      => _get_jobid_from_status($response),
 		 job_id               => _get_jobid_from_status($response),
-		 import_success       => '',
+		 imported_to          => '',
+		 # import_success     => '',
 		 import_failed        => '',
 		 import_empty         => '',
 		 import_success_count => 0,
@@ -1236,22 +1238,22 @@ sub run_import_resource{
 		 import_empty_count   => 0);
 	}
 	else{
-	    LetsMT::WebService::post_meta(
+	    &LetsMT::WebService::post_meta(
 		$res,
 		status => 'waiting in import queue',
 		job_id => _get_jobid_from_status($response),
-		uid    => $args->{uid},
+		uid    => $args->{uid}
 		);
 	}
         LetsMT::WebService::del_meta(
             $corpus,
             import_failed => $relative_path,
-            uid           => $args->{uid},
+            uid           => $args->{uid}
         );
         LetsMT::WebService::put_meta(
             $corpus,
             import_queue => $relative_path,
-            uid          => $args->{uid},
+            uid          => $args->{uid}
         );
         return 1;
     }

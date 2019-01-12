@@ -303,10 +303,23 @@ sub import_resource {
     my @nodes     = $dom->findnodes('//list/entry');
     if (@nodes){
 	$self->{status} = $nodes[0]->findvalue('status');
-	## for archives: check the count for failed imports
-	if ( $nodes[0]->findvalue('import_failed_count') > 0 ){
-	    $self->{status} = 'partially imported';
+
+	## for archives: initialize some additional values
+	## that we can pass on to the import handlers
+	## --> avoid re-reading the same metadata
+	unless ($self->{status}=~/re-?import/){
+	    # @{$self->{success}}  = split(/\,/,$nodes[0]->findvalue('import_success'));
+	    @{$self->{failed}}   = split(/\,/,$nodes[0]->findvalue('import_failed'));
+	    @{$self->{empty}}    = split(/\,/,$nodes[0]->findvalue('import_empty'));
+	    $self->{countOK}     = $nodes[0]->findvalue('import_success_count') || 0;
+	    $self->{countFailed} = $nodes[0]->findvalue('import_failed_count') || 0;
+	    $self->{countEmpty}  = $nodes[0]->findvalue('import_empty_count') || 0;
 	}
+
+	## change status in case some imports failed in archives
+	$self->{status} .= ' (partially)' if ($self->{countFailed});
+
+	## don't do anything if the resource is alread imported
 	if ($self->{status} eq 'imported'){
 	    print "resource ".$resource->path." is already imported\n";
 	    return wantarray ? () : 1;
@@ -359,9 +372,8 @@ sub import_resource {
     # Remove resource from import queue (meta-data for corpus)
     &LetsMT::WebService::del_meta(
         $corpus,
-        'import_queue' => $resource->path
+        'import_queue'  => $resource->path
     );
-
 
     # import success if new_resources is a reference to an array!
     if ( ref($new_resources) eq 'ARRAY' ) {
@@ -1102,6 +1114,13 @@ sub get_resource_handlers {
     ## set additional parameters for each import handler
     foreach my $h (@handlers){
         $h->set_parameter( &get_import_parameter($resource) );
+	$h->{status} = $self->{status};
+	$h->{success} = $self->{success} if ($self->{success});
+	$h->{failed}  = $self->{failed}  if ($self->{failed});
+	$h->{empty}   = $self->{empty}   if ($self->{empty});
+	$h->{countOK}     = $self->{countOK}     if ($self->{countOK});
+	$h->{countFailed} = $self->{countFailed} if ($self->{countFailed});
+	$h->{countEmpty}  = $self->{countEmpty}  if ($self->{countEmpty});
     }
 
     return @handlers;
