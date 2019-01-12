@@ -26,6 +26,9 @@ use Log::Log4perl qw(get_logger :levels);
 
 my $TIKA = Apache::Tika->new();
 
+## restrict size of data to be used for stream type detection
+my $TYPE_DETECT_MAX_SIZE = 65536;
+# my $TYPE_DETECT_MAX_SIZE = 1048576
 
 =head1 CONSTRUCTOR
 
@@ -72,8 +75,8 @@ sub validate {
 	}
     }
 
-    # read content and detect type with Apache Tika (max 1MB)
-    my $content  = $self->_read_raw_file($resource->local_path, 1048576);
+    # read content and detect type with Apache Tika (max 64k)
+    my $content  = $self->_read_raw_file($resource->local_path, $TYPE_DETECT_MAX_SIZE);
     my $detected = $TIKA->detect_stream($content);
 
     if ($detected){
@@ -171,7 +174,9 @@ sub _read_raw_file{
     if ($maxsize){
 	sysread(F, $content, $maxsize );
     }
-    my $content = do { local $/; <F> };
+    else{
+	$content = do { local $/; <F> };
+    }
     close F;
     return $content;
 

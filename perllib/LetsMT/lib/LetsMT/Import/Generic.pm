@@ -143,24 +143,27 @@ sub convert {
     # - default splitter = Lingua::Sentence with resource-specific language
 
     my $normalizer = $importer->{normalizer} || $DEFAULT_NORMALIZER;
-    my $lang       = $importer->{lang}       || $resource->language();
+    # my $lang     = $importer->{lang}       || $resource->language();
 
-    ## NEW: always run language detection
-    my @detected = &detect_language($resource);
-    if ( @detected && $detected[0] ne 'unknown' ){
-	$lang = $detected[0] unless (grep($_ eq $lang,@detected));
+    ## NEW always use the importer language if it is set and not 'xx'
+    ## --> ignore resource language and skip language detection
+    ## --> TODO: should we do language detection to verify this?
+    ##     (not really necessssary because we detect language for each sentence later anyway)
+    my $lang     = $importer->{lang};
+
+    ## run language detection if necessary
+    if ( ! $lang || $lang eq 'xx' ){
+	my @detected = &detect_language($resource);
+	if ( @detected && $detected[0] ne 'unknown' ){
+	    # set language to detected language unless the one that 
+	    # we already have is among the detected ones
+	    $lang = $detected[0] unless (grep($_ eq $lang,@detected));
+	}
     }
     $lang = 'xx' unless ($lang);
 
     # make sure the subdir is set correctly
     $new_resource->language($lang);
-
-
-    # # try to detect the language if it is not specified or 'xx'
-    # if ((!$lang) || ($lang eq 'xx')){
-    #     my @detected = &detect_language($resource);
-    #     $lang = shift(@detected) || 'xx';
-    # }
 
     my $splitter = $importer->{splitter} || new LetsMT::DataProcessing::Splitter(
         method => $DEFAULT_SPLITTER,

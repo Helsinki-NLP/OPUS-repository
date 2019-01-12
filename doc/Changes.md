@@ -140,7 +140,12 @@ TODO: nothing can be done with the annotations yet and automatic word alignment 
 * new import parameter: `ImportPara_autoalign = on/off` - automatically detect and align parallel documents (default = on)
 * new PDF import mode: `ImportPara_mode = combined` - use pdf2xml for conversion from PDF
 * new default sentence splitter: `udpipe` (before it was europarl)
-* new default aligner: `hunalign` (it was `bisent` before)
+* new default aligner: `hunalign-bisent-cautious` (there is now also `hunalign-cautious` and `hunaign-bisent`)
+* language detection now always overrules the language that is found in the path unless the `lang` parameter is set in the importer; this can be set as parameter in import requests and file uploads, see the example below
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/slot1/user1/uploads/pdf/D2.1.pdf?uid=user1&action=import&lang=en" --form payload=@D2.1.pdf 
+```
 
 
 If `autoalign` is off the system will still try to find parallel documents and the result will be stored in the metadata for each monolingual corpus file. The key is `align-candidate` and all candidates can be found by issuing this query on the specific slot (`slot1` in this example):

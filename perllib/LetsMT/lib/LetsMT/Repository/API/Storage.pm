@@ -234,7 +234,11 @@ sub put {
 				'-u' => safe_path($branch),
 				'-s' => safe_path($slot),
 				'-p' => safe_path($upload) );
-	    $command .= ' -E ' . $self->{args}->{email} if (defined $self->{args}->{email});
+	    $command .= ' -E ' . safe_path($self->{args}->{email}) if (defined $self->{args}->{email});
+	    $command .= ' -L ' . safe_path($self->{args}->{lang}) if (defined $self->{args}->{lang});
+	    $command .= ' -S ' . safe_path($self->{args}->{splitter}) if (defined $self->{args}->{spitter});
+	    $command .= ' -T ' . safe_path($self->{args}->{tokenizer}) if (defined $self->{args}->{tokenizer});
+	    $command .= ' -N ' . safe_path($self->{args}->{normalizer}) if (defined $self->{args}->{normalizer});
 
             # create import job
             LetsMT::Repository::JobManager::create_job(

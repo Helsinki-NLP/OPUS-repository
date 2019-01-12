@@ -1180,6 +1180,9 @@ Create an import job for a resource given by its path and submit it to the SGE.
 sub run_import_resource{
     my ($path,$args,$overwrite) = @_;
 
+    # ensure $args points to a hash
+    $args = {} unless (ref($args) eq 'HASH');
+
     my @path_elements = split(/\/+/,$path);
     my $slot = shift(@path_elements);
     my $branch = shift(@path_elements);
@@ -1199,6 +1202,10 @@ sub run_import_resource{
 	. ' -s ' . &safe_path( $slot )
 	. ' -p ' . &safe_path( $relative_path );
     $command .= ' -E ' . $$args{email} if (defined $$args{email});
+    $command .= ' -L ' . safe_path($$args{lang}) if (defined $$args{lang});
+    $command .= ' -S ' . safe_path($$args{splitter}) if (defined $$args{spitter});
+    $command .= ' -T ' . safe_path($$args{tokenizer}) if (defined $$args{tokenizer});
+    $command .= ' -N ' . safe_path($$args{normalizer}) if (defined $$args{normalizer});
 
     my $job_resource = &create_job(
         path     => $jobfile ,
