@@ -229,6 +229,9 @@ sub update_import_meta{
     ##
     ## NEW: only register failed and empty but not successfully imported files
     ## --> we can get success from the metadata of the successfully imported files
+    ##
+    ## TODO: should we also ignore empty imports and do not store information about
+    ##       them in the database? (so, just store failed imports?)
 
     if ($imported){
         if (scalar @$imported){

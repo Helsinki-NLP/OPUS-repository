@@ -344,11 +344,13 @@ sub post {
             get_logger(__PACKAGE__)->error("post meta: got corrupt data!\n");
 	    next;
 	}
+
+	## crazy decoding / encoding to make sure that
+	## we get the string in correct internal format
+	utf8::decode($newData->{$_});
+	utf8::encode($newData->{$_});
+
         $data->{$_} = $newData->{$_};
-	## TODO: crazy decoding / encoding to make sure that
-	##       we get the string in correct internal format
-	utf8::decode($data->{$_});
-	utf8::encode($data->{$_});
     }
 
     # set gid (should always be the same as branch-level gid!)
@@ -386,6 +388,12 @@ sub put {
     my $data = $tdb->get($id) || {};
 
     foreach ( keys %{$newData} ) {
+
+	## crazy decoding / encoding to make sure that
+	## we get the string in correct internal format
+	utf8::decode($newData->{$_});
+	utf8::encode($newData->{$_});
+
 	# avoid rubbish keys
 	if (/^HASH\([0-9defx]+\)$/i){
             get_logger(__PACKAGE__)->error("put meta: got corrupt data!\n");
