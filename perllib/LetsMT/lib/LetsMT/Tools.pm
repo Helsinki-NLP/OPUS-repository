@@ -65,12 +65,12 @@ Good for reading.
 
 =head2 C<$TIMEOUT>
 
-Timeout for system calls (see run_cmd). Default = 60 seconds.
+Timeout for system calls (see run_cmd). Default = 600 seconds.
 
 =cut
 
 our $DEFAULT_INPUT_ENCODING = 'utf8';
-our $TIMEOUT = 300;
+our $TIMEOUT = 600;
 
 =head2 C<$DEFAULT_OUTPUT_ENCODING>
 

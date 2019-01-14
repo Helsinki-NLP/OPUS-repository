@@ -1144,21 +1144,41 @@ sub run_crawler{
     my $pwd = getcwd();
     chdir($tmpdir);
 
-    ## set the run_cmd timout to 3 days
-    local $LetsMT::Tools::TIMEOUT = 3*24*60*60;
+    ## TODO: run_cmd does not seem to work for this
+    ##       even with the higher timeout
+    ## --> use safe_system for now ...
 
-    ## TODO: break if the command returns an error?
-    ##       but this seems to happen all the time ...
-    # if (&run_cmd('wget',@para,$args->{url})){
-    &run_cmd('wget',@para,$args->{url});
-    if (&run_cmd('tar','-czf',$tarfile,'-C',$slot,'./')){
-	## make the storage request to download the page
-	my $resource = LetsMT::Resource::make($slot,$branch,join('/',@{$path_elements}));
-	delete $args->{run};
-	delete $args->{url};
-	chdir($pwd);
-	return LetsMT::WebService::put_file( $resource, $tarfile, %{$args} );
+    # ## set the run_cmd timout to 3 days
+    # local $LetsMT::Tools::TIMEOUT = 3*24*60*60;
+    # if (&run_cmd( 'wget', @para, $args->{url} ) ){
+    # 	if (&run_cmd('tar', '-czf', $tarfile, '-C', $slot, './')){
+
+    if (&safe_system( 'wget', @para, $args->{url} ) ){
+	if (&safe_system('tar', '-czf', $tarfile, '-C', $slot, './')){
+	    ## make the storage request to download the page
+	    my $resource = LetsMT::Resource::make($slot,$branch,
+						  join('/',@{$path_elements}));
+	    delete $args->{run};
+	    delete $args->{url};
+	    chdir($pwd);
+	    ## try 10 times to upload the file
+	    ## (just in case it fails and we do not want to waste the crawled data)
+	    foreach (0..9){
+		if ( LetsMT::WebService::put_file( $resource, $tarfile, %{$args} ) ){
+		    return 1;
+		}
+		sleep(5);
+	    }
+	    ## cannot upload the tar-file?
+	    ## move it to a tmpfile to save from deleting
+	    my $tmpfile = '/tmp/'.$slot.'.tar.gz';
+	    &safe_system( 'mv', $tarfile, $tmpfile );
+	    print STDERR "could not upload the crawled data; saved in:\n";
+	    print STDERR $tmpfile,"\n";
+	    return 0;
+	}
     }
+
     chdir($pwd);
     raise( 8, "cannot download $args->{url} ($?)", 'error' );
 }
