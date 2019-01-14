@@ -169,6 +169,7 @@ sub open{
 	UNLINK => 1
 	);
     close($fh);
+    $self->{dbfile} = $tmpfile;
 
     $self->{tmpdb}  = {};
     my $db = tie %{$self->{tmpdb}},"DB_File",$tmpfile;
@@ -212,6 +213,7 @@ sub close{
     }
 
     untie %{$self->{tmpdb}};
+    unlink($self->{dbfile});
     return $self->SUPER::close(@_);
 
 }

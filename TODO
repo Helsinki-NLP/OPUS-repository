@@ -4,6 +4,7 @@ To do as of version 0.56
 
 High priority:
 
+* incremental crawling (only update changed pages)
 * TMX options
   - option for removing duplicates						(done = default)
   - large imports (tar-files) etc - send only one de-duplicated TMX		(skip this?)
@@ -49,6 +50,17 @@ High priority:
 
 Medium priority:
 
+* better fuzzy matching of file names (translation detection)
+  --> lowercased file names
+  --> without non-letter characters
+  --> remove/replace language names/IDs from names
+  --> even match translated names? (difficult)
+      (use simple lexical matches with prob's?)
+* find translated documents based on their contents (difficult)
+  --> use external tools for searching parallel documents?
+  --> multilingual sentence-embedding based methods
+      see https://arxiv.org/pdf/1812.10464.pdf
+      software: https://github.com/facebookresearch/LASER
 * nicer look and feel for the repository interface using bootstrap?
   https://getbootstrap.com
 * support polyglot python library?
@@ -73,14 +85,6 @@ Medium priority:
     https://savannah.gnu.org/bugs/?20378
 * interactive dependency aligner (IDA), integrated in interface			(started)
 * improve git with remote servers (do not always push!)
-* better fuzzy matching of file names (translation detection)
-  --> lowercased file names
-  --> without non-letter characters
-  --> remove/replace language names/IDs from names
-  --> even match translated names? (difficult)
-      (use simple lexical matches with prob's?)
-* find translated documents based on their contents (difficult)
-  --> use external tools for searching parallel documents?
 * more sentence aligners (srtalign, BLEU align, gargantua, yalign?)
 * support moving files (i.e. git mv in backend)
 * improved pre-processing tools
