@@ -341,6 +341,7 @@ update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_weekly.sh
 	@echo '0 4  1  *  *      ${PREFIX}/bin/tt_monthly.sh > ${LETSMTLOG_DIR}/tt_monthly.out 2> ${LETSMTLOG_DIR}/tt_monthly.err' >> crontab.tmp
 	${INSTALL_BIN} letsmt_weekly.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_daily.sh ${PREFIX}/bin/
+	${INSTALL_BIN} tt_weekly.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_monthly.sh ${PREFIX}/bin/
 	crontab crontab.tmp
 	rm -f crontab.tmp

@@ -61,6 +61,9 @@ Medium priority:
   --> multilingual sentence-embedding based methods
       see https://arxiv.org/pdf/1812.10464.pdf
       software: https://github.com/facebookresearch/LASER
+* use Encode::Guess for guessing character encoding?
+  - also reduce use of encode / decode to avoid all the confusion
+    see https://sites.google.com/site/kbinstuff/perl-unicode-utf8-cgipm-apache-mod_perl-and-mysql
 * nicer look and feel for the repository interface using bootstrap?
   https://getbootstrap.com
 * support polyglot python library?

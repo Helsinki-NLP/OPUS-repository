@@ -164,14 +164,14 @@ The C<_no_copy> version performs destructive conversion by changing the original
 
 sub utf8_to_perl {
     my $string = shift;
-    $string = decode_utf8($string);
+    $string = decode_utf8($string, sub{ return '_' });
     # utf8::decode($string);
     return $string;
 }
 
 sub utf8_to_perl_no_copy {
     # utf8::decode($_[0]);
-    $_[0] = decode_utf8($_[0]);
+    $_[0] = decode_utf8($_[0], sub{ return '_' });
 }
 
 =head2 C<safe_path>, C<safe_path_utf8>

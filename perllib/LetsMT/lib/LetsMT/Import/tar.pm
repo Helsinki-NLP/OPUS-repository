@@ -9,11 +9,11 @@ LetsMT::Import::tar - import handler for C<tar> archives
 use strict;
 use parent 'LetsMT::Import::Generic';
 
-# use utf8;
+use utf8;
 use File::Basename qw/basename dirname/;
 use Data::Dumper;
 use XML::LibXML;
-use Encode qw(decode decode_utf8 is_utf8);
+use Encode qw(encode decode decode_utf8 is_utf8);
 
 
 use LetsMT::Tools;
@@ -209,14 +209,14 @@ sub initialize_import{
     return ($resource_path, $local_path);
 }
 
-
 sub update_import_meta{
     my $self      = shift;
     my ($resource,$filename,$imported) = @_;
 
     # do nothing if no resource is given
     return unless $resource;
-    $filename - &utf8_to_perl($filename);  ## TODO: do we need this
+
+#    $filename = &utf8_to_perl($filename);  ## TODO: do we need this?
 
     ## check whether there is already some metadata about the file
     my $MarkedAsSuccess = grep($_ eq $filename, @{$self->{success}} ) ? 1 : 0;

@@ -56,7 +56,6 @@ my $WgetQuota = '0';
 # my $WgetQuota = '4000m';
 
 
-
 =head1 FUNCTIONS
 
 =head2 C<create_job>
@@ -1109,10 +1108,18 @@ sub run_crawler{
     ## download quota
     my $quota = exists $$args{quota} ? $$args{quota} : $WgetQuota;
 
+    ## TODO: restrict-file-names mode "nocontrol" might be too difficult
+    ##       (see man pages to see what that means)
+    ## other options: unix (that should be the default), ascii, lowercase, ...
+    ##
+    ## TODO: --content-disposition is experimental (is it stable enough for us?)
+
     ## wget parameters
     my @para = ('-r','--no-parent',
 		'--convert-links',
 		'--adjust-extension',
+		'--restrict-file-names=nocontrol',
+		'--content-disposition',
 		'--reject',$WgetReject,
 		# '--accept','xml,html,doc,pdf,docx,epub,rtf,srt,txt,php',
 		'--ignore-case',
