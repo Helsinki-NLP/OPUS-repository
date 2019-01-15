@@ -119,7 +119,10 @@ CPAN_MODULES = 	Apache::Tika \
 		Test::More \
 		Text::PDF2XML \
 		Switch \
-		Ufal::UDPipe
+		Ufal::UDPipe \
+		URL::Encode \
+		URL::Encode::XS
+
 
 #		Inline::Python    # not needed anymore (does not work with mod_perl)
 #		String::Approx    # installed via libstring-approx-perl

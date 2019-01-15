@@ -22,6 +22,7 @@ use LetsMT::WebService;
 use Apache::Tika;
 use IPC::Run qw(run);
 use File::Path;
+use URL::Encode qw/:all/;
 use Log::Log4perl qw(get_logger :levels);
 
 my $TIKA = Apache::Tika->new();
@@ -143,6 +144,10 @@ sub convert {
 	## create the intermediate resource
 	my $type_pattern = $self->{type_pattern} || $type;
 	my $tmp_resource = $resource->convert_type( $type_pattern, $self->{intermediate_format} );
+
+	## NEW: decode URLs! (TODO: is it OK to do that for all resources?)
+	$tmp_resource->path( &url_decode_utf8($tmp_resource->path) );
+
 	File::Path::make_path( $tmp_resource->path_down->local_path );
 
 	open F,'>',$tmp_resource->local_path;
