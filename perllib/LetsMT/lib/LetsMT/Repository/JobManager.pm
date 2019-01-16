@@ -1080,7 +1080,8 @@ sub run_crawler{
     raise( 17, "protocol (supported = http|https|ftp)", 'warn' ) 
 	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
 
-    my $doc    = $2;
+    my $domain = $2;
+    my $doc    = $domain;
     my $slot   = shift(@{$path_elements});
     my $branch = shift(@{$path_elements});
 
@@ -1161,7 +1162,7 @@ sub run_crawler{
     # 	if (&run_cmd('tar', '-czf', $tarfile, '-C', $slot, './')){
 
     if (&safe_system( 'wget', @para, $args->{url} ) ){
-	if (&safe_system('tar', '-czf', $tarfile, '-C', $slot, './')){
+	if (&safe_system('tar', '-czf', $tarfile, '-C', $domain, './')){
 	    ## make the storage request to download the page
 	    my $resource = LetsMT::Resource::make($slot,$branch,
 						  join('/',@{$path_elements}));
