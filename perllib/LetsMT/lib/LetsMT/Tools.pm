@@ -18,7 +18,7 @@ use File::Basename;
 use File::Find;
 use File::ShareDir;
 
-# use utf8;
+use utf8;
 use Encode qw(decode decode_utf8 encode);
 
 use IPC::Open3;
@@ -152,6 +152,7 @@ sub open_bom_file {
         ? ($fh, $enc)
         : $fh;
 }
+
 
 
 =head2 C<utf8_to_perl>, C<utf8_to_perl_no_copy>

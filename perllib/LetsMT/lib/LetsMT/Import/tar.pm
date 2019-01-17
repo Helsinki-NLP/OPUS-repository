@@ -202,7 +202,8 @@ sub initialize_import{
 	# my $DecodeSuccess = utf8::decode($response);
 
 	## NEW: do this only if decoding succeeds
-	if (utf8::decode($response)){
+	utf8::decode($response);
+	if (utf8::is_utf8($response)){
 	    my $XmlParser = new XML::LibXML;
 	    my $dom       = $XmlParser->parse_string($response);
 	    my @nodes     = $dom->findnodes('//list/entry/imported_from');

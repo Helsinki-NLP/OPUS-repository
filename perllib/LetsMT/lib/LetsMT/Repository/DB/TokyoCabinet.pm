@@ -347,10 +347,12 @@ sub post {
 
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
+	## and discard invalid strings
 	utf8::decode($newData->{$_});
-	utf8::encode($newData->{$_});
-
-        $data->{$_} = $newData->{$_};
+	if (utf8::is_utf8($test)){ 
+	    utf8::encode($newData->{$_});
+	    $data->{$_} = $newData->{$_};
+	}
     }
 
     # set gid (should always be the same as branch-level gid!)
@@ -389,17 +391,19 @@ sub put {
 
     foreach ( keys %{$newData} ) {
 
+	# avoid rubbish keys
+	if (/^HASH\([0-9defx]+\)$/i){
+	    get_logger(__PACKAGE__)->error("put meta: got corrupt data!\n");
+	    next;
+	}
+
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
 	utf8::decode($newData->{$_});
-	utf8::encode($newData->{$_});
-
-	# avoid rubbish keys
-	if (/^HASH\([0-9defx]+\)$/i){
-            get_logger(__PACKAGE__)->error("put meta: got corrupt data!\n");
-	    next;
+	if (utf8::is_utf8($test)){ 
+	    utf8::encode($newData->{$_});
+	    $data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
 	}
-        $data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
     }
     return $self->post( $id, $data );
 }

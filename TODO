@@ -4,6 +4,18 @@ To do as of version 0.56
 
 High priority:
 
+* get rid of encode/decode and fix all the unicode issues
+  - reduce use of encode / decode to avoid all the confusion
+  https://sites.google.com/site/kbinstuff/perl-unicode-utf8-cgipm-apache-mod_perl-and-mysql
+  https://unix.stackexchange.com/questions/6516/filtering-invalid-utf8
+  https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
+* better fuzzy matching of file names (translation detection)
+  --> lowercased file names
+  --> without non-letter characters
+  --> remove/replace language names/IDs from names				(done)
+  --> complete local settings (sv_SE, fi_FI, en_US, ...)
+  --> even match translated names? (difficult)
+      (use simple lexical matches with prob's?)
 * incremental crawling (only update changed pages)
 * TMX options
   - option for removing duplicates						(done = default)
@@ -50,20 +62,12 @@ High priority:
 
 Medium priority:
 
-* better fuzzy matching of file names (translation detection)
-  --> lowercased file names
-  --> without non-letter characters
-  --> remove/replace language names/IDs from names
-  --> even match translated names? (difficult)
-      (use simple lexical matches with prob's?)
 * find translated documents based on their contents (difficult)
   --> use external tools for searching parallel documents?
   --> multilingual sentence-embedding based methods
       see https://arxiv.org/pdf/1812.10464.pdf
       software: https://github.com/facebookresearch/LASER
-* use Encode::Guess for guessing character encoding?
-  - also reduce use of encode / decode to avoid all the confusion
-    see https://sites.google.com/site/kbinstuff/perl-unicode-utf8-cgipm-apache-mod_perl-and-mysql
+* use Encode::Guess for guessing character encoding?				(not very useful)
 * nicer look and feel for the repository interface using bootstrap?
   https://getbootstrap.com
 * support polyglot python library?
