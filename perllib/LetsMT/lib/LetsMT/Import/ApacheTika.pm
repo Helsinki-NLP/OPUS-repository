@@ -26,7 +26,8 @@ use File::Path;
 ## TODO: which module is the safest to use?
 ##       there is also URI::Encode, ...
 # use URL::Encode qw/:all/;
-use URI::Escape::XS qw/uri_escape uri_unescape/;
+# use URI::Escape::XS qw/uri_escape uri_unescape/;
+use URI::Escape::XS;
 use utf8;
 
 use Log::Log4perl qw(get_logger :levels);
