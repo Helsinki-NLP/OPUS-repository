@@ -199,16 +199,19 @@ sub initialize_import{
 	## --> use utf8::decode instead to avoid breaking
 	## --> find some more principles way to handle unicode ...
 	# $response = decode( 'utf8', $response );
-	my $DecodeSuccess = utf8::decode($response);
+	# my $DecodeSuccess = utf8::decode($response);
 
-	my $XmlParser = new XML::LibXML;
-	my $dom       = $XmlParser->parse_string($response);
-	my @nodes     = $dom->findnodes('//list/entry/imported_from');
-	foreach my $n (@nodes){
-	    my ( $tarfile, $file ) = split( /\:/, $n->to_literal() );
-	    ## TODO: try again to decode
-	    utf8::decode($file) unless ($DecodeSuccess);
-	    push( @{$self->{success}}, $file );
+	## NEW: do this only if decoding succeeds
+	if (utf8::decode($response)){
+	    my $XmlParser = new XML::LibXML;
+	    my $dom       = $XmlParser->parse_string($response);
+	    my @nodes     = $dom->findnodes('//list/entry/imported_from');
+	    foreach my $n (@nodes){
+		my ( $tarfile, $file ) = split( /\:/, $n->to_literal() );
+		## TODO: try again to decode?
+		# utf8::decode($file) unless ($DecodeSuccess);
+		push( @{$self->{success}}, $file );
+	    }
 	}
     }
 
