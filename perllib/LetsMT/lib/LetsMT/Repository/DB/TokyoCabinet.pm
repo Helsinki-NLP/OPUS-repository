@@ -349,7 +349,7 @@ sub post {
 	## we get the string in correct internal format
 	## and discard invalid strings
 	utf8::decode($newData->{$_});
-	if (utf8::is_utf8($test)){ 
+	if (utf8::is_utf8($newData->{$_})){ 
 	    utf8::encode($newData->{$_});
 	    $data->{$_} = $newData->{$_};
 	}
@@ -400,7 +400,7 @@ sub put {
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
 	utf8::decode($newData->{$_});
-	if (utf8::is_utf8($test)){ 
+	if (utf8::is_utf8($newData->{$_})){ 
 	    utf8::encode($newData->{$_});
 	    $data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
 	}
