@@ -22,7 +22,13 @@ use LetsMT::WebService;
 use Apache::Tika;
 use IPC::Run qw(run);
 use File::Path;
-use URL::Encode qw/:all/;
+
+## TODO: which module is the safest to use?
+##       there is also URI::Encode, ...
+# use URL::Encode qw/:all/;
+use URI::Escape::XS qw/uri_escape uri_unescape/;
+use utf8;
+
 use Log::Log4perl qw(get_logger :levels);
 
 my $TIKA = Apache::Tika->new();
@@ -146,7 +152,14 @@ sub convert {
 	my $tmp_resource = $resource->convert_type( $type_pattern, $self->{intermediate_format} );
 
 	## NEW: decode URLs! (TODO: is it OK to do that for all resources?)
-	$tmp_resource->path( &url_decode_utf8($tmp_resource->path) );
+	## (this breaks with malformed strings)
+	# $tmp_resource->path( &url_decode_utf8($tmp_resource->path) );
+
+	## NEW: use URI::Escape::XS
+	my $decoded = decodeURIComponent( $tmp_resource->path );
+	if (utf8::decode($decoded)){
+	    $tmp_resource->path( $decoded );
+	}
 
 	File::Path::make_path( $tmp_resource->path_down->local_path );
 

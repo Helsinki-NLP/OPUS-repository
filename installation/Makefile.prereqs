@@ -120,6 +120,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Text::PDF2XML \
 		Switch \
 		Ufal::UDPipe \
+		URI::Escape::XS \
 		URL::Encode \
 		URL::Encode::XS
 

@@ -11,7 +11,7 @@ Import resources into the repository.
 =cut
 
 use strict;
-# use utf8;
+use utf8;
 
 use Cwd;
 use Data::Dumper;
@@ -293,11 +293,17 @@ sub import_resource {
 
     ## NEW: only import if status != imported and no failed imports
     my $response = LetsMT::WebService::get_meta( $resource );
+
+    ## TODO: problems with some filenames
+    ## --> utf8::decode does not fail if decoding fails
+    ##     but does that create problems later?
+    ##
     # eval{ $response = decode( 'utf8', $response ) };
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
     # $response = decode( 'utf8', $response, sub{ return ' ' } );
     # $response = decode( 'utf8', $response, Encode::FB_PERLQQ );
-    # utf8::decode($response);
+    utf8::decode($response);
+
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string($response);
     my @nodes     = $dom->findnodes('//list/entry');
