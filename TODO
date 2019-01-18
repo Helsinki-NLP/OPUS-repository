@@ -4,6 +4,11 @@ To do as of version 0.56
 
 High priority:
 
+* crawling produces multiple tar-archives to reduce the size
+  - use File::Find to get the files and 
+    split into archives of max 5000 files
+    https://stackoverflow.com/questions/17754931/finding-files-with-perl
+    https://www.perlmonks.org/?node_id=217166
 * get rid of encode/decode and fix all the unicode issues
   - reduce use of encode / decode to avoid all the confusion
   https://sites.google.com/site/kbinstuff/perl-unicode-utf8-cgipm-apache-mod_perl-and-mysql
@@ -14,6 +19,7 @@ High priority:
   --> without non-letter characters
   --> remove/replace language names/IDs from names				(done)
   --> complete local settings (sv_SE, fi_FI, en_US, ...)
+      https://perldoc.perl.org/Locale/Language.html
   --> even match translated names? (difficult)
       (use simple lexical matches with prob's?)
 * incremental crawling (only update changed pages)

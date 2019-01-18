@@ -13,7 +13,7 @@ Interacts with the Oracle (Sun) Grid Engine.
 use strict;
 
 use open qw(:std :utf8);
-# use utf8;
+use utf8;
 
 use XML::LibXML;
 use File::Basename;
@@ -1077,8 +1077,10 @@ sub run_crawler{
     # raise( 12, "slot/branch", 'warn')   unless (@{$path_elements} > 1);
     raise( 12, "parameter uid", 'warn') unless (exists $args->{uid});
     raise( 12, "parameter url", 'warn') unless (exists $args->{url});
-    raise( 17, "protocol (supported = http|https|ftp)", 'warn' ) 
-	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
+    # raise( 17, "protocol (supported = http|https|ftp)", 'warn' ) 
+    # 	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
+    raise( 17, "URL (supported = http|https|ftp)", 'warn' ) 
+	unless ($args->{url}=~/^(http|https|ftp):\/\/([a-zA-Z0-9][a-zA-Z0-9\.\-]*[a-zA-Z0-9])(\/[\~a-zA-Z0-9\.\-\/]*)?$/i);
 
     my $domain = $2;
     my $doc    = $domain;
@@ -1093,7 +1095,7 @@ sub run_crawler{
 	$doc=~s/\/+$//;
 	push(@{$path_elements},$doc);	
     }
-    unshift(@{$path_elements},'uploads');
+    unshift(@{$path_elements},'uploads') unless ($$path_elements[0] eq 'uploads');
 
     ## temporary download space
     my $tmphome = $ENV{LETSMT_TMP} || '/tmp';
@@ -1145,7 +1147,9 @@ sub run_crawler{
     $branch  = $args->{uid}   unless ($branch);
 
     ## make sure that the file exitension is a tar.gz file
-    $$path_elements[-1]=~s/(.tar.gz)?$/.tar.gz/;
+    $$path_elements[-1]=~s/(.tar|tgz)?(.gz)?$//;
+    my $tarbase = join( '/', $tmpdir, $$path_elements[-1] );
+    $$path_elements[-1].='.tar.gz';
     my $tarfile = join( '/', $tmpdir, $$path_elements[-1] );
 
     ## download, pack into tar archive and upload to repository
@@ -1162,33 +1166,75 @@ sub run_crawler{
     # 	if (&run_cmd('tar', '-czf', $tarfile, '-C', $slot, './')){
 
     if (&safe_system( 'wget', @para, $args->{url} ) ){
-	if (&safe_system('tar', '-czf', $tarfile, '-C', $domain, './')){
-	    ## make the storage request to download the page
-	    my $resource = LetsMT::Resource::make($slot,$branch,
-						  join('/',@{$path_elements}));
-	    delete $args->{run};
-	    delete $args->{url};
-	    chdir($pwd);
-	    ## try 10 times to upload the file
-	    ## (just in case it fails and we do not want to waste the crawled data)
-	    foreach (0..9){
-		if ( LetsMT::WebService::put_file( $resource, $tarfile, %{$args} ) ){
-		    return 1;
-		}
-		sleep(5);
-	    }
-	    ## cannot upload the tar-file?
-	    ## move it to a tmpfile to save from deleting
-	    my $tmpfile = '/tmp/'.$slot.'.tar.gz';
-	    &safe_system( 'mv', $tarfile, $tmpfile );
-	    print STDERR "could not upload the crawled data; saved in:\n";
-	    print STDERR $tmpfile,"\n";
-	    return 0;
-	}
-    }
 
+	## NEW: split into chunks of max 5000 files
+	&safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $tarbase.'_') ||
+	    raise( 8, "cannot download $args->{url} ($?)", 'error' );
+
+	## compress each chunk of files into an archive and upload it
+	my @chunks  = glob("${tarbase}_??");
+	my $success = 0;
+	foreach my $c (@chunks){
+	    my $tarfile = "$c.tar.gz";
+	    if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^${domain}/##") ){
+		$$path_elements[-1] = basename($tarfile);
+		my $resource = LetsMT::Resource::make($slot,$branch,
+						      join('/',@{$path_elements}));
+		delete $args->{run};
+		delete $args->{url};
+		## try 10 times to upload the file
+		## (just in case it fails and we do not want to waste the crawled data)
+		foreach (0..9){
+		    if (LetsMT::WebService::put_file( $resource, $tarfile, %{$args} )){
+			$success++;
+			last;
+		    }
+		    sleep(5);
+		}
+		## cannot upload the tar-file?
+		## move it to a tmpfile to save from deleting
+		unless ($success){
+		    my $tmpfile = '/tmp/'.$$path_elements[-1];
+		    &safe_system( 'mv', $tarfile, $tmpfile );
+		    print STDERR "could not upload the crawled data; saved in:\n";
+		    print STDERR $tmpfile,"\n";
+		}
+	    }
+	}
+	chdir($pwd);
+	return $success;
+    }
     chdir($pwd);
     raise( 8, "cannot download $args->{url} ($?)", 'error' );
+
+
+    # 	if (&safe_system('tar', '-czf', $tarfile, '-C', $domain, './')){
+    # 	    ## make the storage request to download the page
+    # 	    my $resource = LetsMT::Resource::make($slot,$branch,
+    # 						  join('/',@{$path_elements}));
+    # 	    delete $args->{run};
+    # 	    delete $args->{url};
+    # 	    chdir($pwd);
+    # 	    ## try 10 times to upload the file
+    # 	    ## (just in case it fails and we do not want to waste the crawled data)
+    # 	    foreach (0..9){
+    # 		if ( LetsMT::WebService::put_file( $resource, $tarfile, %{$args} ) ){
+    # 		    return 1;
+    # 		}
+    # 		sleep(5);
+    # 	    }
+    # 	    ## cannot upload the tar-file?
+    # 	    ## move it to a tmpfile to save from deleting
+    # 	    my $tmpfile = '/tmp/'.$slot.'.tar.gz';
+    # 	    &safe_system( 'mv', $tarfile, $tmpfile );
+    # 	    print STDERR "could not upload the crawled data; saved in:\n";
+    # 	    print STDERR $tmpfile,"\n";
+    # 	    return 0;
+    # 	}
+    # }
+
+    # chdir($pwd);
+    # raise( 8, "cannot download $args->{url} ($?)", 'error' );
 }
 
 

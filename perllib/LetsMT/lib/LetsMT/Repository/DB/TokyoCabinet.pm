@@ -348,8 +348,7 @@ sub post {
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
 	## and discard invalid strings
-	utf8::decode($newData->{$_});
-	if (utf8::is_utf8($newData->{$_})){ 
+	if (utf8::decode($newData->{$_})){
 	    utf8::encode($newData->{$_});
 	    $data->{$_} = $newData->{$_};
 	}
@@ -399,8 +398,7 @@ sub put {
 
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
-	utf8::decode($newData->{$_});
-	if (utf8::is_utf8($newData->{$_})){ 
+	if (utf8::decode($newData->{$_})){
 	    utf8::encode($newData->{$_});
 	    $data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
 	}
@@ -425,6 +423,10 @@ sub get_strict {
     # is this really necessary?!?
     map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
     # map( utf8::decode( $$data{$_} ), keys %{$data} );
+
+    ## remove invalid strings
+    ## TODO: is it OK to not return anything?
+    foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
 
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         delete $data->{_ID_};        # (only for internal use!)
@@ -457,6 +459,10 @@ sub get {
         # is this really necessary?!?
 	map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
 	# map( utf8::decode( $$data{$_} ), keys %{$data} );
+
+	## remove invalid strings
+	## TODO: is it OK to not return anything?
+	foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
 
         # a key is given: return only that value!
         # (as an array if necessary)
@@ -569,6 +575,11 @@ sub search {
     # TODO: why do we need to decode everything?
     my $result = $qry->search();
     @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
+
+    ## remove invalid strings
+    ## TODO: is it OK to leave out results?
+    @{$result} = grep( utf8::is_utf8( $_ ), @{$result} );
+
     return $result;
     # return $qry->search();
 }

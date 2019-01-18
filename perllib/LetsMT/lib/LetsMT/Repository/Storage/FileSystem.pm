@@ -318,7 +318,7 @@ sub list {
     );
     my $revision = $params{revision} || $self->revision( $owner, $path_to_display );
 
-    my $content = qq(<?xml version="1.0"?><list path="/$path_to_display">);
+    my $content = qq(<?xml version="1.0" encoding="utf-8"?><list path="/$path_to_display">);
 
     if ( -f $path ) {
         $content .= &_list_file( $path, $owner, $revision );

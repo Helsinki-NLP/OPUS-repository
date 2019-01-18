@@ -276,7 +276,7 @@ sub list_all_entries {
     my ( $self, $ids, $entries ) = @_;
     foreach my $id ( @{$ids} ) {
         my $data  = $self->get($id);
-        my %entry = undef;
+        my %entry = ();
 
         foreach my $key ( keys %$data ) {
             $entry{$key} = [ $data->{$key} ];

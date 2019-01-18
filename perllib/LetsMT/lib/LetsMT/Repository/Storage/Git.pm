@@ -624,7 +624,7 @@ sub list {
     chdir($pwd);
 
     ## format output
-    my $content = qq(<?xml version="1.0"?><list path="/$path_to_display">);
+    my $content = qq(<?xml version="1.0" encoding="utf-8"?><list path="/$path_to_display">);
     if ($success){
 	$out = decode( 'utf8', $out );
 	my @info = split(/\x00/s,$out);
