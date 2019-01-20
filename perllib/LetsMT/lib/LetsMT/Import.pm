@@ -1085,6 +1085,7 @@ sub get_resource_handlers {
 	push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});
     }
     elsif (! @handlers){
+	print STDERR "no handler found - try to validate with Apache Tika!\n";
 	$TYPES->{unknown}->validate($resource);
 	if (my $type = $resource->type()){
 	    push( @handlers, $$TYPES{$type} ) if (exists $$TYPES{$type});
