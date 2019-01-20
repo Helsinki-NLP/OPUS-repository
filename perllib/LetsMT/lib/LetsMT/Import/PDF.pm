@@ -62,9 +62,12 @@ my $MODE_TO_CMD = {
     'standard' => \&convert_standard_cmd,
     'raw'      => \&convert_raw_cmd,
     'layout'   => \&convert_layout_cmd,
-    # 'combined' => \&convert_pdf2xml_cmd,
-    'combined' => \&convert_pdf2xml,
-    'pdf2xml'  => \&convert_pdf2xml,
+    ## prefer running as external command to avoid
+    ## that the whole process breaks if conversion fails
+    'combined' => \&convert_pdf2xml_cmd,
+    'pdf2xml'  => \&convert_pdf2xml_cmd,
+    # 'combined' => \&convert_pdf2xml,
+    # 'pdf2xml'  => \&convert_pdf2xml,
 };
 
 ## intermediate format used for conversion in each mode

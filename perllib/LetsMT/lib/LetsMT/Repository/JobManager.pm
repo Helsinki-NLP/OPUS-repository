@@ -1185,6 +1185,13 @@ sub run_crawler{
 		## try 10 times to upload the file
 		## (just in case it fails and we do not want to waste the crawled data)
 		foreach (0..9){
+		    ## switch off auto-alignment to avoid racing issues if several 
+		    ## imports run in parallel
+		    ## TODO: maybe it's OK anyway ... leave it for now aas it is
+		    ## 
+		    # LetsMT::WebService::post_meta( $resource, 
+		    # 				   uid => $args->{uid}, 
+		    # 				   ImportPara_autoalign => 'off');
 		    if (LetsMT::WebService::put_file( $resource, $tarfile, %{$args} )){
 			$success++;
 			last;
@@ -1202,6 +1209,15 @@ sub run_crawler{
 	    }
 	}
 	chdir($pwd);
+	## if we successfully uploaded all files and automatic import is on
+	## --> create a sentence alignment job 
+	## TODO: this is not good either! can create racing situations!
+	# if ($success){
+	#     my $xmlresource = LetsMT::Resource::make( $slot,$branch,'xml' );
+	#     LetsMT::WebService::put_job( $xmlresource, 
+	# 				 uid => $args->{uid}, 
+	# 				 run => 'align_candidates' );
+	# }
 	return $success;
     }
     chdir($pwd);

@@ -4,9 +4,9 @@ To do as of version 0.56
 
 High priority:
 
-* crawling produces multiple tar-archives to reduce the size
-  - use File::Find to get the files and 
-    split into archives of max 5000 files
+* crawling produces multiple tar-archives to reduce the size			(done)
+  - use File::Find to get the files and      	    				(external find is faster)
+    split into archives of max 5000 files					(sytem split)
     https://stackoverflow.com/questions/17754931/finding-files-with-perl
     https://www.perlmonks.org/?node_id=217166
 * get rid of encode/decode and fix all the unicode issues
@@ -20,6 +20,8 @@ High priority:
   --> remove/replace language names/IDs from names				(done)
   --> complete local settings (sv_SE, fi_FI, en_US, ...)
       https://perldoc.perl.org/Locale/Language.html
+      https://github.com/umpirsky/locale-list/tree/master/data
+      https://stackoverflow.com/questions/3191664/list-of-all-locales-and-their-short-codes
   --> even match translated names? (difficult)
       (use simple lexical matches with prob's?)
 * incremental crawling (only update changed pages)
@@ -73,6 +75,8 @@ Medium priority:
   --> multilingual sentence-embedding based methods
       see https://arxiv.org/pdf/1812.10464.pdf
       software: https://github.com/facebookresearch/LASER
+* integrate tidy to clean up xml problems (e.g. from pdf2xml)
+  https://metacpan.org/release/HTML-Valid
 * use Encode::Guess for guessing character encoding?				(not very useful)
 * nicer look and feel for the repository interface using bootstrap?
   https://getbootstrap.com

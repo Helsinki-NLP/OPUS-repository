@@ -107,7 +107,7 @@ sub open {
 
 sub close {
     my $self = shift;
-    return $self->{FH}->close;
+    return $self->{FH}->close if (ref($self->{FH}));
 }
 
 
