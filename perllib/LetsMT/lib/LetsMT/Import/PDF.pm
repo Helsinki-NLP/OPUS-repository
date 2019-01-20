@@ -337,7 +337,7 @@ sub convert_pdf2xml_cmd {
     my $out = $xml_resource->local_path;
     eval {
 	return run [ 'pdf2xml', $resource->local_path ], 
-	           \undef, "$out", \$err, 
+	           '>', "$out", \$err, 
                    timeout($PDF2XML_TIMEOUT);
     };
     print STDERR $@ if ($@);
