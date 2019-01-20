@@ -289,6 +289,7 @@ sub put {
         code      => 0,
         operation => 'PUT',
         location  => $self->{path_info},
+	# message   => "create: $message_create; submit: $message_submit"
         message   => $message_create .
             ( ( length $message_submit ) ? ",$message_submit" : "" ),
     );

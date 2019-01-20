@@ -70,6 +70,8 @@ sub convert {
     my ($resource_home, $local_home) = 
         $self->initialize_import($resource,$meta_resource);
 
+    ## TODO: do we need this?
+    local $ENV{LC_ALL} = 'en_US.UTF-8';
     my $cmd_reader
         = &LetsMT::Tools::cmd_out_reader(
             'unzip -o -d',

@@ -23,7 +23,7 @@ use LetsMT::WebService;
 use LetsMT::Import::ApacheTika;
 
 # needed for the layout-mode conversion
-use IPC::Run qw(run);
+use IPC::Run qw(run timeout);
 use File::Path;
 use Text::PDF2XML;
 use Data::Dumper;
@@ -53,6 +53,10 @@ The default splitter algorithm (europarl).
 
 our $DEFAULT_MODE     = $LetsMT::IMPORT_PDF_MODE;
 our $DEFAULT_SPLITTER = $LetsMT::IMPORT_SPLITTER;
+
+## timeout in seconds for pdf2xml
+## fallback = convert_raw_cmd
+our $PDF2XML_TIMEOUT  = 300;
 
 # C<$MODE_TO_CMD>
 #
@@ -327,13 +331,32 @@ sub convert_pdf2xml_cmd {
     my ( $resource, $xml_resource ) = @_;
 
     ## use IPC::Run to pipe the PDF through pdf2xml
-    return run 
-        [ 'pdf2xml',$resource->local_path ],
-	'>', $xml_resource->local_path;
+    ## NEW: use a timeout of 5 minutes
+    ##      fallback = 
+    my $err = undef;
+    my $out = $xml_resource->local_path;
+    eval {
+	return run [ 'pdf2xml', $resource->local_path ], 
+	           '>', $out, 
+	           \$err, timeout($PDF2XML_TIMEOUT);
+    };
+    print STDERR $@ if ($@);
+
+    ## need to revert to text output for the fallback mode
+    ## TODO: any problems here?
+    $xml_resource->type( 'txt' );
+    &File::Path::make_path( $xml_resource->path_down->local_path );
+    return &convert_raw_cmd($resource, $xml_resource);
+
+## OLD: pdf2xml without timeout
+##
+#    return run 
+#        [ 'pdf2xml',$resource->local_path ],
+#	'>', $xml_resource->local_path;
 }
 
 
-=head2 C<convert_pdf2xml_cmd>
+=head2 C<convert_pdf2xml>
 
  $data = LetsMT::Import::PDF::convert_pdf2xml ($resourcce, $text_resource)
 

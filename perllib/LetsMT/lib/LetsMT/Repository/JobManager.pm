@@ -108,12 +108,17 @@ sub create_job {
     );
 
     # it seems that 'tempfile' is NOT affected by 'use open' above :-(
-    binmode( $fh, ':encoding(utf8)' );
+    # binmode( $fh, ':encoding(utf8)' );
+
+    ## let's do some crazy decoding / encoding instead ....
+    utf8::decode($xml);
+    utf8::encode($xml);
 
     print $fh $xml;
     close($fh) || raise( 8, 'could not close tmp job description file' );
 
     my $resource = LetsMT::Resource::make_from_path($path);
+
     LetsMT::WebService::post_file( $resource, $file_name, uid => $user )
         || raise( 8, 'could not upload job description file');
 
@@ -543,8 +548,6 @@ sub run_align_candidates {
 
     ## check whether there is metadata for the resource
     my $response = LetsMT::WebService::get_meta( $resource );
-
-    ## TODO: why do we need to decode once again?
     $response = decode( 'utf8', $response );
 
     my $XmlParser = new XML::LibXML;

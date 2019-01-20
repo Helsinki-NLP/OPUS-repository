@@ -431,7 +431,14 @@ sub type {
 
     ## set type if given as argument
     ## (TODO: is that OK to make that possible?)
-    $self->{type} = $_[0] if defined( $_[0] );
+    if ( defined( $_[0] )){
+	$self->{type} = $_[0];
+	## change file extension as well if there is
+	## an export reader for the given type
+	if ( defined LetsMT::Export::Reader::reader($_[0]) ){
+	    $self->{path} =~ s/^(.*)\.[^\.]+$/$1.$_[0]/;
+	}
+    }
 
     return $self->{type} if ( exists $self->{type} );
 

@@ -13,6 +13,8 @@ as a query form to the request.
 
 
 use strict;
+use utf8;
+
 use Data::Dumper;
 
 use LWP::UserAgent;
@@ -228,9 +230,9 @@ sub put_file_request {
     my $file         = shift;
 
     # Open the local file in binary mode.
-    open( my $fh, '<', $file )  # || get_logger(__PACKAGE__)->error("Unable to open $file");
+    open( my $fh, '<:raw', $file )  # || get_logger(__PACKAGE__)->error("Unable to open $file");
         or raise( 8, "Unable to open $file", 'error' );
-    binmode $fh;
+    # binmode $fh;
 
     # Create an anonymous read function.
     my $read_func = sub {
@@ -275,6 +277,9 @@ sub post_file_request {
     # Send the request.
     #
     my ($url, $server) = $make_url_ref->( $resource, @_ );
+
+    # get_logger(__PACKAGE__)->debug("post-file: post request $url");
+
     my $res = &user_agent($server)->request(
         POST $url, ## using the HTOOP::Request::Common interface
         Content_Type => 'form-data',
@@ -363,10 +368,14 @@ sub storage_url {
     my %para     = @_;
     $para{uid} = $resource->user if ( !$para{uid} );
     my $server = $resource->get_server( $para{uid} );
+
     my $url = new URI(
         join( '/', $server, 'storage', $resource->storage_path )
     );
     $url->query_form(%para);
+
+    my $path = $resource->storage_path;
+    # get_logger(__PACKAGE__)->error("url: $path - $url");
 
     # $url->query_form( uid => $resource->user, @_ );
     return wantarray

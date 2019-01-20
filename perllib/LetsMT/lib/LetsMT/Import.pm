@@ -302,7 +302,7 @@ sub import_resource {
     # $response = decode( 'utf8', $response );
     # $response = decode( 'utf8', $response, sub{ return ' ' } );
     # $response = decode( 'utf8', $response, Encode::FB_PERLQQ );
-    utf8::decode($response);
+    # utf8::decode($response);
 
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string($response);
@@ -931,7 +931,7 @@ sub upload_new_resource{
     &LetsMT::WebService::put_resource( $new_res->{resource}, auto_commit => 'off' );
 
     ## update meta data
-    $new_res->{meta}->{'imported_from'} => &utf8_to_perl( $from_res->path );
+    $new_res->{meta}->{'imported_from'} => $from_res->path; # &utf8_to_perl( $from_res->path );
     &LetsMT::WebService::post_meta( $new_res->{resource},
                                     %{ $new_res->{meta} } );
 

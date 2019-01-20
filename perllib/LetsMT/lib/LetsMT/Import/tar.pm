@@ -77,6 +77,8 @@ sub convert {
 
     # unpack the tar archive
 
+    ## TODO: do we need this?
+    local $ENV{LC_ALL} = 'en_US.UTF-8';
     my $cmd_reader
         = &LetsMT::Tools::cmd_out_reader( 'tar -xv',
         &_file_arg( $resource->local_path ),
@@ -90,7 +92,7 @@ sub convert {
 
     while ( my $exfile = &$cmd_reader ) {
         chomp $exfile;
-	$exfile = &utf8_to_perl($exfile);
+	# $exfile = &utf8_to_perl($exfile);
         next if ($exfile =~ /\/$/ );              # skip directories
 	next if (basename($exfile)=~/^\./);       # skip files starting with .
 	next if grep($_ eq $exfile,@done);        # skip files that have been done already
@@ -202,8 +204,8 @@ sub initialize_import{
 	# my $DecodeSuccess = utf8::decode($response);
 
 	## NEW: do this only if decoding succeeds
-	utf8::decode($response);
-	if (utf8::is_utf8($response)){
+	# utf8::decode($response);
+	# if (utf8::is_utf8($response)){
 	    my $XmlParser = new XML::LibXML;
 	    my $dom       = $XmlParser->parse_string($response);
 	    my @nodes     = $dom->findnodes('//list/entry/imported_from');
@@ -213,7 +215,7 @@ sub initialize_import{
 		# utf8::decode($file) unless ($DecodeSuccess);
 		push( @{$self->{success}}, $file );
 	    }
-	}
+	# }
     }
 
     return ($resource_path, $local_path);

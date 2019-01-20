@@ -348,10 +348,9 @@ sub post {
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
 	## and discard invalid strings
-	if (utf8::decode($newData->{$_})){
-	    utf8::encode($newData->{$_});
-	    $data->{$_} = $newData->{$_};
-	}
+	# utf8::decode($newData->{$_});
+	# utf8::encode($newData->{$_});
+	$data->{$_} = $newData->{$_};
     }
 
     # set gid (should always be the same as branch-level gid!)
@@ -398,10 +397,9 @@ sub put {
 
 	## crazy decoding / encoding to make sure that
 	## we get the string in correct internal format
-	if (utf8::decode($newData->{$_})){
-	    utf8::encode($newData->{$_});
-	    $data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
-	}
+	# utf8::decode($newData->{$_});
+	# utf8::encode($newData->{$_});
+	$data->{$_} = _merge_values( $data->{$_}, $newData->{$_} );
     }
     return $self->post( $id, $data );
 }
@@ -421,12 +419,12 @@ sub get_strict {
 
     # TODO: this decoding business is quite annoying
     # is this really necessary?!?
-    map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
+    # map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
     # map( utf8::decode( $$data{$_} ), keys %{$data} );
 
     ## remove invalid strings
     ## TODO: is it OK to not return anything?
-    foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
+    # foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
 
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         delete $data->{_ID_};        # (only for internal use!)
@@ -457,12 +455,12 @@ sub get {
     if ( ref($data) eq 'HASH' ) {    # delete special key _ID_
         # TODO: this decoding business is quite annoying
         # is this really necessary?!?
-	map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
+	# map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
 	# map( utf8::decode( $$data{$_} ), keys %{$data} );
 
 	## remove invalid strings
 	## TODO: is it OK to not return anything?
-	foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
+	# foreach (keys %{$data}){ delete $$data{$_} unless (utf8::is_utf8( $$data{$_} )) }
 
         # a key is given: return only that value!
         # (as an array if necessary)
@@ -574,11 +572,11 @@ sub search {
     # finally: run the query!
     # TODO: why do we need to decode everything?
     my $result = $qry->search();
-    @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
+    # @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
 
     ## remove invalid strings
     ## TODO: is it OK to leave out results?
-    @{$result} = grep( utf8::is_utf8( $_ ), @{$result} );
+    # @{$result} = grep( utf8::is_utf8( $_ ), @{$result} );
 
     return $result;
     # return $qry->search();
@@ -802,8 +800,10 @@ sub get_next_key {
 
 sub _merge_values {
     my ( $oldData, $newData ) = @_;
-    my @oldValues = split( /\,/, &utf8_to_perl( $oldData ) );
-    my @newValues = split( /\,/, &utf8_to_perl( $newData ) );
+    # my @oldValues = split( /\,/, &utf8_to_perl( $oldData ) );
+    # my @newValues = split( /\,/, &utf8_to_perl( $newData ) );
+    my @oldValues = split( /\,/, $oldData );
+    my @newValues = split( /\,/, $newData );
     my %values    = ();
     foreach (@oldValues) { $values{$_} = 1; }
     foreach (@newValues) { $values{$_} = 1; }
