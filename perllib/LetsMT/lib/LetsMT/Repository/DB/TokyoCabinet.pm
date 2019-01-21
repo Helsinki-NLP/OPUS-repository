@@ -420,7 +420,7 @@ sub get_strict {
     # TODO: this decoding business is quite annoying
     # is this really necessary?!?
     # map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
-    # map( utf8::decode( $$data{$_} ), keys %{$data} );
+    map( utf8::decode( $$data{$_} ), keys %{$data} );
 
     ## remove invalid strings
     ## TODO: is it OK to not return anything?
@@ -456,7 +456,7 @@ sub get {
         # TODO: this decoding business is quite annoying
         # is this really necessary?!?
 	# map( $$data{$_} = decode( 'UTF-8', $$data{$_} ), keys %{$data} );
-	# map( utf8::decode( $$data{$_} ), keys %{$data} );
+	map( utf8::decode( $$data{$_} ), keys %{$data} );
 
 	## remove invalid strings
 	## TODO: is it OK to not return anything?
@@ -572,6 +572,7 @@ sub search {
     # finally: run the query!
     # TODO: why do we need to decode everything?
     my $result = $qry->search();
+    map( utf8::decode( $$result[$_] ), 0..$#{$result} );
     # @{$result} = map( decode( 'UTF-8', $_ ), @{$result} );
 
     ## remove invalid strings

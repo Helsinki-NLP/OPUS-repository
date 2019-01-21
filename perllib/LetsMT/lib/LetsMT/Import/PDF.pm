@@ -23,7 +23,7 @@ use LetsMT::WebService;
 use LetsMT::Import::ApacheTika;
 
 # needed for the layout-mode conversion
-use IPC::Run qw(run timeout);
+use IPC::Run qw(run start pump finish timeout);
 use File::Path;
 use Text::PDF2XML;
 use Data::Dumper;
@@ -333,20 +333,23 @@ sub convert_pdf2xml_cmd {
     ## use IPC::Run to pipe the PDF through pdf2xml
     ## NEW: use a timeout of 5 minutes
     ##      fallback = 
-    my $err = undef;
-    my $out = $xml_resource->local_path;
-    eval {
-	return run [ 'pdf2xml', $resource->local_path ], 
-	           '>', "$out", \$err, 
-                   timeout($PDF2XML_TIMEOUT);
-    };
-    print STDERR $@ if ($@);
 
-    ## need to revert to text output for the fallback mode
-    ## TODO: any problems here?
-    $xml_resource->type( 'txt' );
-    &File::Path::make_path( $xml_resource->path_down->local_path );
-    return &convert_raw_cmd($resource, $xml_resource);
+    my $success = undef;
+    eval {
+	my @cmd = ('pdf2xml', '-o', $xml_resource->local_path, $resource->local_path);
+	my ($in,$out,$err);
+	$success = run \@cmd, \$in, \$out, \$err, timeout( $PDF2XML_TIMEOUT );
+    };
+    if ( $@ ) {
+	print STDERR $@;
+
+	## need to revert to text output for the fallback mode
+	## TODO: any problems here?
+	$xml_resource->type( 'txt' );
+	&File::Path::make_path( $xml_resource->path_down->local_path );
+	$success = &convert_raw_cmd($resource, $xml_resource);
+    }
+    return $success;
 
 ## OLD: pdf2xml without timeout
 ##
