@@ -149,14 +149,15 @@ sub convert {
     ## --> ignore resource language and skip language detection
     ## --> TODO: should we do language detection to verify this?
     ##     (not really necessssary because we detect language for each sentence later anyway)
-    my $lang     = $importer->{lang};
+
+    my $lang = $importer->{lang} || $resource->language();
 
     ## run language detection if necessary
-    if ( ! $lang || $lang eq 'xx' ){
+    ## (if no lang is set OR it is xx OR we always trust langid)
+
+    unless ( ( $lang && $lang ne 'xx' ) || $self->{trust_langid} ne 'off' ){
 	my @detected = &detect_language($resource);
 	if ( @detected && $detected[0] ne 'unknown' ){
-	    # set language to detected language unless the one that 
-	    # we already have is among the detected ones
 	    $lang = $detected[0] unless (grep($_ eq $lang,@detected));
 	}
     }

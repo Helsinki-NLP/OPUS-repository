@@ -129,11 +129,16 @@ sub convert {
     # shift the 'uploads' path to local_dir
     $new_resource->shift_path_to_local();
 
-    ## NEW: always run language detection
     my $lang = $importer->{lang} || $resource->language();
-    my @detected = &detect_language($resource);
-    if ( @detected && $detected[0] ne 'unknown' ){
-	$lang = $detected[0] unless (grep($_ eq $lang,@detected));
+
+    ## run language detection if necessary
+    ## (if no lang is set OR it is xx OR we always trust langid)
+
+    unless ( ( $lang && $lang ne 'xx' ) || $self->{trust_langid} ne 'off' ){
+	my @detected = &detect_language($resource);
+	if ( @detected && $detected[0] ne 'unknown' ){
+	    $lang = $detected[0] unless (grep($_ eq $lang,@detected));
+	}
     }
     $lang = 'xx' unless ($lang);
 

@@ -22,12 +22,14 @@ Configuration at a lower level overwrites settings of higher levels. This means 
 | ImportPara_splitter   | string | europarl/lingua/opennlp/udpipe   | text splitter (used for sentence boundary detection) |
 | ImportPara_tokenizer  | string | europarl/uplug/whitespace | tokenizer (but: standard import does not tokenize) |
 | ImportPara_autoalign  | string | on|off                    | automatically detect and align parallel documents (default=on) |
+| ImportPara_trust_langid | string | on|off      | trust language detection (default=on) |
+
 
 ### Parameters for importing PDF documents ###
 
 | **parameter** | **type** | **possible values** | **description** |
 |---------------|----------|---------------------|-----------------|
-| ImportPara_mode | string | layout/raw/standard/tika/combined | PDF conversion mode (default = tika) |
+| ImportPara_mode | string | layout/raw/standard/tika/pdf2xml | PDF conversion mode (default = pdf2xml) |
 
 
 These parameters are stored in the group database (user-specific configuration) and in the metadata database (corpus-specific and resource-specific configuration). More information about setting and manipulating these settings can be found at the end of this page.
