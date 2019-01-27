@@ -328,7 +328,8 @@ sub write_links{
     foreach my $l (@$links) {
         $l->{src} = [] unless ( ref( $l->{src} ) eq 'ARRAY' );
         $l->{trg} = [] unless ( ref( $l->{trg} ) eq 'ARRAY' );
-	my $ok = 1;
+	my $ok = 1;         # this allows unknown
+	my $nrUnknown = 0;  # count unknowns
 	foreach my $s (@{$l->{src}}){
 	    next unless (exists($$langs{$SrcLang}) && ref($$langs{$SrcLang}) eq 'HASH' );
 	    next unless (exists($$langs{$SrcLang}{$s}) && ref($$langs{$SrcLang}{$s}) eq 'HASH' );
@@ -337,6 +338,8 @@ sub write_links{
 	    $ok = 0 if ($$langs{$SrcLang}{$s}{lang} && 
 			$$langs{$SrcLang}{$s}{lang} ne $SrcLang && 
 			$$langs{$SrcLang}{$s}{lang} ne 'un');
+	    $nrUnknown++ if ($$langs{$SrcLang}{$s}{lang} && 
+			     $$langs{$SrcLang}{$s}{lang} eq 'un');
 	}
 	foreach my $t (@{$l->{trg}}){
 	    next unless (exists($$langs{$TrgLang}) && ref($$langs{$TrgLang}) eq 'HASH' );
@@ -346,12 +349,13 @@ sub write_links{
 	    $ok = 0 if ($$langs{$TrgLang}{$t}{lang} && 
 			$$langs{$TrgLang}{$t}{lang} ne $TrgLang &&
 			$$langs{$TrgLang}{$t}{lang} ne 'un');
+	    $nrUnknown++ if ($$langs{$TrgLang}{$t}{lang} && 
+			     $$langs{$TrgLang}{$t}{lang} eq 'un');
 	}
 	my $nrSrc = scalar @{ $l->{src} };
 	my $nrTrg = scalar @{ $l->{trg} };
-	unless ($nrSrc || $nrTrg){
-	    print '';
-	}
+	next unless ($nrSrc || $nrTrg);
+	next unless ($nrUnknown < $nrSrc+$nrTrg);  # skip of all sentences marked as unknown
 	if ($ok){
 	    my %para = exists $l->{score} ? ('certainty' => $l->{score}) : ();
 	    $writer->write( $l->{src}, $l->{trg}, %para );
