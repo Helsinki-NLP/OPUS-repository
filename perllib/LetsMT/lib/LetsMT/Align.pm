@@ -332,14 +332,20 @@ sub write_links{
 	foreach my $s (@{$l->{src}}){
 	    next unless (exists($$langs{$SrcLang}) && ref($$langs{$SrcLang}) eq 'HASH' );
 	    next unless (exists($$langs{$SrcLang}{$s}) && ref($$langs{$SrcLang}{$s}) eq 'HASH' );
+	    ## NEW: allow 'un' for unknown (this is typically for short segments 
+	    ##      that the langid is not certain with
 	    $ok = 0 if ($$langs{$SrcLang}{$s}{lang} && 
-			$$langs{$SrcLang}{$s}{lang} ne $SrcLang);
+			$$langs{$SrcLang}{$s}{lang} ne $SrcLang && 
+			$$langs{$SrcLang}{$s}{lang} ne 'un');
 	}
 	foreach my $t (@{$l->{trg}}){
 	    next unless (exists($$langs{$TrgLang}) && ref($$langs{$TrgLang}) eq 'HASH' );
 	    next unless (exists($$langs{$TrgLang}{$t}) && ref($$langs{$TrgLang}{$t}) eq 'HASH' );
+	    ## NEW: allow 'un' for unknown (this is typically for short segments 
+	    ##      that the langid is not certain with
 	    $ok = 0 if ($$langs{$TrgLang}{$t}{lang} && 
-			$$langs{$TrgLang}{$t}{lang} ne $TrgLang);
+			$$langs{$TrgLang}{$t}{lang} ne $TrgLang &&
+			$$langs{$TrgLang}{$t}{lang} ne 'un');
 	}
 	my $nrSrc = scalar @{ $l->{src} };
 	my $nrTrg = scalar @{ $l->{trg} };

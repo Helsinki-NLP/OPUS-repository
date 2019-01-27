@@ -138,3 +138,16 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml/fr?uid=testuser&ru
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml?uid=testuser&run=align_candidates"
 ```
 
+## Combine parallel document detection and alignment
+
+* run first a job for detecting parallel documents and then start a job for aligning the candidates
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml?uid=user&run=detect_and_align"
+```
+
+* this can also be done only for files that are not yet aligned using the command `detect_and_align_unaligned`
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/testslot/testuser/xml?uid=user&run=detect_and_align_unaligned"
+```

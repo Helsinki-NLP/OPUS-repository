@@ -262,6 +262,12 @@ sub run {
     if ($command eq 'align'){
         return run_align($path_elements, $args);
     }
+    if ($command eq 'detect_and_align'){
+        return run_detect_and_align($path_elements, $args);
+    }
+    if ($command eq 'detect_and_align_unaligned'){
+        return run_detect_and_align($path_elements, $args, 1);
+    }
     if ($command eq 'detect_translations'){
         return run_detect_translations($path_elements, $args);
     }
@@ -318,6 +324,15 @@ sub run {
 }
 
 
+
+## combine detect parallel documents and their alignment
+
+sub run_detect_and_align {
+    if (&run_detect_translations(@_)){
+	return &run_align_candidates(@_);
+    }
+    return 0;
+}
 
 
 =head2 C<run_detect_translations>
