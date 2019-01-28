@@ -134,7 +134,7 @@ sub convert {
     ## run language detection if necessary
     ## (if no lang is set OR it is xx OR we always trust langid)
 
-    unless ( ( $lang && $lang ne 'xx' ) || $self->{trust_langid} ne 'off' ){
+    if ( $self->{trust_langid} ne 'off' || ! $lang || $lang eq 'xx' ){
 	my @detected = &detect_language($resource);
 	if ( @detected && $detected[0] ne 'unknown' ){
 	    $lang = $detected[0] unless (grep($_ eq $lang,@detected));
