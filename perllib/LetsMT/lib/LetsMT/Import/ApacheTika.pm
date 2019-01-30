@@ -22,6 +22,7 @@ use LetsMT::WebService;
 use Apache::Tika;
 use IPC::Run qw(run);
 use File::Path;
+use File::Basename qw/dirname basename/;
 
 ## TODO: which module is the safest to use?
 ##       there is also URI::Encode, ...
@@ -132,6 +133,15 @@ sub convert {
     my $RawContent    = $self->_read_raw_file($resource->local_path);
     my $ParsedContent;
 
+    ## extract links between languages
+    ## --> site-specific links
+    ## --> is there any generic way of doing it?
+    ## TODO: add option to elect style etc
+    my %translations = ();
+    if ($resource->type() eq 'html'){
+	%translations = _extract_language_links($RawContent,$resource->path,'vnk');
+    }
+
     ## check whether we want rawxml or text from TIKA
     ## NOTE: extracting meta data seems to be very slow!
     if ( $self->{intermediate_format} eq 'rawxml' ){
@@ -177,7 +187,20 @@ sub convert {
 	}
 
 	## convert text to XML with sentence markup
-	return $importer->convert_resource( $tmp_resource, $meta_resource );
+	my $new_resources = $importer->convert_resource( $tmp_resource, $meta_resource );
+
+	## NEW: add meta data about trabslations if they exist (for HTML resources)
+	if (ref($new_resources) eq 'ARRAY' && $resource->type() eq 'html' && %translations){
+	    my @links = ();
+	    foreach (keys %translations){
+		push (@links, $_.':'.$translations{$_});
+	    }
+	    $$new_resources[0]{meta}{language_links} = join(',',@links);
+	    &LetsMT::WebService::post_meta( $$new_resources[0]{resource},
+					    language_links => join(',',@links) );
+	}
+	return $new_resources;
+	# return $importer->convert_resource( $tmp_resource, $meta_resource );
     }
     return [];
 }
@@ -203,6 +226,68 @@ sub _read_raw_file{
     # my $content = do { local $/; <$fh> };
     # close $fh;
 }
+
+
+## for HTML:
+## extract links to translations of the current website
+## TODO: add various styles and make options to select them
+## ---> quite hard-coded at this moment but difficult to find generic solutions
+
+sub _extract_language_links{
+    my $html     = shift;
+    my $thisfile = shift;
+    my $style    = shift || 'vnk';
+
+    my %trans = ();
+
+    ##----------------------------------------------------
+    ## VNK style links on websites
+    ## TODO: is this safe enough? (also subject to change)
+    ##----------------------------------------------------
+    if ($style eq 'vnk'){
+	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
+	    my $match = $1;
+	    utf8::decode($match); 
+	    my @links = split(/\<\/li\>/,$match);
+	    foreach (@links){
+		my $lang = undef;
+		my $link = undef;
+		if (/class=\"(..)\"/){
+		    $lang = $1;
+		}
+		if (/href=\"(.*?)\"/){
+		    $link = _relative_to_absolute_path($1,$thisfile);;
+		}
+		## if it's not a link to a missing language version notification
+		## and it's not the link to the same page we are at right now
+		## ---> add the translation!
+		if ($lang && $link!~/missinglanguageversion/){
+		    if ($link ne $thisfile){
+			$trans{$lang} = $link;
+		    }
+		}
+	    }
+	}
+    }
+    return %trans;
+}
+
+
+sub _relative_to_absolute_path{
+    my ($link,$file) = @_;
+    unless ($link=~/^\//){
+	my @path = split(/\/+/,dirname($file));
+	my @parts = split(/\/+/,$link);
+	## move up in file system tree
+	while ($parts[0]=~/\.\./){
+	    pop(@path);
+	    shift(@parts);
+	}
+	$link = join('/',@path,@parts);
+    }
+    return $link;
+}
+
 
 
 1;
