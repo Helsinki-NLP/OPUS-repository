@@ -304,7 +304,16 @@ sub find_translations {
     ## otherwise: search in the entire corpus
     ## TODO: this can be a big query (retrieve all corpusfiles)
     else{
+
+	## trust language links first if there are any
+	## (from HTML imports)
+	&resources_with_language_links($corpus, \%parallel);
+
+	## secondly: match documents with identical names
 	&resources_with_identical_names($corpus, \%parallel);
+
+	## third: some more fuzzy name matching
+	##
 	#if ($args{search_parallel}=~/with_lang/){
 	#    &resources_with_langids( $corpus, \%parallel, %args );
 	#}

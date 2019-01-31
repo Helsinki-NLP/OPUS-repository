@@ -30,6 +30,7 @@ our @EXPORT = qw(
     resources_with_identical_names
     resources_with_similar_names
     resources_match_no_lang
+    resources_with_language_links
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -325,6 +326,86 @@ sub resources_with_translated_names{
 
 
 
+
+sub resources_with_language_links{
+    my $corpus   = shift;
+    my $parallel = shift || {};
+    my %args     = @_;
+
+    my $slot        = $corpus->slot;
+    my $branch      = $corpus->user;
+
+    ## make the language-specific resource
+    my $xmlres = LetsMT::Resource::make( $slot, $branch, 'xml' );
+
+    ## NEW: just get everything because we also need imported_from
+    ## TODO: this can become big ...
+    my %query = ( 'resource-type'         => 'corpusfile',
+		  type                    => 'recursive',
+		  action                  => 'list_all');
+
+    # query the database
+    my $response  = LetsMT::WebService::get_meta( $xmlres, %query );
+    $response     = decode( 'utf8', $response );
+
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+
+    my %links = ();
+    my %files = ();
+    foreach my $n (@nodes){
+	my $file = $n->findvalue('@path');
+	my $from = $n->findvalue('imported_from');
+
+	## remove tar/zip file from the path of the original file
+	## to match them with the linked files
+	$from=~s/\/[^\/]+(\.tar|\.tgz|\.tar\.gz|\.zip):/\//;
+
+	## save the new resource file name for each original file
+	$files{$from} = $file;
+
+	## find language links and save them
+	my @l = split( ',', $n->findvalue('language_links') );
+	foreach (@l){
+	    my ($lang,$href) = split(/:/);
+	    if ($href ne $from){
+		$links{$file}{$lang} = $href;
+	    }
+	}
+    }
+
+    ## now we still have to find the linked files
+    my $count = 0;
+    foreach my $f (keys %links){
+
+	## get the basename of the file (without slot/branch/xml/lang)
+        my $newres   = LetsMT::Resource::make_from_storage_path($f);
+	my $basename = $newres->basename;
+
+	foreach my $l ( keys %{$links{$f}} ){
+
+	    ## if the linked file exists in the repository:
+	    ## --> establish a link between them
+	    if (exists $files{$links{$f}{$l}}){
+		$$parallel{$basename}{$l} = $files{$links{$f}{$l}};
+		$count++;
+	    }
+	}
+
+	## also add the current language version
+	if (exists $$parallel{$basename}){
+	    my $lang = $newres->language;
+	    $$parallel{$basename}{$lang} = $f;
+	}
+
+    }
+    return $count;
+}
+
+
+
+
 ## return array of language IDs that are missing in some of the
 ## parallel resources in the given hash of files
 
@@ -373,7 +454,7 @@ sub _get_missing_languages{
 
 
 
-## return array corpus files in a given language
+## return array of corpus files in a given language
 
 sub _get_language_documents{
     my $slot     = shift;
