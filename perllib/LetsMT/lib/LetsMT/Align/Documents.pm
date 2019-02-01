@@ -12,16 +12,17 @@ use XML::LibXML;
 use XML::Simple;
 
 use open qw(:std :utf8);
-# use utf8;
+use utf8;
 use Encode qw(decode decode_utf8 is_utf8);
 
 use String::Approx qw/amatch adistr/;
 use File::Basename qw/basename dirname/;
+use File::Temp 'tempdir';
 
+use LetsMT::Tools;
 use LetsMT::Tools::Strings;
 use LetsMT::Lang::ISO639;
 use LetsMT::WebService;
-
 
 use Log::Log4perl qw(get_logger :levels);
 
@@ -31,6 +32,8 @@ our @EXPORT = qw(
     resources_with_similar_names
     resources_match_no_lang
     resources_with_language_links
+    find_language_links
+    extract_language_links
 );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
@@ -47,7 +50,7 @@ sub resources_with_identical_names{
 		  type             => 'recursive' );
     $query{'ENDS_WITH__ID_'} = $filename if ($filename);
     my $response = LetsMT::WebService::get_meta( $corpus, %query );
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     ## parse the query result (matching files in entry-path)
     my %files     = ();
@@ -346,7 +349,7 @@ sub resources_with_language_links{
 
     # query the database
     my $response  = LetsMT::WebService::get_meta( $xmlres, %query );
-    $response     = decode( 'utf8', $response );
+    # $response     = decode( 'utf8', $response );
 
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string( $response );
@@ -406,6 +409,199 @@ sub resources_with_language_links{
 
 
 
+
+
+
+## find links in files that have been uploaded
+## and look for language links in the data
+## add all language links to the metadata of
+## resources that have already been imported
+
+sub find_language_links {
+    my $resource = shift;
+    my $type = shift || 'vnk';
+
+    # Get requested resource if necessary
+    if ( ( !-e $resource->local_path ) ) {
+	my $tmpdir = tempdir(
+	    'findlinks_XXXXXXXX',
+	    DIR     => $ENV{LETSMT_TMP},
+	    CLEANUP => 1
+	    );
+	$resource->local_dir($tmpdir);
+        return 0 unless ( &LetsMT::WebService::get_resource($resource) );
+    }
+
+    ##------------------------------------
+    ## collect links
+    ##------------------------------------
+    my %links = ();
+
+    ## a bit ad-hoc to check whether the resource is a tar-file
+    if ($resource->path=~/(\.tar|\.tgz|\.tar\.gz)$/){
+	my $localhome = dirname($resource->local_path);
+	my $para = $resource->path=~/gz$/ ? '-xzvf' : '-xcf';
+
+	## TODO: do we need this?
+	local $ENV{LC_ALL} = 'en_US.UTF-8';
+	my $cmd_reader
+	    = &LetsMT::Tools::cmd_out_reader( 'tar', $para,
+					      &safe_path( $resource->local_path ),
+					      '-C',
+					      &safe_path( $localhome ) );
+
+	# run through all unpacked resources and import them
+
+	while ( my $exfile = &$cmd_reader ) {
+	    chomp $exfile;
+	    # $exfile = &utf8_to_perl($exfile);
+	    next if ($exfile =~ /\/$/ );              # skip directories
+	    next if (basename($exfile)=~/^\./);       # skip files starting with .
+	    next unless ($exfile =~ /\.html?$/ );     # only HTML is allowed
+
+	    open F, '<:raw', $localhome. '/'. $exfile;
+	    my $html = do { local $/; <F> };
+	    close F;
+
+	    my $file = $resource->path.':'.$exfile;
+	    %{$links{$file}} = &extract_language_links($html, $file, $type );
+	    delete $links{$file} unless (keys %{$links{$file}});
+	}
+    }
+    ## TODO: should also handle zip-files here
+
+    ## html files
+    elsif ($resource->path=~/\.html?$/i){
+	open F, '<:raw', $resource->local_path;
+	my $html = do { local $/; <F> };
+	close F;
+	%{$links{$resource->path}} = &extract_language_links($html, $resource->path, $type );
+	delete $links{$resource->path} unless (keys %{$links{$resource->path}});
+    }
+
+    ##------------------------------------
+    ## add the information to the metadata
+    ##------------------------------------
+
+    my $slot   = $resource->slot;
+    my $branch = $resource->user;
+
+    ## make the language-specific resource
+    my $xmlres = LetsMT::Resource::make( $slot, $branch, 'xml' );
+    my %query = ( 'resource-type' => 'corpusfile',
+		  type            => 'recursive',
+		  action          => 'list_all');
+
+    # query the database
+    my $response  = LetsMT::WebService::get_meta( $xmlres, %query );
+    # $response     = decode( 'utf8', $response );
+
+    my $XmlParser = new XML::LibXML;
+    my $dom       = $XmlParser->parse_string( $response );
+    my @nodes     = $dom->findnodes('//list/entry');
+
+    my $count = 0;
+    foreach my $n (@nodes){
+	my $file = $n->findvalue('@path');
+	my $from = $n->findvalue('imported_from');
+	if (exists $links{$from}){
+	    my @arr = ();
+	    foreach my $l (sort keys %{$links{$from}}){
+		push(@arr,$l.':'.$links{$from}{$l});
+	    }
+	    my $res   = LetsMT::Resource::make_from_storage_path($file);
+	    my %meta = ( language_links => join(',',@arr) );
+	    &LetsMT::WebService::post_meta( $res, %meta );
+	    $count++;
+	}
+    }
+    return $count;
+}
+
+
+
+## for HTML:
+## extract links to translations of the current website
+## TODO: add various styles and make options to select them
+## ---> quite hard-coded at this moment but difficult to find generic solutions
+
+sub extract_language_links{
+    my $html     = shift;
+    my $thisfile = shift;
+    my $style    = shift || 'vnk';
+
+    my %trans = ();
+
+    ##----------------------------------------------------
+    ## VNK style links on websites
+    ## TODO: is this safe enough? (also subject to change)
+    ##----------------------------------------------------
+    if ($style eq 'vnk'){
+	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
+	    my $match = $1;
+	    utf8::decode($match); 
+	    my @links = split(/\<\/li\>/,$match);
+	    foreach (@links){
+		my $lang = undef;
+		my $link = undef;
+		if (/class=\"(..)\"/){
+		    $lang = $1;
+		}
+		if (/href=\"(.*?)\"/){
+		    $link = _relative_to_absolute_path($1,$thisfile);;
+		}
+		## if it's not a link to a missing language version notification
+		## and it's not the link to the same page we are at right now
+		## ---> add the translation!
+		if ($lang && $link!~/missinglanguageversion/){
+		    if ($link ne $thisfile){
+			$trans{$lang} = $link;
+		    }
+		}
+	    }
+	}
+    }
+
+    ##----------------------------------------------------
+    ## helsinki.fi style
+    ##----------------------------------------------------
+
+    if ($style eq 'helsinki'){
+	while ($html=~/<link\s+rel=\"alternate\"\s+hreflang=\"(..)\"\s+href=\"(.*?)\"/sg){
+	    my ($lang,$link) = ($1,$2);
+	    $link=~s/https?:\/\/www.helsinki.fi\///;
+	    $trans{$lang} = $link.'.html';
+	}
+    }
+    return %trans;
+}
+
+
+sub _relative_to_absolute_path{
+    my ($link,$file) = @_;
+    unless ($link=~/^\//){
+	my @path = split(/\/+/,dirname($file));
+	my @parts = split(/\/+/,$link);
+	## move up in file system tree
+	while ($parts[0]=~/\.\./){
+	    pop(@path);
+	    shift(@parts);
+	}
+	$link = join('/',@path,@parts);
+    }
+    if ($link!~/^uploads/){
+	print '';
+    }
+    return $link;
+}
+
+
+
+
+
+
+
+
 ## return array of language IDs that are missing in some of the
 ## parallel resources in the given hash of files
 
@@ -428,7 +624,7 @@ sub _get_missing_languages{
     ## otherwise: get all registered languages in the corpus
     else{
 	my $response  = &LetsMT::WebService::get_meta( $corpus );
-	$response     = decode( 'utf8', $response );
+	# $response     = decode( 'utf8', $response );
 	my $XmlParser = new XML::LibXML;
 	my $dom       = $XmlParser->parse_string( $response );
 	my @nodes     = $dom->findnodes('//list/entry');
@@ -470,7 +666,7 @@ sub _get_language_documents{
 
     # query the database
     my $response  = LetsMT::WebService::get_meta( $langres, %query );
-    $response     = decode( 'utf8', $response );
+    # $response     = decode( 'utf8', $response );
     my %files     = ();
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string($response);

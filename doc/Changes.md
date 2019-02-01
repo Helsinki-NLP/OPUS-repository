@@ -97,6 +97,19 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/en?uid=user1&run=detect_
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/xml/fi?uid=user1&run=detect_untranslated"
 ```
 
+* find language links in uploaded HTML files
+
+Find language links in HTML files or tar archives (for example from web crawling) and add metadata to imported files. NOTE: files need to be imported already - otherwise this will not add any information to the database! The additional argument `link_type` specifies the style of the language links to look for. Only a few types for specific websites are implemented!
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/test.html?uid=user1&run=find_language_links"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/test.tar?uid=user1&run=find_language_links"
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/slot1/user1/uploads/test.tar?uid=user1&run=find_language_links&link_type=vnk"
+```
+
+
+
+
 * There is a proof of concept installation of the interactive sentence aligner ISA. The job API can be used to prepare the interface for a particular corpusfile, for example
 
 ```

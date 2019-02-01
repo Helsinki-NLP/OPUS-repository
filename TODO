@@ -4,6 +4,8 @@ To do as of version 0.56
 
 High priority:
 
+* make langid optional (sent_langid and doc_langid)
+  ---> option to select tool or none in ImportPara_sent/doc_langid ...
 * crawling produces multiple tar-archives to reduce the size			(done)
   - use File::Find to get the files and      	    				(external find is faster)
     split into archives of max 5000 files					(sytem split)

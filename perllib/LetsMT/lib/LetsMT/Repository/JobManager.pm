@@ -30,6 +30,7 @@ use LetsMT::Repository::Safesys;
 use LetsMT::Corpus;
 use LetsMT::Align;
 use LetsMT::Align::Words;
+use LetsMT::Align::Documents;
 use LetsMT::Tools::UD;
 use LetsMT::Export::Reader;
 use LetsMT::Export::Writer;
@@ -279,6 +280,9 @@ sub run {
     }
     if ($command eq 'realign'){
         return run_realign($path_elements, $args);
+    }
+    if ($command eq 'find_language_links'){
+        return run_find_language_links($path_elements, $args);
     }
     if ($command eq 'import'){
         return run_import($path_elements, $args);
@@ -716,6 +720,18 @@ sub run_align_resource {
     return 0;
 }
 
+
+
+sub run_find_language_links {
+    my $path_elements = shift;
+    my $args = shift || {};
+
+    my $slot      = shift(@{$path_elements});
+    my $branch    = shift(@{$path_elements});
+
+    my $resource  = LetsMT::Resource::make( $slot, $branch, join( '/', @{$path_elements} ) );
+    return &find_language_links($resource, $$args{link_type} );
+}
 
 
 ## tokenize a resource or submit jobs to tokenize all resources in a subtree

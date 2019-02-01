@@ -18,6 +18,7 @@ use LetsMT;
 use LetsMT::Tools;
 use LetsMT::Repository::Err;
 use LetsMT::WebService;
+use LetsMT::Align::Documents;
 
 use Apache::Tika;
 use IPC::Run qw(run);
@@ -139,7 +140,8 @@ sub convert {
     ## TODO: add option to elect style etc
     my %translations = ();
     if ($resource->type() eq 'html'){
-	%translations = _extract_language_links($RawContent,$resource->path,'vnk');
+	%translations = &extract_language_links($RawContent,$resource->path,'vnk');
+	# %translations = _extract_language_links($RawContent,$resource->path,'vnk');
     }
 
     ## check whether we want rawxml or text from TIKA
@@ -228,65 +230,71 @@ sub _read_raw_file{
 }
 
 
-## for HTML:
-## extract links to translations of the current website
-## TODO: add various styles and make options to select them
-## ---> quite hard-coded at this moment but difficult to find generic solutions
-
-sub _extract_language_links{
-    my $html     = shift;
-    my $thisfile = shift;
-    my $style    = shift || 'vnk';
-
-    my %trans = ();
-
-    ##----------------------------------------------------
-    ## VNK style links on websites
-    ## TODO: is this safe enough? (also subject to change)
-    ##----------------------------------------------------
-    if ($style eq 'vnk'){
-	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
-	    my $match = $1;
-	    utf8::decode($match); 
-	    my @links = split(/\<\/li\>/,$match);
-	    foreach (@links){
-		my $lang = undef;
-		my $link = undef;
-		if (/class=\"(..)\"/){
-		    $lang = $1;
-		}
-		if (/href=\"(.*?)\"/){
-		    $link = _relative_to_absolute_path($1,$thisfile);;
-		}
-		## if it's not a link to a missing language version notification
-		## and it's not the link to the same page we are at right now
-		## ---> add the translation!
-		if ($lang && $link!~/missinglanguageversion/){
-		    if ($link ne $thisfile){
-			$trans{$lang} = $link;
-		    }
-		}
-	    }
-	}
-    }
-    return %trans;
-}
 
 
-sub _relative_to_absolute_path{
-    my ($link,$file) = @_;
-    unless ($link=~/^\//){
-	my @path = split(/\/+/,dirname($file));
-	my @parts = split(/\/+/,$link);
-	## move up in file system tree
-	while ($parts[0]=~/\.\./){
-	    pop(@path);
-	    shift(@parts);
-	}
-	$link = join('/',@path,@parts);
-    }
-    return $link;
-}
+
+## MOVED TO LetsMT::Align::Documents
+
+
+# ## for HTML:
+# ## extract links to translations of the current website
+# ## TODO: add various styles and make options to select them
+# ## ---> quite hard-coded at this moment but difficult to find generic solutions
+
+# sub _extract_language_links{
+#     my $html     = shift;
+#     my $thisfile = shift;
+#     my $style    = shift || 'vnk';
+
+#     my %trans = ();
+
+#     ##----------------------------------------------------
+#     ## VNK style links on websites
+#     ## TODO: is this safe enough? (also subject to change)
+#     ##----------------------------------------------------
+#     if ($style eq 'vnk'){
+# 	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
+# 	    my $match = $1;
+# 	    utf8::decode($match); 
+# 	    my @links = split(/\<\/li\>/,$match);
+# 	    foreach (@links){
+# 		my $lang = undef;
+# 		my $link = undef;
+# 		if (/class=\"(..)\"/){
+# 		    $lang = $1;
+# 		}
+# 		if (/href=\"(.*?)\"/){
+# 		    $link = _relative_to_absolute_path($1,$thisfile);;
+# 		}
+# 		## if it's not a link to a missing language version notification
+# 		## and it's not the link to the same page we are at right now
+# 		## ---> add the translation!
+# 		if ($lang && $link!~/missinglanguageversion/){
+# 		    if ($link ne $thisfile){
+# 			$trans{$lang} = $link;
+# 		    }
+# 		}
+# 	    }
+# 	}
+#     }
+#     return %trans;
+# }
+
+
+# sub _relative_to_absolute_path{
+#     my ($link,$file) = @_;
+#     unless ($link=~/^\//){
+# 	my @path = split(/\/+/,dirname($file));
+# 	my @parts = split(/\/+/,$link);
+# 	## move up in file system tree
+# 	while ($parts[0]=~/\.\./){
+# 	    pop(@path);
+# 	    shift(@parts);
+# 	}
+# 	$link = join('/',@path,@parts);
+#     }
+#     return $link;
+# }
 
 
 
