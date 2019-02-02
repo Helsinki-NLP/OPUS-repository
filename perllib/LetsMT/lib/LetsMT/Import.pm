@@ -247,6 +247,21 @@ sub supported {
     return 0;
 }
 
+=head2 C<set_parameter(%ParameterHash)>
+
+Set/change importer parameters.
+
+=cut
+
+
+sub set_parameter{
+    my $self = shift;
+    my %para = @_;
+    foreach (keys %para) {
+        $self->{$_} = $para{$_};
+    }
+}
+
 
 =head2 C<import_file>
 

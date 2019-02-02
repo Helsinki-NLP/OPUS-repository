@@ -542,12 +542,12 @@ sub extract_language_links{
     my %trans = ();
 
     ##----------------------------------------------------
-    ## helsinki.fi, infofinland.fi style
+    ## helsinki.fi, infofinland.fi, jakobstad.fi, lupapiste style
     ##----------------------------------------------------
 
-    if ($style=~/(helsinki|infofinland)/ || ! $style){
-	while ($html=~/<link\s+rel=\"alternate\"\s+hreflang=\"(..)\"\s+href=\"(.*?)\"/sg){
-	    my ($lang,$link) = ($1,$2);
+    if ($style=~/(helsinki|infofinland|jakobstad|lupapiste)/ || ! $style){
+	while ($html=~/<link\s+rel=\"alternate\".*?hreflang=\"(..)(-..)?\"\s+href=\"(.*?)\"/sg){
+	    my ($lang,$link) = ($1,$3);
 	    # $link=~s/https?:\/\/www.helsinki.fi\//\//;
 	    $link=~s/https?:\/\/[\/]+\//\//;
 	    $trans{$lang} = $link.'.html';
@@ -583,6 +583,21 @@ sub extract_language_links{
 		}
 	    }
 	}
+	return %trans if (keys %trans);
+    }
+
+    ##----------------------------------------------------
+    ## www.hanko.fi
+    ##----------------------------------------------------
+
+    if ($style eq 'hanko' || ! $style){
+	if ($html=~/<a href="([^"]+)">På svenska<\/a>/){
+	    $trans{sv} = $1.'.html';
+	}
+	if ($html=~/<a href="([^"]+)">Suomeksi<\/a>/){
+	    $trans{fi} = $1.'.html';
+	}
+	return %trans if (keys %trans);
     }
 
     return %trans;
