@@ -282,10 +282,21 @@ sub import_resource {
     my $resource        = shift;
     my %args            = @_;
 
-    my $skip_align      = $args{skip_align} ? $args{skip_align} : undef;
+    ## set import parameters
+    $self->set_parameter( &get_import_parameter($resource) );
+
+    my $skip_align     = $self->{autoalign}     eq 'off' ? 1 : 0; # default = on
+    my $skip_parsing   = $self->{autoparse}     eq 'on'  ? 0 : 1; # default = off
+    my $skip_wordalign = $self->{autowordalign} eq 'on'  ? 0 : 1; # default = off
+
+    ## overwrite defaults if given as argument
+
+    $skip_align     = $args{skip_align}     if (exists $args{skip_align});
+    $skip_parsing   = $args{skip_parsing}   if (exists $args{skip_parsing});
+    $skip_wordalign = $args{skip_wordalign} if (exists $args{skip_wordalign});
+
     my $skip_find_align = $args{skip_find_align} ? $args{skip_find_align} : undef;
-    my $skip_parsing    = $args{skip_parsing} ? $args{skip_parsing} : undef;
-    my $skip_wordalign  = $args{skip_wordalign} ? $args{skip_wordalign} : undef;
+
 
     $self->{new_resources} = [];
     $resource->local_dir( $self->{local_root} )
@@ -391,14 +402,6 @@ sub import_resource {
 	     'commit_message' =>  'imported '.$resource->path,
 	     'uid'            => $branch
 	    );
-
-	## check import parameters (unless they are given already)
-	unless (defined $skip_align && defined $skip_parsing && defined $skip_wordalign){
-	    my %para = &get_import_parameter($corpus);
-	    $skip_align     = $para{autoalign}     eq 'off' ? 1 : 0; # default = on
-	    $skip_parsing   = $para{autoparse}     eq 'on'  ? 0 : 1; # default = off
-	    $skip_wordalign = $para{autowordalign} eq 'on'  ? 0 : 1; # default = off
-	}
 
         #-------------------------------------------------------------------
         ## check if we should align some documents

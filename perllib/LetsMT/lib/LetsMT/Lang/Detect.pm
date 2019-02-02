@@ -91,8 +91,10 @@ our $BOILER_PLATE_SIZE = 8148; # estimated max size of a boiler plate
 # our $LANGUAGE_IDENTIFIER = 'cld2';
 our $LANGUAGE_IDENTIFIER = 'default';
 
+
 ## the compact language identifier from Google Chrome
 my $CLD = new Lingua::Identify::CLD;
+
 
 # this is mainly copied from textcat ......
 
@@ -111,122 +113,251 @@ my %ngram = ();
 load_models();
 
 
-=head1 FUNCTIONS
 
-=head2 C<load_models>
 
- &load_models
- &load_models ($lm_dir)
+#-------------------------------------------
+# classify a resource, a file or a string
+#-------------------------------------------
 
-=cut
+sub detect_language {
+    my $data = shift;
+    my %args = @_;
 
-sub load_models {
-    my $LMs = shift || $LM_HOMEDIR;
-    my $models = shift || \%ngram;
-
-    # open directory to find which languages are supported
-    opendir DIR, "$LMs" or die "directory $LMs: $!\n";
-    my @languages = sort( grep { s/\.lm// && -r "$LMs/$_.lm" } readdir(DIR) );
-    closedir DIR;
-    @languages
-        or die "sorry, can't read any language models from $LMs\n"
-        . "language models must reside in files with .lm ending\n";
-
-    # load model and count for each language.
-    my $language;
-    my $t1 = new Benchmark;
-    foreach $language (@languages) {
-
-        # loads the language model into hash %$language.
-        my $rang = 1;
-        open( LM, "$LMs/$language.lm" )
-            || die "cannot open $language.lm: $!\n";
-        binmode(LM);
-        while (<LM>) {
-            chomp;
-
-            # only use lines starting with appropriate character. Others are
-            # ignored.
-            if (/^[^$non_word_characters]+/o) {
-                $$models{$language}{$&} = $rang++;
-            }
-        }
-        close(LM);
+    if (ref($data)){
+        return classify_resource($data,@_);
     }
+    if (-e $data){
+	return classify_text($data,@_);
+    }
+    my $lang = detect_language_string($data, 
+				      $args{langhint}, 
+				      $args{classifier}, @_);
+    return wantarray ? ($lang) : $lang;
 }
 
 
-=head2 C<lm_exists>
 
- $result = &lm_exists ($file)
+## detect language in a string
+## default classifier is langid.py
+##
+## $lang = detect_language_string( $string, $lang_hint, $classifier [,%args] )
+##
+## $lang_hint is an optional lang ID that is expected from the input
+## $classifier = classifer to be used
 
-Check if a language model exists for the given file.
-
-=cut
-
-sub lm_exists {
-    my $lang = shift;
-    my $LMs    = shift || $LM_HOMEDIR;
-    my $models = shift || \%ngram;
-
-    # load models if necessary
-    load_models() unless ( keys %${models} );
-    return 1 if ( exists $$models{$lang} );
-
-    # remove regional variants
-    $lang =~ s/\_.*$//;
-    return 1 if ( exists $$models{$lang} );
-    return 1 if ( exists $$models{ iso639_TwoToThree($lang) } );
-    return 0;
+sub detect_language_string {
+    my $string = shift   || return undef;
+    my $hint   = shift   || undef;
+    my $method = shift   || $LANGUAGE_IDENTIFIER;
+    if ( $method eq 'cld' ){
+	return &detect_language_with_cld($string, $hint, @_);
+    }
+    elsif ( $method eq 'cld2' ){
+	return &detect_language_with_cld2($string, $hint, @_);
+    }
+    elsif ( $method eq 'blacklist' ){
+	return &identify($string, $hint, @_);
+    }
+    elsif ( $method eq 'lingua' ){
+	return &detect_language_with_lingua($string, $hint, @_);
+    }
+    elsif ( $method eq 'textcat' ){
+	return &detect_language_with_textcat($string, @_);
+    }
+    return &detect_language_with_langid($string, $hint, @_);
 }
 
 
-=head2 C<classify_text> | C<detect_language>
 
- @answers = &classify_text ($file)
- @answers = &classify_text ($file, $lm_dir)
+
+=head2 C<classify_text>
+
+ @answers = &classify_text ($file [,%args])
+
+  classifier        => textcat|blacklist|cld|cld2|lingua|langid
+  max_text_size     => <max_size_to_read>
+  boiler_plate_size => <estimated_size_of_boiler_plates>
+
+Additional options for specific classifiers are possible, for example
+
+  lm_dir => <LM_model_directory_for_textcat>
 
 =cut
 
 
 sub classify_text {
+    my $file = shift;
+    my %args = @_;
 
-    # text cat mode
-    if ( $LANGUAGE_IDENTIFIER eq 'textcat' ){
-	return &classify_with_textcat(@_);
+    my $classifier        = $args{classifier}        || $LANGUAGE_IDENTIFIER;
+    my $max_text_size     = $args{max_text_size}     || $MAX_TEXT_SIZE;
+    my $boiler_plate_size = $args{boiler_plate_size} || $BOILER_PLATE_SIZE;
+
+    # text-cat mode
+    if ( $classifier eq 'textcat' ){
+	return &classify_with_textcat($file,%args);
     }
 
     # Lingua::Identify::Blacklists with textcat as fallback
-    elsif ( $LANGUAGE_IDENTIFIER eq 'blacklist' ){
-	my $lang = &classify_with_blacklists(@_);
+    if ( $classifier eq 'blacklist' ){
+	my $lang = &identify_file( $_[0] );
+	## remove regional code (why should we?)
+	# $lang =~s/[\-\_].*$//;
 	if ((not defined $lang) || 
 	    ($lang eq 'unknown') || ($lang eq 'un') || ($lang eq 'ut')){
-	    return &classify_with_textcat(@_);
+	    return &classify_with_textcat($file,%args);
 	}
 	return wantarray ? ($lang) : $lang;
     }
 
-    ## NEW: default = langid!
-    my $lang = &classify_with_langid(@_);
+    ##----------------------------------------------
+    ## for other classifiers: first read some text 
+    ## and then classify that string
+    ##----------------------------------------------
+
+    # read input from the file to be classified
+    if   ( $file =~ /\.gz/ ) { open F, "gzip -cd <$file |"; }
+    else                     { open F, "<$file"; }
+
+    ## TODO: what encoding do we actually need? or raw text?
+    ##       is this different for each classifier?
+    # binmode(F);
+    binmode(F, ":utf8");
+    my $text;
+    read( *F, $text, $max_text_size );
+    close F;
+
+    ## if there is enough text: remove some data that might be a boiler plate
+    if ( length($text)-2*$boiler_plate_size > $max_text_size/2 ){
+	$text = substr( $text, $boiler_plate_size, 0-$boiler_plate_size);
+    }
+
+
+    ## classify the string using the selected classifier
+    my $lang = &detect_language_string($text,$args{langhint},$classifier);
     return wantarray ? ($lang) : $lang;
 }
 
-sub detect_language_string {
-    my $method = $_[2] || $LANGUAGE_IDENTIFIER;
-    if ( $method eq 'cld' ){
-	return &detect_language_with_cld(@_);
+
+
+
+
+
+## this is a bit silly on resources with more than one language!
+
+sub classify_resource {
+    my $resource = shift or die("Missing resource!\n");
+    my %args = @_;
+
+    my $max_data = $args{max_data} || $MAX_DATA;
+
+    ## if the resource is a plain text: just send it to the classifier
+    my $type = $resource->type;
+    if ($type=~/(txt|text)/){
+	return classify_text($resource->local_path,@_);
     }
-    elsif ( $method eq 'cld2' ){
-	return &detect_language_with_cld2(@_);
+
+    ## otherwise: try to read from the resource
+    print STDERR "unknown format" unless ($type);
+    my $input = new LetsMT::Export::Reader( $resource, $type );
+    $input->open($resource);
+
+    # NEW: don't actually create a text but just get the string
+    my $string = '';
+
+    my $reader = new LetsMT::Export::Reader($resource);
+    my $writer = new LetsMT::Export::Writer(undef,'text');
+
+    $reader->open();
+    my $count=0;
+    while (my $data = $reader->read ){
+	if ( ref($data) eq 'HASH' ) {
+	    my $str = '';
+	    foreach my $l ( keys %{$data} ) {
+		$str .= $writer->to_string( $$data{$l} )."\n";
+	    }
+	    if ( $str=~/\S/ ){
+		$string .= $str;
+		$count++;
+		last if (length($string) >= $MAX_TEXT_SIZE );
+		last if ($count >= $max_data && 
+			 length($string) >= $MIN_TEXT_SIZE );
+	    }
+	}
     }
-    elsif ( $method eq 'blacklist' ){
-	return &identify(@_);
+    $reader->close();
+    
+    ## if we have enough data - remove some part in the beginning
+    ## (possible boile plate)
+    if ( length($string)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
+	$string = substr( $string, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
     }
-    elsif ( $method eq 'lingua' ){
-	return &detect_language_with_lingua(@_);
-    }
-    return &detect_language_with_langid(@_);
+
+    my $lang = detect_language_string($string,@_);
+    return wantarray ? ($lang) : $lang;
 }
+
+
+### the following method does not work because the Moses Writer does not
+### support anything else then 2 languages in parallel ....
+
+sub classify_resource_multi {
+    my $resource = shift;
+
+    print STDERR "unknown format" unless ($resource->type);
+
+    my $input = new LetsMT::Export::Reader($resource);
+    $input->open($resource);
+
+    # make a temporary resource for writing plain text to be classified
+    my $tmpdir = tempdir(
+        'langdetect_XXXXXXXX',
+        DIR     => '/tmp',
+        CLEANUP => 1
+    );
+    my $tmpfile = 'moses';
+
+    # the temporary resource = moses format (allow multiple languages)
+    my $temp_resource = new LetsMT::Resource(
+        local_dir => $tmpdir,
+        path => $tmpfile
+    );
+
+    my $output = new LetsMT::Export::Writer( $temp_resource, 'moses' );
+
+    # read a number of data records ....
+    my $count = 0;
+    while ( my $data = $input->read ) {
+        $output->write($data);
+        $count++;
+        last if ($count>=$MAX_DATA);
+    }
+    $input->close;
+    $output->close;
+
+    # .... language detection on all files ....
+
+    my %detected  = ();
+    my @resources = $output->get_resources();
+    foreach my $res (@resources){
+        my $lang = $res->lang();
+        my $file = $res->local_path();
+        @{$detected{$lang}} = classify_text($file);
+        unlink($file);
+    }
+    return %detected;
+}
+
+
+
+
+
+
+########################################################################
+# detect language for strings using specific classifiers
+########################################################################
+
+
 
 sub detect_language_with_cld {
     my $string = shift;
@@ -377,55 +508,44 @@ sub detect_language_with_cld2 {
 
 
 
-# classify with langid (require utf8 encoded text!)
-# (TODO: or should it rather be in bytes?)
+# # classify with langid (require utf8 encoded text!)
+# # (TODO: or should it rather be in bytes?)
 
-sub classify_with_langid{
-    my $file   = shift;
-    # read input
-    if   ( $file =~ /\.gz/ ) { open F, "gzip -cd <$file |"; }
-    else                     { open F, "<$file"; }
-    # binmode(F);
-    binmode(F, ":utf8");
-    my $input;
-    read( *F, $input, $MAX_TEXT_SIZE );
-    close F;
-    ## if there is enough text: remove some data that might be a boiler plate
-    if ( length($input)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
-	$input = substr( $input, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
-    }
-    return &detect_language_with_langid($input);
-}
+# sub classify_with_langid{
+#     my $file   = shift;
+#     # read input
+#     if   ( $file =~ /\.gz/ ) { open F, "gzip -cd <$file |"; }
+#     else                     { open F, "<$file"; }
+#     # binmode(F);
+#     binmode(F, ":utf8");
+#     my $input;
+#     read( *F, $input, $MAX_TEXT_SIZE );
+#     close F;
+#     ## if there is enough text: remove some data that might be a boiler plate
+#     if ( length($input)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
+# 	$input = substr( $input, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
+#     }
+#     return &detect_language_with_langid($input);
+# }
 
-
-# classify with Lingua::Identify::Blacklist
-
-sub classify_with_blacklists{
-    my $lang = &identify_file( $_[0] );
-    $lang =~s/[\-\_].*$//;                 # remove regional code
-    return wantarray ? ($lang) : $lang;
-}
 
 # classifify with our own textcat models
 
-sub classify_with_textcat {
-    my $file   = shift;
-    my $LMs    = shift || $LM_HOMEDIR;
-    my $models = shift || \%ngram;
+sub detect_language_with_textcat {
+    my $input  = shift;
+    my %args   = @_;
 
-    # read input
-    if   ( $file =~ /\.gz/ ) { open F, "gzip -cd <$file |"; }
-    else                     { open F, "<$file"; }
-    binmode(F);
-    my $input;
-    read( *F, $input, $MAX_TEXT_SIZE );
-    close F;
+    my $LMs    = $args{lm_dir} || $LM_HOMEDIR;
+    my $models = $args{models} || \%ngram;
 
     my %results = ();
     my $maxp    = $TopNgrams;
 
     # load models if necessary
     load_models($LMs,$models) unless ( keys %{$models} );
+
+    ## TODO: is this correct? 
+    $input = encode('utf8',$_[0], sub{ return  ' ' });
 
     # create ngrams for input. Note that hash %unknown is not used;
     # it contains the actual counts which are only used under -n: creating
@@ -475,128 +595,12 @@ sub classify_with_textcat {
     return wantarray ? @answers : $answers[0];
 }
 
-# alias of classify_text
-sub detect_language {
-    my $data = shift;
-    if (ref($data)){
-        return classify_resource($data,@_);
-    }
-    if (-e $data){
-	return classify_text($data,@_);
-    }
-    my $lang = detect_language_string($data,@_);
-    return wantarray ? ($lang) : $lang;
-    # return detect_language_string($data,@_);
-}
-
-
-## this is a bit silly on resources with more than one language!
-
-sub classify_resource {
-    my $resource = shift or die("Missing resource!\n");
-    my $max_data = shift || $MAX_DATA;
-
-    ## if the resource is a plain text: just send it to the classifier
-    my $type = $resource->type;
-    if ($type=~/(txt|text)/){
-	return classify_text($resource->local_path,@_);
-    }
-
-    ## otherwise: try to read from the resource
-    print STDERR "unknown format" unless ($type);
-    my $input = new LetsMT::Export::Reader( $resource, $type );
-    $input->open($resource);
-
-    # NEW: don't actually create a text but just get the string
-    my $string = '';
-
-    my $reader = new LetsMT::Export::Reader($resource);
-    my $writer = new LetsMT::Export::Writer(undef,'text');
-
-    $reader->open();
-    my $count=0;
-    while (my $data = $reader->read ){
-	if ( ref($data) eq 'HASH' ) {
-	    my $str = '';
-	    foreach my $l ( keys %{$data} ) {
-		$str .= $writer->to_string( $$data{$l} )."\n";
-	    }
-	    if ( $str=~/\S/ ){
-		$string .= $str;
-		$count++;
-		last if (length($string) >= $MAX_TEXT_SIZE );
-		last if ($count >= $max_data && 
-			 length($string) >= $MIN_TEXT_SIZE );
-	    }
-	}
-    }
-    $reader->close();
-    
-    ## if we have enough data - remove some part in the beginning
-    ## (possible boile plate)
-    if ( length($string)-2*$BOILER_PLATE_SIZE > $MAX_TEXT_SIZE/2 ){
-	$string = substr( $string, $BOILER_PLATE_SIZE, 0-$BOILER_PLATE_SIZE);
-    }
-
-    my $lang = detect_language_string($string,@_);
-    return wantarray ? ($lang) : $lang;
-}
 
 
 
-
-
-### the following method does not work because the Moses Writer does not
-### support anything else then 2 languages in parallel ....
-
-sub classify_resource_multi {
-    my $resource = shift;
-
-    print STDERR "unknown format" unless ($resource->type);
-
-    my $input = new LetsMT::Export::Reader($resource);
-    $input->open($resource);
-
-    # make a temporary resource for writing plain text to be classified
-    my $tmpdir = tempdir(
-        'langdetect_XXXXXXXX',
-        DIR     => '/tmp',
-        CLEANUP => 1
-    );
-    my $tmpfile = 'moses';
-
-    # the temporary resource = moses format (allow multiple languages)
-    my $temp_resource = new LetsMT::Resource(
-        local_dir => $tmpdir,
-        path => $tmpfile
-    );
-
-    my $output = new LetsMT::Export::Writer( $temp_resource, 'moses' );
-
-    # read a number of data records ....
-    my $count = 0;
-    while ( my $data = $input->read ) {
-        $output->write($data);
-        $count++;
-        last if ($count>=$MAX_DATA);
-    }
-    $input->close;
-    $output->close;
-
-    # .... language detection on all files ....
-
-    my %detected  = ();
-    my @resources = $output->get_resources();
-    foreach my $res (@resources){
-        my $lang = $res->lang();
-        my $file = $res->local_path();
-        @{$detected{$lang}} = classify_text($file);
-        unlink($file);
-    }
-    return %detected;
-}
-
-
+########################################################################
+# textcat functions
+########################################################################
 
 
 =head2 C<create_lm>
@@ -604,6 +608,9 @@ sub classify_resource_multi {
  @models = &create_lm ($text, $lang, $overwrite)
 
 =cut
+
+
+## this is only used by text_cat
 
 sub create_lm {
     my $t1 = new Benchmark;
@@ -688,6 +695,78 @@ sub create_lm {
 
     return @sorted;
 }
+
+
+=head1 FUNCTIONS
+
+=head2 C<load_models>
+
+ &load_models
+ &load_models ($lm_dir)
+
+=cut
+
+sub load_models {
+    my $LMs = shift || $LM_HOMEDIR;
+    my $models = shift || \%ngram;
+
+    # open directory to find which languages are supported
+    opendir DIR, "$LMs" or die "directory $LMs: $!\n";
+    my @languages = sort( grep { s/\.lm// && -r "$LMs/$_.lm" } readdir(DIR) );
+    closedir DIR;
+    @languages
+        or die "sorry, can't read any language models from $LMs\n"
+        . "language models must reside in files with .lm ending\n";
+
+    # load model and count for each language.
+    my $language;
+    my $t1 = new Benchmark;
+    foreach $language (@languages) {
+
+        # loads the language model into hash %$language.
+        my $rang = 1;
+        open( LM, "$LMs/$language.lm" )
+            || die "cannot open $language.lm: $!\n";
+        binmode(LM);
+        while (<LM>) {
+            chomp;
+
+            # only use lines starting with appropriate character. Others are
+            # ignored.
+            if (/^[^$non_word_characters]+/o) {
+                $$models{$language}{$&} = $rang++;
+            }
+        }
+        close(LM);
+    }
+}
+
+
+=head2 C<lm_exists>
+
+ $result = &lm_exists ($file)
+
+Check if a language model exists for the given file.
+
+=cut
+
+sub lm_exists {
+    my $lang = shift;
+    my $LMs    = shift || $LM_HOMEDIR;
+    my $models = shift || \%ngram;
+
+    # load models if necessary
+    load_models() unless ( keys %${models} );
+    return 1 if ( exists $$models{$lang} );
+
+    # remove regional variants
+    $lang =~ s/\_.*$//;
+    return 1 if ( exists $$models{$lang} );
+    return 1 if ( exists $$models{ iso639_TwoToThree($lang) } );
+    return 0;
+}
+
+
 
 
 1;

@@ -122,25 +122,27 @@ sub write {
             $self->{normalizer}->normalize_no_copy( $data{$lang}{$sid} );
             $self->{resources}{$lang}{meta}{size}++;
 
-	    ## TODO: add language identifier for each sentence (optional?)
+	    ## language identification for each sentence
 	    ## PROBLEM: SRT converts directly to XML and does not go via
 	    ##          LetsMT::Export::Writer::XML
 	    ##
-	    ## should this only be optional?
-	    # my $detected = &identify( $data{$lang}{$sid} );
-
 	    ## NEW: use cld2 with language hint instead of langid ...
-	    my ($detected,$conf) = 
-		&LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, 
-							       $lang, 'cld2' );
 
-	    ## add attribute to sentence tag if the language does not match
-	    ## TODO: should we always add the lang identification scores 
-	    ##       even if the language matches? 
+	    unless ($self->{langid} eq 'none'){
+		my $classifier = $self->{langid} || 'cld2';
 
-	    if ($detected ne $lang){
-		$attr{$lang}{$sid}{lang} = $detected;
-		$attr{$lang}{$sid}{conf} = $conf;
+		my ($detected,$conf) = 
+		    &LetsMT::Lang::Detect::detect_language_string( $data{$lang}{$sid}, 
+								   $lang, 'cld2' );
+
+		## add attribute to sentence tag if the language does not match
+		## TODO: should we always add the lang identification scores 
+		##       even if the language matches? 
+
+		if ($detected ne $lang){
+		    $attr{$lang}{$sid}{lang} = $detected;
+		    $attr{$lang}{$sid}{conf} = $conf;
+		}
 	    }
         }
 

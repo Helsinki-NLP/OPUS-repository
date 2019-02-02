@@ -391,8 +391,17 @@ sub resources_with_language_links{
 	    ## if the linked file exists in the repository:
 	    ## --> establish a link between them
 	    if (exists $files{$links{$f}{$l}}){
-		$$parallel{$basename}{$l} = $files{$links{$f}{$l}};
-		$count++;
+		if ($files{$links{$f}{$l}} ne $f){
+		    $$parallel{$basename}{$l} = $files{$links{$f}{$l}};
+		    $count++;
+		}
+	    }
+	    ## a hack to fix the problem that the uploads dir is sometimes lost
+	    elsif (exists $files{'uploads/'.$links{$f}{$l}}){
+		if ($files{'uploads/'.$links{$f}{$l}} ne $f){
+		    $$parallel{$basename}{$l} = $files{'uploads/'.$links{$f}{$l}};
+		    $count++;
+		}
 	    }
 	}
 
@@ -528,15 +537,28 @@ sub find_language_links {
 sub extract_language_links{
     my $html     = shift;
     my $thisfile = shift;
-    my $style    = shift || 'vnk';
+    my $style    = shift;
 
     my %trans = ();
+
+    ##----------------------------------------------------
+    ## helsinki.fi style
+    ##----------------------------------------------------
+
+    if ($style eq 'helsinki' || ! $style){
+	while ($html=~/<link\s+rel=\"alternate\"\s+hreflang=\"(..)\"\s+href=\"(.*?)\"/sg){
+	    my ($lang,$link) = ($1,$2);
+	    $link=~s/https?:\/\/www.helsinki.fi\///;
+	    $trans{$lang} = $link.'.html';
+	}
+	return %trans if (keys %trans);
+    }
 
     ##----------------------------------------------------
     ## VNK style links on websites
     ## TODO: is this safe enough? (also subject to change)
     ##----------------------------------------------------
-    if ($style eq 'vnk'){
+    if ($style eq 'vnk' || ! $style){
 	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
 	    my $match = $1;
 	    utf8::decode($match); 
@@ -562,17 +584,6 @@ sub extract_language_links{
 	}
     }
 
-    ##----------------------------------------------------
-    ## helsinki.fi style
-    ##----------------------------------------------------
-
-    if ($style eq 'helsinki'){
-	while ($html=~/<link\s+rel=\"alternate\"\s+hreflang=\"(..)\"\s+href=\"(.*?)\"/sg){
-	    my ($lang,$link) = ($1,$2);
-	    $link=~s/https?:\/\/www.helsinki.fi\///;
-	    $trans{$lang} = $link.'.html';
-	}
-    }
     return %trans;
 }
 
@@ -588,9 +599,6 @@ sub _relative_to_absolute_path{
 	    shift(@parts);
 	}
 	$link = join('/',@path,@parts);
-    }
-    if ($link!~/^uploads/){
-	print '';
     }
     return $link;
 }

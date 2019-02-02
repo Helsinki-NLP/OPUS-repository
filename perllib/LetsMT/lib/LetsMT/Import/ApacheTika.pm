@@ -137,10 +137,9 @@ sub convert {
     ## extract links between languages
     ## --> site-specific links
     ## --> is there any generic way of doing it?
-    ## TODO: add option to elect style etc
     my %translations = ();
     if ($resource->type() eq 'html'){
-	%translations = &extract_language_links($RawContent,$resource->path,'vnk');
+	%translations = &extract_language_links($RawContent,$resource->path,$importer->{langlinks});
 	# %translations = _extract_language_links($RawContent,$resource->path,'vnk');
     }
 

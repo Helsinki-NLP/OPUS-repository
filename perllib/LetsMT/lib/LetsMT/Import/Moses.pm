@@ -143,7 +143,9 @@ sub convert {
         );
 
         my $writer = new LetsMT::Import::XCESWriter(
-            tokenizer => $importer->{tokenizer} );
+            tokenizer => $importer->{tokenizer},
+	    langid    => $importer->{langid_sent}
+	    );
 
         # convert the resource and write monolingual/alignment data
         my $count;

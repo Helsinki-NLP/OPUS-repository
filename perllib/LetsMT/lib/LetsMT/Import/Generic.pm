@@ -153,9 +153,14 @@ sub convert {
     my $lang = $importer->{lang} || $resource->language();
 
     ## run language detection if necessary
-    ## (if no lang is set OR it is xx OR we always trust langid)
+    ## (if no lang is set OR it is xx OR 
+    ##     langid is not set to 'none' AND we always trust langid )
+    ##
+    ## meaning that we always run langid if we don't know the language
+    ## otherwise:   we only run it if we always trust langid and overwrite the existing language
 
-    if ( $self->{trust_langid} ne 'off' || ! $lang || $lang eq 'xx' ){
+    if ( ( $self->{trust_langid} ne 'off' && $self->{langid} ne 'none' ) || 
+	 ! $lang || $lang eq 'xx' ){
 	my @detected = &detect_language($resource);
 	if ( @detected && $detected[0] ne 'unknown' ){
 	    $lang = $detected[0] unless (grep($_ eq $lang,@detected));
@@ -184,7 +189,8 @@ sub convert {
     return undef unless ($reader);
 
     my $writer = new LetsMT::Import::XCESWriter(
-        tokenizer => $importer->{tokenizer}
+        tokenizer => $importer->{tokenizer},
+	langid    => $importer->{langid_sent}
     );
 
     my $count;

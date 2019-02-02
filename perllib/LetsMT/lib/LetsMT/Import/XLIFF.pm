@@ -141,7 +141,8 @@ sub convert {
     );
     my $writer = new LetsMT::Import::XCESWriter(
         lang      => $lang,
-        tokenizer => $importer->{tokenizer}
+        tokenizer => $importer->{tokenizer},
+	langid    => $importer->{langid_sent}
     );
 
     my $count;
