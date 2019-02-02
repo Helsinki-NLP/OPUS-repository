@@ -542,13 +542,14 @@ sub extract_language_links{
     my %trans = ();
 
     ##----------------------------------------------------
-    ## helsinki.fi style
+    ## helsinki.fi, infofinland.fi style
     ##----------------------------------------------------
 
-    if ($style eq 'helsinki' || ! $style){
+    if ($style=~/(helsinki|infofinland)/ || ! $style){
 	while ($html=~/<link\s+rel=\"alternate\"\s+hreflang=\"(..)\"\s+href=\"(.*?)\"/sg){
 	    my ($lang,$link) = ($1,$2);
-	    $link=~s/https?:\/\/www.helsinki.fi\///;
+	    # $link=~s/https?:\/\/www.helsinki.fi\//\//;
+	    $link=~s/https?:\/\/[\/]+\//\//;
 	    $trans{$lang} = $link.'.html';
 	}
 	return %trans if (keys %trans);
