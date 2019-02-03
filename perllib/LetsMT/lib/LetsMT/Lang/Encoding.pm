@@ -336,12 +336,16 @@ sub detect_encoding {
     # # }
 
 
-    # last chance: try the hard way and do language + encoding detection
-    my ($lang) = &LetsMT::Lang::Detect::classify_with_textcat($file,$TEXTCAT_LM_DIR,
-							      \%TEXTCAT_MODELS);
-    if ($lang=~/^(.*)\.(.*)$/){
-	return $2;
-    }
+    ## TODO: disable this now because we took away classify_with_textcat
+    ## ---> check if we need something here
+
+    # # last chance: try the hard way and do language + encoding detection
+    # my ($lang) = &LetsMT::Lang::Detect::classify_with_textcat($file,$TEXTCAT_LM_DIR,
+    # 							      \%TEXTCAT_MODELS);
+    # if ($lang=~/^(.*)\.(.*)$/){
+    # 	return $2;
+    # }
+
     return 'utf-8';
 }
 

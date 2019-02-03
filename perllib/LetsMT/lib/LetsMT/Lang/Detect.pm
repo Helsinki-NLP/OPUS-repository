@@ -193,20 +193,9 @@ sub classify_text {
     my $max_text_size     = $args{max_text_size}     || $MAX_TEXT_SIZE;
     my $boiler_plate_size = $args{boiler_plate_size} || $BOILER_PLATE_SIZE;
 
-    # text-cat mode
-    if ( $classifier eq 'textcat' ){
-	return &classify_with_textcat($file,%args);
-    }
-
-    # Lingua::Identify::Blacklists with textcat as fallback
+    # Lingua::Identify::Blacklists
     if ( $classifier eq 'blacklist' ){
 	my $lang = &identify_file( $_[0] );
-	## remove regional code (why should we?)
-	# $lang =~s/[\-\_].*$//;
-	if ((not defined $lang) || 
-	    ($lang eq 'unknown') || ($lang eq 'un') || ($lang eq 'ut')){
-	    return &classify_with_textcat($file,%args);
-	}
 	return wantarray ? ($lang) : $lang;
     }
 

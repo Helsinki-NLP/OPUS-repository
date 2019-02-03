@@ -730,7 +730,7 @@ sub export {
 
 sub _export_subtree {
     my $self  = shift;
-    my ($slot, $user, $repohome, $path, $revision ) = @_;
+    my ($slot, $user, $path, $revision ) = @_;
 
     # Create temp file to store archive in
     my ( $fh, $target ) = tempfile(
