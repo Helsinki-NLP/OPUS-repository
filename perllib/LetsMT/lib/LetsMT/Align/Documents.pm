@@ -559,6 +559,22 @@ sub extract_language_links{
     ## VNK style links on websites
     ## TODO: is this safe enough? (also subject to change)
     ##----------------------------------------------------
+    if ($style eq 'turku' || ! $style){
+	if ($html=~/\<ul class=\"menu menu--language-switcher\"\>(.*?)\<\/ul\>/s){
+	    my @langlinks = split(/\<\/li\>/,$1);
+	    foreach (@langlinks){
+		if (/href=\"(.*?)\"\>([^>]*?)\<\/a\>/){
+		    my ($link,$lang) = ($1,$2);
+		    $lang = lc($lang);
+		    $trans{$lang} = $link.'.html';
+		}
+	    }
+	}
+    }
+    ##----------------------------------------------------
+    ## VNK style links on websites
+    ## TODO: is this safe enough? (also subject to change)
+    ##----------------------------------------------------
     if ($style eq 'vnk' || ! $style){
 	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
 	    my $match = $1;
