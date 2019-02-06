@@ -93,6 +93,7 @@ sub validate {
 	## a bit of ad-hoc changes to mime-types
 	$detected-~s/text\/plain/txt/;
 	$detected=~s/^[^\/]+\///;
+	$detected = 'rawxml' if ($detected eq 'xml'); 
 	$resource->{type} = $detected;
 	# $resource->type($detected);
 	$resource->{apache_tika_validated} = 1;
