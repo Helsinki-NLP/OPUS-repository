@@ -570,6 +570,7 @@ sub extract_language_links{
 		}
 	    }
 	}
+	return %trans if (keys %trans);
     }
     ##----------------------------------------------------
     ## VNK style links on websites
@@ -612,6 +613,29 @@ sub extract_language_links{
 	}
 	if ($html=~/<a href="([^"]+)">Suomeksi<\/a>/){
 	    $trans{fi} = $1.'.html';
+	}
+	return %trans if (keys %trans);
+    }
+
+    ##----------------------------------------------------
+    ## focus on Swedish. Finnish and English
+    ##----------------------------------------------------
+
+    if ($style eq 'fisven' || ! $style){
+	for ('på svenska', 'in swedish', 'svenska', 'swedish', 'sv'){
+	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
+		$trans{sv} = $1;
+	    }
+	}
+	for ('suomeksi', 'in finnish', 'finnish', 'fi'){
+	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
+		$trans{fi} = $1;
+	    }
+	}
+	for ('in english', 'english', 'en'){
+	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
+		$trans{en} = $1;
+	    }
 	}
 	return %trans if (keys %trans);
     }
