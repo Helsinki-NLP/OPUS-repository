@@ -93,7 +93,8 @@ sub validate {
 	## a bit of ad-hoc changes to mime-types
 	$detected-~s/text\/plain/txt/;
 	$detected=~s/^[^\/]+\///;
-	$resource->type($detected);
+	$resource->{type} = $detected;
+	# $resource->type($detected);
 	$resource->{apache_tika_validated} = 1;
 	return ( [] , [[$resource,'detected_stream' => $detected]] );
     }
