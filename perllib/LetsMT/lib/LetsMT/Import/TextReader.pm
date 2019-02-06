@@ -12,6 +12,9 @@ use Data::Dumper;
 use LetsMT::Import;
 use LetsMT::WebService;
 use LetsMT::Tools qw(:all);
+use LetsMT::DataProcessing::Tokenizer;
+use LetsMT::DataProcessing::Splitter;
+use LetsMT::DataProcessing::Normalizer;
 
 use PerlIO::encoding;
 $PerlIO::encoding::fallback = Encode::FB_QUIET;
@@ -53,6 +56,31 @@ sub new {
     $self{splitter}   = $LetsMT::Import::DEFAULT_SPLITTER   unless ( defined $self{splitter} );
     #TODO: a warning should be given if no language is set:
     $self{lang}       = $LetsMT::Import::DEFAULT_LANG       unless ( defined $self{lang} );
+
+    ## make sure we create preprocessing objects
+    if ($self{splitter}) {
+        unless ( ref $self{splitter} ) {
+            $self{splitter} = new LetsMT::DataProcessing::Splitter(
+                method => $self{splitter},
+                lang   => $self{lang}
+            );
+        }
+    }
+    if ($self{tokenizer}) {
+        unless ( ref $self{tokenizer} ) {
+            $self{tokenizer} = new LetsMT::DataProcessing::Tokenizer(
+                method => $self{tokenizer},
+                lang   => $self{lang}
+            );
+        }
+    }
+    if ($self{normalizer}) {
+        unless ( ref $self{normalizer} ) {
+            $self{normalizer} = new LetsMT::DataProcessing::Normalizer(
+                type => $self{normalizer}
+            );
+        }
+    }
 
     return bless \%self, $class;
 }

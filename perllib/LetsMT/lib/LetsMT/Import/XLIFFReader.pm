@@ -59,6 +59,22 @@ sub new {
     $self{tokenizer} = $LetsMT::Import::DEFAULT_TOKENIZER
         unless ( defined $self{tokenizer} );
 
+    if ($self{tokenizer}) {
+        unless ( ref $self{tokenizer} ) {
+            $self{tokenizer} = new LetsMT::DataProcessing::Tokenizer(
+                method => $self{tokenizer},
+                lang   => $self{lang}
+            );
+        }
+    }
+    if ($self{normalizer}) {
+        unless ( ref $self{normalizer} ) {
+            $self{normalizer} = new LetsMT::DataProcessing::Normalizer(
+                type => $self{normalizer}
+            );
+        }
+    }
+
     my $escape_lookup
         = &LetsMT::Tools::build_lookup_func( $TAG_TO_CONCEPT, '^', '$' );
 

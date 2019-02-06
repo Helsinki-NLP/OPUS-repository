@@ -48,6 +48,31 @@ sub new {
     $self{splitter}   = $LetsMT::Import::DEFAULT_SPLITTER    unless ( defined $self{splitter} );
     $self{lang}       = $LetsMT::Import::DEFAULT_LANG        unless ( defined $self{lang} );
 
+    ## make sure we create preprocessing objects
+    if ($self{splitter}) {
+        unless ( ref $self{splitter} ) {
+            $self{splitter} = new LetsMT::DataProcessing::Splitter(
+                method => $self{splitter},
+                lang   => $self{lang}
+            );
+        }
+    }
+    if ($self{tokenizer}) {
+        unless ( ref $self{tokenizer} ) {
+            $self{tokenizer} = new LetsMT::DataProcessing::Tokenizer(
+                method => $self{tokenizer},
+                lang   => $self{lang}
+            );
+        }
+    }
+    if ($self{normalizer}) {
+        unless ( ref $self{normalizer} ) {
+            $self{normalizer} = new LetsMT::DataProcessing::Normalizer(
+                type => $self{normalizer}
+            );
+        }
+    }
+
     $self{parser} = new XML::Parser(
         Handlers => {
             Start => \&handle_start,
