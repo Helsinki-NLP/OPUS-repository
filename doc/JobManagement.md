@@ -162,6 +162,12 @@ $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv/4.xml?uid=user&run
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml/en-sv?uid=user&run=make_tmx"
 ```
 
+A special case is if make_tmx is called on the root of the xml directory. This will create TMX files for each bitext in the corpus:
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml?uid=user&run=make_tmx"
+```
+
 
 # TODO
 

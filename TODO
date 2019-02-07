@@ -4,6 +4,9 @@ To do as of version 0.56
 
 High priority:
 
+* profiling the code with https://metacpan.org/pod/Devel::NYTProf
+  https://metacpan.org/release/Devel-NYTProf
+  https://metacpan.org/pod/Devel::NYTProf::Apache
 * make langid optional (sent_langid and doc_langid)
   ---> option to select tool or none in ImportPara_sent/doc_langid ...
 * crawling produces multiple tar-archives to reduce the size			(done)

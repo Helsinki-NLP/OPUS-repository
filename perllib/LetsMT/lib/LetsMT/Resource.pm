@@ -435,8 +435,16 @@ sub type {
 	$self->{type} = $_[0];
 	## change file extension as well if there is
 	## an export reader for the given type
+	## --> also move the file if it exists!
+	## TODO: don't  we need to check whether there is not file 
+	##       with the new name?
 	if ( defined LetsMT::Export::Reader::reader($_[0]) ){
+	    my $oldPath = $self->local_path;
 	    $self->{path} =~ s/^(.*)\.[^\.]+$/$1.$_[0]/;
+	    if (-e $oldPath){
+		my $newPath = $self->local_path;
+		move( $oldPath,$newPath ) unless ($oldPath eq $newPath);
+	    }
 	}
     }
 

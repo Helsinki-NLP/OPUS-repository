@@ -931,6 +931,30 @@ sub run_make_tmx {
     my $path      = join('/',@{$path_elements});
     my $resource  = LetsMT::Resource::make_from_storage_path( $path );
 
+    ## special case: root xml dir!
+    ## --> make one tmx for all bitexts in the corpus
+    if ($resource->path eq 'xml'){
+	my $slot      = $$path_elements[0];
+	my $branch    = $$path_elements[1];
+	my $corpus    = LetsMT::Resource::make( $slot, $branch );
+	my $response  = LetsMT::WebService::get_meta( $corpus );
+	my $XmlParser = new XML::LibXML;
+	my $dom       = $XmlParser->parse_string( $response );
+	my @nodes     = $dom->findnodes('//list/entry');
+
+	return undef unless (@nodes);
+
+	my @pairs     = split(/,/,$nodes[0]->findvalue('parallel-langs'));
+	my $count     = 0;
+	foreach my $p (@pairs){
+	    my @bitext = @{$path_elements};
+	    push(@bitext,$p);
+	    if (&run_make_tmx(\@bitext,$args)){ $count++; }
+	}
+	return $count;
+    }
+
+
 #     if ($resource->type eq 'xces') {
 
     print "convert to TMX: ".$resource->path."\n";
@@ -961,9 +985,12 @@ sub run_make_tmx {
     my $input = new LetsMT::Export::Reader( $resource, $resource->type );
     my $output = new LetsMT::Export::Writer( $outres, 'tmx' );
 
+    return undef unless($input);
+    return undef unless($output);
+
     ## convert the data
-    $input->open($resource);
-    $output->open($outres);
+    $input->open($resource) || return undef;
+    $output->open($outres) || return undef;
     my ($before, $after) = ({}, {});
     while ( my $data = $input->read( $before, $after ) ) {
 	$output->write( $data, $before, $after );
@@ -995,8 +1022,8 @@ sub run_make_tmx {
     return undef;
 
 
-	## NEW: don't make individual jobs for each sentence alignment file
-	##      but create one TMX file for all of them
+    ## NEW: don't make individual jobs for each sentence alignment file
+    ##      but create one TMX file for all of them
 
     # }
 

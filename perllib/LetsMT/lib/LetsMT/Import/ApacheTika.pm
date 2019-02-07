@@ -94,8 +94,8 @@ sub validate {
 	$detected-~s/text\/plain/txt/;
 	$detected=~s/^[^\/]+\///;
 	$detected = 'rawxml' if ($detected eq 'xml'); 
-	$resource->{type} = $detected;
-	# $resource->type($detected);
+	# $resource->{type} = $detected;
+	$resource->type($detected);
 	$resource->{apache_tika_validated} = 1;
 	return ( [] , [[$resource,'detected_stream' => $detected]] );
     }
