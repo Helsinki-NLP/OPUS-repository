@@ -146,11 +146,20 @@ sub close{
 
 sub read{
     my $self = shift;
+    my $data = undef;
+    do {
+	if ($data = $self->{READER}->read()){
+	    return $data;
+	}
+	return undef if (! $self->open_next());
+    }
+    until ($data);
+
     if (my $data = $self->{READER}->read() ){
         return $data;
     }
-    return undef if (! $self->open_next());
-    return $self->{READER}->read();
+    # return undef if (! $self->open_next());
+    # return $self->{READER}->read();
 }
 
 
