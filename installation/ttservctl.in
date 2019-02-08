@@ -23,6 +23,8 @@ case $0 in
         mport=REPLACE_REPLICATION_PORT_GROUP
         mhost=REPLACE_REPLICATION_HOST_GROUP
 	rtsfile="$datadir/group.rts"
+	bnum=1000000
+	xmsiz=67108864
     ;;
     *_meta)
         database=metadata
@@ -30,6 +32,10 @@ case $0 in
         mport=REPLACE_REPLICATION_PORT_META
         mhost=REPLACE_REPLICATION_HOST_META
 	rtsfile="$datadir/meta.rts"
+	bnum=50000000
+	rcnum=512
+	xmsiz=134217728
+	opts=l
     ;;
     *)
         printf '%s: script name must be *_group or *_meta\n' $0
@@ -43,7 +49,6 @@ ulogdir="$datadir/$database.tct.ulog"
 # ulimsiz="256m"
 ulimsiz="1024m"
 sid=1
-bnum=1000000
 rtsfile="$datadir/rts"
 
 # environment variables
@@ -91,6 +96,9 @@ case "$1" in
             [ -n "$mport"   ] && params="$params -mport $mport"
             [ -n "$rtsfile" ] && params="$params -rts $rtsfile"
             [ -n "$bnum"    ] && dbname="$dbname#bnum=$bnum"
+            [ -n "$rcnum"   ] && dbname="$dbname#rcnum=$rcnum"
+            [ -n "$xmsiz"   ] && dbname="$dbname#xmsiz=$xmsiz"
+            [ -n "$opts"    ] && dbname="$dbname#opts=$opts"
 
             if [ -n "$(pidofproc -p $pidfile $cmd)" ] ; then
                 printf "   ...server already running -\n"
