@@ -147,9 +147,11 @@ MOJO_CPAN_MODULES = Authen::Captcha \
 ## some CPAN modules that fail to install
 ## TODO: fix modules if possible
 FORCECPAN_MODULES = 	Filesys::DiskUsage \
-			Lingua::Identify::Blacklists \
 			Text::SRT::Align \
 			Uplug
+
+#			Lingua::Identify::Blacklists \
+
 
 MYSQL_FORCECPAN_MODULES = Persistent::MySQL
 
