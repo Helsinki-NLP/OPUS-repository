@@ -27,13 +27,11 @@ use LWP::Simple;
 # eflomal
 our $EFLOMAL = $ENV{LETSMTROOT}.'/share/eflomal/align.py';
 # our $EFLOMAL = `which eflomal.py` || undef;
-chomp($EFLOMAL);
+# chomp($EFLOMAL);
 
 
 ## atools for symmetrisation
-our $ATOOLS = `which atools` || undef;
-chomp($ATOOLS);
-
+our $ATOOLS = undef;
 
 ## priors of eflomal
 our $EFLOMAL_MODEL_DIR = $LetsMT::EFLOMAL_MODEL_DIR || 
@@ -49,6 +47,11 @@ our $EFLOMAL_MODEL_DIR = $LetsMT::EFLOMAL_MODEL_DIR ||
 sub new {
     my $class = shift;
     my %self  = @_;
+
+    unless ($ATOOLS){
+	$ATOOLS = `which atools`;
+	chomp($ATOOLS);
+    }
 
     $self{eflomal} = $EFLOMAL unless (defined $self{eflomal});
     $self{atools}  = $ATOOLS  unless (defined $self{atools});

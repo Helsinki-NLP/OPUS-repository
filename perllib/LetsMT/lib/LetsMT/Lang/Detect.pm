@@ -19,7 +19,10 @@ use Benchmark;
 use Encode qw(encode);
 use File::Temp qw(tempfile tempdir);
 use File::ShareDir 'dist_dir';
-use Lingua::Identify::Blacklists qw/:all/;
+
+## NEW: get rid of blacklist classifier
+##      takes too much time for loading models
+# use Lingua::Identify::Blacklists qw/:all/;
 
 ## CLD2 module does not build correcly!
 # use Lingua::Identify::CLD2;
@@ -86,7 +89,6 @@ our $MAX_DATA      = 100;      # max number of data records to be read
 our $BOILER_PLATE_SIZE = 8148; # estimated max size of a boiler plate
 
 # our $LANGUAGE_IDENTIFIER = 'textcat';
-# our $LANGUAGE_IDENTIFIER = 'blacklists';
 # our $LANGUAGE_IDENTIFIER = 'cld';
 # our $LANGUAGE_IDENTIFIER = 'cld2';
 our $LANGUAGE_IDENTIFIER = 'default';
@@ -110,7 +112,8 @@ my $VERBOSE = 0;
 # load all models!
 my %ngram = ();
 
-load_models();
+## don't load models automatically
+# load_models();
 
 
 
@@ -155,9 +158,9 @@ sub detect_language_string {
     elsif ( $method eq 'cld2' ){
 	return &detect_language_with_cld2($string, $hint, @_);
     }
-    elsif ( $method eq 'blacklist' ){
-	return &identify($string, $hint, @_);
-    }
+    # elsif ( $method eq 'blacklist' ){
+    # 	return &identify($string, $hint, @_);
+    # }
     elsif ( $method eq 'lingua' ){
 	return &detect_language_with_lingua($string, $hint, @_);
     }
@@ -174,7 +177,7 @@ sub detect_language_string {
 
  @answers = &classify_text ($file [,%args])
 
-  classifier        => textcat|blacklist|cld|cld2|lingua|langid
+  classifier        => textcat|cld|cld2|lingua|langid
   max_text_size     => <max_size_to_read>
   boiler_plate_size => <estimated_size_of_boiler_plates>
 
@@ -193,11 +196,11 @@ sub classify_text {
     my $max_text_size     = $args{max_text_size}     || $MAX_TEXT_SIZE;
     my $boiler_plate_size = $args{boiler_plate_size} || $BOILER_PLATE_SIZE;
 
-    # Lingua::Identify::Blacklists
-    if ( $classifier eq 'blacklist' ){
-	my $lang = &identify_file( $_[0] );
-	return wantarray ? ($lang) : $lang;
-    }
+    # # Lingua::Identify::Blacklists
+    # if ( $classifier eq 'blacklist' ){
+    # 	my $lang = &identify_file( $_[0] );
+    # 	return wantarray ? ($lang) : $lang;
+    # }
 
     ##----------------------------------------------
     ## for other classifiers: first read some text 

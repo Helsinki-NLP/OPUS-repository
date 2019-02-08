@@ -36,6 +36,7 @@ UBUNTU_BASE_PACKAGES = \
 		libbz2-dev \
 		libclass-inspector-perl \
 		libcrypt-ssleay-perl \
+		libdevel-nytprof-perl \
 		libdbi-perl \
 		libdrmaa-java \
 		libfile-bom-perl \
@@ -54,6 +55,7 @@ UBUNTU_BASE_PACKAGES = \
 		libpython3.4-dev \
 		libssl-dev \
 		libstring-approx-perl \
+		libsvg-perl \
 		libsub-uplevel-perl \
 		libtest-differences-perl \
 		libtest-nowarnings-perl \
@@ -164,13 +166,12 @@ TOKYOTYRANT_PERL  = tokyotyrant-perl-1.16
 #   hunalign ... sentence aligner
 #   chared ..... character encoding detection
 
-HUNALIGN = hunalign-1.1
-CHARED   = chared-1.2
-OPENNLP  = apache-opennlp-1.5.2-incubating
+HUNALIGN     = hunalign-1.1
+CHARED       = chared-1.2
+OPENNLP      = apache-opennlp-1.5.2-incubating
 FUSECOMPRESS = https://github.com/hexxellor/fusecompress.git
-# FUSECOMPRESS = http://fusecompress.googlecode.com/svn/trunk/
-EFLOMAL    = https://github.com/robertostling/eflomal.git
-FAST_ALIGN = https://github.com/clab/fast_align.git
+EFLOMAL      = https://github.com/robertostling/eflomal.git
+FAST_ALIGN   = https://github.com/clab/fast_align.git
 
 # just in case they are installed: remove the old TokyoCabinet packages
 
@@ -474,16 +475,6 @@ software-fusecompress:
 	  ./configure; \
 	  make install; )
 	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
-
-# software-fusecompress:
-# 	! ( ${FORCE} || ! which fusecompress ) || \
-# 	( svn checkout ${FUSECOMPRESS} fusecompress; \
-# 	  cd fusecompress; \
-# 	  ./autogen.sh; \
-# 	  ./configure; \
-# 	  make install; )
-# 	sed -i "s/#user_allow_other/user_allow_other/" /etc/fuse.conf
-
 
 
 .PHONY: software-eflomal

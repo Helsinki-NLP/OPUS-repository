@@ -27,8 +27,7 @@ use File::ShareDir qw(dist_dir);
 
 # default locations and parameters for hunalign
 
-our $HUNALIGN = `which hunalign` || undef;
-chomp($HUNALIGN);
+our $HUNALIGN = undef;
 
 ## the recommended options for post-filtering do not seem to worl well
 ## (-ppthresh=30 -headerthresh=100 -topothresh=30)
@@ -117,6 +116,11 @@ our $HUNPARA     = '-realign';                                                 #
 sub new {
     my $class = shift;
     my %self  = @_;
+
+    unless ($HUNALIGN){
+	$HUNALIGN = `which hunalign`;
+	chomp($HUNALIGN);
+    }
 
     # if hunalign is not found
     # --> use Gale&Church as fall back!

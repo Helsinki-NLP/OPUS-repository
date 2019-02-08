@@ -32,7 +32,10 @@ use File::GetLineMaxLength;
 
 use File::ShareDir 'dist_dir';
 our $LOCAL_MODELS = &dist_dir('LetsMT') . '/lang/chared';
-our $TEXTCAT_LM_DIR = &dist_dir('LetsMT') . '/lang/textcat2';
+
+## don't use textcat for encoding detection!
+# our $TEXTCAT_LM_DIR = &dist_dir('LetsMT') . '/lang/textcat2';
+
 
 ## create LibMagic handle
 ## TODO: this does not seem to work in mod_perl
@@ -42,25 +45,34 @@ our $TEXTCAT_LM_DIR = &dist_dir('LetsMT') . '/lang/textcat2';
 # my $LIBMAGIC = File::LibMagic->new();
 
 
-my %TEXTCAT_MODELS = ();
+# my %TEXTCAT_MODELS = ();
 
 # initialize list of chared models (if chared is found)
 
-our $CHARED       = `which chared`       || undef;
-our $CHARED_LEARN = `which chared-learn` || undef;
+our $CHARED        = undef;
+our $CHARED_LEARN  = undef;
 our %CHARED_MODELS = ();
-
-if ($CHARED) {
-    chomp($CHARED);
-    my $models = `$CHARED --list-models`;
-    foreach ( split( /\s/, $models ) ) {
-        my $id = &iso639_NameToTwo($_);
-        $CHARED_MODELS{$id} = $_;
-    }
-}
 
 our $SIZE_CHARED     = 2**16;  # text size used for detection (in bytes)
 our $MAX_LINE_LENGTH = 2**16;  # max line length when reading files
+
+
+sub initialize_chared{
+
+    unless ($CHARED){
+	$CHARED       = `which chared`       || undef;
+	$CHARED_LEARN = `which chared-learn` || undef;
+    }
+
+    if ($CHARED) {
+	chomp($CHARED);
+	my $models = `$CHARED --list-models`;
+	foreach ( split( /\s/, $models ) ) {
+	    my $id = &iso639_NameToTwo($_);
+	    $CHARED_MODELS{$id} = $_;
+	}
+    }
+}
 
 
 =head1 FUNCTIONS
@@ -234,6 +246,7 @@ sub detect_encoding {
 	    $lang = 'zh_TW';
 	}
 
+	&initialize_chared();
 	unless ($CHARED){
 	    get_logger(__PACKAGE__)->warn("chared is not found!");
 	}
@@ -275,12 +288,6 @@ sub detect_encoding {
 	    close $in;
 	    close $out;
 
-	    ## OLD: call with backticks
-	    ##
-	    # my $safename = quotemeta($filename);
-	    # my $result   = `$CHARED -m $CHARED_MODELS{$lang} $safename`;
-	    # chomp $result;
-
 	    # call chared to predict the encoding
 	    my ($success,$ret,$result,$err) =
 		&run_cmd( $CHARED, '-m', $CHARED_MODELS{$lang},$filename );
@@ -311,7 +318,7 @@ sub detect_encoding {
     ## 3) try LibMagic
     ##    TODO: should that before using chared?
     ##    TODO: creating new objects is not very efficient
-    ##          but cteating a global handle at the start of the module
+    ##          but creating a global handle at the start of the module
     ##          does not work with mod_perl it seems
     my $LIBMAGIC = File::LibMagic->new();
     my $info = $LIBMAGIC->info_from_filename($file);
