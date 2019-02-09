@@ -4,9 +4,8 @@ To do as of version 0.56
 
 High priority:
 
-* profiling the code with https://metacpan.org/pod/Devel::NYTProf
-  https://metacpan.org/release/Devel-NYTProf
-  https://metacpan.org/pod/Devel::NYTProf::Apache
+* cronjob for cleaning /var/tmp on clients (worker nodes) 
+  - see letsmt_weekly.sh
 * make langid optional (sent_langid and doc_langid)
   ---> option to select tool or none in ImportPara_sent/doc_langid ...
 * crawling produces multiple tar-archives to reduce the size			(done)
@@ -124,6 +123,9 @@ Medium priority:
 * integrate other tokenizers for specific languages
   (mecab for ja ...)
 * code optimization (backends, validation, conversion ...)
+* profiling the code with https://metacpan.org/pod/Devel::NYTProf		(partially done)
+  https://metacpan.org/release/Devel-NYTProf
+  https://metacpan.org/pod/Devel::NYTProf::Apache
 
 
 Low priority:

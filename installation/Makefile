@@ -134,6 +134,8 @@ install-sge-client-targets install-client-targets: \
 	config-conf \
 	config-slurm \
 	install-diskroot
+	$(MAKE) update-cron-letsmt
+
 
 
 # 	/etc/ssl/${LETSMTHOST}
@@ -343,6 +345,16 @@ update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_weekly.sh
 	${INSTALL_BIN} tt_daily.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_weekly.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_monthly.sh ${PREFIX}/bin/
+	crontab crontab.tmp
+	rm -f crontab.tmp
+
+
+## on worker nodes: only letsmt cronjob for cleaning tmp files
+.PHONY: update-cron-letsmt
+update-cron-letsmt: letsmt_weekly.sh
+	-crontab -l | grep -v 'letsmt_weekly.sh'  > crontab.tmp
+	@echo '0 2  *  *  0      ${PREFIX}/bin/letsmt_weekly.sh > ${LETSMTLOG_DIR}/letsmt_weekly.out 2> ${LETSMTLOG_DIR}/letsmt_weekly.err' >> crontab.tmp
+	${INSTALL_BIN} letsmt_weekly.sh ${PREFIX}/bin/
 	crontab crontab.tmp
 	rm -f crontab.tmp
 

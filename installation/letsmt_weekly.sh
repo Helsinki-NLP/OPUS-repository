@@ -1,3 +1,3 @@
 #!/bin/bash
 
-find /var/tmp -atime +14 -delete
+find /var/tmp -atime +3 -delete
