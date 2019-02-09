@@ -133,7 +133,9 @@ sub convert {
     my $type = $self->{type} || $resource->type();
 
     # read content and parse with TIKA
+    # print STDERR "ApacheTika: read raw file ... ";
     my $RawContent    = $self->_read_raw_file($resource->local_path);
+    # print STDERR "done\n";
     my $ParsedContent;
 
     ## extract links between languages
@@ -141,14 +143,18 @@ sub convert {
     ## --> is there any generic way of doing it?
     my %translations = ();
     if ($resource->type() eq 'html'){
+	# print STDERR "ApacheTika: find language links ... ";
 	%translations = &extract_language_links($RawContent,$resource->path,$importer->{langlinks});
 	# %translations = _extract_language_links($RawContent,$resource->path,'vnk');
+	# print STDERR "done\n";
     }
 
     ## check whether we want rawxml or text from TIKA
     ## NOTE: extracting meta data seems to be very slow!
     if ( $self->{intermediate_format} eq 'rawxml' ){
+	# print STDERR "ApacheTika: parse document and return rmeta ... ";
 	my $parsed = $TIKA->rmeta($RawContent);
+	# print STDERR "done!\n";
 	if (ref($parsed) eq 'ARRAY'){
 	    if (ref($$parsed[0]) eq 'HASH'){
 		my $ParsedContent = $$parsed[0]{'X-TIKA:content'};
@@ -156,7 +162,9 @@ sub convert {
 	}
     }
     else {
+	# print STDERR "ApacheTika: parse document and return text ... ";
 	$ParsedContent = $TIKA->tika($RawContent);
+	# print STDERR "done!\n";
     }
 
     if ($ParsedContent){
@@ -177,10 +185,12 @@ sub convert {
 
 	File::Path::make_path( $tmp_resource->path_down->local_path );
 
+	# print STDERR "ApacheTika: print converted file content ... ";
 	open F,'>',$tmp_resource->local_path;
 	binmode(F,":utf8");
 	print F $ParsedContent;
 	close F;
+	# print STDERR "done!\n";
 
 	## add pre-processing tools to the importer if necessary
 	foreach ('normalizer', 'splitter', 'tokenizer') {
@@ -190,7 +200,9 @@ sub convert {
 	}
 
 	## convert text to XML with sentence markup
+	# print STDERR "ApacheTika: convert to xml ... ";
 	my $new_resources = $importer->convert_resource( $tmp_resource, $meta_resource );
+	# print STDERR "done!\n";
 
 	## NEW: add meta data about trabslations if they exist (for HTML resources)
 	if (ref($new_resources) eq 'ARRAY' && $resource->type() eq 'html' && %translations){

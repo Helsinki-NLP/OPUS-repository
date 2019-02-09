@@ -431,7 +431,7 @@ sub find_language_links {
     my $type = shift || 'vnk';
 
     # Get requested resource if necessary
-    if ( ( !-e $resource->local_path ) ) {
+    if ( ( ! -e $resource->local_path ) ) {
 	my $tmpdir = tempdir(
 	    'findlinks_XXXXXXXX',
 	    DIR     => $ENV{LETSMT_TMP},
@@ -539,6 +539,7 @@ sub extract_language_links{
     my $thisfile = shift;
     my $style    = shift;
 
+    utf8::decode($html);
     my %trans = ();
 
     ##----------------------------------------------------
@@ -546,11 +547,17 @@ sub extract_language_links{
     ##----------------------------------------------------
 
     if ($style=~/(helsinki|infofinland|jakobstad|lupapiste)/ || ! $style){
+	# print STDERR "Align::Documents: helsinki style ...\n";
+	my $count = 0;
 	while ($html=~/<link\s+rel=\"alternate\".*?hreflang=\"(..)(-..)?\"\s+href=\"(.*?)\"/sg){
 	    my ($lang,$link) = ($1,$3);
 	    # $link=~s/https?:\/\/www.helsinki.fi\//\//;
 	    $link=~s/https?:\/\/[\/]+\//\//;
 	    $trans{$lang} = $link.'.html';
+
+	    ## avoid massive loops and stop after max 100 links
+	    $count++;
+	    last if ($count > 100);
 	}
 	return %trans if (keys %trans);
     }
@@ -561,13 +568,18 @@ sub extract_language_links{
     ##----------------------------------------------------
     if ($style eq 'turku' || ! $style){
 	if ($html=~/\<ul class=\"menu menu--language-switcher\"\>(.*?)\<\/ul\>/s){
+	    # print STDERR "Align::Documents: turku style ...\n";
 	    my @langlinks = split(/\<\/li\>/,$1);
+	    my $count = 0;
 	    foreach (@langlinks){
 		if (/href=\"(.*?)\"\>([^>]*?)\<\/a\>/){
 		    my ($link,$lang) = ($1,$2);
 		    $lang = lc($lang);
 		    $trans{$lang} = $link.'.html';
 		}
+		## avoid massive loops and stop after max 100 links
+		$count++;
+		last if ($count > 100);
 	    }
 	}
 	return %trans if (keys %trans);
@@ -578,9 +590,11 @@ sub extract_language_links{
     ##----------------------------------------------------
     if ($style eq 'vnk' || ! $style){
 	if ($html=~/<ul\s+class=\"..\">\s*(<li class=\"..\".*?)\<\/ul/s){
+	    # print STDERR "Align::Documents: vnk style ...\n";
 	    my $match = $1;
 	    utf8::decode($match); 
 	    my @links = split(/\<\/li\>/,$match);
+	    my $count = 0;
 	    foreach (@links){
 		my $lang = undef;
 		my $link = undef;
@@ -598,6 +612,9 @@ sub extract_language_links{
 			$trans{$lang} = $link;
 		    }
 		}
+		## avoid massive loops and stop after max 100 links
+		$count++;
+		last if ($count > 100);
 	    }
 	}
 	return %trans if (keys %trans);
@@ -608,6 +625,7 @@ sub extract_language_links{
     ##----------------------------------------------------
 
     if ($style eq 'hanko' || ! $style){
+	# print STDERR "Align::Documents: hanko style ...\n";
 	if ($html=~/<a href="([^"]+)">På svenska<\/a>/){
 	    $trans{sv} = $1.'.html';
 	}
@@ -622,20 +640,28 @@ sub extract_language_links{
     ##----------------------------------------------------
 
     if ($style eq 'fisven' || ! $style){
-	for ('på svenska', 'in swedish', 'svenska', 'swedish', 'sv'){
-	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
-		$trans{sv} = $1;
+	# print STDERR "Align::Documents: fisven style ...\n";
+
+	## TODO: is this efficient enough??
+	my %re = ( sv => 'på svenska|in swedish|svenska|swedish|sv|sv-se|sv_se|swe',
+		   fi => 'suomeksi|in finnish|finnish|fi|fi-fi|fi_fi|fin',
+		   en => 'in english|en|en-us|en-uk|en_us|en_uk|eng' );
+
+	my $langRE = join( '|',values %re );
+
+	my $count = 0;
+	while ($html=~/href=\"([^\"]+)\"[^\>]*\>\s*($langRE)\s*\</sgio){
+	    my ($link,$lang) = ($1,$2);
+	    foreach (keys %re){
+		next if (exists $trans{$_});
+		if ($lang=~/re{$_}/){
+		    $trans{$_} = $link;
+		    $count++;
+		    last;
+		}
 	    }
-	}
-	for ('suomeksi', 'in finnish', 'finnish', 'fi'){
-	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
-		$trans{fi} = $1;
-	    }
-	}
-	for ('in english', 'english', 'en'){
-	    while ($html=~/href=\"(.*?)\".*?\>$_\<\/a\>/sgi){
-		$trans{en} = $1;
-	    }
+	    ## avoid massive loops and stop after max 100 links
+	    last if ($count > 100);
 	}
 	return %trans if (keys %trans);
     }
