@@ -332,16 +332,16 @@ restart-apache:
 # - optimize the databases
 
 .PHONY: update-cron
-update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_weekly.sh
+update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_daily.sh
 	-crontab -l | \
-		grep -v 'letsmt_weekly.sh' | \
+		grep -v 'letsmt_daily.sh' | \
 		grep -v 'tt_daily.sh' | \
 		grep -v 'tt_monthly.sh' > crontab.tmp
-	@echo '0 2  *  *  0      ${PREFIX}/bin/letsmt_weekly.sh > ${LETSMTLOG_DIR}/letsmt_weekly.out 2> ${LETSMTLOG_DIR}/letsmt_weekly.err' >> crontab.tmp
+	@echo '0 2  *  *  *      ${PREFIX}/bin/letsmt_daily.sh > ${LETSMTLOG_DIR}/letsmt_daily.out 2> ${LETSMTLOG_DIR}/letsmt_daily.err' >> crontab.tmp
 	@echo '0 3  *  *  *      ${PREFIX}/bin/tt_daily.sh > ${LETSMTLOG_DIR}/tt_daily.out 2> ${LETSMTLOG_DIR}/tt_daily.err' >> crontab.tmp
 	@echo '1 3  *  *  0      ${PREFIX}/bin/tt_weekly.sh > ${LETSMTLOG_DIR}/letsmt_weekly.out 2> ${LETSMTLOG_DIR}/letsmt_weekly.err' >> crontab.tmp
 	@echo '0 4  1  *  *      ${PREFIX}/bin/tt_monthly.sh > ${LETSMTLOG_DIR}/tt_monthly.out 2> ${LETSMTLOG_DIR}/tt_monthly.err' >> crontab.tmp
-	${INSTALL_BIN} letsmt_weekly.sh ${PREFIX}/bin/
+	${INSTALL_BIN} letsmt_daily.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_daily.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_weekly.sh ${PREFIX}/bin/
 	${INSTALL_BIN} tt_monthly.sh ${PREFIX}/bin/
@@ -351,10 +351,10 @@ update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_weekly.sh
 
 ## on worker nodes: only letsmt cronjob for cleaning tmp files
 .PHONY: update-cron-letsmt
-update-cron-letsmt: letsmt_weekly.sh
-	-crontab -l | grep -v 'letsmt_weekly.sh'  > crontab.tmp
-	@echo '0 2  *  *  0      ${PREFIX}/bin/letsmt_weekly.sh > ${LETSMTLOG_DIR}/letsmt_weekly.out 2> ${LETSMTLOG_DIR}/letsmt_weekly.err' >> crontab.tmp
-	${INSTALL_BIN} letsmt_weekly.sh ${PREFIX}/bin/
+update-cron-letsmt: letsmt_daily.sh
+	-crontab -l | grep -v 'letsmt_daily.sh'  > crontab.tmp
+	@echo '0 2  *  *  *      ${PREFIX}/bin/letsmt_daily.sh > ${LETSMTLOG_DIR}/letsmt_daily.out 2> ${LETSMTLOG_DIR}/letsmt_daily.err' >> crontab.tmp
+	${INSTALL_BIN} letsmt_daily.sh ${PREFIX}/bin/
 	crontab crontab.tmp
 	rm -f crontab.tmp
 
