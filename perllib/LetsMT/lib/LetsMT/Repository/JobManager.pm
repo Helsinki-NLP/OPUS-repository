@@ -1982,6 +1982,7 @@ sub submit_slurm_job {
     # check if job was submitted
     my $status = undef;
     check_status( message => \$status, job_id => $jobID );
+    # get_logger(__PACKAGE__)->debug("$jobID ... $status\n");
     return $status;
 }
 

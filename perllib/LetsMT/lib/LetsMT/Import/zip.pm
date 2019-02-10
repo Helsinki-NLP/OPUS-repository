@@ -79,7 +79,7 @@ sub convert {
             &safe_path( $resource->local_path ) );
     my $count=0;
     while ( my $exline = &$cmd_reader ) {
-	$exfile = &utf8_to_perl($exfile);
+	$exline = &utf8_to_perl($exline);
         if ( $exline =~ /^\s*(?:extracting|inflating):\s*$local_home\/(.*?)\s*$/ ){
             my $exfile = $1;
 
