@@ -92,7 +92,7 @@ sub convert {
 
     while ( my $exfile = &$cmd_reader ) {
         chomp $exfile;
-	# $exfile = &utf8_to_perl($exfile);
+	$exfile = &utf8_to_perl($exfile);
         next if ($exfile =~ /\/$/ );              # skip directories
 	next if (basename($exfile)=~/^\./);       # skip files starting with .
 	next if grep($_ eq $exfile,@done);        # skip files that have been done already

@@ -541,6 +541,7 @@ sub extract_language_links{
 
     utf8::decode($html);
     my %trans = ();
+    my %countLinks = ();
 
     ##----------------------------------------------------
     ## helsinki.fi, infofinland.fi, jakobstad.fi, lupapiste style
@@ -554,11 +555,13 @@ sub extract_language_links{
 	    # $link=~s/https?:\/\/www.helsinki.fi\//\//;
 	    $link=~s/https?:\/\/[\/]+\//\//;
 	    $trans{$lang} = $link.'.html';
+	    $countLinks{helsinki}++;
 
 	    ## avoid massive loops and stop after max 100 links
 	    $count++;
 	    last if ($count > 100);
 	}
+	print STDERR "lang links found: ",join(':',%countLinks),"\n" if (%countLinks);
 	return %trans if (keys %trans);
     }
 
@@ -576,12 +579,14 @@ sub extract_language_links{
 		    my ($link,$lang) = ($1,$2);
 		    $lang = lc($lang);
 		    $trans{$lang} = $link.'.html';
+		    $countLinks{turku}++;
 		}
 		## avoid massive loops and stop after max 100 links
 		$count++;
 		last if ($count > 100);
 	    }
 	}
+	print STDERR "lang links found: ",join(':',%countLinks),"\n" if (%countLinks);
 	return %trans if (keys %trans);
     }
     ##----------------------------------------------------
@@ -610,6 +615,7 @@ sub extract_language_links{
 		if ($lang && $link!~/missinglanguageversion/){
 		    if ($link ne $thisfile){
 			$trans{$lang} = $link;
+			$countLinks{vnk}++;
 		    }
 		}
 		## avoid massive loops and stop after max 100 links
@@ -617,6 +623,7 @@ sub extract_language_links{
 		last if ($count > 100);
 	    }
 	}
+	print STDERR "lang links found: ",join(':',%countLinks),"\n" if (%countLinks);
 	return %trans if (keys %trans);
     }
 
@@ -628,10 +635,13 @@ sub extract_language_links{
 	# print STDERR "Align::Documents: hanko style ...\n";
 	if ($html=~/<a href="([^"]+)">På svenska<\/a>/){
 	    $trans{sv} = $1.'.html';
+	    $countLinks{hanko}++;
 	}
 	if ($html=~/<a href="([^"]+)">Suomeksi<\/a>/){
 	    $trans{fi} = $1.'.html';
+	    $countLinks{hanko}++;
 	}
+	print STDERR "lang links found: ",join(':',%countLinks),"\n" if (%countLinks);
 	return %trans if (keys %trans);
     }
 
@@ -656,6 +666,7 @@ sub extract_language_links{
 		next if (exists $trans{$_});
 		if ($lang=~/re{$_}/){
 		    $trans{$_} = $link;
+		    $countLinks{fisven}++;
 		    $count++;
 		    last;
 		}
@@ -663,6 +674,7 @@ sub extract_language_links{
 	    ## avoid massive loops and stop after max 100 links
 	    last if ($count > 100);
 	}
+	print STDERR "lang links found: ",join(':',%countLinks),"\n" if (%countLinks);
 	return %trans if (keys %trans);
     }
 

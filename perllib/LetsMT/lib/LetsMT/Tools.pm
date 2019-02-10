@@ -24,6 +24,9 @@ use Encode qw(decode decode_utf8 encode);
 use IPC::Open3;
 use IPC::Run qw(run start pump finish timeout);
 
+## TODO: should we use this to always have utf8 from system calls?
+# use open qw(:std :utf8);
+
 
 #########################
 ## TODO: not working yet ....
