@@ -378,8 +378,17 @@ sub import_resource {
     my $branch = $resource->user();
     my $corpus = &LetsMT::Resource::make( $slot, $branch );
 
+    ## avoid zipping compressed data
+    ## TODO: a bit ad-hoc to match resource type with a regex ....
+    my %param   = ();
+    my $restype = $resource->type();
+    $param{archive} = 'no' if ($restype=~/(tar|tar.gz|gz|tgz|zip)$/);
+
+    ## TODO: or should we even avoid zipping any single file
+    # $param{archive} = 'no' if (is_file($resource));
+
     # Get requested resource
-    unless ( &LetsMT::WebService::get_resource($resource) ) {
+    unless ( &LetsMT::WebService::get_resource($resource, %param) ) {
         get_logger(__PACKAGE__)->error("Unable to fetch resource: $resource");
         &LetsMT::WebService::post_meta( $resource,
             status => 'failed to fetch' );
