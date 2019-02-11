@@ -4,13 +4,13 @@ To do as of version 0.56
 
 High priority:
 
-* cronjob for cleaning /var/tmp on clients (worker nodes) 
+* cronjob for cleaning /var/tmp on clients (worker nodes)			(done)
   - see letsmt_weekly.sh
-* make langid optional (sent_langid and doc_langid)
+* make langid optional (sent_langid and doc_langid)				(done?)
   ---> option to select tool or none in ImportPara_sent/doc_langid ...
 * crawling produces multiple tar-archives to reduce the size			(done)
   - use File::Find to get the files and      	    				(external find is faster)
-    split into archives of max 5000 files					(sytem split)
+    split into archives of max 5000 files					(using system split)
     https://stackoverflow.com/questions/17754931/finding-files-with-perl
     https://www.perlmonks.org/?node_id=217166
 * get rid of encode/decode and fix all the unicode issues
@@ -29,6 +29,14 @@ High priority:
   --> even match translated names? (difficult)
       (use simple lexical matches with prob's?)
 * incremental crawling (only update changed pages)
+  - could use file checksums for comparison					(md5 added)
+    https://metacpan.org/pod/Digest::MD5::File  this seems optimal!!
+    https://metacpan.org/pod/Digest
+    https://metacpan.org/pod/Digest::MD4	fastest
+    https://metacpan.org/pod/Digest::MD5    	widely used
+    https://metacpan.org/pod/File::Signature	specific for files
+    https://metacpan.org/pod/File::Checksum
+    https://metacpan.org/pod/File::Modified
 * TMX options
   - option for removing duplicates						(done = default)
   - large imports (tar-files) etc - send only one de-duplicated TMX		(skip this?)

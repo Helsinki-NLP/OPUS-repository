@@ -40,6 +40,7 @@ use LetsMT::DataProcessing::Tokenizer;
 
 use Cwd;
 use Data::Dumper;
+use Digest::MD5::File qw/dir_md5_hex/;
 use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
 
@@ -1226,7 +1227,29 @@ sub run_crawler{
     # if (&run_cmd( 'wget', @para, $args->{url} ) ){
     # 	if (&run_cmd('tar', '-czf', $tarfile, '-C', $slot, './')){
 
+    print STDERR "run wget:\n";
+    print STDERR join(' ', 'wget', @para, $args->{url} );
+    print STDERR "\n";
+
     if (&safe_system( 'wget', @para, $args->{url} ) ){
+
+	## NEW: create md5 signatures for all files
+	## --> allow checking for changes in subsequent crawl jobs (not yet implemented)
+	my $md5hash = dir_md5_hex($domain);
+	my $md5file = $tarbase.'.md5';
+	if (ref($md5hash) eq 'HASH'){
+	    if (open F,'>',$md5file){
+		binmode(F,":utf8");
+		foreach (keys %{$md5hash}){
+		    print F $_,"\t",$$md5hash{$_},"\n";
+		}
+		close F;
+	    }
+	    $$path_elements[-1] = basename($tarbase).'.md5';
+	    my $md5resource = LetsMT::Resource::make($slot,$branch,
+						     join('/',@{$path_elements}));
+	    &LetsMT::WebService::put_file( $md5resource, $md5file );
+	}
 
 	## NEW: split into chunks of max 5000 files
 	&safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $tarbase.'_') ||
@@ -1248,7 +1271,7 @@ sub run_crawler{
 		foreach (0..9){
 		    ## switch off auto-alignment to avoid racing issues if several 
 		    ## imports run in parallel
-		    ## TODO: maybe it's OK anyway ... leave it for now aas it is
+		    ## TODO: maybe it's OK anyway ... leave it for now as it is
 		    ## 
 		    # LetsMT::WebService::post_meta( $resource, 
 		    # 				   uid => $args->{uid}, 

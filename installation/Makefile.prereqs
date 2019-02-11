@@ -38,6 +38,7 @@ UBUNTU_BASE_PACKAGES = \
 		libcrypt-ssleay-perl \
 		libdevel-nytprof-perl \
 		libdbi-perl \
+		libdigest-md5-file-perl \
 		libdrmaa-java \
 		libfile-bom-perl \
 		libfile-slurp-perl \
@@ -126,6 +127,9 @@ CPAN_MODULES = 	Apache::Tika \
 		URL::Encode \
 		URL::Encode::XS
 
+
+## apt-get package exists
+#		Digest::MD5::File \
 
 #		Inline::Python    # not needed anymore (does not work with mod_perl)
 #		String::Approx    # installed via libstring-approx-perl
