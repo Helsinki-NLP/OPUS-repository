@@ -289,7 +289,9 @@ sub find_translations {
     ## if there are given resources:
     ## search only for those resources (their basename without lang/subdir)
     ## TODO: this might become expensive if there are many resources!
-    if (@{$resources}){
+    ## ---> could we simply have an upper limit of resources that we can serve here?
+    ##      now: not more than 100 ....
+    if (@{$resources}  && (scalar @{$resources} <= 100)){
 	my %basepaths = ();
 	foreach my $r (@{$resources}){
 	    my $base = $r->basename;

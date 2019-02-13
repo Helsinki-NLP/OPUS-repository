@@ -4,6 +4,8 @@ To do as of version 0.56
 
 High priority:
 
+* speed up the detection of align candidates in large data sets
+  (import process seems to be stuck for a long time in crawled imports)
 * cronjob for cleaning /var/tmp on clients (worker nodes)			(done)
   - see letsmt_weekly.sh
 * make langid optional (sent_langid and doc_langid)				(done?)
