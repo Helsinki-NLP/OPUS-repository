@@ -335,7 +335,9 @@ restart-apache:
 update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_daily.sh
 	-crontab -l | \
 		grep -v 'letsmt_daily.sh' | \
+		grep -v 'letsmt_weekly.sh' | \
 		grep -v 'tt_daily.sh' | \
+		grep -v 'tt_weekly.sh' | \
 		grep -v 'tt_monthly.sh' > crontab.tmp
 	@echo '0 2  *  *  *      ${PREFIX}/bin/letsmt_daily.sh > ${LETSMTLOG_DIR}/letsmt_daily.out 2> ${LETSMTLOG_DIR}/letsmt_daily.err' >> crontab.tmp
 	@echo '0 3  *  *  *      ${PREFIX}/bin/tt_daily.sh > ${LETSMTLOG_DIR}/tt_daily.out 2> ${LETSMTLOG_DIR}/tt_daily.err' >> crontab.tmp
