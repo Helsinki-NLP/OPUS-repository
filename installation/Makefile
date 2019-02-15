@@ -354,7 +354,7 @@ update-cron: tt_daily.sh tt_weekly.sh tt_monthly.sh letsmt_daily.sh
 ## on worker nodes: only letsmt cronjob for cleaning tmp files
 .PHONY: update-cron-letsmt
 update-cron-letsmt: letsmt_daily.sh
-	-crontab -l | grep -v 'letsmt_daily.sh'  > crontab.tmp
+	-crontab -l | grep -v 'letsmt_daily.sh' | grep -v 'letsmt_weekly.sh'  > crontab.tmp
 	@echo '0 2  *  *  *      ${PREFIX}/bin/letsmt_daily.sh > ${LETSMTLOG_DIR}/letsmt_daily.out 2> ${LETSMTLOG_DIR}/letsmt_daily.err' >> crontab.tmp
 	${INSTALL_BIN} letsmt_daily.sh ${PREFIX}/bin/
 	crontab crontab.tmp
