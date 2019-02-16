@@ -48,13 +48,13 @@ use LetsMT::Import::XCESWriter;
 =cut
 
 our %WRITER = (
-    txt   => 'LetsMT::Export::Writer::Text',
-    xml   => 'LetsMT::Export::Writer::XML',
-    # tmx   => 'LetsMT::Export::Writer::TMX',
-    tmx   => 'LetsMT::Export::Writer::TMX::Unique',
-    moses => 'LetsMT::Export::Writer::Moses',
-    align => 'LetsMT::Export::Writer::XCES',
-    xces  => 'LetsMT::Import::XCESWriter'
+    txt        => 'LetsMT::Export::Writer::Text',
+    xml        => 'LetsMT::Export::Writer::XML',
+    tmx        => 'LetsMT::Export::Writer::TMX',
+    tmx_unique => 'LetsMT::Export::Writer::TMX::Unique',
+    moses      => 'LetsMT::Export::Writer::Moses',
+    align      => 'LetsMT::Export::Writer::XCES',
+    xces       => 'LetsMT::Import::XCESWriter'
 );
 
 $WRITER{text}   = $WRITER{txt};

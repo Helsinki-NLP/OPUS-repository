@@ -29,7 +29,10 @@ LETSMT_USERKEY  = ${LETSMT_SSL_DIR}/user/keys/developers@localhost.key
 LETSMT_USERCERTPASS = letsmt
 
 ## server and compute nodes for SLURM
-SLURM_NODES  = ${NODENAME}
+SLURM_NODES_STANDARD = ${NODENAME}
+SLURM_NODES_SHORT    = ${NODENAME}
+SLURM_NODES_LONG     = ${NODENAME}
+
 ifndef SLURM_SERVER
     SLURM_SERVER = ${NODENAME}
 endif
@@ -638,7 +641,9 @@ config-slurm: 	/etc/slurm-llnl/slurm.conf \
 /etc/slurm-llnl/slurm.conf: slurm.conf
 	mkdir -p ${dir $@}
 	sed -e "s#REPLACE_SLURM_SERVER#${SLURM_SERVER}#" \
-	    -e "s#REPLACE_SLURM_NODES#${SLURM_NODES}#" \
+	    -e "s#REPLACE_SLURM_NODES_STANDARD#${SLURM_NODES_STANDARD}#" \
+	    -e "s#REPLACE_SLURM_NODES_SHORT#${SLURM_NODES_SHORT}#" \
+	    -e "s#REPLACE_SLURM_NODES_LONG#${SLURM_NODES_LONG}#" \
 	< $< > $@
 
 

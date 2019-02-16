@@ -82,8 +82,8 @@ sub create_job {
     my $path     = $args{'path'}     or raise( 12, 'path',         'error' );
     my $user     = $args{'uid'}      or raise( 12, 'user',         'error' );
     my $commands = $args{'commands'} or raise( 12, 'command list', 'error' );
-    my $walltime = $args{'walltime'} || 10;
-    my $queue    = $args{'queue'}    || 'letsmt';
+    my $walltime = $args{'walltime'} || 4320;
+    my $queue    = $args{'queue'}    || 'standard';
 
     push my @cmd_array, map { { "command" => $_ } } $commands;
 
@@ -167,12 +167,15 @@ sub job_maker{
             ' ' . &safe_path( $args->{$_} );
     }
 
+    my $queue    = $args->{queue} || 'standard';
+    my $walltime = $args->{walltime} || 4320;
+
     # create job
     create_job(
         path     => $jobfile,
         uid      => $args->{uid},
-        walltime => 5,
-        queue    => 'letsmt',
+        walltime => $walltime,
+        queue    => $queue,
         commands => [
             'letsmt_make'
             . ' -u ' . &safe_path( $args->{uid} )
@@ -186,9 +189,11 @@ sub job_maker{
     # and submit job
     my $message;
     my $jobID = &submit(
-        message => \$message,
-        path    => $jobfile,
-        uid     => $args->{uid},
+        message  => \$message,
+        path     => $jobfile,
+        uid      => $args->{uid},
+	queue    => $queue,
+	walltime => $walltime,
 	);
 
     ## save job ID also for the resource
@@ -972,19 +977,23 @@ sub run_make_tmx {
 	}
     }
 
-    ## output resource
+    ## output resource and output writer
+    ## if the file is a single xces file: create standard TMX file
+    ## if the file is a durectory: create a TMX with unique entries (no duplicates)
     my $outres = undef;
+    my $output = undef;
     if ($resource->type ne 'xces') {
 	$outres = $resource->graft_suffix('.tmx');
+	$output = new LetsMT::Export::Writer( $outres, 'tmx_unique' );
     }
     else{
 	$outres = $resource->clone;
+	$output = new LetsMT::Export::Writer( $outres, 'tmx' );
     }
     $outres->base_path('tmx');
 
     ## readers and writers
     my $input = new LetsMT::Export::Reader( $resource, $resource->type );
-    my $output = new LetsMT::Export::Writer( $outres, 'tmx' );
 
     return undef unless($input);
     return undef unless($output);
@@ -1143,6 +1152,9 @@ sub run_crawler{
     # 	unless ($args->{url}=~/^(http|https|ftp):\/\/(.*)$/);
     raise( 17, "URL (supported = http|https|ftp)", 'warn' ) 
 	unless ($args->{url}=~/^(http|https|ftp):\/\/([a-zA-Z0-9][a-zA-Z0-9\.\-]*[a-zA-Z0-9])(\/[\~a-zA-Z0-9\.\-\/]*)?$/i);
+
+    ## select long queue as the default
+    $$args{queue} = 'long' unless ($$args{queue});
 
     my $domain = $2;
     my $doc    = $domain;
@@ -1381,11 +1393,12 @@ sub run_import_resource{
     $command .= ' -T ' . safe_path($$args{tokenizer}) if (defined $$args{tokenizer});
     $command .= ' -N ' . safe_path($$args{normalizer}) if (defined $$args{normalizer});
 
+    my $queue = $args->{uid} || 'standard';
     my $job_resource = &create_job(
         path     => $jobfile ,
         uid      => $args->{uid},
-        walltime => 5,
-        queue    => 'letsmt',
+        # walltime => 5,
+        queue    => $queue,
         commands => [ $command ],
     );
 
@@ -1789,10 +1802,10 @@ sub submit {
 
     ## submit either to SGE ot SLURM
     if ($ENV{LETSMT_BATCHQUEUE_MANAGER} eq 'sge'){
-	$status = submit_sge_job($job,$jobID,$workDir,$jobOut,$jobErr);
+	$status = submit_sge_job($job,$jobID,$workDir,$jobOut,$jobErr,\%args);
     }
     else{
-	$status = submit_slurm_job($job,$jobID,$workDir,$jobOut,$jobErr);
+	$status = submit_slurm_job($job,$jobID,$workDir,$jobOut,$jobErr,\%args);
     }
 
     $logger->debug( 'Job status:' . $status );
@@ -1987,7 +2000,7 @@ sub _get_jobid_from_status{
 
 
 sub submit_slurm_job {
-    my ($job,$jobID,$workDir,$jobOut,$jobErr) = @_;
+    my ($job,$jobID,$workDir,$jobOut,$jobErr,$args) = @_;
 
     my ($fh, $filename) = tempfile();
     binmode( $fh, ':encoding(utf8)' );
@@ -1996,11 +2009,25 @@ sub submit_slurm_job {
     close $fh;
 
     ## TODO: more options? -t for time limit? mail when finished?
+    ## (check args)
 
-    get_logger(__PACKAGE__)->debug("slurm: sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename");
-    LetsMT::Repository::Safesys::sys(
-        "sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename"
-    );
+    my %para = ('-n' => 1,
+		'-J' => $jobID,
+		'-D' => $workDir,
+		'-e' => $jobErr,
+		'-o' => $jobOut);
+    if (ref($args) eq 'HASH'){
+	$para{'-p'} = $$args{queue} if $$args{queue};
+    }
+    my $cmd = 'sbatch '.join(' ',%para).' '.$filename;
+
+    get_logger(__PACKAGE__)->debug("slurm: ".$cmd);
+    LetsMT::Repository::Safesys::sys($cmd);
+
+    # get_logger(__PACKAGE__)->debug("slurm: sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename");
+    # LetsMT::Repository::Safesys::sys(
+    #     "sbatch -n 1 -J $jobID -D $workDir -e $jobErr -o $jobOut $filename"
+    # );
 
     # check if job was submitted
     my $status = undef;

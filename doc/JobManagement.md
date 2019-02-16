@@ -168,6 +168,13 @@ A special case is if make_tmx is called on the root of the xml directory. This w
 $LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml?uid=user&run=make_tmx"
 ```
 
+* specify the queue for the job to run
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/xml?uid=user&run=make_tmx&queue=short"
+```
+
+
 
 # TODO
 
