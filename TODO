@@ -4,7 +4,19 @@ To do as of version 0.56
 
 High priority:
 
-* support for multiple queues (keep long-term crawl jobs separate)
+* try other web crawlers
+  wget does not recursively retrieve https://valtioneuvosto.fi
+  wget2, spiderling, scrapy ...?
+  https://gitlab.com/gnuwget/wget2
+  wget2 has some interesting options like --timestamping and --filter-mime-type
+  more info: https://gnuwget.gitlab.io/wget2/reference/md_wget2.html
+  wget options (that do not help in the case above)
+  -e robots=off
+  -U Mozilla - set the "User-Agent" header to "Mozilla". Though a better choice is a real User-Agent like "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729)".
+  --limit-rate=20k - limits download speed to 20kbps.
+  -o logfile.txt - log the downloads.
+  -l 0 - remove recursion depth (which is 5 by default).
+* support for multiple queues (keep long-term crawl jobs separate)		(started)
 * speed up the detection of align candidates in large data sets			(now: file limit in import)
   (import process seems to be stuck for a long time in crawled imports)
 * cronjob for cleaning /var/tmp on clients (worker nodes)			(done)
@@ -85,15 +97,6 @@ High priority:
 
 Medium priority:
 
-* try other web crawlers
-  wget does not recursively retrieve https://valtioneuvosto.fi
-  wget2, spiderling, scrapy ...?
-  wget options (that do not help in the case above)
-  -e robots=off
-  -U Mozilla - set the "User-Agent" header to "Mozilla". Though a better choice is a real User-Agent like "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729)".
-  --limit-rate=20k - limits download speed to 20kbps.
-  -o logfile.txt - log the downloads.
-  -l 0 - remove recursion depth (which is 5 by default).
 * find translated documents based on their contents (difficult)
   --> use external tools for searching parallel documents?
   --> multilingual sentence-embedding based methods
