@@ -52,112 +52,115 @@ install-storage-server install-sge-client install-client install-frontend: prepa
 
 
 
-###########################################################################
-## OPUS specific installation (remote git & OPUS-specific ssl keys)
+## OPUS specific targets moved to opus/Makefile
 ##
-##   sudo make install-opus .......... install repository server
-##   sudo make install-opus-client ... install slurm compute node
 ##
-###########################################################################
+# ###########################################################################
+# ## OPUS specific installation (remote git & OPUS-specific ssl keys)
+# ##
+# ##   sudo make install-opus .......... install repository server
+# ##   sudo make install-opus-client ... install slurm compute node
+# ##
+# ###########################################################################
 
-## remote git server for OPUS
-GITSEVER = version.helsinki.fi
-OPUSGIT  = git@${GITSERVER}:OPUS
-ADMIN    = tiedeman
-KEYHOME  = taito.csc.fi:/proj/OPUS/admin/repository
+# ## remote git server for OPUS
+# GITSEVER = version.helsinki.fi
+# OPUSGIT  = git@${GITSERVER}:OPUS
+# ADMIN    = tiedeman
+# KEYHOME  = taito.csc.fi:/proj/OPUS/admin/repository
 
-## stable version
-OPUS_STABLE    = vm1637.kaj.pouta.csc.fi
-OPUS_STABLE_IP = 192.168.1.19
+# ## stable version
+# OPUS_STABLE    = vm1637.kaj.pouta.csc.fi
+# OPUS_STABLE_IP = 192.168.1.19
 
-## development version
-OPUS_DEV       = vm0081.kaj.pouta.csc.fi
-OPUS_DEV_IP    = 192.168.1.10
-
-
-## install stable versions
-opus-stable opus-client-stable:
-	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
-		OPUSRR=${OPUS_STABLE} \
-		OPUSIP=${OPUS_STABLE_IP} \
-	${@:-stable=}
-
-## install development versions
-opus-dev opus-client-dev:
-	${MAKE} OPUSGIT= \
-		OPUSRR=${OPUS_DEV} \
-		OPUSIP=${OPUS_DEV_IP} \
-	${@:-dev=}
-
-ifndef OPUSRR
-  OPUSRR = ${OPUS_STABLE}
-  OPUSIP = ${OPUS_STABLE_IP}
-endif
-
-## install repository for OPUS with connection to remote git server
-.PHONY: install-opus opus
-install-opus opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
-	${MAKE} GIT_REMOTE='${OPUSGIT}' HOSTNAME=${OPUSRR} install
-	service munge restart
-	service slurm-llnl restart
-	@echo
-	@echo '----------------------------------------------------------';
-	@echo "Installation of the OPUS repository backend finished"
-	@echo "Don't forget to upload the public key /etc/ssh/opusrr.pub"
-	@echo "to the git server at ${OPUSGIT}!"
-	@echo '----------------------------------------------------------';
-	@echo
-
-.PHONY: install-opus-client opus-client
-install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
-	${MAKE} SLURM_SERVER=${OPUSIP} LETSMTHOST=${OPUSRR} install-client
-	service munge restart
-	service slurm-llnl restart
-
-/var/www/.ssh/config: /etc/ssh/opusrr
-	mkdir -p ${dir $@}
-	echo 'Host *' > $@
-	echo '  IdentityFile /etc/ssh/opusrr' >> $@
-	chown -R www-data:www-data $@
-	chmod 700 $@
-	chmod 400 $@
-	ssh-keyscan -H ${GITSERVER} > ${dir $@}/known_hosts
-	chown -R www-data:www-data ${dir $@}/known_hosts
+# ## development version
+# OPUS_DEV       = vm0081.kaj.pouta.csc.fi
+# OPUS_DEV_IP    = 192.168.1.10
 
 
-## copy ssh, ssl and munge keys from KEYHOME
+# ## install stable versions
+# opus-stable opus-client-stable:
+# 	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
+# 		OPUSRR=${OPUS_STABLE} \
+# 		OPUSIP=${OPUS_STABLE_IP} \
+# 	${@:-stable=}
 
-/etc/ssh/opusrr:
-	mkdir -p ${dir $@}
-	rsync -zav ${ADMIN}@${KEYHOME}/ssh/opusrr* ${dir $@}
-	chown www-data:www-data $@ $@.pub
-	chmod 400 $@
-	chmod 444 $@.pub
+# ## install development versions
+# opus-dev opus-client-dev:
+# 	${MAKE} OPUSGIT= \
+# 		OPUSRR=${OPUS_DEV} \
+# 		OPUSIP=${OPUS_DEV_IP} \
+# 	${@:-dev=}
 
-/etc/munge/munge.key:
-	mkdir -p ${dir $@}
-	apt-get -qq install munge
-	rsync -zav ${ADMIN}@${KEYHOME}/munge/munge.key $@
-	chmod 400 $@
-	chmod 700 ${dir $@}
-	chown munge:munge ${dir $@} $@
+# ifndef OPUSRR
+#   OPUSRR = ${OPUS_STABLE}
+#   OPUSIP = ${OPUS_STABLE_IP}
+# endif
 
-/etc/ssl/${OPUSRR}:
-	mkdir -p ${dir $@}
-	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${OPUSRR} ${dir $@}
-	chmod -R og+rX $@
+# ## install repository for OPUS with connection to remote git server
+# .PHONY: install-opus opus
+# install-opus opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
+# 	${MAKE} GIT_REMOTE='${OPUSGIT}' HOSTNAME=${OPUSRR} install
+# 	service munge restart
+# 	service slurm-llnl restart
+# 	@echo
+# 	@echo '----------------------------------------------------------';
+# 	@echo "Installation of the OPUS repository backend finished"
+# 	@echo "Don't forget to upload the public key /etc/ssh/opusrr.pub"
+# 	@echo "to the git server at ${OPUSGIT}!"
+# 	@echo '----------------------------------------------------------';
+# 	@echo
 
-## generate a new ssh key for remote git access
-#
-#/etc/ssh/opusrr:
-#	ssh-keygen -q -t rsa -f $@ -N ""
-#	chown www-data:www-data $@
-#	chmod 400 $@
+# .PHONY: install-opus-client opus-client
+# install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
+# 	${MAKE} SLURM_SERVER=${OPUSIP} LETSMTHOST=${OPUSRR} install-client
+# 	service munge restart
+# 	service slurm-llnl restart
+
+# /var/www/.ssh/config: /etc/ssh/opusrr
+# 	mkdir -p ${dir $@}
+# 	echo 'Host *' > $@
+# 	echo '  IdentityFile /etc/ssh/opusrr' >> $@
+# 	chown -R www-data:www-data $@
+# 	chmod 700 $@
+# 	chmod 400 $@
+# 	ssh-keyscan -H ${GITSERVER} > ${dir $@}/known_hosts
+# 	chown -R www-data:www-data ${dir $@}/known_hosts
 
 
-###########################################################################
-## end of OPUS specific installation
-###########################################################################
+# ## copy ssh, ssl and munge keys from KEYHOME
+
+# /etc/ssh/opusrr:
+# 	mkdir -p ${dir $@}
+# 	rsync -zav ${ADMIN}@${KEYHOME}/ssh/opusrr* ${dir $@}
+# 	chown www-data:www-data $@ $@.pub
+# 	chmod 400 $@
+# 	chmod 444 $@.pub
+
+# /etc/munge/munge.key:
+# 	mkdir -p ${dir $@}
+# 	apt-get -qq install munge
+# 	rsync -zav ${ADMIN}@${KEYHOME}/munge/munge.key $@
+# 	chmod 400 $@
+# 	chmod 700 ${dir $@}
+# 	chown munge:munge ${dir $@} $@
+
+# /etc/ssl/${OPUSRR}:
+# 	mkdir -p ${dir $@}
+# 	rsync -zav ${ADMIN}@${KEYHOME}/ssl/${OPUSRR} ${dir $@}
+# 	chmod -R og+rX $@
+
+# ## generate a new ssh key for remote git access
+# #
+# #/etc/ssh/opusrr:
+# #	ssh-keygen -q -t rsa -f $@ -N ""
+# #	chown www-data:www-data $@
+# #	chmod 400 $@
+
+
+# ###########################################################################
+# ## end of OPUS specific installation
+# ###########################################################################
 
 
 

@@ -19,7 +19,6 @@ use XML::Writer;
 use LetsMT::Resource;
 use LetsMT::Tools;
 
-
 =head1 CONSTRUCTOR
 
 =cut
@@ -155,6 +154,10 @@ package LetsMT::Export::Writer::TMX::Unique;
 use parent 'LetsMT::Export::Writer::TMX';
 use File::Temp qw(tempfile tempdir);
 use Data::Dumper;
+use DBM_Filter;
+use DB_File;
+
+
 
 $Data::Dumper::Terse = 1;
 $Data::Dumper::Sortkeys = 1;

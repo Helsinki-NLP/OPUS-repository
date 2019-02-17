@@ -6,8 +6,6 @@ LetsMT::Repository::JobManager - manager for the job API
 
 =head1 DESCRIPTION
 
-Interacts with the Oracle (Sun) Grid Engine.
-
 =cut
 
 use strict;
@@ -21,6 +19,11 @@ use File::Temp qw/tempfile tempdir/;
 use File::Path;
 use Encode qw(decode decode_utf8 is_utf8);
 use MIME::Lite;
+use POSIX qw(strftime);
+use DBM_Filter;
+use DB_File;
+
+
 
 use LetsMT::Repository::MetaManager;
 use LetsMT::Resource;
@@ -40,7 +43,7 @@ use LetsMT::DataProcessing::Tokenizer;
 
 use Cwd;
 use Data::Dumper;
-use Digest::MD5::File qw/dir_md5_hex/;
+use Digest::MD5::File qw/dir_md5_hex file_md5_hex/;
 use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
 
@@ -89,8 +92,8 @@ sub create_job {
 
     # Build hash structure for XML job description
     my $hash_structure = {
-        'wallTime' => [ $args{'walltime'} ],
-        'queue'    => [ $args{'queue'} ],
+        'wallTime' => [ $walltime ],
+        'queue'    => [ $queue ],
         'commands' => @cmd_array,
     };
 
@@ -1245,30 +1248,71 @@ sub run_crawler{
 
     if (&safe_system( 'wget', @para, $args->{url} ) ){
 
-	## NEW: create md5 signatures for all files
-	## --> allow checking for changes in subsequent crawl jobs (not yet implemented)
+	# create and save md5 signatures to detect identical files
+	# --> avoid uploading the same file again
+
+	# my $md5file = $tarbase.'.md5';
+	$$path_elements[-1] = basename($tarbase).'.md5';
+	my $md5resource = LetsMT::Resource::make($slot,$branch,
+						 join('/',@{$path_elements}));
+
+	my $md5file = $md5resource->local_path();
 	my $md5hash = dir_md5_hex($domain);
-	my $md5file = $tarbase.'.md5';
-	if (ref($md5hash) eq 'HASH'){
-	    if (open F,'>',$md5file){
-		binmode(F,":utf8");
-		foreach (keys %{$md5hash}){
-		    print F $_,"\t",$$md5hash{$_},"\n";
+	# eval { $md5hash = dir_md5_hex($domain); };
+	$md5hash    = {} unless (ref($md5hash) eq 'HASH');
+	my %md5db   = ();
+
+	## check whether there is an md5 file in the repository
+	## --> download and read that file
+	## --> delete all files that have the same md5 hash key
+
+	if (LetsMT::Corpus::resource_exists($md5resource)){
+	    &LetsMT::WebService::get_resource($md5resource, 'archive' => 'no');
+	}
+	else{
+	    $md5file = basename($md5file);
+	    open F,">",$md5file; close F;
+	}
+	my $db = tie %md5db,"DB_File",$md5file;
+
+	$db->Filter_Key_Push('utf8');
+	$db->Filter_Value_Push('utf8');
+
+	foreach my $file (keys %md5db){
+	    if (exists($$md5hash{$file}) && -e $domain.'/'.$file){
+		if ( $$md5hash{$file} eq $md5db{$file} ){
+		    print STDERR "identical MD5: delete $domain/$file\n";
+		    unlink($domain.'/'.$file);
 		}
-		close F;
+		## TODO: what do we do if the file has changed?
+		## --> now no change and we will overwrite the old one!
+		## --> should we rename the file instead?
+		else{
+		    print STDERR "new MD5: overwrite domain/$file\n";
+		}
 	    }
-	    $$path_elements[-1] = basename($tarbase).'.md5';
-	    my $md5resource = LetsMT::Resource::make($slot,$branch,
-						     join('/',@{$path_elements}));
+	}
+
+	## save all MD5 signatures to file
+	foreach (keys %{$md5hash}){
+	    $md5db{$_} = $$md5hash{$_} if ($$md5hash{$_});
+	}
+	if (keys %md5db){
+	    undef $db;
+	    untie %md5db;
 	    &LetsMT::WebService::put_file( $md5resource, $md5file );
 	}
 
+	# get local time (for tarbase)
+	my $datestr = strftime "%Y-%b-%e", localtime;
+	my $splitbase = $tarbase.$datestr.'_';
+
 	## NEW: split into chunks of max 5000 files
-	&safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $tarbase.'_') ||
+	&safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $splitbase) ||
 	    raise( 8, "cannot download $args->{url} ($?)", 'error' );
 
 	## compress each chunk of files into an archive and upload it
-	my @chunks  = glob("${tarbase}_??");
+	my @chunks  = glob("${splitbase}??");
 	my $success = 0;
 	foreach my $c (@chunks){
 	    my $tarfile = "$c.tar.gz";
@@ -1393,7 +1437,7 @@ sub run_import_resource{
     $command .= ' -T ' . safe_path($$args{tokenizer}) if (defined $$args{tokenizer});
     $command .= ' -N ' . safe_path($$args{normalizer}) if (defined $$args{normalizer});
 
-    my $queue = $args->{uid} || 'standard';
+    my $queue = $args->{queue} || 'standard';
     my $job_resource = &create_job(
         path     => $jobfile ,
         uid      => $args->{uid},

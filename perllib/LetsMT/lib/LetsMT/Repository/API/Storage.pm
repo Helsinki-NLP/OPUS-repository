@@ -241,12 +241,13 @@ sub put {
 	    $command .= ' -N ' . safe_path($self->{args}->{normalizer}) if (defined $self->{args}->{normalizer});
 
             # create import job
+	    my $queue = $self->{args}->{queue} || 'standard';
             LetsMT::Repository::JobManager::create_job(
                 # path   => "$path.import_job",
                 path     => $jobfile,
                 uid      => $self->{args}->{uid},
                 walltime => 5,
-                queue    => 'letsmt',
+                queue    => $queue,
                 commands => [ $command ],
             );
 
@@ -256,6 +257,7 @@ sub put {
 		# path    => "$path.import_job",
 		path    => $jobfile,
 		uid     => $self->{args}->{uid},
+		queue   => $queue
             );
 
             # add some information to the meta database
