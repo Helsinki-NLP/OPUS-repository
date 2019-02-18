@@ -1272,8 +1272,10 @@ sub run_crawler{
 						 join('/',@{$path_elements}));
 
 	my $md5file = $md5resource->local_path();
+
+	## TODO: should also get MD5 signatures from files in other
+	##       subdirectories .... (see find and split below)
 	my $md5hash = dir_md5_hex($domain);
-	# eval { $md5hash = dir_md5_hex($domain); };
 	$md5hash    = {} unless (ref($md5hash) eq 'HASH');
 	my %md5db   = ();
 
@@ -1323,7 +1325,10 @@ sub run_crawler{
 	my $splitbase = $tarbase.$datestr.'_';
 
 	## NEW: split into chunks of max 5000 files
-	&safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $splitbase) ||
+	## NEW NEW: also allow other sub-dirs than the domain dir only
+	# &safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $splitbase) ||
+	&safe_system('find', '.', '-mindepth', '2', '-type', 'f', '|', 
+		     'split', '-l', 5000, '-', $splitbase) ||
 	    raise( 8, "cannot download $args->{url} ($?)", 'error' );
 
 	## compress each chunk of files into an archive and upload it
@@ -1331,7 +1336,8 @@ sub run_crawler{
 	my $success = 0;
 	foreach my $c (@chunks){
 	    my $tarfile = "$c.tar.gz";
-	    if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^${domain}/##") ){
+	    if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^./${domain}/##") ){
+	    # if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^${domain}/##") ){
 		$$path_elements[-1] = basename($tarfile);
 		my $resource = LetsMT::Resource::make($slot,$branch,
 						      join('/',@{$path_elements}));
