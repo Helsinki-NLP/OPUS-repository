@@ -320,8 +320,12 @@ sub detect_encoding {
     ##    TODO: creating new objects is not very efficient
     ##          but creating a global handle at the start of the module
     ##          does not work with mod_perl it seems
+    ##    TODO: sometimes it croaks on empty files
+    ##          (error calling magic_file: (null))
+    ##          --> enclose in eval to avoid breaking out
     my $LIBMAGIC = File::LibMagic->new();
-    my $info = $LIBMAGIC->info_from_filename($file);
+    my $info = undef;
+    eval { $info = $LIBMAGIC->info_from_filename($file); };
     if (ref($info) eq 'HASH'){
     	if (defined $info->{encoding}){
     	    return $info->{encoding} unless ($info->{encoding} eq 'binary' ||
@@ -376,12 +380,13 @@ sub guess_encoding {
     ##          but cteating a global handle at the start of the module
     ##          does not work with mod_perl it seems
     my $LIBMAGIC = File::LibMagic->new();
-    my $info = $LIBMAGIC->info_from_filename($file);
+    my $info = undef;
+    eval { $info = $LIBMAGIC->info_from_filename($file); };
     if (ref($info) eq 'HASH'){
     	if (defined $info->{encoding}){
     	    return $info->{encoding} unless ($info->{encoding} eq 'binary' ||
     					     $info->{encoding}=~/unknown/);
-    	   }
+	}
     }
 
 

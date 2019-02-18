@@ -44,7 +44,7 @@
         ## mod_perl ##################
         PerlOptions +Parent
         PerlPostConfigRequire REPLACE_MODPERL_STARTUP
-        PerlSwitches -IREPLACE_LETSMTPERL5LIB
+        PerlSwitches -C -IREPLACE_LETSMTPERL5LIB
         <Location /ws>
             SetHandler perl-script
             ### for Content-Length in downloads to be computed by mod_perl

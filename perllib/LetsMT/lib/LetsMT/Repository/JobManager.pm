@@ -48,6 +48,16 @@ use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
 
 
+## make sure that Digest::MD5 does not croak on weird file names
+## PROBLEM: this will ignore files with utf8 characters
+$Digest::MD5::File::NOFATALS = 1;
+
+## this does not help (it refers to reading file contents)
+# $Digest::MD5::File::UTF8 = 1;
+
+
+
+
 ## wget parameters
 ##
 ## WgetReject: file types to reject
@@ -1246,7 +1256,12 @@ sub run_crawler{
     print STDERR join(' ', 'wget', @para, $args->{url} );
     print STDERR "\n";
 
-    if (&safe_system( 'wget', @para, $args->{url} ) ){
+    unless (&safe_system( 'wget', @para, $args->{url} ) ){
+	print STDERR "something went wrong with crawling - maybe timeout?\n";
+    }
+
+    ## try to save all data anyway even if wget stopped above
+    if (-d $domain){
 
 	# create and save md5 signatures to detect identical files
 	# --> avoid uploading the same file again
@@ -1358,6 +1373,9 @@ sub run_crawler{
 	# 				 uid => $args->{uid}, 
 	# 				 run => 'align_candidates' );
 	# }
+	##
+	## TODO: do we need to do some cleanup of $tmpdir?
+	##
 	return $success;
     }
     chdir($pwd);

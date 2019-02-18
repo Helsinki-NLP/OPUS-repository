@@ -4,6 +4,13 @@ To do as of version 0.56
 
 High priority:
 
+* unicode handling once again:
+  check that it works to add -C flag in mod_perl
+    perllib/conf_modperl.pl
+    installation/letsmt       (PerlSwitches)
+  ---> Digest::MD5 does not work properly otherwise
+       with reading filenames with utf8 characters
+       (see JobManager.pm)
 * try other web crawlers
   wget does not recursively retrieve https://valtioneuvosto.fi
   wget2, spiderling, scrapy ...?

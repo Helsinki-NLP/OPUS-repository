@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -C
 # -*-perl-*-
 
 # called from the apache sites file
