@@ -1324,51 +1324,59 @@ sub run_crawler{
 	my $datestr = strftime "%Y-%b-%e", localtime;
 	my $splitbase = $tarbase.$datestr.'_';
 
-	## NEW: split into chunks of max 5000 files
-	## NEW NEW: also allow other sub-dirs than the domain dir only
-	# &safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $splitbase) ||
-	&safe_system('find', '.', '-mindepth', '2', '-type', 'f', '|', 
-		     'split', '-l', 5000, '-', $splitbase) ||
-	    raise( 8, "cannot download $args->{url} ($?)", 'error' );
+	eval {
+	    ## TODO: does this help with UTF8 file names?
+	    local $ENV{LC_ALL} = 'en_US.UTF-8';
 
-	## compress each chunk of files into an archive and upload it
-	my @chunks  = glob("${splitbase}??");
-	my $success = 0;
-	foreach my $c (@chunks){
-	    my $tarfile = "$c.tar.gz";
-	    if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^./${domain}/##") ){
-	    # if ( &safe_system('tar','-czf',$tarfile, '-T',$c,'--transform',"s#^${domain}/##") ){
-		$$path_elements[-1] = basename($tarfile);
-		my $resource = LetsMT::Resource::make($slot,$branch,
-						      join('/',@{$path_elements}));
-		delete $args->{run};
-		delete $args->{url};
-		## try 10 times to upload the file
-		## (just in case it fails and we do not want to waste the crawled data)
-		foreach (0..9){
-		    ## switch off auto-alignment to avoid racing issues if several 
-		    ## imports run in parallel
-		    ## TODO: maybe it's OK anyway ... leave it for now as it is
-		    ## 
-		    # LetsMT::WebService::post_meta( $resource, 
-		    # 				   uid => $args->{uid}, 
-		    # 				   ImportPara_autoalign => 'off');
-		    if (LetsMT::WebService::put_file( $resource, $tarfile, %{$args} )){
-			$success++;
-			last;
+	    ## NEW: split into chunks of max 5000 files
+	    ## NEW NEW: also allow other sub-dirs than the domain dir only
+	    # &safe_system('find', $domain, '-type', 'f', '|', 'split', '-l', 5000, '-', $splitbase) ||
+	    &safe_system('find', '.', '-mindepth', '2', '-type', 'f', '|', 
+			 'split', '-l', 5000, '-', $splitbase) ||
+			     raise( 8, "cannot download $args->{url} ($?)", 'error' );
+
+	    ## compress each chunk of files into an archive and upload it
+	    my @chunks  = glob("${splitbase}??");
+	    my $success = 0;
+	    foreach my $c (@chunks){
+		my $tarfile = "$c.tar.gz";
+		if ( &safe_system('tar','--ignore-failed-read','-czf',$tarfile, 
+				  '-T',$c,'--transform',"s#^./${domain}/##") ){
+		    # if ( &safe_system('tar','--ignore-failed-read','-czf',$tarfile, 
+		    #                   '-T',$c,'--transform',"s#^${domain}/##") ){
+		    $$path_elements[-1] = basename($tarfile);
+		    my $resource = LetsMT::Resource::make($slot,$branch,
+							  join('/',@{$path_elements}));
+		    delete $args->{run};
+		    delete $args->{url};
+		    ## try 10 times to upload the file
+		    ## (just in case it fails and we do not want to waste the crawled data)
+		    foreach (0..9){
+			## switch off auto-alignment to avoid racing issues if several 
+			## imports run in parallel
+			## TODO: maybe it's OK anyway ... leave it for now as it is
+			## 
+			# LetsMT::WebService::post_meta( $resource, 
+			# 				   uid => $args->{uid}, 
+			# 				   ImportPara_autoalign => 'off');
+			if (LetsMT::WebService::put_file( $resource, $tarfile, %{$args} )){
+			    $success++;
+			    last;
+			}
+			sleep(5);
 		    }
-		    sleep(5);
-		}
-		## cannot upload the tar-file?
-		## move it to a tmpfile to save from deleting
-		unless ($success){
-		    my $tmpfile = '/tmp/'.$$path_elements[-1];
-		    &safe_system( 'mv', $tarfile, $tmpfile );
-		    print STDERR "could not upload the crawled data; saved in:\n";
-		    print STDERR $tmpfile,"\n";
+		    ## cannot upload the tar-file?
+		    ## move it to a tmpfile to save from deleting
+		    unless ($success){
+			my $tmpfile = '/tmp/'.$$path_elements[-1];
+			&safe_system( 'mv', $tarfile, $tmpfile );
+			print STDERR "could not upload the crawled data; saved in:\n";
+			print STDERR $tmpfile,"\n";
+		    }
 		}
 	    }
-	}
+	};
+	warn $@ if $@;
 	chdir($pwd);
 	## if we successfully uploaded all files and automatic import is on
 	## --> create a sentence alignment job 
