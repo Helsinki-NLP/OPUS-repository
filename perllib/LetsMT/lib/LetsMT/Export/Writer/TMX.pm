@@ -105,7 +105,7 @@ sub write {
 	return 0 unless (keys %{$data} > 1);
 	$self->{WRITER}->startTag('tu');
         foreach my $l ( sort keys %{$data} ) {
-	    $self->{WRITER}->startTag('tuv', 'xml::lang' => $l);
+	    $self->{WRITER}->startTag('tuv', 'xml:lang' => $l);
             $self->to_string( $$data{$l} );
 	    $self->{WRITER}->endTag('tuv');
 	}

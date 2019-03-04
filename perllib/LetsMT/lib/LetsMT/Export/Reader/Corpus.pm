@@ -123,6 +123,8 @@ sub open_next{
     $self->{CurrentResource} = $self->{BaseResource}->clone;
     $self->{CurrentResource}->path($path);
 
+    print STDERR "open ",$path,"\n";
+
     # open next resource
     $self->{READER} = new LetsMT::Export::Reader($self->{CurrentResource});
     return $self->{READER}->open(
@@ -149,13 +151,20 @@ sub read{
     my $data = undef;
     do {
 	if ($data = $self->{READER}->read()){
+	    $self->{COUNT_TOTAL_READ}++;
+	    $self->{COUNT_DOC_READ}++;
 	    return $data;
 	}
+	print STDERR "nr of data records read in last document: ",$self->{COUNT_DOC_READ};
+	print STDERR " (total = ",$self->{COUNT_TOTAL_READ},")\n";
+	$self->{COUNT_DOC_READ} = 0;
 	return undef if (! $self->open_next());
     }
     until ($data);
 
     if (my $data = $self->{READER}->read() ){
+	$self->{COUNT_TOTAL_READ}++;
+	$self->{COUNT_DOC_READ}++;
         return $data;
     }
     # return undef if (! $self->open_next());

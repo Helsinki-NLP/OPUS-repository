@@ -995,18 +995,25 @@ sub run_make_tmx {
     ## if the file is a durectory: create a TMX with unique entries (no duplicates)
     my $outres = undef;
     my $output = undef;
+    my $input = undef;
     if ($resource->type ne 'xces') {
+	## TODO: download_all_mono avoids downloading all monolingual files one-by-one
+	##       but that's quite a waste if only a small portion of the monolingual files
+	##       are aligned. So, better leave it out at the moment ....
+	## TODO: adding the option "download_all_mono" does not seem to work either
+	##       --> the mono files do not appear in the correct tmp location ....
+	# $input = new LetsMT::Export::Reader( $resource, $resource->type, 
+	# 				     download_all_mono => 1 );
+	$input = new LetsMT::Export::Reader( $resource, $resource->type );
 	$outres = $resource->graft_suffix('.tmx');
 	$output = new LetsMT::Export::Writer( $outres, 'tmx_unique' );
     }
     else{
+	$input = new LetsMT::Export::Reader( $resource, $resource->type );
 	$outres = $resource->clone;
 	$output = new LetsMT::Export::Writer( $outres, 'tmx' );
     }
     $outres->base_path('tmx');
-
-    ## readers and writers
-    my $input = new LetsMT::Export::Reader( $resource, $resource->type );
 
     return undef unless($input);
     return undef unless($output);
@@ -1324,6 +1331,7 @@ sub run_crawler{
 	my $datestr = strftime "%Y-%b-%e", localtime;
 	my $splitbase = $tarbase.$datestr.'_';
 
+	my $success = 0;
 	eval {
 	    ## TODO: does this help with UTF8 file names?
 	    local $ENV{LC_ALL} = 'en_US.UTF-8';
@@ -1337,7 +1345,6 @@ sub run_crawler{
 
 	    ## compress each chunk of files into an archive and upload it
 	    my @chunks  = glob("${splitbase}??");
-	    my $success = 0;
 	    foreach my $c (@chunks){
 		my $tarfile = "$c.tar.gz";
 		if ( &safe_system('tar','--ignore-failed-read','-czf',$tarfile, 
