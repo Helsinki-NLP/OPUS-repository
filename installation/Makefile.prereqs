@@ -54,6 +54,7 @@ UBUNTU_BASE_PACKAGES = \
 		libparams-util-perl \
 		libppi-perl \
 		libpython3.4-dev \
+		libregexp-common-perl \
 		libssl-dev \
 		libstring-approx-perl \
 		libsvg-perl \

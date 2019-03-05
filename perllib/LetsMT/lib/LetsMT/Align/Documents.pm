@@ -15,6 +15,8 @@ use open qw(:std :utf8);
 use utf8;
 use Encode qw(decode decode_utf8 is_utf8);
 
+# use Regexp::Common qw /URI/;
+
 use String::Approx qw/amatch adistr/;
 use File::Basename qw/basename dirname/;
 use File::Temp 'tempdir';
@@ -363,7 +365,8 @@ sub resources_with_language_links{
 
 	## remove tar/zip file from the path of the original file
 	## to match them with the linked files
-	$from=~s/\/[^\/]+(\.tar|\.tgz|\.tar\.gz|\.zip):/\//;
+	$from=~s/\/[^\/]+(\.tar|\.tgz|\.tar\.gz|\.zip):(\.\/)?/\//;
+	$from=~s/uploads\///;
 
 	## save the new resource file name for each original file
 	$files{$from} = $file;
@@ -371,8 +374,18 @@ sub resources_with_language_links{
 	## find language links and save them
 	my @l = split( ',', $n->findvalue('language_links') );
 	foreach (@l){
-	    my ($lang,$href) = split(/:/);
-	    if ($href ne $from){
+	    my @parts = split(/:/);
+	    my $lang = shift(@parts);
+	    my $href = join(':',@parts);      # href could include ':'
+	    $href=~s/https?:\/\/[^\/]+\///;   # remove protocol and domain if necessary
+
+	    ## OLD
+	    # my ($lang,$href) = split(/:/);
+	    ## remove protocol and domain of URIs if they exist
+	    # if ($href=~/^$RE{URI}{HTTP}{-scheme => 'https?'}{-keep}$/){
+	    # 	$href = $7;
+	    # }
+	    if ( ($href ne $from) && ('uploads/'.$href ne $from) ){
 		$links{$file}{$lang} = $href;
 	    }
 	}
