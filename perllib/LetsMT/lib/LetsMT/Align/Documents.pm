@@ -366,7 +366,7 @@ sub resources_with_language_links{
 	## remove tar/zip file from the path of the original file
 	## to match them with the linked files
 	$from=~s/\/[^\/]+(\.tar|\.tgz|\.tar\.gz|\.zip):(\.\/)?/\//;
-	$from=~s/uploads\///;
+	$from=~s/^uploads\///;
 
 	## save the new resource file name for each original file
 	$files{$from} = $file;
@@ -378,6 +378,10 @@ sub resources_with_language_links{
 	    my $lang = shift(@parts);
 	    my $href = join(':',@parts);      # href could include ':'
 	    $href=~s/https?:\/\/[^\/]+\///;   # remove protocol and domain if necessary
+	    $href=~s/^uploads\///;            # do the same as for $from
+
+	    ## in some cases this can also still be a relative path
+	    $href = _relative_to_absolute_path($href,$from);
 
 	    ## OLD
 	    # my ($lang,$href) = split(/:/);
@@ -409,13 +413,27 @@ sub resources_with_language_links{
 		    $count++;
 		}
 	    }
-	    ## a hack to fix the problem that the uploads dir is sometimes lost
-	    elsif (exists $files{'uploads/'.$links{$f}{$l}}){
-		if ($files{'uploads/'.$links{$f}{$l}} ne $f){
-		    $$parallel{$basename}{$l} = $files{'uploads/'.$links{$f}{$l}};
-		    $count++;
+
+	    ## sometimes there is an extra file extension
+	    ## (is that a problem of wget?)
+	    else{
+		my $link = $links{$f}{$l};
+		$link=~s/\.[a-z]+$//i;
+		if (exists $files{$link}){
+		    if ($files{$link} ne $f){
+			$$parallel{$basename}{$l} = $files{$link};
+			$count++;
+		    }
 		}
 	    }
+
+	    # ## a hack to fix the problem that the uploads dir is sometimes lost
+	    # elsif (exists $files{'uploads/'.$links{$f}{$l}}){
+	    # 	if ($files{'uploads/'.$links{$f}{$l}} ne $f){
+	    # 	    $$parallel{$basename}{$l} = $files{'uploads/'.$links{$f}{$l}};
+	    # 	    $count++;
+	    # 	}
+	    # }
 	}
 
 	## also add the current language version

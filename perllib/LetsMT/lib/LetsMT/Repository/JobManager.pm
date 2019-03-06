@@ -377,13 +377,14 @@ sub run_detect_translations {
     my $args = shift || {};
     my $skip_aligned = shift || 0;
 
-    my $slot      = shift(@{$path_elements});
-    my $branch    = shift(@{$path_elements});
+    my @path      = @{$path_elements};
+    my $slot      = shift(@path);
+    my $branch    = shift(@path);
 
     my $corpus    = LetsMT::Resource::make( $slot, $branch );
-    my $resource  = @{$path_elements}
+    my $resource  = @path
         ? LetsMT::Resource::make(
-            $slot, $branch, join( '/', @{$path_elements} )
+            $slot, $branch, join( '/', @path )
         )
         : $corpus;
 
@@ -484,13 +485,14 @@ sub run_align {
 
     my @sentalign = ();
 
-    my $slot      = shift(@{$path_elements});
-    my $branch    = shift(@{$path_elements});
+    my @path      = @{$path_elements};
+    my $slot      = shift(@path);
+    my $branch    = shift(@path);
 
     my $corpus    = LetsMT::Resource::make( $slot, $branch );
-    my $resource  = @{$path_elements}
+    my $resource  = @path
         ? LetsMT::Resource::make(
-            $slot, $branch, join( '/', @{$path_elements} )
+            $slot, $branch, join( '/', @path )
         )
         : $corpus;
 
@@ -574,13 +576,14 @@ sub run_align_candidates {
 
     my @sentalign = ();
 
-    my $slot      = shift(@{$path_elements});
-    my $branch    = shift(@{$path_elements});
+    my @path      = @{$path_elements};
+    my $slot      = shift(@path);
+    my $branch    = shift(@path);
 
     my $corpus    = LetsMT::Resource::make( $slot, $branch );
-    my $resource  = @{$path_elements}
+    my $resource  = @path
         ? LetsMT::Resource::make(
-            $slot, $branch, join( '/', @{$path_elements} )
+            $slot, $branch, join( '/', @path )
         )
         : $corpus;
 
