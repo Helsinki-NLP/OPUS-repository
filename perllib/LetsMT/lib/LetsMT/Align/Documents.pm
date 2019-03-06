@@ -459,7 +459,8 @@ sub resources_with_language_links{
 
 sub find_language_links {
     my $resource = shift;
-    my $type = shift || 'vnk';
+    my $type     = shift;
+    # my $type = shift || 'vnk';
 
     # Get requested resource if necessary
     if ( ( ! -e $resource->local_path ) ) {
