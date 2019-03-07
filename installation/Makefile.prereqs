@@ -13,6 +13,10 @@ FORCE  = false
 # APTGET = apt-get --force-yes
 # FORCE  = true
 
+## a newer version of git
+## --> faster than the standard version
+GITVERSION = 2.21.0
+
 UBUNTU_BASE_PACKAGES = \
 		apache2 \
 		autoconf \
@@ -26,6 +30,7 @@ UBUNTU_BASE_PACKAGES = \
 		default-jre \
 		dos2unix \
 		g++ \
+		gettext \
 		git \
 		graphviz \
 		gzip \
@@ -287,6 +292,7 @@ server-software: \
 	software-eflomal \
 	software-fastalign \
 	software-langid \
+	software-git \
 	software-fusecompress
 
 
@@ -459,6 +465,19 @@ software-opennlp:
 		${INSTALL_BIN} bin/opennlp ${PREFIX}/bin/opennlp; \
 		${INSTALL_BIN} lib/*.jar ${PREFIX}/lib; )
 
+.PHONY: software-git
+software-git: /usr/local/bin/git
+
+/usr/local/bin/git:
+	wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GITVERSION}.tar.gz
+	tar -xzf git-${GITVERSION}.tar.gz
+	( cd git-${GITVERSION} && ./configure )
+	make -C git-${GITVERSION} all
+	make -C git-${GITVERSION} install
+	rm -f git-${GITVERSION}.tar.gz
+	rm -f git-${GITVERSION}
+	$@ config --global core.commitGraph true
+	$@ config --global gc.writeCommitGraph true
 
 .PHONY: software-udpipe
 software-udpipe: ${PREFIX}/share/UDPipe
