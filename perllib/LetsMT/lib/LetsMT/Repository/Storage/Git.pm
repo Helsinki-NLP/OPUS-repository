@@ -742,18 +742,22 @@ sub _export_subtree {
     close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
 
     my $repohome = join( '/', $self->{partition}, $slot, $user );
-    my $head = undef;
-    if ($revision && $revision ne 'HEAD'){
-	my @parts = split(/\//,$repohome);
-	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
-    }
+
+    ## we don't need this do we?
+    ## 
+    # my $head = undef;
+    # if ($revision && $revision ne 'HEAD'){
+    # 	my @parts = split(/\//,$repohome);
+    # 	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
+    # }
 
     my $pwd = getcwd();
     chdir( $repohome );
-    # git archive --format=zip --prefix=... -o output.zip rev:path 
+
     my $prefix = basename($path);
-    $path = ':'.$path if ($path);
-    $revision = 'HEAD' unless ($revision);
+    $path      = ':'.$path if ($path);
+    $revision  = 'HEAD' unless ($revision);
+
     get_logger(__PACKAGE__)->info("git archive --format=zip --prefix=$prefix -o $target $revision$path");
     my $success = &run_cmd( 'git',
 			    'archive',
@@ -761,6 +765,7 @@ sub _export_subtree {
 			    '--prefix='.$prefix.'/',
 			    '-o', $target,
 			    $revision.$path );
+
     chdir($pwd);
     return $target;
 }
@@ -771,43 +776,21 @@ sub _export_file {
     my ($slot, $user, $path, $revision, $archive) = @_;
 
     my $repohome = join( '/', $self->{partition}, $slot, $user );
-    my $head = undef;
-    if ($revision && $revision ne 'HEAD'){
-	my @parts = split(/\//,$repohome);
-	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
-    }
+    $revision    = 'HEAD' unless ($revision);
 
-    # Create temp dir for svn export
+    # Create temp dir for export
     my $tmp_dir = tempdir(
 	'git_export_XXXXXXXX',
 	DIR     => $ENV{UPLOADDIR},
 	CLEANUP => 1
 	);
 
+    ## get the file content using 'git show'
     my $pwd = getcwd();
     chdir( $repohome );
-    if ( ! $revision || $revision eq 'HEAD' || $revision eq $head ){
-	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
-	my $success = &run_cmd( 'git',
-				'checkout-index',
-				'--prefix='.$tmp_dir.'/',
-				$path );
-	## we don't want sub-dir's
-	my @parts = split(/\//,$path);
-	my $basename = pop(@parts);
-	move( $tmp_dir.'/'.$path, $tmp_dir.'/'.$basename ) || raise( 8, $! );
-	while (@parts){
-	    rmdir( join('/',$tmp_dir,@parts) );
-	    pop(@parts);
-	}
-    }
-    else{
-	my $output = $tmp_dir.'/'.basename($path);
-	&pipe_out_cmd( $output, 'git', 'show', $revision.':'.$path ) || 
-	    raise( 8, "Cannot get $path\@$revision" );
-	## TODO: implement checking out old revisions of single files
-	# raise( 8, 'checking out old revisions of files is not implemented in Storage::Git', 'warn' );
-    }
+    my $output = $tmp_dir.'/'.basename($path);
+    &pipe_out_cmd( $output, 'git', 'show', $revision.':'.$path ) || 
+	raise( 8, "Cannot get $path\@$revision" );
     chdir($pwd);
 
     if ( $archive ){
@@ -838,6 +821,86 @@ sub _export_file {
     }
     return join( '/', $tmp_dir, basename( $path ) );
 }
+
+
+
+
+#
+# OLD version with revision=HEAD check etc ....
+#
+
+# sub _export_file {
+#     my $self  = shift;
+#     my ($slot, $user, $path, $revision, $archive) = @_;
+
+#     my $repohome = join( '/', $self->{partition}, $slot, $user );
+#     my $head = undef;
+#     if ($revision && $revision ne 'HEAD'){
+# 	my @parts = split(/\//,$repohome);
+# 	$head = $self->revision( $user, join('/', ($slot, $user, $path) ));
+#     }
+
+#     # Create temp dir for svn export
+#     my $tmp_dir = tempdir(
+# 	'git_export_XXXXXXXX',
+# 	DIR     => $ENV{UPLOADDIR},
+# 	CLEANUP => 1
+# 	);
+
+#     my $pwd = getcwd();
+#     chdir( $repohome );
+#     if ( ! $revision || $revision eq 'HEAD' || $revision eq $head ){
+# 	get_logger(__PACKAGE__)->info("git checkout export $path to $tmp_dir");
+# 	my $success = &run_cmd( 'git',
+# 				'checkout-index',
+# 				'--prefix='.$tmp_dir.'/',
+# 				$path );
+# 	## we don't want sub-dir's
+# 	my @parts = split(/\//,$path);
+# 	my $basename = pop(@parts);
+# 	move( $tmp_dir.'/'.$path, $tmp_dir.'/'.$basename ) || raise( 8, $! );
+# 	while (@parts){
+# 	    rmdir( join('/',$tmp_dir,@parts) );
+# 	    pop(@parts);
+# 	}
+#     }
+#     else{
+# 	my $output = $tmp_dir.'/'.basename($path);
+# 	&pipe_out_cmd( $output, 'git', 'show', $revision.':'.$path ) || 
+# 	    raise( 8, "Cannot get $path\@$revision" );
+# 	## TODO: implement checking out old revisions of single files
+# 	# raise( 8, 'checking out old revisions of files is not implemented in Storage::Git', 'warn' );
+#     }
+#     chdir($pwd);
+
+#     if ( $archive ){
+
+# 	my $zip = Archive::Zip->new();
+
+# 	# Add temp dir to zip archive
+# 	unless ( $zip->addTree($tmp_dir) == AZ_OK ) {
+# 	    rmtree($tmp_dir);
+# 	    raise( 8, 'Wrote nothing to zip archive', 'warn' );
+# 	}
+
+# 	# Create temp file to store archive in
+# 	my ( $fh, $target ) = tempfile(
+# 	    'zip_download_XXXXXXXX',
+# 	    DIR    => $ENV{UPLOADDIR},
+# 	    SUFFIX => '.zip',
+# 	    UNLINK => 1
+# 	    );
+# 	close($fh) or raise( 8, "Could not close file handle: $fh", 'error' );
+
+# 	unless ( $zip->writeToFileNamed($target) == AZ_OK ) {
+# 	    rmtree($tmp_dir);
+# 	    raise( 8, 'zip write error', 'error' );
+# 	}
+
+# 	return $target;
+#     }
+#     return join( '/', $tmp_dir, basename( $path ) );
+# }
 
 
 

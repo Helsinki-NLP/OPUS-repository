@@ -4,6 +4,26 @@ To do as of version 0.56
 
 High priority:
 
+* make the git backend faster for large repos
+  'git log' slows down a lot --> avoid calling it if not needed!
+
+  otherwise: improve performance by 
+  from https://stackoverflow.com/questions/35186829/how-to-improve-git-log-performance
+
+  git config --global core.commitGraph true
+  git config --global gc.writeCommitGraph true
+  cd /path/to/repo
+  git commit-graph write
+
+  but that requires new versions of git (I think)
+
+  apt-get install gettext
+  wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.21.0.tar.gz
+  tar -xzf git-2.21.0.tar.gz
+  cd git-2.21.0
+  ./configure
+  make all
+
 * unicode handling once again:
   check that it works to add -C flag in mod_perl
     perllib/conf_modperl.pl
