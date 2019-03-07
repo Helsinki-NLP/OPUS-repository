@@ -41,6 +41,7 @@ UBUNTU_BASE_PACKAGES = \
 		libbz2-dev \
 		libclass-inspector-perl \
 		libcrypt-ssleay-perl \
+		libcurl4-openssl-dev \
 		libdevel-nytprof-perl \
 		libdbi-perl \
 		libdigest-md5-file-perl \
@@ -471,7 +472,7 @@ software-git: /usr/local/bin/git
 /usr/local/bin/git:
 	wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GITVERSION}.tar.gz
 	tar -xzf git-${GITVERSION}.tar.gz
-	( cd git-${GITVERSION} && ./configure )
+	( cd git-${GITVERSION} && ./configure --with-curl )
 	make -C git-${GITVERSION} all
 	make -C git-${GITVERSION} install
 	rm -f git-${GITVERSION}.tar.gz
