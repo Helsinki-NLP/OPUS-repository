@@ -34,7 +34,7 @@ OPUS_DEV_IP    = 192.168.1.10
 
 ## worker nodes of stable and development version
 OPUS_CLIENTS    = 
-OPUSDEV_CLIENTS = opusdev0 opusdev1 opusdev2
+OPUSDEV_CLIENTS = opusdev0 opusdev1 # opusdev2
 
 
 
