@@ -58,6 +58,7 @@ update-dev:
 ## install stable versions
 opus-stable opus-client-stable:
 	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
+		HOSTNAME=${OPUS_STABLE} \
 		OPUSRR=${OPUS_STABLE} \
 		OPUSIP=${OPUS_STABLE_IP} \
 	${@:-stable=}
@@ -65,6 +66,7 @@ opus-stable opus-client-stable:
 ## install development versions
 opus-dev opus-client-dev:
 	${MAKE} OPUSGIT= \
+		HOSTNAME=${OPUS_DEV} \
 		OPUSRR=${OPUS_DEV} \
 		OPUSIP=${OPUS_DEV_IP} \
 	${@:-dev=}
@@ -76,7 +78,10 @@ endif
 
 ## install repository for OPUS with connection to remote git server
 .PHONY: install-opus opus
-install-opus opus: /var/www/.ssh/config /etc/munge/munge.key /etc/ssl/${HOSTNAME}
+install-opus opus: /etc/munge/munge.key /etc/ssl/${HOSTNAME}
+ifneq (${GITSERVER},)
+	${MAKE} /var/www/.ssh/config
+endif
 	${MAKE} -C .. GIT_REMOTE='${OPUSGIT}' HOSTNAME=${OPUSRR} install
 	service munge restart
 	service slurm-llnl restart

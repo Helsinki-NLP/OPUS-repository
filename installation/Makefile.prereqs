@@ -121,6 +121,7 @@ CPAN_MODULES = 	Apache::Tika \
 		File::LibMagic \
 		File::Touch \
 		Lingua::Sentence \
+		Lingua::Identify \
 		LWP::Simple \
 		Module::Install \
 		Net::SSL \
@@ -476,7 +477,7 @@ software-git: /usr/local/bin/git
 	make -C git-${GITVERSION} all
 	make -C git-${GITVERSION} install
 	rm -f git-${GITVERSION}.tar.gz
-	rm -f git-${GITVERSION}
+	rm -fr git-${GITVERSION}
 	$@ config --global core.commitGraph true
 	$@ config --global gc.writeCommitGraph true
 
