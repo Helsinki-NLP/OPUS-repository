@@ -1331,7 +1331,7 @@ sub run_crawler{
 	}
 
 	# get local time (for tarbase)
-	my $datestr = strftime "%Y-%b-%e", localtime;
+	my $datestr = strftime "%Y-%b-%d", localtime;
 	my $splitbase = $tarbase.$datestr.'_';
 
 	my $success = 0;
