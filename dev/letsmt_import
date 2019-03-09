@@ -1,0 +1,285 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#-------------------------------------------------------------------------
+# Joerg Tiedemann                            jorg.tiedemann@lingfil.uu.se
+#
+# A script for importing documents to the LetsMT repository
+# This will do various steps depending on the input format
+# (Most of these steps are not implemented yet! Look into LetsMT::Import)
+#
+# - checkout from repository
+# - unpack (if archive file)
+# - validate input file(s)
+# - convert to LetsMT format
+# - (possibly start sentence alignment?)
+# - checkin converted files (and everything that is new)
+# - update metadata database & resource status
+#
+# Second use of this script (add -O flag):
+#
+#  convert an OPUS corpus to LetsMT format and make it ready to import
+#  (maybe we should include checkin here as well ....?)
+#
+
+=head1 NAME
+
+letsmt_import - a script for importing corpus data to the LetsMT repository
+
+=head1 USAGE
+
+=head2 NORMAL USAGE:
+
+ letsmt_import -u user -s slot -p path [OPTIONS]
+
+ slot ........ name of the REST-slot (= corpus name)
+ user ........ name of the REST-user (= branch name)
+ path ........ relative path to file to be imported (within slot/user/)
+
+=head2 OPUS USAGE:
+
+See
+
+ letsmt_import -o
+ letsmt_import -O
+
+=head1 OPTIONS
+
+ -L language ..... language ID (may change some import behavior)
+ -S splitter ..... text splitter (sentence boundary detection)
+ -T tokenizer .... tokenizer
+ -N normalizer ... comma-separated chain of text normalizers
+ -m mode ......... conversion mode (useful for some import handlers)
+ -E e-mail ....... e-mail the resulting bitexts in TMX
+ -v .............. be verbose
+
+ -h .............. show the help text
+ -V .............. display the LetsMT library version
+
+=head1 DESCRIPTION
+
+This script is used for converting and importing data files into the LetsMT repository.
+It has two interfaces:
+
+1) It is used to validate/convert/import files that are already in the 'uploads' directory of existing repositories (see NORMAL USAGE).
+Supported formats are listed in L<LetsMT::Import|LetsMT::Import>.
+The script will be called automatically when data are uploaded to appropriate data directories via the LetsMT high-level webservice API.
+
+2) The second interface is initiated by the flag (-o).
+In this way letsmt_import can be used to upload OPUS corpora to LetsMT in the format required (see IMPORT OPUS).
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use lib "$ENV{HOME}/OPUS-repository/perllib/LetsMT/lib";
+
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+# use FindBin;                       # We use this in order to use the library in the source tree,
+# use lib $FindBin::Bin . '/../lib'; # not the installed one.
+use File::Temp;
+
+use vars qw($opt_a $opt_d $opt_e $opt_f $opt_h $opt_l $opt_L $opt_m $opt_E $opt_N
+    $opt_o $opt_O $opt_p $opt_r $opt_s $opt_S $opt_T $opt_u $opt_v $opt_V);
+use Getopt::Std;
+
+use LetsMT;
+use LetsMT::Import;
+use LetsMT::Import::OPUS;
+use LetsMT::Resource;
+use LetsMT::DataProcessing::Tokenizer;
+use LetsMT::DataProcessing::Normalizer;
+use LetsMT::DataProcessing::Splitter;
+
+getopts('ad:E:e:fhl:L:m:N:p:rs:S:T:u:vOoV');
+
+sub usage {
+    use Pod::Usage;
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -message => 'letsmt_import - a script for importing corpus data to the LetsMT repository',
+        -verbose => 1,
+    );
+    &usage_opus if ($opt_o);
+    &usage_opus if ($opt_O);
+    exit;
+}
+&usage if ($opt_h);
+
+if ($opt_V) {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+}
+
+#---------------------------------------------------------------------------
+# import OPUS corpora into the LetsMT repository
+#---------------------------------------------------------------------------
+
+sub usage_opus {
+    my $usage = <<'=cut';
+
+=head2 IMPORT OPUS
+
+letsmt_import -o -u user [OPTIONS] corpus [destname]
+
+Import the OPUS corpus <corpus> to LetsMT using <destname> as the corpus name in the repository.
+The script tries to create the user <user> in group 'public'.
+It also tries to create the slot <destname>/<user>.
+
+=head3 OPTIONS
+
+ -d opushome ........ home directory of the OPUS corpus 
+                      (default = /home/opus/OPUS/corpus/)
+ -a ................. skip individual sentence alignment files
+                      (the ones in xml/xx-yy/ for each document)
+ -l letsmt_url ...... URL of the LetsMT repository (default=$ENV{LETSMT_URL})
+ -f ................. force overwriting existing files (default: skip existing)
+
+=cut
+
+    system("echo '$usage' | pod2text");
+}
+
+if ($opt_o) {
+    if ( not( @ARGV && $opt_u ) ) {
+        &usage_opus;
+        die "Corpus name and user name required!\n";
+    }
+    my $corpus      = shift(@ARGV);
+    my $destination = shift(@ARGV) || $corpus;
+    my $user        = $opt_u;
+
+    my $importer = new LetsMT::Import::OPUS(
+        -skip_align_files => $opt_a,
+        -overwrite        => $opt_f,
+        -opus_home        => $opt_d,
+        -rest_home        => $opt_l
+    );
+    $importer->import_corpus( $corpus, $destination, $user );
+    exit;
+}
+
+#---------------------------------------------------------------------------
+# convert old (!) OPUS corpora to LetsMT format
+# (this was useful to convert OPUS data from the OLD VERSION)
+# (not useful anymore because the old OPUS is gone (soon))
+#---------------------------------------------------------------------------
+
+sub usage_oldopus {
+    my $usage = <<'=cut';
+=head2 IMPORT OLD OPUS
+
+ letsmt_import -O [OPTIONS] corpdir [destdir]
+
+(this was useful to convert OPUS data from the OLD VERSION)
+(not useful anymore because the old OPUS is gone (soon))
+
+=head3 OPTIONS
+
+ -s slot ........ name of the REST-slot (= corpus)
+ -u user ........ name of the REST-user (= branch)
+ -e ext ......... file extension of sentence align files (default: try various)
+ -r ............. keep region codes (like BR in pt_BR)
+ -a ............. skip sentence alignment files for individual documents
+
+If slot is given: Add prefix to   https://rest-server/letsmt/slot
+If slot and branch are given: add https://rest-server/storage/slot/branch
+
+=cut
+
+    system("echo '$usage' | pod2text");
+}
+
+if ($opt_O) {
+    if ( not @ARGV ) {
+        &usage_oldopus();
+        die "You have to specify the corpus directory!\n";
+    }
+
+    my $corpdir = shift(@ARGV);
+    my $destdir = shift(@ARGV) || "corpus";
+
+    my $importer = new LetsMT::Import::OPUS(
+        -slot                => $opt_s,
+        -branch              => $opt_u,
+        -skip_align_files    => $opt_a,
+        -alignment_extension => $opt_e,
+        -keep_region_codes   => $opt_r
+    );
+
+    $importer->import_corpus( $corpdir, $destdir );
+    exit;
+}
+
+
+#---------------------------------------------------------------------------
+# convert & import document
+#---------------------------------------------------------------------------
+
+my $user = $opt_u or &usage && die "need to specify a user name!\n";
+my $slot = $opt_s or &usage && die "need to specify a slot name!\n";
+my $path = $opt_p or &usage && die "need to specify a document in the slot!\n";
+
+my $resource = &LetsMT::Resource::make( $slot, $user, $path );
+
+# importer parameters:
+# - specific text splitters, normalizers, tokenizers ....
+
+my %args = ();
+if ( defined $opt_S ) {
+    $args{splitter} = new LetsMT::DataProcessing::Splitter(
+        method => $opt_S,
+        lang   => $opt_L
+    );
+}
+if ( defined $opt_T ) {
+    $args{tokenizer} = new LetsMT::DataProcessing::Tokenizer(
+        method => $opt_T,
+        lang   => $opt_L
+    );
+}
+if ( defined $opt_N ) {
+    $args{normalizer}
+        = new LetsMT::DataProcessing::Normalizer( type => $opt_N );
+}
+$args{lang} = $opt_L if ( defined $opt_L );
+$args{mode} = $opt_m if ( defined $opt_m );
+
+# finally: create the importer object and import the resource!
+
+my $importer = new LetsMT::Import(%args);
+
+
+print "trying to import $slot/$user/$path ... " if ($opt_v);
+my %para = $opt_E ? ( email => $opt_E ) : ();
+my $result = $importer->import_resource($resource,%para);
+print $result ? "success\n" : "failed\n" if ($opt_v);
+
+
+END {
+    File::Temp::cleanup();
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta name="pdf:PDFVersion" content="1.4"></meta>
+  <meta name="xmp:CreatorTool" content="TeX"></meta>
+  <meta name="access_permission:modify_annotations" content="true"></meta>
+  <meta name="access_permission:can_print_degraded" content="true"></meta>
+  <meta name="dcterms:created" content="2011-05-25T12:11:16Z"></meta>
+  <meta name="dc:format" content="application/pdf; version=1.4"></meta>
+  <meta name="pdf:docinfo:creator_tool" content="TeX"></meta>
+  <meta name="access_permission:fill_in_form" content="true"></meta>
+  <meta name="pdf:encrypted" content="false"></meta>
+  <meta name="pdf:docinfo:custom:PTEX.Fullbanner" content="This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) kpathsea version 3.5.4"></meta>
+  <meta name="Content-Type" content="application/pdf"></meta>
+  <meta name="PTEX.Fullbanner" content="This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) kpathsea version 3.5.4"></meta>
+  <meta name="X-Parsed-By" content="org.apache.tika.parser.DefaultParser"></meta>
+  <meta name="X-Parsed-By" content="org.apache.tika.parser.pdf.PDFParser"></meta>
+  <meta name="meta:creation-date" content="2011-05-25T12:11:16Z"></meta>
+  <meta name="created" content="Wed May 25 12:11:16 UTC 2011"></meta>
+  <meta name="access_permission:extract_for_accessibility" content="true"></meta>
+  <meta name="access_permission:assemble_document" content="true"></meta>
+  <meta name="xmpTPg:NPages" content="28"></meta>
+  <meta name="Creation-Date" content="2011-05-25T12:11:16Z"></meta>
+  <meta name="access_permission:extract_content" content="true"></meta>
+  <meta name="access_permission:can_print" content="true"></meta>
+  <meta name="producer" content="pdfeTeX-1.21a"></meta>
+  <meta name="access_permission:can_modify" content="true"></meta>
+  <meta name="pdf:docinfo:producer" content="pdfeTeX-1.21a"></meta>
+  <meta name="pdf:docinfo:created" content="2011-05-25T12:11:16Z"></meta>
+  <title></title>
+ </head>
+ <body>
+  <div class="page">
+   <p>LetsMT!</p>
+   <p>Platform for Online Sharing of Training Data and Building User Tailored MT www.letsmt.eu/</p>
+   <p>Project no. 250456</p>
+   <p>Deliverable D2.1 Specification of data formats</p>
+   <p>Version No. v1.1</p>
+   <p>May 25, 2011</p>
+   <p>1</p>
+  </div>
+  <div class="page">
+   <p>Contract no. 250456</p>
+   <p>Document Information</p>
+   <p>Deliverable number: D2.1 Deliverable title: Specification of data formats Due date of deliverable according to DoW:</p>
+   <p>31/08/2010</p>
+   <p>Actual submission date of deliverable:</p>
+   <p>31/08/2010</p>
+   <p>Main Author(s): Jörg Tiedemann, Per Weijnitz Participants: Uppsala Reviewer Tilde, Moravia Workpackage: WP2 Workpackage title: SMT resource repository and data processing facili- ties Workpackage leader: Uppsala Dissemination Level: PU Version: v1.1 Keywords: data formats</p>
+   <p>Version History</p>
+   <p>Version Date Status Name of Author (Partner)</p>
+   <p>Contributions</p>
+   <p>Description/ Approval Level v0.1 July 17, 2010 initial draft</p>
+   <p>Uppsala ready for reviewing v0.2 August 17, 2010 final draft</p>
+   <p>Uppsala v1.0 August 30, 2010 final version</p>
+   <p>Uppsala approved by all partners v1.1 May 23, 2011 revised version</p>
+   <p>Uppsala</p>
+   <p>EXECUTIVE SUMMARY</p>
+   <p>This is a description of data formats that will be used internally in the LetsMT! data resource repository and data formats that will be allowed when uploading parallel and monolingual data to the LetsMT! platform. The report includes a discussion of issues that have to be handled for various formats and points to solutions and tools that will be used in the project.</p>
+   <p>D2.1— v1.1 2</p>
+  </div>
+  <div class="page">
+   <p>Contract no. 250456</p>
+   <p>Contents</p>
+   <p>1 Task Description 5</p>
+   <p>2 Internal Storage Formats 5 2.1 Corpus Data. . ... ... ... ... ... ... ... ... ... 5 2.2 Alignment Information. . ... ... ... ... ... ... ... 7 2.3 Repository Structure ... ... ... ... ... ... ... ... 9 2.4 Revisions &amp; Corpus Selections . ... ... ... ... ... ... 10</p>
+   <p>3 Upload Formats 12 3.1 Pre-aligned Parallel Corpora ... ... . . ... ... ... ... 13</p>
+   <p>3.1.1 Translation Memory eXchange format (TMX) ... ... 13 3.1.2 Plain text Giza++/Moses format. . ... ... ... ... 17 3.1.3 Factored Moses format. ... ... ... ... ... ... 18 3.1.4 XML Localization Interchange File Format (XLIFF) ... 18 3.1.5 LetsMT!-conform XML/XCES . ... ... . ... ... 19</p>
+   <p>3.2 Unaligned Parallel Documents. ... ... ... ... ... ... 20 3.2.1 Microsoft Word DOC &amp; DOCX . . ... ... ... ... 20 3.2.2 Portable Document Format (PDF) ... . ... ... ... 21 3.2.3 Plain text ... . ... ... . ... ... ... ... ... 22 3.2.4 OpenDocument Format (ODF) ... . . ... ... ... 22 3.2.5 XML &amp; HTML ... . . ... ... ... ... ... ... 23</p>
+   <p>3.3 Monolingual Data. . ... ... ... ... ... ... ... ... 23</p>
+   <p>4 Validation of Data Uploads 24</p>
+   <p>5 Risk Analysis 26</p>
+   <p>6 Conclusions 27</p>
+   <p>D2.1— v1.1 3</p>
+  </div>
+  <div class="page">
+   <p>Contract no. 250456</p>
+   <p>List of Figures</p>
+   <p>1 Corpus data after pre-processing. ... ... ... ... ... ... 7 2 Sentence alignments. ... ... ... ... ... ... ... ... 8 3 File structure in LetsMT! repositories. ... ... ... ... ... 11 4 Classification of upload formats. ... ... ... ... ... ... 13 5 Example TMX file. ... ... ... ... ... ... ... ... 14 6 Content markup in TMX files. ... . ... ... ... ... ... 15 7 The general structure of XLIFF ... . ... ... ... ... ... 18 8 Non-equivalence in XLIFF ... ... ... ... ... ... ... 19</p>
+   <p>List of Tables</p>
+   <p>1 Preliminary list of and remarks on data format specific validation and conversion tools. ... ... ... ... ... ... ... ... 25</p>
+   <p>D2.1— v1.1 4</p>
+  </div>
+  <div class="page">
+   <p>Contract no. 250456</p>
+   <p>1 Task Description</p>
+   <p>One of the key functions of the LetsMT! platform is to provide the possibility to train domain specific SMT models tailored towards specific needs of its users. For this appropriate data resources are required. LetsMT! is based on data sharing and user collaboration. The scope of workpackage two is to develop facilities to store, process and manage resources coming from LetsMT! users. The purpose of this report is to specify data formats that will be used internally when storing parallel and monolingual corpus data in the repository and to list data formats that will be supported for the user contributions. The main focus here is to balance robustness and flexibility, meaning that supported upload formats have to be handled in a stable and robust way. Each additional formats usually increases complexity of the validation and conversion processes and, therefore, may reduce overall robustness of the system. Restricting the system to a few well supported formats will lead to user satisfaction more than a brittle system with a lot of possibilities would do. Adding support for new formats can always be done later on after carefully testing the integration of upload possibilities and after checking possible interferences with existing features.</p>
+   <p>2 Internal Storage Formats</p>
+   <p>In this section we will describe the internal data formats that we will use to store training data in the shared repository. We will use a unified format for all textual data in the repository which makes it easy to select subsets of the entire collection for training tailored SMT engines. All incoming data will be converted to this format and possibly enriched using preprocessing tools. We will also store the raw uploads to ensure data recovery and to make it possible to adjust conversion and preprocessing if necessary.</p>
+   <p>2.1 Corpus Data</p>
+   <p>All corpus data, regardless whether it is part of a parallel corpus or part of a monolingual corpus, will be stored in a simple XML format.1 XML is a well-established and widely used markup language for the representation of structured information. XML comes with fixed standard specifications [1], naively supports Unicode [9], and the main advantage is that a lot of tools (parsers, transfo

@@ -1,0 +1,15 @@
+
+
+* import can fail if HTML is not valid:
+  see
+
+
+sudo tail /var/lib/letsmt/www-data/www.vnk.fi/opus/jobs/import/uploads/crawl_aa.tar.gz.xml_err_1 
+                                                 ^
+:10: parser error : Opening and ending tag mismatch: hr line 8 and body
+</body></html>
+       ^
+:10: parser error : Opening and ending tag mismatch: body line 4 and html
+</body></html>
+              ^
+:11: parser error : Premature end of data in tag html line 2

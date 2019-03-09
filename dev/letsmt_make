@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+letsmt_make - create import|align|realign|align-candidates jobs and commit them
+
+=head1 USAGE
+
+ letsmt_make [OPTION] -u USER -p PATH  COMMAND ARGS
+
+=head1 OPTIONS
+
+ -p path ..... relative path to job description file in XML format
+ -u user ..... user ID
+ -s slot ..... name of the slot (if given: add slot/user to the path)
+ 
+ -h .......... show the help text
+ -V .......... display the LetsMT library version
+
+=head1 DESCRIPTION
+
+The script create jobs to be submitted to the LetsMT! JobManager.
+C<COMMAND> is one of the commands supported by C<LetsMT::Repository::JobManager::run>,
+and C<ARGS> are key--value pairs (separated by spaces) of additional arguments.
+
+=cut
+
+use strict;
+$| = 1; ## Autoflush STDOUT
+
+use Encode qw(decode);
+use Encode::Locale;
+Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+#use FindBin;                       # We use this in order to use the library in the source tree,
+#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+
+use Getopt::Std;
+use vars qw($opt_h $opt_i $opt_p $opt_s $opt_u $opt_V);
+getopts('h:p:s:u:V');
+
+use lib "$ENV{HOME}/OPUS-repository/perllib/LetsMT/lib";
+use LetsMT;
+use LetsMT::Repository::JobManager;
+
+my $command = shift(@ARGV);
+my %args = @ARGV;
+
+
+sub usage {
+    use Pod::Usage;
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -message => 'letsmt_make - create import|align|realign jobs and commit them',
+        -verbose => 1,
+    );
+    print STDERR $_[0] if @_;
+    exit;
+}
+
+&usage if ($opt_h);
+
+do {
+    print "\nLetsMT modules version $LetsMT::VERSION\n\n";
+    exit;
+} if ($opt_V);
+
+
+my $path = $opt_p || &usage ("Need to specify a path with option -p!\n");
+my $user = $opt_u || &usage ("Need to specify a user with option -u!\n");
+
+# only if -s is given: create a path as a combination of slot/user/path
+# otherwise: -p should give the entire storage-path
+
+if ($opt_s) {
+    $path = join( '/', $opt_s, $user, $path );
+}
+
+$args{uid} = $user;
+my @path_elements = split( /\/+/, $path );
+
+my $response = LetsMT::Repository::JobManager::run(
+    $command,
+    \@path_elements,
+    \%args
+);
+
+print "response from job maker: $response";
+
+
+END {
+    chdir;
+    File::Temp::cleanup();
+}
+
+
+=head1 LICENSE
+
+This program is part of LetsMT! Resource Repository.
+
+LetsMT! Resource Repository is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+LetsMT! Resource Repository is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LetsMT! Resource Repository.  If not, see
+L<http://www.gnu.org/licenses/>.

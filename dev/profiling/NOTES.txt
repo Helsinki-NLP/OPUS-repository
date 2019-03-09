@@ -1,0 +1,23 @@
+
+sudo apt-get install libdevel-nytprof-perl libsvg-perl
+
+
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/storage/corpus100/user/uploads/html/html.tar.gz?uid=user" --form payload=@small.tar.gz
+perl -d:NYTProf `which letsmt_import`  -u user -s corpus100 -p uploads/html/html.tar.gz
+
+nytprofhtml
+
+
+
+
+
+
+# profile code and write database to ./nytprof.out
+perl -d:NYTProf some_perl.pl
+ 
+# convert database into a set of html files, e.g., ./nytprof/index.html
+# and open a web browser on the nytprof/index.html file
+nytprofhtml --open
+ 
+# or into comma separated files, e.g., ./nytprof/*.csv
+nytprofcsv
