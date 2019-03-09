@@ -16,6 +16,13 @@ There is quite a lot of changes since the latest release from the original LetsM
 
 ## Changes to the storage API
 
+* commit revision is set to HEAD i git backend as a default; the real revision hash number is show if you add `rev=show` to a GET reques; the revision history is shown when the argument is set to 'history':
+
+```
+$LETSMT_CONNECT -X GET "$LETSMT_URL/storage/corpus/user/xml/file.xml?uid=user&rev=history"
+```
+
+
 * downloading data from URL's: Now it is possible to give a url in the request to download a file directly from the webto store in the repository. For example, to download `http://spiegel.de` to a repository you can run:
 
 ```

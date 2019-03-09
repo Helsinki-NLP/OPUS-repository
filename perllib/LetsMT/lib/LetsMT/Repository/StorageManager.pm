@@ -572,7 +572,7 @@ sub list_storage_branch_filelist {
     };
 
     ## show existing revisions (if $rev is set)
-    if ($rev){
+    if ($rev eq 'history'){
         my %revisions = $vc->revisions( $slot, $branch, @{$pathref} );
         foreach (sort { $a <=> $b } keys %revisions){
             push( @{$$result{history}}, {

@@ -595,13 +595,21 @@ sub list {
     my $path_to_display = join( '/', $params{repos}, $params{dir} );
 
     ## check whether we need to commit anything
-    ## TODO: does this become inefficient?
+    ## TODO: does this becomes inefficient?
     ## - only list committed files!
     # $self->commit( $user, $path, 'last commit before listing') unless ($self->auto_commit());
 
     ## revision of the root dir is set for all files
     ## TODO: should we get commit hash's for all individual files?
-    my $revision = $params{revision} || $self->revision( $user, $path_to_display ) || 'HEAD';
+
+    ## NEW: get reivisons is expensive for large GIT repositories
+    ##      because git log is slow with many commits
+    ## --> only get the real revision number if 'rev' attribute is set
+
+    my $revision = $params{revision} || 'HEAD';
+    if ( $params{rev} && ! $params{revision} ){
+	$revision = $self->revision( $user, $path_to_display );
+    }
     if ($path){
 	unless ( $self->_is_file( $repohome, $revision, $path )){
 	    $path .= '/';
