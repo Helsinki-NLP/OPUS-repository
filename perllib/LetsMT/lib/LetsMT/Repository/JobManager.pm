@@ -834,6 +834,7 @@ sub run_parse {
 		$resource->local_dir($local_root);
 		unless ( &LetsMT::WebService::get_resource($resource) ) {
 		    get_logger(__PACKAGE__)->error("Unable to fetch resource: $resource");
+		    return undef;
 		}
 	    }
 	    my $pr = $resource->clone();
@@ -990,6 +991,8 @@ sub run_make_tmx {
 	$resource->local_dir($local_root);
 	unless ( &LetsMT::WebService::get_resource($resource) ) {
 	    get_logger(__PACKAGE__)->error("Unable to fetch resource: $resource");
+	    print STDERR "cannot find resource ".$resource->path."\n";
+	    return undef;
 	}
     }
 

@@ -13,6 +13,7 @@ A factory class to return an object instance of a selected alignment module.
 use strict;
 use File::Temp 'tempdir';
 use File::Path;
+use Cwd;
 
 use LetsMT::WebService;
 use LetsMT::Resource;
@@ -242,8 +243,14 @@ sub align_resources {
             );
 
 	    ## NEW: also create a TMX file out of the bitext
+	    ## make sure that we can access the local file
+	    ## --> avoid downloading (which may fail anyway 
+	    ##     if the new file is not yet committed)
+	    my $pwd = getcwd();
+	    chdir($AlgResource->local_dir());
 	    my @path_elements = split(/\/+/,$AlgResource->storage_path);
 	    LetsMT::Repository::JobManager::run_make_tmx(\@path_elements, \%UploadParams);
+	    chdir($pwd);
 
             return $AlgResource;
         }
@@ -258,6 +265,39 @@ sub align_resources {
     );
     return undef;
 }
+
+
+
+
+# sub _convert_to_tmx{
+#     my $resource = shift;
+#     my %para     = @_;
+
+#     my $input = new LetsMT::Export::Reader( $resource, 'xces' );
+#     my $outres = $resource->clone;
+#     my $output = new LetsMT::Export::Writer( $outres, 'tmx' );
+
+#     return undef unless($input);
+#     return undef unless($output);
+
+#     ## convert the data
+#     $input->open($resource) || return undef;
+#     $output->open($outres) || return undef;
+#     my ($before, $after) = ({}, {});
+#     while ( my $data = $input->read( $before, $after ) ) {
+# 	$output->write( $data, $before, $after );
+#     }
+#     $input->close();
+#     $output->close();
+
+#     if ( &LetsMT::WebService::put_resource( $outres, %para ) ){
+# 	&LetsMT::WebService::put_meta( $resource,'tmx' => $outres->path );
+# 	return $outres;
+#     }
+#     return undef;
+# }
+
+
 
 
 =head2 make_align_resource
@@ -275,6 +315,14 @@ sub make_align_resource {
     my ( $SrcResource, $TrgResource ) = @_;
 
     my $resource = $SrcResource->clone;
+
+    ## copy the local dir from any of the two resources
+    ## if it exists in one of them (preference for SrcResource)
+    unless ($resource->local_dir()){
+	if ($TrgResource->local_dir()){
+	    $resource->local_dir( $TrgResource->local_dir() );
+	}
+    }
 
     my $SrcLang = $SrcResource->language();
     my $TrgLang = $TrgResource->language();
