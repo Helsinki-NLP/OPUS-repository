@@ -1285,9 +1285,15 @@ sub run_crawler{
 
 	## TODO: should also get MD5 signatures from files in other
 	##       subdirectories .... (see find and split below)
-	my $md5hash = dir_md5_hex($domain);
-	$md5hash    = {} unless (ref($md5hash) eq 'HASH');
-	my %md5db   = ();
+	## NEW: use our own recursive call to file_md5_hex
+	##      --> properly read utf8 file names
+	# my $md5hash = dir_md5_hex($domain);
+	my $md5hash = _recursive_md5_hex($domain);
+	unless (ref($md5hash) eq 'HASH'){
+	    print STDERR "crawler: no files found when making md5 signatures!";
+	    $md5hash = {};
+	}
+	my %md5db = ();
 
 	## check whether there is an md5 file in the repository
 	## --> download and read that file
@@ -1305,9 +1311,10 @@ sub run_crawler{
 	$db->Filter_Key_Push('utf8');
 	$db->Filter_Value_Push('utf8');
 
-	foreach my $file (keys %md5db){
+	while (my @v = each %md5db){
+	    my ($file,$md5) = @v;
 	    if (exists($$md5hash{$file}) && -e $domain.'/'.$file){
-		if ( $$md5hash{$file} eq $md5db{$file} ){
+		if ( $$md5hash{$file} eq $md5 ){
 		    print STDERR "identical MD5: delete $domain/$file\n";
 		    unlink($domain.'/'.$file);
 		}
@@ -1315,7 +1322,7 @@ sub run_crawler{
 		## --> now no change and we will overwrite the old one!
 		## --> should we rename the file instead?
 		else{
-		    print STDERR "new MD5: overwrite domain/$file\n";
+		    print STDERR "new MD5: overwrite $domain/$file\n";
 		}
 	    }
 	}
@@ -1377,11 +1384,26 @@ sub run_crawler{
 		    }
 		    ## cannot upload the tar-file?
 		    ## move it to a tmpfile to save from deleting
+		    ## TODO: should we do that? need to inform the user/admin about it!
+		    ## --> now it's at least printed to stderr ....
 		    unless ($success){
 			my $tmpfile = '/tmp/'.$$path_elements[-1];
 			&safe_system( 'mv', $tarfile, $tmpfile );
 			print STDERR "could not upload the crawled data; saved in:\n";
 			print STDERR $tmpfile,"\n";
+		    }
+		    ## make space!
+		    else{
+			unlink($tarfile);
+		    }
+		    ## NEW: start cleaning up the directory
+		    ## to make more space --> delete all files in $c
+		    if (open F,'<',$c){
+			binmode( F, ':encoding(utf8)' );
+			while (<F>){
+			    unlink($_) if (-e $_);
+			}
+			close F;
 		    }
 		}
 	    }
@@ -1433,6 +1455,41 @@ sub run_crawler{
 
     # chdir($pwd);
     # raise( 8, "cannot download $args->{url} ($?)", 'error' );
+}
+
+
+sub _recursive_md5_hex{
+    my ($dir,$md5hash) = @_;
+
+    $md5hash = {} unless (ref($md5hash) eq 'HASH');
+    return {} unless (-d $dir);
+
+
+    opendir( my $dh, $dir )
+	or raise( 8, "cannot open dir '$dir'", 'warn' );
+
+    ## TODO: readdir is one of the few places where utf8 decoding is really still needed
+    ## http://perldoc.perl.org/perlunicode.html#When-Unicode-Does-Not-Happen
+    ## TODO: utf8::all seems to be close to enabling utf8 for readdir...
+    while ( my $f = decode( 'utf8', readdir $dh ) ) {
+	next if ( $f =~ /^\.$/ );
+	my $file = "$dir/$f";
+	if ( -d $file ) {
+	    _recursive_md5_hex( $file, $md5hash );
+	}
+	elsif ( -f $file ) {
+	    ## remove first path element (key = relative path to basedir)
+	    my @path = split(/\/+/,$file);
+	    shift @path;
+	    my $key = join('/',@path);
+	    $$md5hash{$key} = file_md5_hex($file);
+	}
+	else{
+	    print STDERR "crawler/md5: not a regular file nor a directory: $file\n";
+	}
+        closedir $dh;
+    }
+    return $md5hash;
 }
 
 
