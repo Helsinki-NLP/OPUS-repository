@@ -52,6 +52,12 @@ $LETSMT_CONNECT -X GET "$LETSMT_URL/storage/corpus/user/xml/en/test.html?uid=use
 
 ## Changes to the job API
 
+* create MD5 signatures (in case it didn't work during crawling)
+
+```
+$LETSMT_CONNECT -X PUT "$LETSMT_URL/job/corpus/user/uploads/crawl2019-Mar-10.tar.gz?uid=user&run=make_md5"
+```
+
 * list all jobs in the SLURM job queue:
 
 ```

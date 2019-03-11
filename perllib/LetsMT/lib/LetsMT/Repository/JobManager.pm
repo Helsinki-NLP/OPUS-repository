@@ -313,24 +313,34 @@ sub run {
     if ($command eq 'tokenize'){
         return run_tokenize($path_elements, $args);
     }
+    ## word-align a bitext
     if ($command eq 'wordalign'){
         return run_wordalign($path_elements, $args);
     }
+    ## parse corpus with UDPipe
     if ($command eq 'parse'){
         return run_parse($path_elements, $args);
     }
+    ## convert bitext to TMX
     if ($command eq 'make_tmx'){
         return run_make_tmx($path_elements, $args);
     }
+    ## download from URLs
     if ($command eq 'download'){
         return run_import_url($path_elements, $args);
     }
     ## TODO: implement web crawling of entire websites
     ##       (using bitextor?)
     ## 
+    ## crawl websites with wget
     if ($command eq 'crawl'){
         return run_crawler($path_elements, $args);
     }
+    ## create MD5 signature file
+    if ($command eq 'make_md5'){
+        return run_make_md5($path_elements, $args);
+    }
+    ## experimental stuff with ISA/IDA
     if ($command eq 'setup_isa'){
         return run_setup_isa($path_elements, $args);
     }
@@ -1163,6 +1173,81 @@ sub run_import_url{
 
 
 
+## make md5 signatures for a file or tar-ball
+sub run_make_md5{
+    # my ($path_elements, $args) = @_;
+    my $path_elements = ref($_[0]) eq 'ARRAY' ? shift : [];
+    my $args          = ref($_[0]) eq 'HASH'  ? shift : ();
+
+    raise( 12, "parameter uid", 'warn') unless (exists $args->{uid});
+
+    my $slot   = shift(@{$path_elements});
+    my $branch = shift(@{$path_elements});
+
+    my $resource = LetsMT::Resource::make($slot,$branch,
+					  join('/',@{$path_elements}));
+
+    ## temporary download space
+    my $tmphome = $ENV{LETSMT_TMP} || '/tmp';
+    my $tmpdir  = tempdir( 'md5_XXXXXXXX',
+			   DIR     => $tmphome,
+			   CLEANUP => 1 );
+
+    my $pwd = getcwd();
+    chdir($tmpdir);
+
+    if (LetsMT::Corpus::resource_exists($resource)){
+	&LetsMT::WebService::get_resource($resource, 'archive' => 'no') ||
+	    raise( 8, "cannot download $resource ($?)", 'error' );
+    }
+    my $datafile = $resource->path;
+    if ($datafile=~/\.tar\.gz/){
+	&safe_system( 'tar', '-xzf', $datafile ) || 
+	    raise( 8, "cannot unpack $datafile ($?)", 'error' );
+	unlink($datafile);
+    }
+
+    ## the name of the resource with all the md5 signatures
+    my $md5file = $datafile;
+    $md5file=~s/\.[a-z]+(\.gz)?$/\.md5/i;
+    $md5file=~s/[0-9]{4}\-[a-zA-Z]{3}\-[0-9]{2}\_[a-z]{2}(\.md5)/$1/;
+
+    ## make the md5-resource object and download if it already exists
+    my $md5resource = LetsMT::Resource::make($slot,$branch,$md5file);
+    if (LetsMT::Corpus::resource_exists($md5resource)){
+	&LetsMT::WebService::get_resource($md5resource, 'archive' => 'no') ||
+	    raise( 8, "cannot download $md5resource ($?)", 'error' );
+    }
+    else{
+	$md5file = basename($md5file);
+	open F,">",$md5file; close F;
+    }
+
+    ## tie the database
+    my %md5hash = ();
+    my $db = tie %md5hash,"DB_File",$md5file;
+
+    $db->Filter_Key_Push('utf8');
+    $db->Filter_Value_Push('utf8');
+
+    ## make md5 signatures of all files in the current dir
+    ## TODO: is it OK to also include the md5 databasefile?
+    _recursive_md5_hex('.',\%md5hash);
+
+    if (keys %md5hash){
+	undef $db;
+	untie %md5hash;
+	&LetsMT::WebService::put_file( $md5resource, $md5file ) ||
+	    raise( 8, "cannot upload $md5resource ($?)", 'error' );
+    }
+
+    chdir($pwd);
+    return "updated ".$md5resource->path();
+}
+
+
+
+
 ## recursively download a whole website ...
 ## TODO: make sure that this does not crash the system and overloads another server
 sub run_crawler{
@@ -1179,13 +1264,13 @@ sub run_crawler{
     raise( 17, "URL (supported = http|https|ftp)", 'warn' ) 
 	unless ($args->{url}=~/^(http|https|ftp):\/\/([a-zA-Z0-9][a-zA-Z0-9\.\-]*[a-zA-Z0-9])(\/[\~a-zA-Z0-9\.\-\/]*)?$/i);
 
-    ## select long queue as the default
-    $$args{queue} = 'long' unless ($$args{queue});
-
     my $domain = $2;
     my $doc    = $domain;
     my $slot   = shift(@{$path_elements});
     my $branch = shift(@{$path_elements});
+
+    ## select long queue as the default
+    $$args{queue} = 'long' unless ($$args{queue});
 
     ## make the upload location if not given
     unless (@{$path_elements}){
@@ -1476,12 +1561,15 @@ sub _recursive_md5_hex{
     ## http://perldoc.perl.org/perlunicode.html#When-Unicode-Does-Not-Happen
     ## TODO: utf8::all seems to be close to enabling utf8 for readdir...
     while ( my $f = decode( 'utf8', readdir $dh ) ) {
-	next if ( $f =~ /^\.$/ );
+    # while ( my $f = readdir $dh ) {
+	# utf8::decode($f);
+	next if ( $f =~/^\./ );
 
 	my $abspath = Cwd::abs_path("$dir/$f");
 	my $relpath = File::Spec->abs2rel( $abspath, $basedir );
 
 	next if (exists($$md5hash{$relpath}));
+	# print STDERR "doing $relpath\n";
 
 	if ( -d $abspath ) {
 	    $$md5hash{$relpath} = '';
