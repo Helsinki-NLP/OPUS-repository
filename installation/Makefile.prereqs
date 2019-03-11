@@ -119,6 +119,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Encode::Locale \
 		File::GetLineMaxLength \
 		File::LibMagic \
+		File::Spec \
 		File::Touch \
 		Lingua::Sentence \
 		Lingua::Identify \

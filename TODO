@@ -124,6 +124,7 @@ High priority:
 
 Medium priority:
 
+* replace path manipulation things to use File::Spec
 * find translated documents based on their contents (difficult)
   --> use external tools for searching parallel documents?
   --> multilingual sentence-embedding based methods

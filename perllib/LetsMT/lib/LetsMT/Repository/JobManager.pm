@@ -1462,11 +1462,12 @@ sub run_crawler{
 
 
 sub _recursive_md5_hex{
-    my ($dir,$md5hash) = @_;
+    my ($dir,$md5hash,$basedir) = @_;
 
+    $basedir = $dir unless ($basedir);
     $md5hash = {} unless (ref($md5hash) eq 'HASH');
-    return {} unless (-d $dir);
 
+    return {} unless (-d $dir);
 
     opendir( my $dh, $dir )
 	or raise( 8, "cannot open dir '$dir'", 'warn' );
@@ -1476,22 +1477,24 @@ sub _recursive_md5_hex{
     ## TODO: utf8::all seems to be close to enabling utf8 for readdir...
     while ( my $f = decode( 'utf8', readdir $dh ) ) {
 	next if ( $f =~ /^\.$/ );
-	my $file = "$dir/$f";
-	if ( -d $file ) {
-	    _recursive_md5_hex( $file, $md5hash );
+
+	my $abspath = Cwd::abs_path("$dir/$f");
+	my $relpath = File::Spec->abs2rel( $abspath, $basedir );
+
+	next if (exists($$md5hash{$relpath}));
+
+	if ( -d $abspath ) {
+	    $$md5hash{$relpath} = '';
+	    _recursive_md5_hex( $abspath, $md5hash, $basedir );
 	}
-	elsif ( -f $file ) {
-	    ## remove first path element (key = relative path to basedir)
-	    my @path = split(/\/+/,$file);
-	    shift @path;
-	    my $key = join('/',@path);
-	    $$md5hash{$key} = file_md5_hex($file);
+	elsif ( -f $abspath ) {
+	    $$md5hash{$relpath} = file_md5_hex($abspath);
 	}
 	else{
-	    print STDERR "crawler/md5: not a regular file nor a directory: $file\n";
+	    print STDERR "crawler/md5: not a regular file nor a directory: $relpath\n";
 	}
-        closedir $dh;
     }
+    closedir $dh;
     return $md5hash;
 }
 
