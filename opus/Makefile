@@ -79,7 +79,7 @@ endif
 ## install repository for OPUS with connection to remote git server
 .PHONY: install-opus opus
 install-opus opus: /etc/munge/munge.key /etc/ssl/${HOSTNAME}
-ifneq (${GITSERVER},)
+ifneq (${OPUSGIT},)
 	${MAKE} /var/www/.ssh/config
 endif
 	${MAKE} -C .. GIT_REMOTE='${OPUSGIT}' HOSTNAME=${OPUSRR} install
@@ -88,10 +88,13 @@ endif
 	@echo
 	@echo '----------------------------------------------------------';
 	@echo "Installation of the OPUS repository backend finished"
+ifneq (${OPUSGIT},)
 	@echo "Don't forget to upload the public key /etc/ssh/opusrr.pub"
 	@echo "to the git server at ${OPUSGIT}!"
+endif
 	@echo '----------------------------------------------------------';
 	@echo
+
 
 .PHONY: install-opus-client opus-client
 install-opus-client opus-client: /etc/ssl/${OPUSRR} /etc/munge/munge.key
