@@ -294,6 +294,7 @@ install-config: \
 	config-apache2 \
 	config-mysql \
 	config-openssl \
+	config-login \
 	install-diskroot
 
 
@@ -309,9 +310,9 @@ update-config: config-conf config-apache2 install-diskroot
 install-diskroot: ${LETSMTDISKROOT}
 
 ${LETSMTDISKROOT}:
-	mkdir -p ${LETSMTDISKROOT}
-	chown www-data:www-data ${LETSMTDISKROOT}
-
+	mkdir -p $@
+	chown www-data:www-data $@
+	chmod g+s $@
 
 .PHONY: dbstartup-scripts
 dbstartup-scripts: ttservctl
@@ -508,6 +509,10 @@ config-apache2:
 	grep 'export LC_ALL=${LANG}' /etc/apache2/envvars > /dev/null || \
 	    echo 'export LC_ALL=${LANG}' >> /etc/apache2/envvars
 
+#	grep 'umask 022' /etc/apache2/envvars > /dev/null || \
+#	    echo 'umask 022' >> /etc/apache2/envvars
+
+
 ## OLD:
 #	${INSTALL_DATA} -b -S .old apreq.conf ${APACHE_CONF}/conf.d/apreq.conf
 # 	mkdir -p ${PREFIX}/www
@@ -661,6 +666,9 @@ config-gridengine:
 	sed    -e "s#REPLACE_HOSTNAME#${LETSMTHOST} localhost#" letsmt.q_conf > letsmt.q
 	-qconf -Aq letsmt.q
 
+.PHONY: config-login
+config-login:
+	sed -i 's/^USERGROUPS_ENAB.*$$/USERGROUPS_ENAB no/' /etc/login.defs
 
 
 # #########################################################################
