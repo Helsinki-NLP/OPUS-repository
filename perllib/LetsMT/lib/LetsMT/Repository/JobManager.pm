@@ -1303,7 +1303,7 @@ sub run_crawler{
     ## TODO: --content-disposition is experimental (is it stable enough for us?)
 
     ## wget parameters
-    my @para = ('-r','--no-parent',
+    my @para = ('-r','-nv','--no-parent',
 		'--convert-links',
 		'--adjust-extension',
 		'--restrict-file-names=nocontrol',

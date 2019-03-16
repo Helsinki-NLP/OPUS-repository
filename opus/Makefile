@@ -34,7 +34,7 @@ OPUS_DEV_IP    = 192.168.1.10
 
 ## worker nodes of stable and development version
 OPUS_CLIENTS    = 
-OPUSDEV_CLIENTS = opusdev0 opusdev1 # opusdev2
+OPUSDEV_CLIENTS = opusdev0 opusdev1 opusdev2
 
 
 
@@ -42,7 +42,7 @@ OPUSDEV_CLIENTS = opusdev0 opusdev1 # opusdev2
 update:
 	sudo make -C .. code-update
 	for s in ${OPUS_CLIENTS}; do \
-	  rsync --delete -zav ${HOME}/OPUS-repository cloud-user@$$s:.; \
+	  rsync -L --delete -zav ${HOME}/OPUS-repository cloud-user@$$s:.; \
 	  ssh -i /home/cloud-user/.ssh/opus $$s sudo make -C OPUS-repository code-update; \
 	done
 
@@ -50,7 +50,7 @@ update:
 update-dev:
 	sudo make -C .. code-update
 	for s in ${OPUSDEV_CLIENTS}; do \
-	  rsync --delete -zav ${HOME}/OPUS-repository cloud-user@$$s:.; \
+	  rsync -L --delete -zav ${HOME}/OPUS-repository cloud-user@$$s:.; \
 	  ssh -i /home/cloud-user/.ssh/opus $$s sudo make -C OPUS-repository code-update; \
 	done
 

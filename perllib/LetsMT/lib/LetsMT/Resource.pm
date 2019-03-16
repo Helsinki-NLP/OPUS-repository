@@ -247,7 +247,7 @@ sub revision{
     return $1 if ( $self->{path} =~ /\@([0-9]+|HEAD)$/ );
 
     # OR try to get the latest revision number from the repository
-    my $xml = LetsMT::WebService::get( $self );
+    my $xml = LetsMT::WebService::get( $self, rev => 'show' );
     return undef unless (length $xml);
 
     my $parser = new XML::LibXML;
