@@ -8,15 +8,13 @@ BACKUPDIR = /var/lib/letsmt/backup/monthly
 
 
 METAFILES = ${patsubst ${BACKUPDIR}/meta.${BACKUP}%,\
-		${LETSMTROOT}/metadata%,\
-		${wildcard ${BACKUPDIR}/meta.${BACKUP}.*}}
+		${LETSMTROOT}/metadata.tct%,\
+		${wildcard ${BACKUPDIR}/meta.${BACKUP}*}}
 
 
 ## only print the commands that need to be run
 
 restore-meta: ${METAFILES}
 
-${METAFILES}: ${LETSMTROOT}/metadata%: ${BACKUPDIR}/meta.${BACKUP}%
-	@echo "make stop-db"
+${METAFILES}: ${LETSMTROOT}/metadata.tct%: ${BACKUPDIR}/meta.${BACKUP}%
 	@echo "sudo cp $< $@"
-	@echo "make start-db"

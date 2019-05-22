@@ -101,7 +101,7 @@ sub find_corpusfiles {
     );
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     ## parse the query result (matching files in entry-path)
     my @resources     = ();
@@ -127,7 +127,7 @@ sub resource_type {
 
     ## check whether there is metadata for the resource
     my $response = LetsMT::WebService::get_meta( $resource );
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string( $response );
@@ -157,7 +157,7 @@ sub is_file {
     my $dir       = dirname($resource->storage_path);
     my $dir_res   = LetsMT::Resource::make_from_storage_path($dir);
     my $response  = LetsMT::WebService::get( $dir_res );
-    $response     = decode( 'utf8', $response );
+    # $response     = decode( 'utf8', $response );
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string( $response );
     my @nodes     = $dom->findnodes('//list/entry/name[text()="'.basename($resource).'"]');
@@ -180,7 +180,7 @@ Returns 1 if the resource exists, 0 otherwise
 sub resource_exists {
     my $resource    = shift;
     my $response  = LetsMT::WebService::get( $resource );
-    $response     = decode( 'utf8', $response );
+    # $response     = decode( 'utf8', $response );
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string( $response );
     my @nodes     = $dom->findnodes('//list/entry');
@@ -552,7 +552,7 @@ sub find_parallel_documents {
     );
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     ## parse the query result (matching files in entry-path)
     my @files     = ();
@@ -585,7 +585,7 @@ sub find_aligned_documents {
     my $response = LetsMT::WebService::get_meta( $resource );
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     my $XmlParser = new XML::LibXML;
     my $dom       = $XmlParser->parse_string( $response );
@@ -635,7 +635,7 @@ sub find_sentence_aligned {
     }
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     my $repo = $corpus->slot . '/' . $corpus->user;
 
@@ -708,7 +708,7 @@ sub find_all_parallel {
     );
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     ## parse the query result (matching files in entry-path)
     my %files     = ();
@@ -902,7 +902,7 @@ sub find_resources {
     );
 
     ## TODO: why do we need to decode once again?
-    $response = decode( 'utf8', $response );
+    # $response = decode( 'utf8', $response );
 
     ## parse the query result (matching files in entry-path)
 
