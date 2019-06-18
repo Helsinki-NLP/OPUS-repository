@@ -514,6 +514,10 @@ sub run_align {
 
     if ($resource && (exists $$args{trg}) ){
 	my $SrcRes = $resource;
+	# my $TrgRes = LetsMT::Resource::make( $slot, $branch, $$args{trg} );
+	# my $TrgRes = LetsMT::Resource::make( $slot, $branch, decode( 'utf8', $$args{trg}) );
+	## why do we need to decode the request arguments?
+	utf8::decode($$args{trg});
 	my $TrgRes = LetsMT::Resource::make( $slot, $branch, $$args{trg} );
 	my $AlgRes = LetsMT::Align::make_align_resource($SrcRes, $TrgRes);
 	# delete($$args{trg});
