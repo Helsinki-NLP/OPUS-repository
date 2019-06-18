@@ -44,7 +44,7 @@ sub validate {
 
     my @errors = grep {/^tar: /} @{
         &LetsMT::Tools::scrape_cmd_out_err( 
-             'tar -t',
+             'tar --warning=no-unknown-keyword -t',
              &_file_arg( $resource->local_path ) )
         };
     if ( scalar @errors ) {
@@ -80,7 +80,7 @@ sub convert {
     ## TODO: do we need this?
     local $ENV{LC_ALL} = 'en_US.UTF-8';
     my $cmd_reader
-        = &LetsMT::Tools::cmd_out_reader( 'tar -xv',
+        = &LetsMT::Tools::cmd_out_reader( 'tar --warning=no-unknown-keyword -xv',
         &_file_arg( $resource->local_path ),
         '-C',
         &safe_path( $local_home ) );
