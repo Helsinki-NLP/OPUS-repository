@@ -16,6 +16,9 @@ use Data::Dumper;
 use File::BOM ':all';
 use File::Basename;
 use File::Find;
+## make find utf8 aware! https://metacpan.org/pod/File::Find::utf8
+## (does not seem to work does it? use utf8::decode instead)
+# use File::Find::utf8;
 use File::ShareDir;
 
 use utf8;
@@ -690,8 +693,12 @@ sub find_files {
     return () if (not @_);
     my @files = ();
     find( sub{
+	# push( @files, $File::Find::utf8::name ) if (/$pattern/)
         push( @files, $File::Find::name ) if (/$pattern/)
     }, @_ );
+    ## the following seems necessary as the File::Find function returns bytes
+    ## File::Find::utf8 does not seem to work for whatever reason
+    map(utf8::decode($_),@files);
     return @files;
 }
 

@@ -117,6 +117,7 @@ CPAN_MODULES = 	Apache::Tika \
 		Archive::Zip \
 		Class::Sniff \
 		Encode::Locale \
+		File::Find::utf8 \
 		File::GetLineMaxLength \
 		File::LibMagic \
 		File::Spec \
