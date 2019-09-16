@@ -157,7 +157,7 @@ sub convert {
 	# print STDERR "done!\n";
 	if (ref($parsed) eq 'ARRAY'){
 	    if (ref($$parsed[0]) eq 'HASH'){
-		my $ParsedContent = $$parsed[0]{'X-TIKA:content'};
+		$ParsedContent = $$parsed[0]{'X-TIKA:content'};
 	    }
 	}
     }
