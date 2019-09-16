@@ -49,7 +49,10 @@ sub new {
     my %self  = @_;
 
     ## could also have rawxml here (use rmeta function to get XML output from TIKA)
-    $self{intermediate_format} = 'txt' unless ($self{intermediate_format});
+    # $self{intermediate_format} = 'txt' unless ($self{intermediate_format});
+
+    ## NEW: changed to rawxml - seems better in quality ...
+    $self{intermediate_format} = 'rawxml' unless ($self{intermediate_format});
 
     bless \%self, $class;
     return \%self;
