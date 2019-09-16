@@ -26,11 +26,11 @@ KEYHOME  = taito.csc.fi:/proj/OPUS/admin/repository
 
 ## stable version
 OPUS_STABLE    = vm1637.kaj.pouta.csc.fi
-OPUS_STABLE_IP = 192.168.1.19
+OPUS_STABLE_IP = 192.168.1.12
 
 ## development version
 OPUS_DEV       = vm0081.kaj.pouta.csc.fi
-OPUS_DEV_IP    = 192.168.1.10
+OPUS_DEV_IP    = 192.168.1.13
 
 ## worker nodes of stable and development version
 OPUS_CLIENTS    = 

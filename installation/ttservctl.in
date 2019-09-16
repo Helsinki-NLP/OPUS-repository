@@ -32,9 +32,9 @@ case $0 in
         mport=REPLACE_REPLICATION_PORT_META
         mhost=REPLACE_REPLICATION_HOST_META
 	rtsfile="$datadir/meta.rts"
-	bnum=50000000
+	bnum=200000000
 	rcnum=512
-	xmsiz=134217728
+	xmsiz=268435456
 	opts=l
     ;;
     *)

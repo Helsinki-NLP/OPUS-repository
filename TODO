@@ -4,6 +4,12 @@ To do as of version 0.56
 
 High priority:
 
+
+* make sure that Tokyo Tyrant really scales well
+  - optimize bnum and xmsiz
+  - host on ext2 instead of ext3
+  - https://stackoverflow.com/questions/1051847/why-does-tokyo-tyrant-slow-down-exponentially-even-after-adjusting-bnum/2394599
+
 * make the git backend faster for large repos
   'git log' slows down a lot --> avoid calling it if not needed!
 

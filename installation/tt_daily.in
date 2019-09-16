@@ -2,7 +2,7 @@
 
 day=`date +%a`
 
-backupdir=REPLACE_DBDIR/backup/monthly
+backupdir=REPLACE_DBDIR/backup/daily
 
 mkdir -p $backupdir
 
