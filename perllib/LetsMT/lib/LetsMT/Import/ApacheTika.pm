@@ -161,6 +161,7 @@ sub convert {
 	if (ref($parsed) eq 'ARRAY'){
 	    if (ref($$parsed[0]) eq 'HASH'){
 		$ParsedContent = $$parsed[0]{'X-TIKA:content'};
+		&_fix_xml($ParsedContent);
 	    }
 	}
     }
@@ -223,6 +224,19 @@ sub convert {
     return [];
 }
 
+
+## fix some problems in the XML returned by ApacheTika
+## ---> escape quotes in metadata entries
+sub _fix_xml{
+    my $count=0;
+    while ($_[0]=~s/(<meta\s+content=\"[^\"\>]*)\"([^\>]*\")(\s+name=)/$1\&quot;$2$3/s){
+	$count++;
+    }
+    while ($_[0]=~s/(<meta\s+name=\"[^\"\>]*\"\s+content=\"[^\"\>]*)\"([^\>]*\")(\\?\>)/$1\&quot;$2$3/s){
+	$count++;
+    }
+    return $count;
+}
 
 
 sub _read_raw_file{

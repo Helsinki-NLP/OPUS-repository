@@ -37,8 +37,8 @@ use Encode::Locale;
 Encode::Locale::decode_argv;
 use open qw(:std :locale);
 
-#use FindBin;                       # We use this in order to use the library in the source tree,
-#use lib $FindBin::Bin . '/../lib'; # not the installed one.
+use FindBin;                       # We use this in order to use the library in the source tree,
+use lib $FindBin::Bin . '/../lib'; # not the installed one.
 
 use File::Temp;
 
