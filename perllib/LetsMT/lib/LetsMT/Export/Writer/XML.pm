@@ -42,7 +42,7 @@ sub markup_to_string {
                 $string .= '<' . $tag;
                 foreach ( keys %{$attr} ) {
                     $string .= ' ' . $self->_key_encode($_);
-                    $string .= '="' . $self->_encode( $$attr{$_} ) . '"';
+                    $string .= '="' . $self->_attr_encode( $$attr{$_} ) . '"';
                 }
                 $string .= ">";
                 # $string .= ">\n";
@@ -234,7 +234,13 @@ sub _print_tree {
 }
 
 
+
+## TODO: better use some explicit XML writer?
+## (or do some better checking of strings, non-printable characters etc)
+
 =head2 C<_encode>
+
+Encode strings
 
 =cut
 
@@ -246,13 +252,27 @@ sub _encode {
     return $_[1];
 }
 
+=head2 C<_attr_encode>
 
-=head2 C<_key_encode>
+Encode string in attribute values
 
 =cut
 
-# encode tag-attribute keys:
-# only allow basic ascii characters!
+sub _attr_encode {
+    $_[1] =~ s/\&/&amp;/gs;
+    $_[1] =~ s/\</&lt;/gs;
+    $_[1] =~ s/\>/&gt;/gs;
+    $_[1] =~ s/\"/&quot;/gs;
+    return $_[1];
+}
+
+
+=head2 C<_key_encode>
+
+Encode tag-attribute keys:
+only allow basic ascii characters!
+
+=cut
 
 sub _key_encode {
     $_[1] =~ s/[^a-zA-Z\_\-0-9]/\_/gs;
