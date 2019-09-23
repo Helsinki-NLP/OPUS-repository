@@ -140,7 +140,7 @@ sub new {
     $self{para}     = $self{para}     || $HUNPARA;
 
     ## filter alignments with scores below scorethr
-    $self{scorethr} = 0 unless $self{scorethr};
+    $self{scorethr} = -10 unless $self{scorethr};
 
     ## maximum number of sentences in alignments
     $self{maxsrc} = 2 unless $self{maxsrc};
@@ -290,10 +290,6 @@ sub _hunalign2links {
         my ( $sid, $tid, $score ) = split(/\s+/);
 
         ## add links
-        my $idx = @{$links};
-        $links->[$idx]->{src} = [];
-        $links->[$idx]->{trg} = [];
-
 	if ($prevScore < $self->{scorethr} ){
 	    $self->{NrSkippedLinks}++;
 	    $self->{NrSkippedSrcSents}+=$sid-$prevSrc+1;
@@ -305,7 +301,6 @@ sub _hunalign2links {
 		foreach ( $prevSrc .. $sid - 1 ) {
 		    next if ( $$srcids[$_] eq 'p' );
 		    push( @srcids, $$srcids[$_] );
-		    # push( @{ $links->[$idx]->{src} }, $$srcids[$_] );
 		}
 	    }
 	    my @trgids = ();
@@ -313,13 +308,18 @@ sub _hunalign2links {
 		foreach ( $prevTrg .. $tid - 1 ) {
 		    next if ( $$trgids[$_] eq 'p' );
 		    push( @trgids, $$trgids[$_] );
-		    # push( @{ $links->[$idx]->{trg} }, $$trgids[$_] );
 		}
 	    }
 	    if ( (! $self->{maxsrc} || @srcids <= $self->{maxsrc}) &&
 		 (! $self->{maxtrg} || @trgids <= $self->{maxtrg}) ){
-		push( @{ $links->[$idx]->{src} }, @srcids );
-		push( @{ $links->[$idx]->{trg} }, @trgids );
+		if (@srcids || @trgids){
+		    my $idx = @{$links};
+		    $links->[$idx]->{src} = [];
+		    $links->[$idx]->{trg} = [];
+		    push( @{ $links->[$idx]->{src} }, @srcids );
+		    push( @{ $links->[$idx]->{trg} }, @trgids );
+		    $links->[$idx]->{score} = $prevScore;
+		}
 	    }
 	    else{
 		$self->{NrSkippedLinks}++;
@@ -327,22 +327,10 @@ sub _hunalign2links {
 		$self->{NrSkippedTrgSents}+=scalar @trgids;
 	    }
 	}
-
-        # no sentences linked? --> pop it again
-        # (could be a linked paragraph boundary)
-        if ( ( not @{ $links->[$idx]->{src} } ) &&
-             ( not @{ $links->[$idx]->{trg} } ) ){
-            pop (@{$links});
-        }
-        else{
-            $links->[$idx]->{score} = $prevScore;
-        }
-
         $prevScore = $score;
         $totalScore += $score;
         $prevSrc   = $sid;
         $prevTrg   = $tid;
-
     }
 
     if ($#{$output}){
