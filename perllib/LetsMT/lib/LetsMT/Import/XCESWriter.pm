@@ -120,6 +120,13 @@ sub write {
             $data{$lang}{$sid}
                 = $self->{tokenizer}->detokenize( $sent_pair->{$lang}{$sid} );
             $self->{normalizer}->normalize_no_copy( $data{$lang}{$sid} );
+
+	    ## delete if empty (or only space characters)
+	    unless ($data{$lang}{$sid}=~/\S/){
+		delete $data{$lang}{$sid};
+		next;
+	    }
+
             $self->{resources}{$lang}{meta}{size}++;
 
 	    ## language identification for each sentence
