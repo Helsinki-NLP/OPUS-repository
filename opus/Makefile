@@ -57,11 +57,13 @@ update-dev:
 
 ## install stable versions
 opus-stable opus-client-stable:
-	${MAKE} OPUSGIT=git@version.helsinki.fi:OPUS \
+	${MAKE} OPUSGIT= \
 		HOSTNAME=${OPUS_STABLE} \
 		OPUSRR=${OPUS_STABLE} \
 		OPUSIP=${OPUS_STABLE_IP} \
 	${@:-stable=}
+
+# OPUSGIT=git@version.helsinki.fi:OPUS \
 
 ## install development versions
 opus-dev opus-client-dev:
