@@ -19,3 +19,6 @@ do
 	it=$((it+1))
     done
 done
+
+REPLACE_TCMGR optimize -port REPLACE_META_DB_PORT localhost
+REPLACE_TCMGR optimize -port REPLACE_GROUP_DB_PORT localhost

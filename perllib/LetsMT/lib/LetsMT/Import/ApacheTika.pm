@@ -155,8 +155,12 @@ sub convert {
     ## check whether we want rawxml or text from TIKA
     ## NOTE: extracting meta data seems to be very slow!
     if ( $self->{intermediate_format} eq 'rawxml' ){
+
 	# print STDERR "ApacheTika: parse document and return rmeta ... ";
-	my $parsed = $TIKA->rmeta($RawContent);
+	my $parsed = undef;
+	eval { $parsed = $TIKA->rmeta($RawContent); };
+	$logger->error("ApacheTike could not parse ".$resource->path) if ($@);
+
 	# print STDERR "done!\n";
 	if (ref($parsed) eq 'ARRAY'){
 	    if (ref($$parsed[0]) eq 'HASH'){

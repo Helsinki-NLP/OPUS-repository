@@ -9,6 +9,6 @@ mkdir -p $backupdir
 REPLACE_TCMGR copy -port REPLACE_META_DB_PORT localhost $backupdir/meta.$day
 REPLACE_TCMGR copy -port REPLACE_GROUP_DB_PORT localhost $backupdir/group.$day
 
-REPLACE_TCMGR optimize -port REPLACE_META_DB_PORT localhost
-REPLACE_TCMGR optimize -port REPLACE_GROUP_DB_PORT localhost
+# REPLACE_TCMGR optimize -port REPLACE_META_DB_PORT localhost
+# REPLACE_TCMGR optimize -port REPLACE_GROUP_DB_PORT localhost
 
