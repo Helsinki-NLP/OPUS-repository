@@ -97,11 +97,11 @@ sub remove  { return 0; }
 sub add_file { return 1; }
 sub commit   { return 1; }
 sub checkout { return 1; }
-sub revisions{ return 1; }
-sub revision { return 'HEAD'; }
 sub push     { return 1; }
 sub pull     { return 1; }
 sub tag      { return 1; }
+sub revisions{ return (); }
+sub revision { return 'HEAD'; }
 
 # return or switch on/off AUTO_COMMIT and AUTO_PUSH
 # (mainly useful for the git backend)

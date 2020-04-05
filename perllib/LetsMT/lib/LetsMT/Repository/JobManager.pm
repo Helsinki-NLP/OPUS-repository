@@ -1323,6 +1323,12 @@ sub run_crawler{
 	push (@para,'--accept',$$args{accept});
     }
 
+    ## switch off check for robots file (not recommended!
+    if (exists $$args{robotsoff}){
+	push (@para,'-e','robots=off');
+    }
+
+
     my @docdir = split(/\/+/,$doc);
     if (@docdir > 1){
 	my @subdir = @docdir;

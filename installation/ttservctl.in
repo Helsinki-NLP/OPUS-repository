@@ -32,15 +32,20 @@ case $0 in
         mport=REPLACE_REPLICATION_PORT_META
         mhost=REPLACE_REPLICATION_HOST_META
 	rtsfile="$datadir/meta.rts"
-	bnum=200000000
+	bnum=400000000
 	rcnum=512
-	xmsiz=268435456
+	xmsiz=1073741824
 	opts=l
     ;;
     *)
         printf '%s: script name must be *_group or *_meta\n' $0
         exit 1
 esac
+
+#	bnum=200000000
+#	rcnum=512
+#	xmsiz=268435456
+
 dbname="$datadir/$database.tct"
 piddir="/var/run/letsmt"
 pidfile="$piddir/tt_$database.pid"
