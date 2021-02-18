@@ -29,6 +29,9 @@ include Makefile.conf
 .PHONY: all
 all: install
 
+cert:
+	make -C installation config-openssl
+
 .PHONY: install install-rr-server
 install install-rr-server:  prepare-target stop-db
 	$(MAKE) $@ -C installation -f Makefile.prereqs

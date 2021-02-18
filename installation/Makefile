@@ -24,9 +24,12 @@ LETSMT_CERTPATH = ${LETSMT_SSL_DIR}/newcerts
 LETSMT_REVOCATIONPATH=${LETSMT_SSL_DIR}/crl
 
 ### the important variables that should be exported
-LETSMT_CACERT   = ${LETSMT_SSL_DIR}/ca.crt
-LETSMT_USERCERT = ${LETSMT_SSL_DIR}/user/certificates/developers@localhost.crt
-LETSMT_USERKEY  = ${LETSMT_SSL_DIR}/user/keys/developers@localhost.key
+LETSMT_CACERT     = ${LETSMT_SSL_DIR}/ca.crt
+LETSMT_CAKEY      = ${LETSMT_SSL_DIR}/ca.key
+LETSMT_SERVERCERT = ${LETSMT_SSL_DIR}/server/certificates/${HOSTNAME}.crt
+LETSMT_SERVERKEY  = ${LETSMT_SSL_DIR}/server/keys/${HOSTNAME}.key
+LETSMT_USERCERT   = ${LETSMT_SSL_DIR}/user/certificates/developers@localhost.crt
+LETSMT_USERKEY    = ${LETSMT_SSL_DIR}/user/keys/developers@localhost.key
 LETSMT_USERCERTPASS = letsmt
 
 ## server and compute nodes for SLURM
@@ -38,6 +41,56 @@ SLURM_NODES          = ${NODENAME}
 ifndef SLURM_SERVER
     SLURM_SERVER = ${NODENAME}
 endif
+
+
+
+
+# ###############
+# ## another way of creating the certificates
+# ## ---> does not work properly
+
+# certificate: ${LETSMT_SERVERCERT} ${LETSMT_USERCERT}
+# 	mkdir -p ${LETSMT_SSL_DIR}/newcerts
+# 	mkdir -p ${LETSMT_SSL_DIR}/crl
+
+
+# ${LETSMT_CAKEY}:
+# 	mkdir -p ${dir $@}
+# 	openssl ecparam -out $@ -name prime256v1 -genkey
+# 	chmod 600 $@
+
+# ${LETSMT_CACERT}: ${LETSMT_CAKEY}
+# 	mkdir -p ${dir $@}
+# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
+# 	openssl x509 -req -sha256 -days 365 -in ${@:.crt=.csr} -signkey $< -out $@
+
+# ${LETSMT_SERVERKEY}:
+# 	mkdir -p ${dir $@}
+# 	openssl ecparam -out $@ -name prime256v1 -genkey
+# 	chmod 600 $@
+
+# ${LETSMT_SERVERCERT}: ${LETSMT_SERVERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
+# 	mkdir -p ${dir $@}
+# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
+# 	openssl x509 -req -in ${@:.crt=.csr} \
+# 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
+# 		-CAcreateserial -out $@ -days 365 -sha256
+
+# ${LETSMT_USERKEY}:
+# 	mkdir -p ${dir $@}
+# 	openssl ecparam -out $@ -name prime256v1 -genkey
+# 	chmod 600 $@
+
+# ${LETSMT_USERCERT}: ${LETSMT_USERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
+# 	mkdir -p ${dir $@}
+# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
+# 	openssl x509 -req -in ${@:.crt=.csr} \
+# 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
+# 		-CAcreateserial -out $@ -days 365 -sha256
+
+# ###############
+
+
 
 
 ### Java classpath
@@ -206,47 +259,81 @@ install-files: ttservctl prepare-directories install-log install-apache-tika ins
 	update-rc.d ttservctl_group defaults
 	update-rc.d ttservctl_meta defaults
 
-## OLD: this is not part of the distribution anymore
-## TODO: check whether this still needs to be supported
-##
-##	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
+# ## OLD: this is not part of the distribution anymore
+# ## TODO: check whether this still needs to be supported
+# ##
+# ##	${INSTALL_BIN} ../lib/tika-app-1.18.jar ${PREFIX}/lib/
 
-## install Apache Tika server (should listen on port 9998)
+# ## install Apache Tika server (should listen on port 9998)
+# .PHONY: install-apache-tika
+# install-apache-tika: ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar
+# 	@echo 'description     "Apache Tika Server"'    > tika-server.conf
+# 	@echo ''                                       >> tika-server.conf
+# 	@echo 'start on filesystem or runlevel [2345]' >> tika-server.conf
+# 	@echo 'stop on shutdown'                       >> tika-server.conf
+# 	@echo ''                                       >> tika-server.conf
+# 	@echo 'respawn'                                >> tika-server.conf
+# 	@echo 'respawn limit 3 12'                     >> tika-server.conf
+# 	@echo ''                                       >> tika-server.conf
+# 	@echo "exec java -jar ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar" >> tika-server.conf
+# 	${INSTALL_DATA} -b -S .old tika-server.conf /etc/init/tika-server.conf
+# 	rm -f tika-server.conf
+# 	service tika-server start || true
+
+
 .PHONY: install-apache-tika
-install-apache-tika: ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar
-	@echo 'description     "Apache Tika Server"'    > tika-server.conf
-	@echo ''                                       >> tika-server.conf
-	@echo 'start on filesystem or runlevel [2345]' >> tika-server.conf
-	@echo 'stop on shutdown'                       >> tika-server.conf
-	@echo ''                                       >> tika-server.conf
-	@echo 'respawn'                                >> tika-server.conf
-	@echo 'respawn limit 3 12'                     >> tika-server.conf
-	@echo ''                                       >> tika-server.conf
-	@echo "exec java -jar ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar" >> tika-server.conf
-	${INSTALL_DATA} -b -S .old tika-server.conf /etc/init/tika-server.conf
-	rm -f tika-server.conf
-	service tika-server start || true
+install-apache-tika: /etc/init.d/tika-server
+
+/etc/init.d/tika-server: ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar service-template
+	sed 	-e 's#%%SERVICENAME%%#ApacheTika#' \
+		-e 's#%%APPSHORTDESCR%%#ApacheTika#' \
+		-e 's#%%APPLONGDESCR%%#Apache Tika#' \
+		-e 's#%%APPBIN%%#java#' \
+		-e 's#%%APPARGS%%#-jar $<#' \
+	< service-template > ${notdir $@}
+	${INSTALL_BIN} ${notdir $@} $@
+	rm -f ${notdir $@}
+	update-rc.d ${notdir $@} defaults 80
+	rm -f ${notdir $@}
+	service ${notdir $@} restart
 
 ${PREFIX}/lib/tika-server-${APACHE_TIKA_VERSION}.jar:
 	wget ${APACHE_TIKA_DIST}/tika-server-${APACHE_TIKA_VERSION}.jar
 	${INSTALL_BIN} tika-server-${APACHE_TIKA_VERSION}.jar ${PREFIX}/lib/
 	rm -f tika-server-${APACHE_TIKA_VERSION}.jar
 
+
 ## install Apache Tika server (should listen on port 9998)
 .PHONY: install-langid-server
-install-langid-server:  ${PREFIX}/bin/langid-server
-	@echo 'description     "langid Server"'        > langid-server.conf
-	@echo ''                                       >> langid-server.conf
-	@echo 'start on filesystem or runlevel [2345]' >> langid-server.conf
-	@echo 'stop on shutdown'                       >> langid-server.conf
-	@echo ''                                       >> langid-server.conf
-	@echo 'respawn'                                >> langid-server.conf
-	@echo 'respawn limit 3 12'                     >> langid-server.conf
-	@echo ''                                       >> langid-server.conf
-	@echo "exec python3 ${PREFIX}/bin/langid-server"    >> langid-server.conf
-	${INSTALL_DATA} -b -S .old langid-server.conf /etc/init/langid-server.conf
-	rm -f langid-server.conf
-	service langid-server start || true
+install-langid-server: /etc/init.d/langid-server
+
+/etc/init.d/langid-server: ${PREFIX}/bin/langid-server
+	sed 	-e 's#%%SERVICENAME%%#ApacheTika#' \
+		-e 's#%%APPSHORTDESCR%%#ApacheTika#' \
+		-e 's#%%APPLONGDESCR%%#Apache Tika#' \
+		-e 's#%%APPBIN%%#$<#' \
+		-e 's#%%APPARGS%%##' \
+	< service-template > ${notdir $@}
+	${INSTALL_BIN} ${notdir $@} $@
+	update-rc.d ${notdir $@} defaults 60
+	service ${notdir $@} restart
+
+
+# ## install Apache Tika server (should listen on port 9998)
+# .PHONY: install-langid-server
+# install-langid-server:  ${PREFIX}/bin/langid-server
+# 	@echo 'description     "langid Server"'        > langid-server.conf
+# 	@echo ''                                       >> langid-server.conf
+# 	@echo 'start on filesystem or runlevel [2345]' >> langid-server.conf
+# 	@echo 'stop on shutdown'                       >> langid-server.conf
+# 	@echo ''                                       >> langid-server.conf
+# 	@echo 'respawn'                                >> langid-server.conf
+# 	@echo 'respawn limit 3 12'                     >> langid-server.conf
+# 	@echo ''                                       >> langid-server.conf
+# 	@echo "exec python3 ${PREFIX}/bin/langid-server"    >> langid-server.conf
+# 	${INSTALL_DATA} -b -S .old langid-server.conf /etc/init/langid-server.conf
+# 	rm -f langid-server.conf
+# 	service langid-server start || true
 
 ${PREFIX}/bin/langid-server: langid-server
 	${INSTALL_BIN} $< $@
@@ -547,7 +634,7 @@ config-conf:
 	@echo "export LETSMT_USERKEY=${LETSMT_USERKEY}" >> conf.sh
 	@echo "export LETSMT_CONNECT=\"${LETSMT_CONNECT}\"" >> conf.sh
 	@echo "# (LETSMT_CONNECT_RAW is just an alias for historical reasons)" >> conf.sh
-	@echo "export LETSMT_CONNECT_RAW=\"\$$LETSMT_CONNECT\"" >> conf.sh
+#	@echo "export LETSMT_CONNECT_RAW=\"\$$LETSMT_CONNECT\"" >> conf.sh
 	@echo "export LETSMT_URL=\"${LETSMT_URL}\"" >> conf.sh
 	@echo "export SSL_TIMEOUT=${SSL_TIMEOUT}" >> conf.sh
 	@echo "export CLASSPATH=\"${CLASSPATH}\"" >> conf.sh
@@ -635,11 +722,19 @@ ${LETSMT_SSL_DIR}:
 		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
 		--site $(LETSMTHOST)
 
+#	mkdir -p ${dir ${LETSMT_USERCERT}}
+#	mkdir -p ${dir ${LETSMT_USERKEY}}
+#	./make-ssl-cert /usr/share/ssl-cert/ssleay.cnf \
+#		${LETSMT_USERCERT} \
+#		${LETSMT_USERKEY}
+
+
 
 .PHONY: config-slurm
 config-slurm: 	/etc/slurm-llnl/slurm.conf \
 		/etc/slurm-llnl/cgroup.conf
-	service slurm-llnl start
+	service slurmctld start
+	service slurmd start
 
 /etc/slurm-llnl/cgroup.conf: cgroup.conf
 	mkdir -p ${dir $@}

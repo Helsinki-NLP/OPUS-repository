@@ -143,7 +143,7 @@ sub gen_key {
     die()
         unless (
         syslog(
-            "cd $ssl_targetdir && openssl genrsa -out $out -passout $pass_cakey 1024"
+            "cd $ssl_targetdir && openssl genrsa -out $out -passout $pass_cakey 2048"
         ) == 0
         );
 

@@ -4,20 +4,20 @@
 # exec 1>/tmp/init.log 2>&1
 
 ### BEGIN INIT INFO
-# Provides:          ApacheTika
+# Provides:          %%SERVICENAME%%
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: ApacheTika
-# Description:       Apache Tika
+# Short-Description: %%APPSHORTDESCR%%
+# Description:       %%APPLONGDESCR%%
 ### END INIT INFO
 
-NAME="ApacheTika"
+NAME="%%SERVICENAME%%"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
 APPDIR="/"
-APPBIN="/usr/local/bin/langid-server"
-APPARGS=""
+APPBIN="%%APPBIN%%"
+APPARGS="%%APPARGS%%"
 USER="root"
 GROUP="root"
 
@@ -29,7 +29,7 @@ start() {
   printf "Starting '$NAME'... "
   LANG="en_US.UTF-8" start-stop-daemon --start --chuid "$USER:$GROUP" --background --make-pidfile --pidfile /var/run/$NAME.pid --chdir "$APPDIR" --exec "$APPBIN" -- $APPARGS || true
   ## with logfiles
-  # LANG="en_US.UTF-8" start-stop-daemon --start --chuid "$USER:$GROUP" --background --make-pidfile --pidfile /var/run/$NAME.pid --chdir "$APPDIR" --startas /bin/bash -- -c "exec $APPBIN $APPARGS > /var/log/ApacheTika.log 2>&1" || true
+  # LANG="en_US.UTF-8" start-stop-daemon --start --chuid "$USER:$GROUP" --background --make-pidfile --pidfile /var/run/$NAME.pid --chdir "$APPDIR" --startas /bin/bash -- -c "exec $APPBIN $APPARGS > /var/log/%%SERVICENAME%%.log 2>&1" || true
   printf "done\n"
 }
 

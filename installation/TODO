@@ -1,0 +1,19 @@
+
+* re-do SSL setup
+
+read /usr/share/doc/apache2/README.Debian.gz
+key was too short -> fixed
+
+
+
+* fix Uplug to install properly
+
+```
+Unimplemented: POSIX::tmpnam(): use File::Temp instead at /usr/lib/x86_64-linux-gnu/perl/5.30/POSIX.pm line 185.
+Unimplemented: POSIX::tmpnam() at /usr/local/share/perl/5.30.0/Uplug.pm line 55.
+```
+
+now install from git
+
+
+* update Apache Tika? (now 1.18 - current version is 1.25, 2.0 coming out soon)

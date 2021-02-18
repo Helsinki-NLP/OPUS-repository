@@ -34,10 +34,10 @@
         SSLEngine on
         SSLCertificateFile REPLACE_CERTROOT/server/certificates/REPLACE_SERVER.crt
         SSLCertificateKeyFile REPLACE_CERTROOT/server/keys/REPLACE_SERVER.key
-        SSLCertificateChainFile REPLACE_CERTROOT/server/certificates/REPLACE_SERVER.crt
-        SSLCACertificatePath REPLACE_CERTPATH
-        SSLCACertificateFile REPLACE_CERTROOT/ca.crt
-        SSLCARevocationPath REPLACE_REVOCATIONPATH
+#        SSLCertificateChainFile REPLACE_CERTROOT/server/certificates/REPLACE_SERVER.crt
+#        SSLCACertificatePath REPLACE_CERTPATH
+#        SSLCACertificateFile REPLACE_CERTROOT/ca.crt
+#        SSLCARevocationPath REPLACE_REVOCATIONPATH
         SSLVerifyClient require
         SSLVerifyDepth 2
 

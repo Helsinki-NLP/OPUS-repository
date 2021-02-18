@@ -23,11 +23,12 @@ UBUNTU_BASE_PACKAGES = \
 		automake \
 		build-essential \
 		bzip2 \
-		cmake3 \
+		cmake \
 		cpanminus \
 		curl \
 		cython3 \
 		default-jre \
+		default-jdk \
 		dos2unix \
 		g++ \
 		gettext \
@@ -45,8 +46,9 @@ UBUNTU_BASE_PACKAGES = \
 		libdevel-nytprof-perl \
 		libdbi-perl \
 		libdigest-md5-file-perl \
-		libdrmaa-java \
+		libdrmaa1.0-java \
 		libfile-bom-perl \
+		libfile-copy-recursive-perl \
 		libfile-slurp-perl \
 		libfuse-dev \
 		libhook-lexwrap-perl \
@@ -59,7 +61,7 @@ UBUNTU_BASE_PACKAGES = \
 		libmime-lite-perl \
 		libparams-util-perl \
 		libppi-perl \
-		libpython3.4-dev \
+		libpython3-dev \
 		libregexp-common-perl \
 		libssl-dev \
 		libstring-approx-perl \
@@ -70,9 +72,9 @@ UBUNTU_BASE_PACKAGES = \
 		libtest-object-perl \
 		libtest-requires-perl \
 		libtest-subcalls-perl \
-		libtest-tester-perl \
-		libtest-use-ok-perl \
+		libtest-simple-perl \
 		libtest-warn-perl \
+		libtika-java \
 		libtool \
 		liburi-query-perl \
 		libvariable-magic-perl \
@@ -85,14 +87,14 @@ UBUNTU_BASE_PACKAGES = \
 		liblzma-dev \
 		liblzo2-dev \
 		lzma-dev \
-		openjdk-6-jdk \
-		openjdk-7-jdk \
+		openjdk-8-jdk \
+		openjdk-14-jdk \
 		openssl \
 		perl-doc \
-		php5 \
+		php \
 		pkg-config \
 		python \
-		python-pip \
+		python-pip-whl \
 		python3 \
 		python3-numpy \
 		python3-pip \
@@ -106,7 +108,6 @@ UBUNTU_BASE_PACKAGES = \
 		xpdf-utils \
 		zip
 
-# 		libdrmaa-dev \
 
 MYSQL_UBUNTU_PACKAGES = mysql-server mysql-client libdbd-mysql-perl
 
@@ -161,9 +162,9 @@ MOJO_CPAN_MODULES = Authen::Captcha \
 ## some CPAN modules that fail to install
 ## TODO: fix modules if possible
 FORCECPAN_MODULES = 	Filesys::DiskUsage \
-			Text::SRT::Align \
-			Uplug
+			Text::SRT::Align
 
+#			Uplug
 #			Lingua::Identify::Blacklists \
 
 
@@ -191,8 +192,10 @@ FAST_ALIGN   = https://github.com/clab/fast_align.git
 
 # just in case they are installed: remove the old TokyoCabinet packages
 
-OLD_TOKYO_PACKAGES = libtokyocabinet-dbg libtokyocabinet-dev libtokyocabinet9 \
-		python-pytyrant tokyocabinet-bin tokyocabinet-doc
+# OLD_TOKYO_PACKAGES = libtokyocabinet-dbg libtokyocabinet-dev libtokyocabinet9 \
+#		python-pytyrant tokyocabinet-bin tokyocabinet-doc
+
+OLD_TOKYO_PACKAGES = libtokyocabinet-dev libtokyocabinet9 tokyocabinet-bin tokyocabinet-doc
 
 
 # prerequesites on a server machine (do the same for storage-server & rr-server)
@@ -258,7 +261,9 @@ install-perlmodules: prepare-cpan
 
 ## also special: Inline::Java requires JAVA_HOME
 
-	$(APTGET) -qq install openjdk-7-jdk
+## TODO: do we need openjdk 7?
+##
+#	$(APTGET) -qq install openjdk-7-jdk
 	cpanm Inline
 	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
 
@@ -296,8 +301,12 @@ server-software: \
 	software-eflomal \
 	software-fastalign \
 	software-langid \
-	software-git \
-	software-fusecompress
+	software-uplug
+
+## fusecompress does not compile and
+## git is already newer than we need
+#	software-fusecompress
+#	software-git
 
 
 ## software required by the sge-clients
@@ -378,7 +387,8 @@ install-swap: /swapfile
 
 .PHONY: software-slurm
 software-slurm: /etc/munge/munge.key
-	$(APTGET) -qq install slurm-llnl
+	$(APTGET) -qq install slurmd slurm-client slurmctld
+#	$(APTGET) -qq install slurm-llnl
 
 # .PHONY: software-slurm
 # software-slurm: /etc/munge/munge.key \
@@ -495,6 +505,11 @@ ${PREFIX}/share/UDPipe:
 	rm -fr udpipe-ud-2.0-170801
 	rm -f udpipe-ud-2.0-170801.zip
 
+.PHONY: software-udpipe
+software-uplug:
+	! ( ${FORCE} || ! which uplug ) || \
+	( git clone https://github.com/Helsinki-NLP/Uplug.git; \
+	  make -C Uplug install; )
 
 .PHONY: software-fusecompress
 software-fusecompress:
