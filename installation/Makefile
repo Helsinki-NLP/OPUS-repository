@@ -634,7 +634,7 @@ config-conf:
 	@echo "export LETSMT_USERKEY=${LETSMT_USERKEY}" >> conf.sh
 	@echo "export LETSMT_CONNECT=\"${LETSMT_CONNECT}\"" >> conf.sh
 	@echo "# (LETSMT_CONNECT_RAW is just an alias for historical reasons)" >> conf.sh
-#	@echo "export LETSMT_CONNECT_RAW=\"\$$LETSMT_CONNECT\"" >> conf.sh
+	@echo "export LETSMT_CONNECT_RAW=\"\$$LETSMT_CONNECT\"" >> conf.sh
 	@echo "export LETSMT_URL=\"${LETSMT_URL}\"" >> conf.sh
 	@echo "export SSL_TIMEOUT=${SSL_TIMEOUT}" >> conf.sh
 	@echo "export CLASSPATH=\"${CLASSPATH}\"" >> conf.sh

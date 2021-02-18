@@ -33,13 +33,13 @@ my $pass_cacsr    = "pass:''";
 
 ## CA key, CA csr, self-signed crt
 &gen_key("private/ca.key");
-&gen_csr( "private/ca.key", "ca.csr", $opts{'site'} );
+# &gen_csr( "private/ca.key", "ca.csr", $opts{'site'} );
+&gen_csr( "private/ca.key", "ca.csr", 'ca-site' );
 &gen_crt( "private/ca.key", "ca.csr", "ca.crt" );
 
 ## server key, csr and CA-signed crt
 &gen_key("server/keys/$opts{site}.key");
-&gen_csr( "server/keys/$opts{site}.key", "server/keys/$opts{site}.csr",
-    $opts{'site'} );
+&gen_csr( "server/keys/$opts{site}.key", "server/keys/$opts{site}.csr", $opts{'site'} );
 &gen_crt_ca(
     "private/ca.key", "server/keys/$opts{site}.csr",
     "ca.crt",         "server/certificates/$opts{site}.crt"
@@ -162,7 +162,7 @@ sub gen_csr {
                 . $opts{'city'} . "/O="
                 . $opts{'company'} . "/OU="
                 . $opts{'company'} . "/CN="
-                . $opts{'site'} . "'"
+                . $cn . "'"
         ) == 0
         );
 }
