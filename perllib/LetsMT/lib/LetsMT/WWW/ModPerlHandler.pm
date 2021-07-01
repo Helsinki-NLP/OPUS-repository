@@ -35,6 +35,11 @@ use Apache2::RequestUtil ();
 use Apache2::Const -compile => qw(OK DONE);
 
 use LetsMT::Repository::API;
+use LetsMT::WebService;
+
+
+
+our $GlobalUserAgent = LetsMT::WebService::user_agent('localhost');
 
 
 =head1 CLASS METHOD
@@ -55,6 +60,11 @@ sub handler {
     my $r      = shift;
     my $logger = get_logger(__PACKAGE__);
 
+    $logger->debug( 'RECEIVED: method: '
+                    . $r->method
+                    . ', location: '
+                    . $r->path_info );
+    
     # Create API object via factory method
     my $api_result = new LetsMT::Repository::API($r);
 
@@ -71,8 +81,12 @@ sub handler {
         my $line       = undef;
         my $httpstatus = undef;
 
+	$logger->debug( 'call process ...' );
+	
         # Execute the requested method in process()
         eval { $result = $api_result->process(); };
+
+	$logger->debug( 'process done ...' );
 
         if ($@) {
             if ( $@->isa('LetsMT::WWW::LetsMT_modperl_handler_exception::Exception')

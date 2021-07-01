@@ -125,9 +125,9 @@ CPAN_MODULES = 	Apache::Tika \
 		File::Touch \
 		Lingua::Sentence \
 		Lingua::Identify \
+		LWP::Protocol::Net::Curl \
 		LWP::Simple \
 		Module::Install \
-		Net::SSL \
 		Persistent::Base \
 		Persistent::DBI \
 		Test::More \
@@ -137,6 +137,10 @@ CPAN_MODULES = 	Apache::Tika \
 		URI::Escape::XS \
 		URL::Encode \
 		URL::Encode::XS
+
+
+#		Mojo::UserAgent \
+#		Net::SSL
 
 
 ## apt-get package exists
@@ -246,19 +250,6 @@ install-perlmodules: prepare-cpan
 	    done \
 	fi
 
-## remove IO::Socket::SSL (does not seem to work - we use Net::SSL)
-
-	while M=$$(perl -e 'use IO::Socket::SSL; print $$INC{"IO/Socket/SSL.pm"}' 2>/dev/null); \
-		[ -n "$$M" ]; \
-	do \
-		echo "*** Removing IO::Socket::SSL from path $${M%IO/Socket/SSL.pm}"; \
-		mv $$M $$M~; \
-	done
-
-## Again ... for some strange reason Net::SSL often doesn't install properly at first!
-
-	cpanm Net::SSL
-
 ## also special: Inline::Java requires JAVA_HOME
 
 ## TODO: do we need openjdk 7?
@@ -266,6 +257,23 @@ install-perlmodules: prepare-cpan
 #	$(APTGET) -qq install openjdk-7-jdk
 	cpanm Inline
 	JAVA_HOME=/usr/lib/jvm/default-java cpanm Inline::Java
+
+
+## don't do this anymore ...
+#
+# ## remove IO::Socket::SSL (does not seem to work - we use Net::SSL)
+
+# 	while M=$$(perl -e 'use IO::Socket::SSL; print $$INC{"IO/Socket/SSL.pm"}' 2>/dev/null); \
+# 		[ -n "$$M" ]; \
+# 	do \
+# 		echo "*** Removing IO::Socket::SSL from path $${M%IO/Socket/SSL.pm}"; \
+# 		mv $$M $$M~; \
+# 	done
+
+# ## Again ... for some strange reason Net::SSL often doesn't install properly at first!
+
+# 	cpanm Net::SSL
+
 
 
 ## ......... doesn't work with mod_perl ..........
@@ -294,6 +302,7 @@ server-software: \
 	${BATCHQUEUE_SERVER_TARGETS} \
 	software-tokyocabinet \
 	software-tokyotyrant \
+	software-git \
 	software-hunalign \
 	software-chared \
 	software-opennlp \

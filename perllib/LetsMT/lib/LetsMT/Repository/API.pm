@@ -120,7 +120,7 @@ sub new {
 
     # handle revision numbers
     &_handle_resource_revision($r_ref);
-
+    
     # Log the API call
     if ( $logger->is_debug() ) {
         $logger->debug(
@@ -142,7 +142,7 @@ sub new {
     $api_class = 'LetsMT::Repository::API::Letsmt'   if ($api =~ /^letsmt$/i);
     $api_class = 'LetsMT::Repository::API::MetaData' if ($api =~ /^metadata$/i);
     $api_class = 'LetsMT::Repository::API::Storage'  if ($api =~ /^storage$/i);
-
+    
     # If valid API class keyword found, create and return new instance
     if ($api_class) {
         return $api_class->new($r_ref);
@@ -183,6 +183,8 @@ sub process {
 
     my $http_method = $self->{http_method};
     my $result      = undef;
+
+    get_logger(__PACKAGE__)->debug('call API handler ...');
 
     switch ($http_method) {
         case 'DELETE' { $result = $self->delete(); }

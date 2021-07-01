@@ -1,13 +1,18 @@
-package LetsMT::WebService;
+package LetsMT::WebService::LWP;
 
 =head1 NAME
 
-LetsMT::WebService - low level repository manager for C<Resource>s
+LetsMT::WebService::LWP - low level repository manager for C<Resource>s
 
 =head1 DESCRIPTION
 
 All functions accept additional key-value pairs as parameters that will be added
 as a query form to the request.
+
+IMPORTANT:
+This is the old version using the Net::SSL
+However, this causes random (huge) delays in SSL connections!
+Don't use this module!
 
 =cut
 
@@ -22,18 +27,9 @@ use HTTP::Request;
 use HTTP::Request::Common;
 use HTTP::Response;
 use HTTP::Headers;
-
-## problems with SSL and self-signed certificates:
-## - IO::Socket::SSL does not seem to work with LWP
-## - Net::SSL causes random (huge) connection delays
-## possible alternatives (TODOs):
-## - LWP::Protocol::Net::Curl (compatible with LWP::UserAgent?)
-## - WWW::Mechanize (need to re-write everything)
-## - Mojo::UserAgent (need to re-write everything)
-
-# use Net::SSL; ## for SSL to work with LWP > 6.0
+use Net::SSL; ## for SSL to work with LWP > 6.0
 # use IO::Socket::SSL;
-use LWP::Protocol::Net::Curl;
+
 
 use File::Basename 'dirname';
 use File::Path;
@@ -258,13 +254,29 @@ sub put_file_request {
     my $resource     = shift;
     my $file         = shift;
 
+    # Open the local file in binary mode.
+    open( my $fh, '<:raw', $file )  # || get_logger(__PACKAGE__)->error("Unable to open $file");
+        or raise( 8, "Unable to open $file", 'error' );
+    # binmode $fh;
+
+    # Create an anonymous read function.
+    my $read_func = sub {
+        read( $fh, my $buf, 65536 );
+        return $buf;
+    };
+
     # Send the request.
     my ($url, $server) = $make_url_ref->( $resource, @_ );
     my $res = &user_agent($server)->request(
-        PUT $url, ## using the HTOOP::Request::Common interface
-        Content_Type => 'form-data',
-        Content      => [ payload => ["$file"], ]
+        new HTTP::Request(
+            'PUT',             $url,
+            new HTTP::Headers, $read_func
+        )
     );
+
+    # Close the file.
+    close $fh
+        or raise( 8, "Unable to close $file", 'error' );
 
     return wantarray
         ? ( $res->is_success, $res->decoded_content, $res )

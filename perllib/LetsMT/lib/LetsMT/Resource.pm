@@ -84,7 +84,8 @@ sub new {
     $self{user}      = '' unless ( defined $self{user} );
     $self{path}      = '' unless ( defined $self{path} );
     $self{local_dir} = '' unless ( defined $self{local_dir} );
-    return bless \%self;
+
+    return bless \%self, $class;
 }
 
 
@@ -245,11 +246,13 @@ sub revision{
 
     # return revision number attached to the path name
     return $1 if ( $self->{path} =~ /\@([0-9]+|HEAD)$/ );
-
+    
     # OR try to get the latest revision number from the repository
+    get_logger(__PACKAGE__)->debug('get revision from repository ...');
     my $xml = LetsMT::WebService::get( $self, rev => 'show' );
     return undef unless (length $xml);
 
+    get_logger(__PACKAGE__)->debug('parse resource info ...');    
     my $parser = new XML::LibXML;
     my $dom;
 
@@ -952,6 +955,8 @@ sub get_server {
     # 1) try to get from metadata
     my $resource = new LetsMT::Resource( slot => $slot );
     my $response = undef;
+
+    get_logger(__PACKAGE__)->debug('get server info from metaDB ...');    
     eval {
         $response = LetsMT::WebService::get_meta(
             $resource,
@@ -960,6 +965,7 @@ sub get_server {
     };
     return $ENV{LETSMT_URL}  if $@;
 
+    get_logger(__PACKAGE__)->debug('parse and return server info ...');    
     my $parser = new XML::LibXML;
     my $dom;
     eval {

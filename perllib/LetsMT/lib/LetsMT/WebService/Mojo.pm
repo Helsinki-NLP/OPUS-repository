@@ -9,6 +9,12 @@ LetsMT::WebService - low level repository manager for C<Resource>s
 All functions accept additional key-value pairs as parameters that will be added
 as a query form to the request.
 
+IMPORTANT:
+
+This is an unfinished attempt to replace the LWP::UserAgent
+with the Mojolicious UserAgent. However, the implementation
+is not finished! Don't use this module!
+
 =cut
 
 
@@ -17,23 +23,14 @@ use utf8;
 
 use Data::Dumper;
 
-use LWP::UserAgent;
+use Mojo::UserAgent;
+# use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Request::Common;
 use HTTP::Response;
 use HTTP::Headers;
-
-## problems with SSL and self-signed certificates:
-## - IO::Socket::SSL does not seem to work with LWP
-## - Net::SSL causes random (huge) connection delays
-## possible alternatives (TODOs):
-## - LWP::Protocol::Net::Curl (compatible with LWP::UserAgent?)
-## - WWW::Mechanize (need to re-write everything)
-## - Mojo::UserAgent (need to re-write everything)
-
 # use Net::SSL; ## for SSL to work with LWP > 6.0
-# use IO::Socket::SSL;
-use LWP::Protocol::Net::Curl;
+use IO::Socket::SSL;
 
 use File::Basename 'dirname';
 use File::Path;
@@ -88,18 +85,25 @@ sub user_agent {
 
     get_logger(__PACKAGE__)->debug('create user agent ...');
 
-    $UserAgents{$server} = new LWP::UserAgent(
-        keep_alive    => 1,
-        timeout       => $SSL_timeout,
-        show_progress => $VERBOSE,
-	);
-    $UserAgents{$server}->ssl_opts( #$key => $value 
-	SSL_version         => 'SSLv3',
-	SSL_ca_file         => '/etc/ssl/'.$server.'/ca.crt',
-	SSL_cert_file       => '/etc/ssl/'.$server.'/user/certificates/developers@localhost.crt',
-	SSL_key_file        => '/etc/ssl/'.$server.'/user/keys/developers@localhost.key'
-        ); # ssl_opts => { verify_hostname => 0 }
-    $UserAgents{$server}->agent("OpusRepository/0.1 ");
+    # https://metacpan.org/pod/Mojo::UserAgent
+    $UserAgents{$server}  = Mojo::UserAgent->new;
+    $UserAgents{$server} = $UserAgents{$server}->ca('/etc/ssl/'.$server.'/ca.crt');
+    $UserAgents{$server} = $UserAgents{$server}->cert('/etc/ssl/'.$server.'/user/certificates/developers@localhost.crt');
+    $UserAgents{$server} = $UserAgents{$server}->key('/etc/ssl/'.$server.'/user/keys/developers@localhost.key');
+    $UserAgents{$server} = $UserAgents{$server}->connect_timeout($SSL_timeout);
+
+    # $UserAgents{$server} = new LWP::UserAgent(
+    #     keep_alive    => 1,
+    #     timeout       => $SSL_timeout,
+    #     show_progress => $VERBOSE,
+    # 	);
+    # $UserAgents{$server}->ssl_opts( #$key => $value 
+    # 	SSL_version         => 'SSLv3',
+    # 	SSL_ca_file         => '/etc/ssl/'.$server.'/ca.crt',
+    # 	SSL_cert_file       => '/etc/ssl/'.$server.'/user/certificates/developers@localhost.crt',
+    # 	SSL_key_file        => '/etc/ssl/'.$server.'/user/keys/developers@localhost.key'
+    #     ); # ssl_opts => { verify_hostname => 0 }
+    # $UserAgents{$server}->agent("OpusRepository/0.1 ");
 
     return $UserAgents{$server};
 }
@@ -126,10 +130,17 @@ sub request {
     my $url    = shift;
 
     get_logger(__PACKAGE__)->debug('request $method from $url ...');
+
+    my $ua = &user_agent($url);
+    if ($method eq 'GET'){ return $ua->get( $url )->result; }
+    if ($method eq 'PUT'){ return $ua->put( $url )->result; }
+    if ($method eq 'POST'){ return $ua->post( $url )->result; }
+    if ($method eq 'DELETE'){ return $ua->delete( $url )->result; }
+    return undef;
     
-    return &user_agent($url)->request(
-        new HTTP::Request( $method, $url )
-    );
+#    return &user_agent($url)->request(
+#        new HTTP::Request( $method, $url )
+#    );
 }
 
 
@@ -149,9 +160,17 @@ sub letsmt_request {
     my $make_url_ref = shift;
     my ($url, $server) = $make_url_ref->( @_ );
     get_logger(__PACKAGE__)->debug("letsmt request ($url) ...");
-    return &user_agent($server)->request(
-        new HTTP::Request( $method, $url )
-    );
+
+    my $ua = &user_agent($server);
+    if ($method eq 'GET'){ return $ua->get( $url )->result; }
+    if ($method eq 'PUT'){ return $ua->put( $url )->result; }
+    if ($method eq 'POST'){ return $ua->post( $url )->result; }
+    if ($method eq 'DELETE'){ return $ua->delete( $url )->result; }
+    return undef;
+    
+#    return &user_agent($server)->request(
+#        new HTTP::Request( $method, $url )
+#    );
 }
 
 
@@ -176,9 +195,9 @@ sub request_result {
 
     my $res = request( $method, @_ );
     return wantarray
-        ? ( $res->is_success, $res->decoded_content, $res->code, $res )
+        ? ( $res->is_success, $res->body, $res->code, $res )
         : ($method eq 'GET')
-            ? $res->decoded_content
+            ? $res->body
             : $res->is_success;
 }
 
@@ -205,9 +224,9 @@ sub letsmt_request_result {
 
     my $res = letsmt_request( $method, @_ );
     return wantarray
-        ? ( $res->is_success, $res->decoded_content, $res->code, $res )
+        ? ( $res->is_success, $res->body, $res->code, $res )
         : ($method eq 'GET')
-            ? $res->decoded_content
+            ? $res->body
             : $res->is_success;
 }
 
@@ -258,16 +277,38 @@ sub put_file_request {
     my $resource     = shift;
     my $file         = shift;
 
+    # Open the local file in binary mode.
+    open( my $fh, '<:raw', $file )  # || get_logger(__PACKAGE__)->error("Unable to open $file");
+        or raise( 8, "Unable to open $file", 'error' );
+    # binmode $fh;
+
+    # Create an anonymous read function.
+    my $read_func = sub {
+        read( $fh, my $buf, 65536 );
+        return $buf;
+    };
+
     # Send the request.
     my ($url, $server) = $make_url_ref->( $resource, @_ );
-    my $res = &user_agent($server)->request(
-        PUT $url, ## using the HTOOP::Request::Common interface
-        Content_Type => 'form-data',
-        Content      => [ payload => ["$file"], ]
-    );
+    my $ua = &user_agent($url);
+    my $tx = $ua->put( $url );
+
+    ## TODO: how do we write the file ...
+    my $res = $tx->result;
+	
+    # my $res = &user_agent($server)->request(
+    #     new HTTP::Request(
+    #         'PUT',             $url,
+    #         new HTTP::Headers, $read_func
+    #     )
+    # );
+
+    # Close the file.
+    close $fh
+        or raise( 8, "Unable to close $file", 'error' );
 
     return wantarray
-        ? ( $res->is_success, $res->decoded_content, $res )
+        ? ( $res->is_success, $res->body, $res )
         : $res->is_success;
 }
 
@@ -293,11 +334,17 @@ sub post_file_request {
 
     # get_logger(__PACKAGE__)->debug("post-file: post request $url");
 
-    my $res = &user_agent($server)->request(
-        POST $url, ## using the HTOOP::Request::Common interface
-        Content_Type => 'form-data',
-        Content      => [ payload => ["$file"], ]
-    );
+    my $ua = &user_agent($url);
+    my $tx = $ua->post( $url );
+
+    ## TODO: how do we write the file ...
+    my $res = $tx->result;
+
+    # my $res = &user_agent($server)->request(
+    #     POST $url, ## using the HTOOP::Request::Common interface
+    #     Content_Type => 'form-data',
+    #     Content      => [ payload => ["$file"], ]
+    # );
 
     return wantarray
         ? ( $res->is_success, $res->decoded_content, $res )
@@ -337,10 +384,19 @@ sub get_resource_request {
 
     # Send the request.
     my ($url, $server) = $make_url_ref->( $resource, action => 'download', @_ );
-    my $res = &user_agent($server)->request(
-        new HTTP::Request( 'GET', $url ),
-        $target_file
-    );
+
+    my $ua = &user_agent($url);
+    my $tx = $ua->get( $url );
+
+    # TODO: read target file
+    # https://metacpan.org/pod/Mojo::Transaction::HTTP#client_read
+
+    my $res = $tx->result;
+
+    # my $res = &user_agent($server)->request(
+    #     new HTTP::Request( 'GET', $url ),
+    #     $target_file
+    # );
 
     # If we successfully downloaded an archive: unpack it.
     # (but if param{archive} is given --> keep it packed)

@@ -1,4 +1,4 @@
-This is a test file
-Nothing more
-Nothing less
-Bye
+<letsmt-ws version="56">
+  <status code="0" location="/storage/slot_name_2_106111445088/user_id_545153240529/uploads/test_file_2_106111445088.txt" operation="PUT" type="ok">mkdir ok /slot_name_2_106111445088/user_id_545153240529/uploads/test_file_2_106111445088.txt/</status>
+</letsmt-ws>
+

@@ -36,7 +36,8 @@ use LetsMT::Repository::StorageManager;
 use LetsMT::Repository::JobManager;
 use LetsMT::Repository::Result;
 
-use LetsMT::Resource;
+# use LetsMT::Resource;
+use LetsMT::Repository::Resource;
 
 use LetsMT::Repository::Err;
 use Log::Log4perl qw(get_logger :levels);
@@ -181,9 +182,9 @@ sub put {
     my $path = join( "/", @{ $self->{path_elements} } );
 
     # make a copy of the old metadata record (archive revisions!)
+    # (TODO: this seems expensive and blows up the metaDB)
     get_logger(__PACKAGE__)->debug( "archive metadata of $path" );
     &_archive_meta( $self->{args}->{uid}, $path );
-    get_logger(__PACKAGE__)->debug( "done with archive metadata of $path" );
 
     ## get a document from an URL or payload
     my $file = undef;
@@ -370,9 +371,14 @@ sub post {
     }
     else {
 
+	$logger->debug('archive meta data ...');
+
         # make a copy of the old metadata record (archive revisions)
+	# (TODO: this seems expensive and blows up the metaDB)
         &_archive_meta($self->{args}->{uid}, join( "/", @{ $self->{path_elements} }));
 
+	$logger->debug('get file ...');
+	
 	## get a document from an URL or payload
 	my $file = undef;
 	if ( exists( $self->{args}->{url} ) ){
@@ -384,6 +390,8 @@ sub post {
 	    $file = $payload->{file} if ($payload);
 	}
 
+	$logger->debug('create storage ...');
+	
         LetsMT::Repository::StorageManager::create_storage(
             message => \$message,
             path    => $self->{path_elements},
@@ -393,9 +401,13 @@ sub post {
             type    => $self->{args}->{type},
         );
 
+	$logger->debug('post meta data ...');
+	
         &_post_meta( join( "/", @{ $self->{path_elements} } ),
             status => 'created' );
 
+	$logger->debug('cleanup ...');
+	
         # don't wait for cleaning up and remove payload immediately
         unlink($file) if (-f $file);
     }
@@ -603,11 +615,25 @@ sub _archive_meta {
     my $user = shift;
     my $path = shift;
 
-    my $resource = &LetsMT::Resource::make_from_storage_path($path);
-    my $revision = $resource->revision( $user, $path );
+    get_logger(__PACKAGE__)->debug("get resource revison ($path) ...");
+    ## getting the revision seems to block processing the request
+    ## as this creates additional web requests (get_server and show slot info)
 
+    ## TODO: make sure that this still works ...
+    # my $resource = &LetsMT::Resource::make_from_storage_path($path);
+    my @parts = split( /\/+/, $path );
+    my $slot  = shift(@parts);
+    my $user  = shift(@parts);
+    my $resource = new LetsMT::Repository::Resource (
+        slot      => $slot,
+        user      => $user,
+        path      => join( '/', @parts ) );
+    # my $resource = &LetsMT::Repository::Resource::make_from_storage_path($path);
+    my $revision = $resource->revision( $user, $path );
+    
     if ($revision){
-        my $metaDB = new LetsMT::Repository::MetaManager();
+	get_logger(__PACKAGE__)->debug('save current meta as revision data ...');
+	my $metaDB = new LetsMT::Repository::MetaManager();
         $metaDB->open() or raise( 8, "open metadata database", 'error' );
         my $meta = $metaDB->get( $path );
         if (keys %{$meta}){

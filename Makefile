@@ -29,6 +29,7 @@ include Makefile.conf
 .PHONY: all
 all: install
 
+.PHONY: cert
 cert:
 	make -C installation config-openssl
 
@@ -40,6 +41,9 @@ install install-rr-server:  prepare-target stop-db
 	@echo
 	@echo "Installation is finished."
 	@echo
+
+software-git:
+	$(MAKE) $@ -C installation -f Makefile.prereqs
 
 .PHONY: install-storage-server install-sge-client install-client install-frontend
 install-storage-server install-sge-client install-client install-frontend: prepare-target

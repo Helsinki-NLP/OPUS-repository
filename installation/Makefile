@@ -25,7 +25,7 @@ LETSMT_REVOCATIONPATH=${LETSMT_SSL_DIR}/crl
 
 ### the important variables that should be exported
 LETSMT_CACERT     = ${LETSMT_SSL_DIR}/ca.crt
-LETSMT_CAKEY      = ${LETSMT_SSL_DIR}/ca.key
+LETSMT_CAKEY      = ${LETSMT_SSL_DIR}/private/ca.key
 LETSMT_SERVERCERT = ${LETSMT_SSL_DIR}/server/certificates/${HOSTNAME}.crt
 LETSMT_SERVERKEY  = ${LETSMT_SSL_DIR}/server/keys/${HOSTNAME}.key
 LETSMT_USERCERT   = ${LETSMT_SSL_DIR}/user/certificates/developers@localhost.crt
@@ -45,50 +45,6 @@ endif
 
 
 
-# ###############
-# ## another way of creating the certificates
-# ## ---> does not work properly
-
-# certificate: ${LETSMT_SERVERCERT} ${LETSMT_USERCERT}
-# 	mkdir -p ${LETSMT_SSL_DIR}/newcerts
-# 	mkdir -p ${LETSMT_SSL_DIR}/crl
-
-
-# ${LETSMT_CAKEY}:
-# 	mkdir -p ${dir $@}
-# 	openssl ecparam -out $@ -name prime256v1 -genkey
-# 	chmod 600 $@
-
-# ${LETSMT_CACERT}: ${LETSMT_CAKEY}
-# 	mkdir -p ${dir $@}
-# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
-# 	openssl x509 -req -sha256 -days 365 -in ${@:.crt=.csr} -signkey $< -out $@
-
-# ${LETSMT_SERVERKEY}:
-# 	mkdir -p ${dir $@}
-# 	openssl ecparam -out $@ -name prime256v1 -genkey
-# 	chmod 600 $@
-
-# ${LETSMT_SERVERCERT}: ${LETSMT_SERVERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
-# 	mkdir -p ${dir $@}
-# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
-# 	openssl x509 -req -in ${@:.crt=.csr} \
-# 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
-# 		-CAcreateserial -out $@ -days 365 -sha256
-
-# ${LETSMT_USERKEY}:
-# 	mkdir -p ${dir $@}
-# 	openssl ecparam -out $@ -name prime256v1 -genkey
-# 	chmod 600 $@
-
-# ${LETSMT_USERCERT}: ${LETSMT_USERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
-# 	mkdir -p ${dir $@}
-# 	openssl req -new -sha256 -key $< -out ${@:.crt=.csr}
-# 	openssl x509 -req -in ${@:.crt=.csr} \
-# 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
-# 		-CAcreateserial -out $@ -days 365 -sha256
-
-# ###############
 
 
 
@@ -563,6 +519,7 @@ config-apache2:
 	echo "        PerlSetEnv LETSMT_USERCERT ${LETSMT_USERCERT}" >> apache.conf
 	echo "        PerlSetEnv LETSMT_USERCERTPASS ${LETSMT_USERCERTPASS}" >> apache.conf
 	echo "        PerlSetEnv LETSMT_USERKEY ${LETSMT_USERKEY}" >> apache.conf
+	echo "        PerlSetEnv PERL_LWP_SSL_VERIFY_HOSTNAME 0" >> apache.conf
 	echo "        PerlSetEnv SGE_ROOT ${SGE_ROOT}" >> apache.conf
 	echo "        PerlSetEnv SVN_PASSWORD ${SVN_PASSWORD}" >> apache.conf
 	@if [ "${VC_BACKEND}" = "git" ]; then \
@@ -709,24 +666,82 @@ config-mysql:
 #       for additional servers
 
 .PHONY: config-openssl
-config-openssl: ${LETSMT_SSL_DIR}
 
-${LETSMT_SSL_DIR}:
-	 ${PREFIX}/bin/setup_cert_based_auth.pl \
-		--projname "$(LETSMT_SSL_PROJECT)" \
-		--country "$(LETSMT_SSL_COUNTRY)" \
-		--city "$(LETSMT_SSL_CITY)" \
-		--company "$(LETSMT_SSL_COMPANY)" \
-		--user "$(LETSMT_SSL_USER)" \
-		--username "$(LETSMT_SSL_USERNAME)" \
-		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
-		--site $(LETSMTHOST)
+# config-openssl: ${LETSMT_SSL_DIR}
 
-#	mkdir -p ${dir ${LETSMT_USERCERT}}
-#	mkdir -p ${dir ${LETSMT_USERKEY}}
-#	./make-ssl-cert /usr/share/ssl-cert/ssleay.cnf \
-#		${LETSMT_USERCERT} \
-#		${LETSMT_USERKEY}
+# ${LETSMT_SSL_DIR}:
+# 	 ${PREFIX}/bin/setup_cert_based_auth.pl \
+# 		--projname "$(LETSMT_SSL_PROJECT)" \
+# 		--country "$(LETSMT_SSL_COUNTRY)" \
+# 		--city "$(LETSMT_SSL_CITY)" \
+# 		--company "$(LETSMT_SSL_COMPANY)" \
+# 		--user "$(LETSMT_SSL_USER)" \
+# 		--username "$(LETSMT_SSL_USERNAME)" \
+# 		--ssl_sysdir "$(LETSMT_SSL_HOME)"\
+# 		--site $(LETSMTHOST)
+
+# #	mkdir -p ${dir ${LETSMT_USERCERT}}
+# #	mkdir -p ${dir ${LETSMT_USERKEY}}
+# #	./make-ssl-cert /usr/share/ssl-cert/ssleay.cnf \
+# #		${LETSMT_USERCERT} \
+# #		${LETSMT_USERKEY}
+
+
+###############
+## replacing the perl script for openssl setup
+
+config-openssl: ${LETSMT_SERVERCERT} ${LETSMT_USERCERT}
+	mkdir -p ${LETSMT_SSL_DIR}/newcerts
+	mkdir -p ${LETSMT_SSL_DIR}/crl
+
+${LETSMT_CAKEY}:
+	mkdir -p ${dir $@}
+	openssl ecparam -out $@ -name prime256v1 -genkey
+	chmod 600 $@
+
+${LETSMT_CACERT}: ${LETSMT_CAKEY}
+	mkdir -p ${dir $@}
+	openssl req -new -sha256 -key $< -out ${@:.crt=.csr} \
+		-inform PEM -outform PEM \
+		-passin pass:'' -passout pass:'' \
+		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=ca-site'
+	openssl x509 -req -sha256 -days 365 -in ${@:.crt=.csr} -signkey $< -out $@
+
+${LETSMT_SERVERKEY}:
+	mkdir -p ${dir $@}
+	openssl ecparam -out $@ -name prime256v1 -genkey
+	chmod 644 $@
+#	chmod 600 $@
+
+${LETSMT_SERVERCERT}: ${LETSMT_SERVERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
+	mkdir -p ${dir $@}
+	openssl req -new -sha256 -key $< -out ${@:.crt=.csr} \
+		-inform PEM -outform PEM \
+		-passin pass:'' -passout pass:'' \
+		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=${HOSTNAME}'
+	openssl x509 -req -in ${@:.crt=.csr} \
+		-CA ${word 2,$^} -CAkey ${word 3,$^} \
+		-CAcreateserial -out $@ -days 365 -sha256
+
+${LETSMT_USERKEY}:
+	mkdir -p ${dir $@}
+	openssl ecparam -out $@ -name prime256v1 -genkey
+	chmod 644 $@
+#	chmod 600 $@
+
+${LETSMT_USERCERT}: ${LETSMT_USERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
+	mkdir -p ${dir $@}
+	openssl req -new -sha256 -key $< -out ${@:.crt=.csr} \
+		-inform PEM -outform PEM \
+		-passin pass:'' -passout pass:'' \
+		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=developers@localhost'
+	openssl x509 -req -in ${@:.crt=.csr} \
+		-CA ${word 2,$^} -CAkey ${word 3,$^} \
+		-CAcreateserial -out $@ -days 365 -sha256
+	chmod 644 $@
+
+###############
+
 
 
 
