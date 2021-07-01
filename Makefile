@@ -33,6 +33,12 @@ all: install
 cert:
 	make -C installation config-openssl
 
+.PHONY: slurm
+slurm:
+	$(MAKE) -C installation -f Makefile.prereqs software-slurm
+	$(MAKE) -C installation config-slurm
+
+
 .PHONY: install install-rr-server
 install install-rr-server:  prepare-target stop-db
 	$(MAKE) $@ -C installation -f Makefile.prereqs

@@ -174,3 +174,8 @@ sudo service slurm-llnl start
 sudo slurmctld -Dvvv
 sudo slurmd -Dvvv
 ```
+
+
+## Links
+
+* https://slurm.schedmd.com/troubleshoot.html
