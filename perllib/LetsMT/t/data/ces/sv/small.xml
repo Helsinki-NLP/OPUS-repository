@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <letsmt version="1.0">
-<s id="1">Systemadministratörshandbok</s>
+<s id="1" conf="0.61" lang="nb">Systemadministratörshandbok</s>
 <s id="2">Det går inte att aktivera en licens med det här serienumret.</s>
 <s id="3">Svara inte på det här meddelandet.</s>
 </letsmt>

@@ -115,7 +115,7 @@ my $response = LetsMT::WebService::get( $algres, uid => $uid );
 $result = LetsMT::WebService::get_resource( $algres, uid => $uid );
 is( $result, 1, "DOWNLOAD sentence alignment file" );
 
-## TODO: mke it easier to test in case we change the default sentence aligner
+## TODO: make it easier to test in case we change the default sentence aligner
 ## now it is hunalign (before it was bisent)
 $algfile = $algres->local_path;
 system( "sed -e 's/ fromDocRev=\"[^\"]*\"//' -e 's/ toDocRev=\"[^\"]*\"//' < $algfile > $algfile.tmp ");
