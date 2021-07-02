@@ -422,7 +422,7 @@ Returns: an XML-formatted string with a content listing.
 
 sub list_storage {
     my ( $result_ref, $pathref, $uid, $rev ) = @_;
-
+    
     $pathref = [ @{$pathref} ];    #make copy so we can modify it
     my $slot = shift( @{$pathref} );
 

@@ -109,6 +109,10 @@ sub _clone{
     my $pwd = getcwd();
     chdir($localgit);
 
+    ## make sure that e-mail and user name are set for the repo
+    &run_cmd( 'git', 'config', 'user.email', $user.'@'.$ENV{LETSMTHOST} );
+    &run_cmd( 'git', 'config', 'user.name', $user );
+
     ## switch to given branch to start with
     &run_cmd( 'git', 'checkout', $branch );
 
@@ -194,6 +198,7 @@ sub commit{
     my $pwd = getcwd();
     chdir($gitpath);
     my $success = &run_cmd( 'git', 'commit', '-am', $message );
+	
     # if ($success){
     # 	$success = &run_cmd( 'git', 'push', 'origin', $user );
     # }
@@ -584,7 +589,7 @@ sub list {
     my %params = @_;
     map { $params{$_} = "" unless ( defined( $params{$_} ) ) }
         qw/ repos dir branch /;
-
+    
     # need owner name to set 'author' attribute
     my $owner = length $params{branch} ? $params{branch}->owner() : 'unknown';
     my @paths = split(/\//,$params{dir});
@@ -623,12 +628,16 @@ sub list {
     ## get listing from git
     my $pwd = getcwd();
     chdir( $repohome );
-    get_logger(__PACKAGE__)->info("git: list $path in $repohome ($revision)");
+    # get_logger(__PACKAGE__)->info("git: list $path in $repohome ($revision)");
+    # get_logger(__PACKAGE__)->info("git ls-tree -lz $revision $path");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'ls-tree',
 					     '-lz',
 					     $revision,
 					     $path );
+    # get_logger(__PACKAGE__)->info("return: $ret ($success)");
+    # get_logger(__PACKAGE__)->info("output: $out");
+    # get_logger(__PACKAGE__)->info("error: $err");
     chdir($pwd);
 
     ## format output

@@ -260,6 +260,8 @@ sub put_file_request {
 
     # Send the request.
     my ($url, $server) = $make_url_ref->( $resource, @_ );
+    # my $res = &user_agent($server)->request( new HTTP::Request( 'PUT', $url ), $file);
+
     my $res = &user_agent($server)->request(
         PUT $url, ## using the HTOOP::Request::Common interface
         Content_Type => 'form-data',
