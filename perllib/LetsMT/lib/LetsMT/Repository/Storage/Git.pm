@@ -628,7 +628,7 @@ sub list {
     ## get listing from git
     my $pwd = getcwd();
     chdir( $repohome );
-    # get_logger(__PACKAGE__)->info("git: list $path in $repohome ($revision)");
+    get_logger(__PACKAGE__)->info("git: list $path in $repohome ($revision)");
     # get_logger(__PACKAGE__)->info("git ls-tree -lz $revision $path");
     my ($success,$ret,$out,$err) = &run_cmd( 'git',
 					     'ls-tree',
