@@ -5,7 +5,7 @@ LetsMT! was a European project on developing an on-line platform for user-tailor
 
 The description of the original software is included in a technical report: [D2.2.pdf](D2.2.pdf)
 
-The document above includes a detailed overview of the LetsMT repository API, command-line tools etc. The basic concepts and most of the components are still the same with some [modifications and updates](Changes.md) that are described in the documentation below. The documentation below is an on-going effort to migrate from the [original project](http://opus.nlpl.eu/letsmt-trac/wiki) with additional tutorials and examples to make it easier to get started with the current version of the software.
+The document above includes a detailed overview of the LetsMT repository API, command-line tools etc. The basic concepts and most of the components are still the same with some [modifications and updates](Changes.md) that are described in the documentation below. The documentation below is an on-going effort to migrate from the [original project](http://opus.nlpl.eu/letsmt-trac) with additional tutorials and examples to make it easier to get started with the current version of the software.
 
 * [Users and Groups](UsersAndGroups.md)
 * [Working with slots](WorkingWithSlots.md)
