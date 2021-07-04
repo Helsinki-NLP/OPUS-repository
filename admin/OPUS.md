@@ -13,6 +13,7 @@ sudo apt-get install git
 git clone https://github.com/Helsinki-NLP/LetsMT-repository.git
 ```
 
+* find your DNS name: `nslookup <IP-ADRESS>
 * install the software
 
 ```
