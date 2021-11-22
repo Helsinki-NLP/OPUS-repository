@@ -159,12 +159,12 @@ sub add_file{
 }
 
 
-sub auto_commit { 
+sub auto_commit {
     $_[0]->{auto_commit} = $_[1] if (defined $_[1]);
     return (defined $_[0]->{auto_commit}) ? $_[0]->{auto_commit} : 1;
 }
 
-sub auto_push { 
+sub auto_push {
     $_[0]->{auto_push} = $_[1] if (defined $_[1]);
     return (defined $_[0]->{auto_push}) ? $_[0]->{auto_push} : 1;
 }
@@ -197,7 +197,21 @@ sub commit{
 
     my $pwd = getcwd();
     chdir($gitpath);
-    my $success = &run_cmd( 'git', 'commit', '-am', $message );
+    # my $success = &run_cmd( 'git', 'commit', '-am', $message );
+    my ($success,$status,$out,$err) = &run_cmd( 'git', 'commit', '-am', $message );
+
+    ## if we cannot commit: try to set e-mail and username
+    unless ($success){
+	my $success = &run_cmd( 'git', 'config', 'user.email', $ENV{LETSMTUSER}.'@'.$ENV{LETSMTHOST} );
+	my $success = &run_cmd( 'git', 'config', 'user.name', $ENV{LETSMTUSER} );
+	my ($success,$status,$out,$err) = &run_cmd( 'git', 'commit', '-am', $message );
+	unless ($success){
+	    get_logger(__PACKAGE__)->debug("git: commit changes returned $success");
+	    get_logger(__PACKAGE__)->debug("git: commit changes returned $status");
+	    get_logger(__PACKAGE__)->debug("git: commit changes returned $out");
+	    get_logger(__PACKAGE__)->debug("git: commit changes returned $err");
+	}
+    }
 	
     # if ($success){
     # 	$success = &run_cmd( 'git', 'push', 'origin', $user );
