@@ -303,6 +303,7 @@ server-software: \
 	software-tokyocabinet \
 	software-tokyotyrant \
 	software-git \
+	/var/www/.gitconfig \
 	software-hunalign \
 	software-chared \
 	software-opennlp \
@@ -311,6 +312,7 @@ server-software: \
 	software-fastalign \
 	software-langid \
 	software-uplug
+
 
 ## fusecompress does not compile and
 ## git is already newer than we need
@@ -501,6 +503,14 @@ software-git: /usr/local/bin/git
 	rm -fr git-${GITVERSION}
 	$@ config --global core.commitGraph true
 	$@ config --global gc.writeCommitGraph true
+
+/var/www/.gitconfig:
+	git config --global core.commitGraph true
+	git config --global gc.writeCommitGraph true
+	echo '[user]'                                     >> /var/www/.gitconfig
+        echo '       email = ${LETSMTUSER}@${LETSMTHOST}' >> /var/www/.gitconfig
+        echo '       name = ${LETSMTUSER}'                >> /var/www/.gitconfig
+
 
 .PHONY: software-udpipe
 software-udpipe: ${PREFIX}/share/UDPipe

@@ -21,6 +21,10 @@ use LetsMT::WebService;
 use LetsMT::Align::Documents;
 
 use Apache::Tika;
+use LWP::UserAgent;
+use HTTP::Request;
+use Encode qw/decode_utf8/;
+
 use IPC::Run qw(run);
 use File::Path;
 use File::Basename qw/dirname basename/;
@@ -51,9 +55,16 @@ sub new {
     ## could also have rawxml here (use rmeta function to get XML output from TIKA)
     # $self{intermediate_format} = 'txt' unless ($self{intermediate_format});
 
-    ## NEW: changed to rawxml - seems better in quality ...
-    $self{intermediate_format} = 'rawxml' unless ($self{intermediate_format});
+    ## OLD: changed to rawxml - seems better in quality ...
+    ## but does not seem to work in the same way with newer ApacheTika servers
+    # $self{intermediate_format} = 'rawxml' unless ($self{intermediate_format});
 
+    ## always use plain text now ....
+    $self{intermediate_format} = 'txt';
+
+    $self{ua} = $self{ua} || LWP::UserAgent->new;
+    $self{url} = $self{url} || 'http://localhost:9998';
+    
     bless \%self, $class;
     return \%self;
 }
@@ -135,10 +146,9 @@ sub convert {
     # document type
     my $type = $self->{type} || $resource->type();
 
-    # read content and parse with TIKA
-    # print STDERR "ApacheTika: read raw file ... ";
-    my $RawContent    = $self->_read_raw_file($resource->local_path);
-    # print STDERR "done\n";
+    ## read content and parse with TIKA
+    ## TODO: avoid to read big files into memory!
+    my $RawContent = $self->_read_raw_file($resource->local_path);
     my $ParsedContent;
 
     ## extract links between languages
@@ -146,22 +156,17 @@ sub convert {
     ## --> is there any generic way of doing it?
     my %translations = ();
     if ($resource->type() eq 'html'){
-	# print STDERR "ApacheTika: find language links ... ";
 	%translations = &extract_language_links($RawContent,$resource->path,$importer->{langlinks});
-	# %translations = _extract_language_links($RawContent,$resource->path,'vnk');
-	# print STDERR "done\n";
     }
 
     ## check whether we want rawxml or text from TIKA
     ## NOTE: extracting meta data seems to be very slow!
+    ## newer ApacheTika (> 1.18) does not seem to work in this way anymore
+    ## TODO: ---> delete this part completely?!
     if ( $self->{intermediate_format} eq 'rawxml' ){
-
-	# print STDERR "ApacheTika: parse document and return rmeta ... ";
 	my $parsed = undef;
 	eval { $parsed = $TIKA->rmeta($RawContent); };
 	$logger->error("ApacheTike could not parse ".$resource->path) if ($@);
-
-	# print STDERR "done!\n";
 	if (ref($parsed) eq 'ARRAY'){
 	    if (ref($$parsed[0]) eq 'HASH'){
 		$ParsedContent = $$parsed[0]{'X-TIKA:content'};
@@ -169,9 +174,25 @@ sub convert {
 	}
     }
     else {
-	# print STDERR "ApacheTika: parse document and return text ... ";
-	$ParsedContent = $TIKA->tika($RawContent);
-	# print STDERR "done!\n";
+	## TODO: Apache::Tika module seems to be broken
+	## ---> just make a request and parse the output
+	##
+	## print STDERR "ApacheTika: parse document and return text ... ";
+	# $ParsedContent = $TIKA->tika($RawContent);
+	## print STDERR "done!\n";
+	my $request = HTTP::Request->new(PUT => $self->{url}.'/tika/main');
+	$request->content($RawContent);
+	## somehow reading from the request does not seem to work
+	## (is that a problem when running in mod_perl?)
+	# my ($fh, $buf);
+	# open $fh, $resource->local_path;
+	# $request->content(sub { return sysread($fh, $buf, 1048576) ? $buf : undef; });
+	my $response = $self->{ua}->request($request);
+	$ParsedContent = decode_utf8($response->decoded_content(charset => 'none'));
+
+	# add empty lines to mark paragraph breaks
+	# TODO: is that a good thing to do in all cases?
+	$ParsedContent=~s/\n/\n\n/gs;
     }
 
     if ($ParsedContent){
@@ -179,7 +200,6 @@ sub convert {
 	## create the intermediate resource
 	my $type_pattern = $self->{type_pattern} || $type;
 	my $tmp_resource = $resource->convert_type( $type_pattern, $self->{intermediate_format} );
-
 	## NEW: decode URLs! (TODO: is it OK to do that for all resources?)
 	## (this breaks with malformed strings)
 	# $tmp_resource->path( &url_decode_utf8($tmp_resource->path) );
@@ -191,13 +211,10 @@ sub convert {
 	}
 
 	File::Path::make_path( $tmp_resource->path_down->local_path );
-
-	# print STDERR "ApacheTika: print converted file content ... ";
 	open F,'>',$tmp_resource->local_path;
 	binmode(F,":utf8");
 	print F $ParsedContent;
 	close F;
-	# print STDERR "done!\n";
 
 	## add pre-processing tools to the importer if necessary
 	foreach ('normalizer', 'splitter', 'tokenizer') {
@@ -207,11 +224,9 @@ sub convert {
 	}
 
 	## convert text to XML with sentence markup
-	# print STDERR "ApacheTika: convert to xml ... ";
 	my $new_resources = $importer->convert_resource( $tmp_resource, $meta_resource );
-	# print STDERR "done!\n";
 
-	## NEW: add meta data about trabslations if they exist (for HTML resources)
+	## NEW: add meta data about translations if they exist (for HTML resources)
 	if (ref($new_resources) eq 'ARRAY' && $resource->type() eq 'html' && %translations){
 	    my @links = ();
 	    foreach (keys %translations){
@@ -222,7 +237,6 @@ sub convert {
 					    language_links => join(',',@links) );
 	}
 	return $new_resources;
-	# return $importer->convert_resource( $tmp_resource, $meta_resource );
     }
     return [];
 }

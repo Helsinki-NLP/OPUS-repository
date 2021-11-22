@@ -15,7 +15,7 @@
 
 NAME="%%SERVICENAME%%"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
-APPDIR="/"
+APPDIR="%%APPDIR%%"
 APPBIN="%%APPBIN%%"
 APPARGS="%%APPARGS%%"
 USER="root"
