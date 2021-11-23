@@ -50,6 +50,7 @@ See
  -N normalizer ... comma-separated chain of text normalizers
  -m mode ......... conversion mode (useful for some import handlers)
  -E e-mail ....... e-mail the resulting bitexts in TMX
+ -R .............. re-import (even if status = imported already)
  -v .............. be verbose
 
  -h .............. show the help text
@@ -82,7 +83,7 @@ use open qw(:std :locale);
 use File::Temp;
 
 use vars qw($opt_a $opt_d $opt_e $opt_f $opt_h $opt_l $opt_L $opt_m $opt_E $opt_N
-    $opt_o $opt_O $opt_p $opt_r $opt_s $opt_S $opt_T $opt_u $opt_v $opt_V);
+    $opt_o $opt_O $opt_p $opt_r $opt_R $opt_s $opt_S $opt_T $opt_u $opt_v $opt_V);
 use Getopt::Std;
 
 use LetsMT;
@@ -93,7 +94,7 @@ use LetsMT::DataProcessing::Tokenizer;
 use LetsMT::DataProcessing::Normalizer;
 use LetsMT::DataProcessing::Splitter;
 
-getopts('ad:E:e:fhl:L:m:N:p:rs:S:T:u:vOoV');
+getopts('ad:E:e:fhl:L:m:N:p:rRs:S:T:u:vOoV');
 
 sub usage {
     use Pod::Usage;
@@ -254,6 +255,7 @@ my $importer = new LetsMT::Import(%args);
 
 print "trying to import $slot/$user/$path ... " if ($opt_v);
 my %para = $opt_E ? ( email => $opt_E ) : ();
+$para{'re-import'}=1 if ($opt_R);
 my $result = $importer->import_resource($resource,%para);
 print $result ? "success\n" : "failed\n" if ($opt_v);
 

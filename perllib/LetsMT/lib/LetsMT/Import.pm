@@ -352,7 +352,7 @@ sub import_resource {
 	$self->{status} .= ' (partially)' if ($self->{countFailed});
 
 	## don't do anything if the resource is alread imported
-	if ($self->{status} eq 'imported'){
+	if (($self->{status} eq 'imported') && (!$args{'re-import'})){
 	    print "resource ".$resource->path." is already imported\n";
 	    return wantarray ? () : 1;
 	}

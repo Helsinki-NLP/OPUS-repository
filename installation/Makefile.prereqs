@@ -218,6 +218,10 @@ install-frontend: install-swap frontend-software install-perlmodules
 install-client install-sge-client: \
 	update-apt-repository install-swap client-software install-perlmodules
 
+# install mailserver
+.PHONY:	install-mail
+install-mail:
+	${APTGET} -qq install sendmail postfix sharutils
 
 # modules for mojolicious webinterface
 .PHONY: install-grenzschnitte
