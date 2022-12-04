@@ -8,7 +8,7 @@ COPY = cp -r --preserve=mode,timestamps
 APACHE_CONF = /etc/apache2
 
 APACHE_TIKA_DIST    = https://archive.apache.org/dist/tika/
-APACHE_TIKA_VERSION = 1.18
+APACHE_TIKA_VERSION = 1.26
 
 
 LETSMT_SSL_HOME    = /etc/ssl
@@ -150,8 +150,6 @@ install-sge-client-targets install-client-targets: \
 	install-diskroot
 	$(MAKE) update-cron-letsmt
 
-
-
 # 	/etc/ssl/${LETSMTHOST}
 
 
@@ -244,6 +242,7 @@ install-apache-tika: /etc/init.d/tika-server
 	sed 	-e 's#%%SERVICENAME%%#ApacheTika#' \
 		-e 's#%%APPSHORTDESCR%%#ApacheTika#' \
 		-e 's#%%APPLONGDESCR%%#Apache Tika#' \
+		-e 's#%%APPDIR%%#$(dir $(shell which java))#' \
 		-e 's#%%APPBIN%%#java#' \
 		-e 's#%%APPARGS%%#-jar $<#' \
 	< service-template > ${notdir $@}
@@ -267,7 +266,8 @@ install-langid-server: /etc/init.d/langid-server
 	sed 	-e 's#%%SERVICENAME%%#ApacheTika#' \
 		-e 's#%%APPSHORTDESCR%%#ApacheTika#' \
 		-e 's#%%APPLONGDESCR%%#Apache Tika#' \
-		-e 's#%%APPBIN%%#$<#' \
+		-e 's#%%APPDIR%%#$(dir $<)#' \
+		-e 's#%%APPBIN%%#$(notdir $<)#' \
 		-e 's#%%APPARGS%%##' \
 	< service-template > ${notdir $@}
 	${INSTALL_BIN} ${notdir $@} $@
@@ -690,6 +690,10 @@ config-mysql:
 ###############
 ## replacing the perl script for openssl setup
 
+refresh-openssl:
+	mv -f ${LETSMT_SSL_DIR} ${LETSMT_SSL_DIR}-${shell date +%F}
+	${MAKE} config-openssl
+
 config-openssl: ${LETSMT_SERVERCERT} ${LETSMT_USERCERT}
 	mkdir -p ${LETSMT_SSL_DIR}/newcerts
 	mkdir -p ${LETSMT_SSL_DIR}/crl
@@ -705,7 +709,7 @@ ${LETSMT_CACERT}: ${LETSMT_CAKEY}
 		-inform PEM -outform PEM \
 		-passin pass:'' -passout pass:'' \
 		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=ca-site'
-	openssl x509 -req -sha256 -days 365 -in ${@:.crt=.csr} -signkey $< -out $@
+	openssl x509 -req -sha256 -days 3650 -in ${@:.crt=.csr} -signkey $< -out $@
 
 ${LETSMT_SERVERKEY}:
 	mkdir -p ${dir $@}
@@ -721,7 +725,7 @@ ${LETSMT_SERVERCERT}: ${LETSMT_SERVERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
 		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=${HOSTNAME}'
 	openssl x509 -req -in ${@:.crt=.csr} \
 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
-		-CAcreateserial -out $@ -days 365 -sha256
+		-CAcreateserial -out $@ -days 3650 -sha256
 
 ${LETSMT_USERKEY}:
 	mkdir -p ${dir $@}
@@ -737,7 +741,7 @@ ${LETSMT_USERCERT}: ${LETSMT_USERKEY} ${LETSMT_CACERT} ${LETSMT_CAKEY}
 		-multivalue-rdn -subj '/C=FI/ST=Helsinki/O=OPUS/OU=OPUS/CN=developers@localhost'
 	openssl x509 -req -in ${@:.crt=.csr} \
 		-CA ${word 2,$^} -CAkey ${word 3,$^} \
-		-CAcreateserial -out $@ -days 365 -sha256
+		-CAcreateserial -out $@ -days 3650 -sha256
 	chmod 644 $@
 
 ###############

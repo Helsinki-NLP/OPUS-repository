@@ -33,6 +33,16 @@ all: install
 cert:
 	make -C installation config-openssl
 
+# Don't forget to set the HOSTNAME if this needs another fully-qualified domain name
+# for example,
+#    sudo make HOSTNAME=vm1637.kaj.pouta.csc.fi refresh-cert
+#    sudo apache2ctl restart
+
+.PHONY: refresh-cert
+refresh-cert:
+	make -C installation refresh-openssl
+
+
 .PHONY: slurm
 slurm:
 	$(MAKE) -C installation -f Makefile.prereqs software-slurm

@@ -1048,8 +1048,11 @@ sub run_make_tmx {
     $input->close();
     $output->close();
 
+    # get_logger(__PACKAGE__)->debug( 'email argument:' . $$args{email} );
+
     ## send the TMX by e-mail if there is an email in the arguments
     if ($$args{email}=~/\S+\@\S+/){
+	get_logger(__PACKAGE__)->debug( 'send mail to:' . $$args{email} );
 	my $msg = MIME::Lite->new(
 	    From    => 'admin@opus.nlpl.eu',
 	    To      => $$args{email},
