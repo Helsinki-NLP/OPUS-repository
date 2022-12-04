@@ -2,6 +2,15 @@ To do as of version 0.56
 ========================
 
 
+Improvements:
+
+* better detection and conversion of character encodings
+  https://pypi.org/project/ftfy/
+  https://github.com/nijel/enca
+  https://pypi.org/project/chardet/
+  
+
+
 High priority:
 
 
